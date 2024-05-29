@@ -1,0 +1,59 @@
+import {Inject, Injectable} from '@angular/core';
+import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
+import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
+import {NavigationEnd, Router} from '@angular/router';
+
+@Injectable({
+	providedIn: 'root'
+})
+export class ConfigurationService {
+	private envConfiguration: Configuration;
+
+	constructor(
+		@Inject(ZCO_CONFIGURATIONS_TOKEN) private readonly configurations: Configuration[],
+		@Inject(WINDOW) private readonly window: Window,
+		private readonly masterLayoutConfig: ObMasterLayoutConfig,
+		private readonly router: Router,
+		private readonly interceptorConfig: ObHttpApiInterceptorConfig
+	) {}
+
+	preInitialize() {
+		this.loadConfigurationForEnv();
+		this.configureMasterLayout();
+		this.configureInterceptor();
+	}
+
+	loadConfigurationForEnv() {
+		const windowLocation = this.window.location.href;
+		const envConfiguration = this.configurations.find(e => e.patterns.find(pattern => windowLocation.search(pattern) >= 0));
+		if (!envConfiguration) {
+			throw new Error(`Environnement non trouvé pour ${windowLocation}!`);
+		}
+		this.envConfiguration = envConfiguration;
+	}
+
+	configureMasterLayout(): void {
+		this.masterLayoutConfig.header.serviceNavigation.returnUrl = this.window.location.href;
+		this.router.events.subscribe(event => {
+			if (event instanceof NavigationEnd) {
+				this.masterLayoutConfig.header.serviceNavigation.returnUrl = this.window.location.href;
+			}
+		});
+
+		this.masterLayoutConfig.homePageRoute = '/home';
+		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = true;
+		this.masterLayoutConfig.header.serviceNavigation.displayLanguages = true;
+		this.masterLayoutConfig.header.serviceNavigation.displayProfile = true;
+		this.masterLayoutConfig.header.serviceNavigation.displayInfo = false;
+		this.masterLayoutConfig.header.serviceNavigation.displayMessage = false;
+		this.masterLayoutConfig.header.serviceNavigation.displayApplications = false;
+	}
+
+	getEnvConfiguration(): Configuration {
+		return this.envConfiguration;
+	}
+
+	private configureInterceptor() {
+		this.interceptorConfig.api.notification.active = false;
+	}
+}

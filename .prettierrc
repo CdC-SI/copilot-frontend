@@ -1,0 +1,23 @@
+{
+	"overrides": [
+		{
+			"files": "*.ts",
+			"options": {
+				"semi": true,
+				"singleQuote": true,
+				"bracketSpacing": false,
+				"useTabs": true,
+				"trailingComma": "none",
+				"arrowParens": "avoid",
+				"endOfLine": "auto"
+			}
+		},
+		{
+			"files": "*.html",
+			"options": {
+				"parser": "angular",
+				"endOfLine": "auto"
+			}
+		}
+	]
+}

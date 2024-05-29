@@ -1,0 +1,22 @@
+@use "@oblique/oblique/styles/scss/core/variables";
+@use "@oblique/oblique/styles/scss/core/palette";
+
+.h100 {
+  height: 100%;
+}
+
+.mr8 {
+  margin-right: 8px;
+}
+
+.mr16 {
+  margin-right: 16px;
+}
+
+.d-grid {
+  display: grid !important;
+}
+
+.zco-highlight-text {
+  font-weight: bold;
+}

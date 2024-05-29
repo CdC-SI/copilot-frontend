@@ -1,0 +1,12 @@
+# Use for DEV environment
+# docker-compose up
+
+version: "3.3"
+services:
+  zas-copilot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: zas-copilot:latest
+    ports:
+      - "4200:4200"
