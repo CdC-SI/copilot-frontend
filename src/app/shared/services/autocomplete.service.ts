@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 @Injectable({
 	providedIn: 'root'
 })
-export class SearchService {
+export class AutocompleteService {
 	constructor(private readonly http: HttpClient) {}
 
 	search(requested: string): Observable<any> {

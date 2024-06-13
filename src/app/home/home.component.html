@@ -2,19 +2,22 @@
 	<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
 </div>
 
-<div *ngFor="let message of messages" class="message">
+<div *ngFor="let message of messages; let last = last" class="message">
 	<div *ngIf="message.fromMe" class="my-message">
-		{{ message.text }}
+		{{ message.message }}
 	</div>
 	<div *ngIf="!message.fromMe" class="ia-message">
 		<div class="h100">
-			<img class="mr16" src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+			<img [ngClass]="last && chatIsSpeaking ? 'clignote' : ''" class="mr16" src="./assets/images/copilot_logo.png" alt="copilot-logo" />
 		</div>
-		<span>{{ message.text }}</span>
+		<div class="flex-column">
+			<markdown [data]="message.message"></markdown>
+			<a style="font-style: italic" class="mt8" *ngIf="!!message.url" [href]="message.url">{{ message.url }}</a>
+		</div>
 	</div>
 </div>
 
-<div class="question-container">
+<form class="question-container" ngForm>
 	<ut-autocomplete-input
 		class="mr8"
 		[required]="false"
@@ -27,11 +30,11 @@
 		(optionSelected)="selectOption($event)"
 	/>
 
-	<button type="button" mat-icon-button [obButton]="'primary'">
+	<button type="submit" mat-icon-button [obButton]="'primary'" (click)="send()">
 		<mat-icon svgIcon="paper-plane"></mat-icon>
 	</button>
 
 	<button type="button" mat-icon-button (click)="clearChat()" [obButton]="'secondary'">
 		<mat-icon svgIcon="trash"></mat-icon>
 	</button>
-</div>
+</form>

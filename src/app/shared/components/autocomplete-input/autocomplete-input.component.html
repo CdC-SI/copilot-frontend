@@ -3,7 +3,7 @@
 	<input #itemFilterInput [formControl]="formControl" type="text" matInput [matAutocomplete]="autoInput" />
 	<mat-autocomplete
 		autoSelectActiveOption="true"
-		autoActiveFirstOption="true"
+		autoActiveFirstOption="false"
 		#autoInput="matAutocomplete"
 		(optionSelected)="fireOptionSelected($event.option.value)"
 		[displayWith]="getProposalLabelFn()"

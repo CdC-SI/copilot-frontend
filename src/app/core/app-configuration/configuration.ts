@@ -24,9 +24,20 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		production: false
 	},
 	{
-		patterns: ['-d.zas.admin.ch'],
+		patterns: ['-d.apps.openshift'],
 		banner: {
 			text: 'DEV'
+		},
+		pamsConfig: {
+			environment: ObEPamsEnvironment.REF,
+			rootUrl: '/pams/'
+		},
+		production: false
+	},
+	{
+		patterns: ['-r.apps.openshift'],
+		banner: {
+			text: 'REF'
 		},
 		pamsConfig: {
 			environment: ObEPamsEnvironment.REF,

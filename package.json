@@ -1,6 +1,6 @@
 {
   "name": "zas-eak-copilot-frontend",
-  "version": "0.0.0",
+  "version": "0.2.0-SNAPSHOT",
   "scripts": {
     "start": "ng serve",
     "build": "ng build",
@@ -26,6 +26,7 @@
     "@popperjs/core": "^2.0.0",
     "angular-oauth2-oidc": "^17.0.0",
     "jwt-decode": "^4.0.0",
+    "ngx-markdown": "17.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
