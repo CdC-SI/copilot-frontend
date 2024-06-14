@@ -17,14 +17,14 @@ export class HomeComponent {
 	chatIsSpeaking = false;
 
 	constructor(
-		private readonly searchService: AutocompleteService,
+		private readonly autocompleteService: AutocompleteService,
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
 		private readonly spinner: ObSpinnerService
 	) {}
 
 	getSearchProposalFunction = (text: string) => {
-		return this.searchService.search(text);
+		return this.autocompleteService.search(text);
 	};
 
 	searchOptionLabelFn = (answer: IAnswer): string => answer?.question;

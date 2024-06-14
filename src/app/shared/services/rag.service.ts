@@ -1,12 +1,13 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {RagRequest} from '../model/rag';
+import { ConfigurationService } from "../../core/app-configuration/configuration.service";
 
 @Injectable({
 	providedIn: 'root'
 })
 export class RagService {
-	constructor(private readonly http: HttpClient) {}
+	constructor(private readonly http: HttpClient, private readonly config: ConfigurationService) {}
 
 	process(ragRequest: RagRequest) {
 		const headers = {
