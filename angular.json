@@ -79,7 +79,7 @@
               "buildTarget": "zas-eak-copilot-frontend:build:production"
             },
             "development": {
-              "buildTarget": "zas-eak-copilot-frontend:build:development"
+              "buildTarget": "zas-eak-copilot-frontend:build:development",
             }
           },
           "defaultConfiguration": "development"

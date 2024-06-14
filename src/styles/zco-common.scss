@@ -2,21 +2,43 @@
 @use "@oblique/oblique/styles/scss/core/palette";
 
 .h100 {
-  height: 100%;
+	height: 100%;
 }
 
 .mr8 {
-  margin-right: 8px;
+	margin-right: 8px;
 }
 
 .mr16 {
-  margin-right: 16px;
+	margin-right: 16px;
+}
+
+.mt8 {
+	margin-top: 8px;
 }
 
 .d-grid {
-  display: grid !important;
+	display: grid !important;
 }
 
 .zco-highlight-text {
-  font-weight: bold;
+	font-weight: bold;
+}
+
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+.clignote  {
+	animation-duration: .8s;
+	animation-name: clignoter;
+	animation-iteration-count: infinite;
+	transition: none;
+}
+
+@keyframes clignoter {
+	0%   { opacity:1; }
+	40%   {opacity:0; }
+	100% { opacity:1; }
 }
