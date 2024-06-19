@@ -23,7 +23,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: 'http://localhost:8207/'
 		},
 		production: false,
-		apiUrl: 'http://localhost:8000'
+		apiUrl: 'http://localhost:8000/apy'
 	},
 	{
 		patterns: ['-d.apps.openshift'],
