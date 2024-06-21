@@ -53,19 +53,19 @@ export class ConfigurationService {
 		return this.envConfiguration;
 	}
 
-	private configureInterceptor() {
-		this.interceptorConfig.api.notification.active = false;
-	}
-
 	ragApi(subPath: string): string {
-		return this.envConfiguration.ragUrl + subPath;
+		return this.envConfiguration.apiUrl + subPath;
 	}
 
 	autocompleteApi(subPath: string): string {
-		return this.envConfiguration.autocompleteUrl + subPath;
+		return this.envConfiguration.apiUrl + subPath;
 	}
 
 	indexingApi(subPath: string): string {
-		return this.envConfiguration.indexingUrl + subPath;
+		return this.envConfiguration.apiUrl + subPath;
+	}
+
+	private configureInterceptor() {
+		this.interceptorConfig.api.notification.active = false;
 	}
 }

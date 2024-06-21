@@ -7,9 +7,7 @@ export interface Configuration {
 	banner: ObIBanner;
 	patterns: string[];
 	pamsConfig?: ObIPamsConfiguration;
-	ragUrl?:string;
-	autocompleteUrl?:string;
-	indexingUrl?:string;
+	apiUrl?:string;
 }
 
 export const ZCO_CONFIGURATIONS_TOKEN = new InjectionToken('zco-configuration');
@@ -25,9 +23,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: 'http://localhost:8207/'
 		},
 		production: false,
-		ragUrl: 'http://localhost:8010',
-		indexingUrl: 'http://localhost:8011',
-		autocompleteUrl: 'http://localhost:8000'
+		apiUrl: 'http://localhost:8000/apy'
 	},
 	{
 		patterns: ['-d.apps.openshift'],

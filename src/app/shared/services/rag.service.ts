@@ -14,6 +14,6 @@ export class RagService {
 			'Content-Type': 'application/json',
 			Accept: 'text/event-stream'
 		};
-		return this.http.post(this.config.ragApi('/rag/process'), ragRequest, {headers, reportProgress: true, observe: 'events', responseType: 'text'});
+		return this.http.post(this.config.ragApi('/rag/query'), ragRequest, {headers, reportProgress: true, observe: 'events', responseType: 'text'});
 	}
 }
