@@ -7,7 +7,7 @@ export interface Configuration {
 	banner: ObIBanner;
 	patterns: string[];
 	pamsConfig?: ObIPamsConfiguration;
-	apiUrl?:string;
+	apiUrl?: string;
 }
 
 export const ZCO_CONFIGURATIONS_TOKEN = new InjectionToken('zco-configuration');
@@ -34,7 +34,8 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			environment: ObEPamsEnvironment.REF,
 			rootUrl: '/pams/'
 		},
-		production: false
+		production: false,
+		apiUrl: '/apy'
 	},
 	{
 		patterns: ['-r.apps.openshift'],
@@ -45,6 +46,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			environment: ObEPamsEnvironment.REF,
 			rootUrl: '/pams/'
 		},
-		production: false
+		production: false,
+		apiUrl: '/apy'
 	}
 ];
