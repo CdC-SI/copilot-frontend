@@ -1,4 +1,23 @@
 {
   "enter.message": "Nachricht eingeben",
-  "home": "Homepage"
+  "home": "Homepage",
+  "admin": "Adminbereich",
+  "admin.add.item": "Element hinzufügen",
+  "admin.add.item.confirm": "Hinzufügen bestätigen",
+  "llm.message.edit": "Antwort bearbeiten",
+  "llm.message.upvote": "Gute Antwort",
+  "llm.message.downvote": "Schlechte Antwort",
+  "llm.message.audio": "Laut vorlesen",
+  "faq.item.add": "Frage/Antwort hinzufügen",
+  "faq.item.question": "Frage",
+  "faq.item.answer": "Antwort",
+  "faq.item.source": "Quellen-URL",
+  "faq.item.language": "Sprache",
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen",
+  "return": "Zurück",
+  "fr": "Französisch",
+  "en": "Englisch",
+  "de": "Deutsch",
+  "it": "Italienisch"
 }

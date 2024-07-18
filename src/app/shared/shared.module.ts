@@ -8,9 +8,10 @@ import {TranslateModule, TranslatePipe} from '@ngx-translate/core';
 import {HighlightTextPipe} from './pipes/highlight-text.pipe';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MarkdownModule} from 'ngx-markdown';
+import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
 
 @NgModule({
-	declarations: [AutocompleteInputComponent],
+	declarations: [AutocompleteInputComponent, ConfirmDialogComponent],
 	imports: [CommonModule, FormsModule, ReactiveFormsModule, ObliqueModule, MaterialModule, TranslateModule, BrowserAnimationsModule, MarkdownModule.forRoot()],
 	exports: [
 		CommonModule,
@@ -21,7 +22,8 @@ import {MarkdownModule} from 'ngx-markdown';
 		AutocompleteInputComponent,
 		TranslateModule,
 		BrowserAnimationsModule,
-		MarkdownModule
+		MarkdownModule,
+		ConfirmDialogComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

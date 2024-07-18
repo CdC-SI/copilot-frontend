@@ -1,28 +1,41 @@
-import {ChangeDetectorRef, Component} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {AutocompleteService} from '../shared/services/autocomplete.service';
 import {FormControl} from '@angular/forms';
 import {IAnswer} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {ChatMessage} from '../shared/services/chat-message';
+import {ChatMessage, ChatMessageSource} from '../shared/services/chat-message';
 import {ObSpinnerService} from '@oblique/oblique';
+import {Router} from '@angular/router';
+import {AdminService} from '../shared/services/admin.service';
+import {TranslateService} from '@ngx-translate/core';
+import {SpeechService} from '../shared/services/speech.service';
 
 @Component({
 	selector: 'zco-home',
 	templateUrl: './home.component.html',
 	styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 	searchCtrl = new FormControl();
 	messages: ChatMessage[] = [];
 	chatIsSpeaking = false;
+
+	protected readonly ChatMessageSource = ChatMessageSource;
 
 	constructor(
 		private readonly autocompleteService: AutocompleteService,
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
-		private readonly spinner: ObSpinnerService
+		private readonly spinner: ObSpinnerService,
+		private readonly router: Router,
+		private readonly adminService: AdminService,
+		private readonly translateService: TranslateService,
+		private readonly speechService: SpeechService
 	) {}
 
+	ngOnInit() {
+		speechSynthesis.cancel();
+	}
 	getSearchProposalFunction = (text: string) => {
 		return this.autocompleteService.search(text);
 	};
@@ -30,8 +43,8 @@ export class HomeComponent {
 	searchOptionLabelFn = (answer: IAnswer): string => answer?.question;
 
 	selectOption($event: IAnswer) {
-		this.messages.push({message: $event.question, fromMe: true, timestamp: new Date()});
-		this.messages.push({message: $event.answer, fromMe: false, url: $event.url, timestamp: new Date()});
+		this.messages.push({message: $event.question, source: ChatMessageSource.USER, timestamp: new Date(), lang: $event.language});
+		this.messages.push({message: $event.answer, source: ChatMessageSource.FAQ, url: $event.url, timestamp: new Date(), lang: $event.language});
 		this.searchCtrl.setValue('');
 		this.scrollToBottom();
 	}
@@ -47,10 +60,34 @@ export class HomeComponent {
 		this.messages = [];
 	}
 
+	editLLMAnswer() {
+		const question = this.messages[this.messages.length - 2].message;
+		const answer = this.messages[this.messages.length - 1].message;
+		const url = this.messages[this.messages.length - 1].url;
+		const language = this.translateService.currentLang;
+		this.adminService.setLlmAnswerToInsert({question, answer, url, language});
+		void this.router.navigate(['/admin']);
+	}
+
+	speak(message: ChatMessage) {
+		speechSynthesis.cancel();
+		if (!message.beingSpoken) {
+			message.beingSpoken = true;
+			const speech = new SpeechSynthesisUtterance();
+			speech.text = message.message;
+			speech.rate = 1.5;
+			speech.pitch = 1;
+			speech.voice = this.speechService.getVoice(message.lang || this.translateService.currentLang);
+			speechSynthesis.speak(speech);
+		} else {
+			message.beingSpoken = false;
+		}
+	}
+
 	send() {
 		this.chatIsSpeaking = true;
-		this.messages.push({message: this.searchCtrl.value, fromMe: true, timestamp: new Date()});
-		this.messages.push({message: '', fromMe: false, timestamp: new Date()});
+		this.messages.push({message: this.searchCtrl.value, source: ChatMessageSource.USER, timestamp: new Date()});
+		this.messages.push({message: '', source: ChatMessageSource.LLM, timestamp: new Date()});
 		this.ragService.process({query: this.searchCtrl.value}).subscribe((event: any) => {
 			this.searchCtrl.setValue('');
 			this.spinner.deactivate();

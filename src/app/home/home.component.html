@@ -3,16 +3,28 @@
 </div>
 
 <div *ngFor="let message of messages; let last = last" class="message">
-	<div *ngIf="message.fromMe" class="my-message">
+	<div *ngIf="message.source === ChatMessageSource.USER" class="my-message">
 		{{ message.message }}
 	</div>
-	<div *ngIf="!message.fromMe" class="ia-message">
+	<div *ngIf="message.source !== ChatMessageSource.USER" class="ia-message">
 		<div class="h100">
-			<img [ngClass]="last && chatIsSpeaking ? 'clignote' : ''" class="mr16" src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+			<img [ngClass]="last && chatIsSpeaking ? 'blink' : ''" class="mr16" src="./assets/images/copilot_logo.png" alt="copilot-logo" />
 		</div>
 		<div class="flex-column">
 			<markdown [data]="message.message"></markdown>
-			<a style="font-style: italic" class="mt8" *ngIf="!!message.url" [href]="message.url">{{ message.url }}</a>
+			<a style="font-style: italic" class="mt4 mb4" *ngIf="!!message.url" [href]="message.url">{{ message.url }}</a>
+			<p class="llm-message-actions" *ngIf="!chatIsSpeaking">
+				<mat-icon class="llm-message-action" [matTooltip]="'llm.message.edit' | translate" [svgIcon]="'pen'" (click)="editLLMAnswer()"></mat-icon>
+				<mat-icon class="llm-message-action" [matTooltip]="'llm.message.upvote' | translate" [svgIcon]="'thumbs-up'"></mat-icon>
+				<mat-icon class="llm-message-action" [matTooltip]="'llm.message.downvote' | translate" [svgIcon]="'thumbs-down'"></mat-icon>
+				<mat-icon
+					class="llm-message-action"
+					[matTooltip]="'llm.message.audio' | translate"
+					[svgIcon]="'audio'"
+					[color]="message.beingSpoken ? 'warn' : 'primary'"
+					(click)="speak(message)"
+				></mat-icon>
+			</p>
 		</div>
 	</div>
 </div>

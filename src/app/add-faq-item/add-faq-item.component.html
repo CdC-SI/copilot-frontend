@@ -1,0 +1,27 @@
+<form [formGroup]="faqItemFrmGrp">
+	<h4>{{ "faq.item.add" | translate }}</h4>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "faq.item.question" | translate }}</mat-label>
+		<input [formControlName]="FORM_FIELDS.QUESTION" name="question" type="text" matInput placeholder="" />
+		<mat-error></mat-error>
+	</mat-form-field>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "faq.item.answer" | translate }}</mat-label>
+		<input [formControlName]="FORM_FIELDS.ANSWER" name="answer" type="text" matInput placeholder="" />
+		<mat-error></mat-error>
+	</mat-form-field>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "faq.item.source" | translate }}</mat-label>
+		<input [formControlName]="FORM_FIELDS.SOURCE" name="source" type="text" matInput placeholder="" />
+		<mat-error></mat-error>
+	</mat-form-field>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "faq.item.language" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.LANGUAGE">
+			<mat-option *ngFor="let language of languages" [value]="language">
+				{{ language | translate }}
+			</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+</form>

@@ -13,6 +13,14 @@
 	margin-right: 16px;
 }
 
+.mt4 {
+	margin-top: 4px;
+}
+
+.mb4 {
+	margin-bottom: 4px;
+}
+
 .mt8 {
 	margin-top: 8px;
 }
@@ -30,14 +38,14 @@
 	flex-direction: column;
 }
 
-.clignote  {
+.blink  {
 	animation-duration: .8s;
-	animation-name: clignoter;
+	animation-name: blink;
 	animation-iteration-count: infinite;
 	transition: none;
 }
 
-@keyframes clignoter {
+@keyframes blink {
 	0%   { opacity:1; }
 	40%   {opacity:0; }
 	100% { opacity:1; }

@@ -1,0 +1,17 @@
+<div class="mb16" mat-dialog-title>{{ this.data.title | translate }}</div>
+
+<div mat-dialog-content [hidden]="!this.data.content">
+	<ob-alert [type]="this.type" [hidden]="!this.data.content">
+		{{ this.data.content | translate }}
+	</ob-alert>
+</div>
+<div mat-dialog-actions>
+	<button mat-button [obButton]="'tertiary'" (click)="onReturnClick()">
+		<mat-icon svgIcon="cancel"></mat-icon>
+		{{ "return" | translate }}
+	</button>
+	<button mat-button [obButton]="'primary'" (click)="onConfirmClick()">
+		<mat-icon svgIcon="checkmark"></mat-icon>
+		{{ "confirm" | translate }}
+	</button>
+</div>
