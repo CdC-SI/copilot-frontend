@@ -1,7 +1,3 @@
-@use "src/styles/ut-common";
-@use "src/styles/ut-form";
-@use "@oblique/oblique/styles/scss/core/variables";
-
 :host {
   div[mat-dialog-actions] {
     display: flex;
