@@ -43,8 +43,15 @@ export class HomeComponent implements OnInit {
 	searchOptionLabelFn = (answer: IAnswer): string => answer?.question;
 
 	selectOption($event: IAnswer) {
-		this.messages.push({message: $event.question, source: ChatMessageSource.USER, timestamp: new Date(), lang: $event.language});
-		this.messages.push({message: $event.answer, source: ChatMessageSource.FAQ, url: $event.url, timestamp: new Date(), lang: $event.language});
+		this.messages.push({faqItemId: $event.id, message: $event.question, source: ChatMessageSource.USER, timestamp: new Date(), lang: $event.language});
+		this.messages.push({
+			faqItemId: $event.id,
+			message: $event.answer,
+			source: ChatMessageSource.FAQ,
+			url: $event.url,
+			timestamp: new Date(),
+			lang: $event.language
+		});
 		this.searchCtrl.setValue('');
 		this.scrollToBottom();
 	}
@@ -61,11 +68,10 @@ export class HomeComponent implements OnInit {
 	}
 
 	editLLMAnswer() {
-		const question = this.messages[this.messages.length - 2].message;
-		const answer = this.messages[this.messages.length - 1].message;
-		const url = this.messages[this.messages.length - 1].url;
+		const question = this.messages[this.messages.length - 2];
+		const answer = this.messages[this.messages.length - 1];
 		const language = this.translateService.currentLang;
-		this.adminService.setLlmAnswerToInsert({question, answer, url, language});
+		this.adminService.setLlmAnswerToInsert({id: answer.faqItemId, question: question.message, answer: answer.message, url: answer.url, language});
 		void this.router.navigate(['/admin']);
 	}
 

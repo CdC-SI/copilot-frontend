@@ -1,5 +1,5 @@
 <form [formGroup]="faqItemFrmGrp">
-	<h4>{{ "faq.item.add" | translate }}</h4>
+	<h4>{{ (editMode ? "faq.item.edit" : "faq.item.add") | translate }}</h4>
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "faq.item.question" | translate }}</mat-label>
 		<input [formControlName]="FORM_FIELDS.QUESTION" name="question" type="text" matInput placeholder="" />
@@ -7,7 +7,7 @@
 	</mat-form-field>
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "faq.item.answer" | translate }}</mat-label>
-		<input [formControlName]="FORM_FIELDS.ANSWER" name="answer" type="text" matInput placeholder="" />
+		<textarea [formControlName]="FORM_FIELDS.ANSWER" name="answer" matInput placeholder=""></textarea>
 		<mat-error></mat-error>
 	</mat-form-field>
 	<mat-form-field obErrorMessages>

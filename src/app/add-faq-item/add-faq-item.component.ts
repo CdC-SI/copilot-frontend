@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
 import {FaqItemFields, IFaqItem} from '../shared/model/faq';
@@ -27,6 +27,7 @@ export class AddFaqItemComponent implements ControlValueAccessor, Validator, OnI
 	faqItemFrmGrp: FormGroup;
 	destroyed$ = new Subject<void | null>();
 	languages = ['de', 'fr', 'it', 'en'];
+	@Input() editMode: boolean;
 
 	constructor(
 		private readonly fb: FormBuilder,
@@ -34,6 +35,7 @@ export class AddFaqItemComponent implements ControlValueAccessor, Validator, OnI
 	) {}
 	ngOnInit(): void {
 		this.faqItemFrmGrp = this.fb.group({
+			[FaqItemFields.ID]: [''],
 			[FaqItemFields.QUESTION]: ['', Validators.required],
 			[FaqItemFields.ANSWER]: ['', Validators.required],
 			[FaqItemFields.SOURCE]: ['', Validators.required],

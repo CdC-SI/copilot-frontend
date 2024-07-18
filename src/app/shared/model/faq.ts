@@ -1,4 +1,5 @@
 export enum FaqItemFields {
+	ID = 'id',
 	QUESTION = 'question',
 	ANSWER = 'answer',
 	SOURCE = 'url',
@@ -6,6 +7,7 @@ export enum FaqItemFields {
 }
 
 export interface IFaqItem {
+	id?: number;
 	question: string;
 	answer: string;
 	url: string;

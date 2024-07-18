@@ -5,6 +5,7 @@ import {AdminService} from '../shared/services/admin.service';
 import {Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../shared/components/confirm-dialog/confirm-dialog.component';
+import {ObNotificationService} from '@oblique/oblique';
 
 @Component({
 	selector: 'zco-admin',
@@ -14,12 +15,14 @@ import {ConfirmDialogComponent} from '../shared/components/confirm-dialog/confir
 export class AdminComponent implements OnInit {
 	addFaqItemFormGrp: FormGroup;
 	faqItem: IFaqItem;
+	faqEditMode = false;
 
 	constructor(
 		private readonly fb: FormBuilder,
 		private readonly adminService: AdminService,
 		private readonly router: Router,
-		private readonly dialog: MatDialog
+		private readonly dialog: MatDialog,
+		private readonly notifService: ObNotificationService
 	) {}
 
 	ngOnInit(): void {
@@ -30,6 +33,7 @@ export class AdminComponent implements OnInit {
 
 		const llmAnswerToInsert = this.adminService.getLlmAnswerToInsert();
 		if (llmAnswerToInsert) {
+			if (llmAnswerToInsert.id) this.faqEditMode = true;
 			this.addFaqItemFormGrp.patchValue({faqItem: llmAnswerToInsert});
 		}
 	}
@@ -45,17 +49,23 @@ export class AdminComponent implements OnInit {
 		this.dialog
 			.open(ConfirmDialogComponent, {
 				data: {
-					title: 'admin.add.item',
-					content: 'admin.add.item.confirm',
+					title: this.faqEditMode ? 'admin.edit.item' : 'admin.add.item',
+					content: this.faqEditMode ? 'admin.edit.item.confirm' : 'admin.add.item.confirm',
 					type: 'warning'
 				}
 			})
 			.afterClosed()
 			.subscribe((result: boolean) => {
 				if (result) {
-					this.adminService.addFaqItem(this.faqItem).subscribe(() => {
-						this.adminService.setLlmAnswerToInsert(null);
-						this.addFaqItemFormGrp.reset();
+					this.adminService.addFaqItem(this.faqItem).subscribe({
+						next: () => {
+							this.adminService.setLlmAnswerToInsert(null);
+							this.addFaqItemFormGrp.reset();
+							this.notifService.success('admin.add.item.success');
+						},
+						error: () => {
+							this.notifService.error('admin.add.item.error');
+						}
 					});
 				}
 			});

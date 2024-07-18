@@ -1,7 +1,7 @@
 export interface IAnswer {
 	answer?: string;
 	created_at: Date;
-	id: number;
+	id?: number;
 	language: Language;
 	modified_at: Date;
 	question: string;

@@ -1,4 +1,5 @@
 export interface ChatMessage {
+	faqItemId?: number;
 	message?: string;
 	source: ChatMessageSource;
 	timestamp: Date;

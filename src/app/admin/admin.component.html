@@ -1,5 +1,5 @@
 <form [formGroup]="addFaqItemFormGrp">
-	<zco-add-faq-item formControlName="faqItem"></zco-add-faq-item>
+	<zco-add-faq-item [editMode]="faqEditMode" formControlName="faqItem"></zco-add-faq-item>
 	<div>
 		<button mat-button type="button" (click)="cancel()" [obButton]="'secondary'">
 			<mat-icon svgIcon="cancel"></mat-icon>
@@ -7,7 +7,7 @@
 		</button>
 		<button mat-button [obButton]="'primary'" (click)="submit()" [disabled]="!addFaqItemFormGrp.valid">
 			<mat-icon svgIcon="checkmark"></mat-icon>
-			{{ "confirm" | translate }}
+			{{ (faqEditMode ? "edit" : "add") | translate }}
 		</button>
 	</div>
 </form>
