@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {AutocompleteService} from '../shared/services/autocomplete.service';
 import {FormControl} from '@angular/forms';
-import {IAnswer} from '../shared/model/answer';
+import {IQuestion} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
 import {ChatMessage, ChatMessageSource} from '../shared/services/chat-message';
 import {ObSpinnerService} from '@oblique/oblique';
@@ -40,13 +40,13 @@ export class HomeComponent implements OnInit {
 		return this.autocompleteService.search(text);
 	};
 
-	searchOptionLabelFn = (answer: IAnswer): string => answer?.question;
+	searchOptionLabelFn = (question: IQuestion): string => question?.text;
 
-	selectOption($event: IAnswer) {
-		this.messages.push({faqItemId: $event.id, message: $event.question, source: ChatMessageSource.USER, timestamp: new Date(), lang: $event.language});
+	selectOption($event: IQuestion) {
+		this.messages.push({faqItemId: $event.id, message: $event.text, source: ChatMessageSource.USER, timestamp: new Date(), lang: $event.language});
 		this.messages.push({
 			faqItemId: $event.id,
-			message: $event.answer,
+			message: $event.answer.text,
 			source: ChatMessageSource.FAQ,
 			url: $event.url,
 			timestamp: new Date(),
