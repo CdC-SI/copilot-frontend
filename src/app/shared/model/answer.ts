@@ -1,10 +1,14 @@
-export interface IAnswer {
-	answer?: string;
-	created_at: Date;
-	id: number;
+export interface IQuestion {
+	id?: number;
 	language: Language;
-	modified_at: Date;
-	question: string;
+	text: string;
+	url: string;
+	answer?: IAnswer;
+}
+
+export interface IAnswer {
+	language: Language;
+	text: string;
 	url: string;
 }
 

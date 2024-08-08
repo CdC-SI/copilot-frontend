@@ -50,6 +50,17 @@
     }
   }
 
+  .llm-message-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100px;
+  }
+
+  .llm-message-actions {
+	cursor: pointer;
+  }
+
   .question-container {
     background: #ffffff;
     position: fixed;

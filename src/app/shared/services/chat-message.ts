@@ -1,6 +1,15 @@
 export interface ChatMessage {
+	faqItemId?: number;
 	message?: string;
-	fromMe: boolean;
+	source: ChatMessageSource;
 	timestamp: Date;
 	url?: string;
+	beingSpoken?: boolean;
+	lang?: string;
+}
+
+export enum ChatMessageSource {
+	USER = 'USER',
+	LLM = 'LLM',
+	FAQ = 'FAQ'
 }

@@ -23,6 +23,8 @@ import {HomeComponent} from './home/home.component';
 import {ConfigurationService} from './core/app-configuration/configuration.service';
 import {ZCO_CONFIGURATIONS, ZCO_CONFIGURATIONS_TOKEN} from './core/app-configuration/configuration';
 import {SharedModule} from './shared/shared.module';
+import {AdminComponent} from './admin/admin.component';
+import {AddFaqItemComponent} from './add-faq-item/add-faq-item.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -37,7 +39,7 @@ function bannerFactory(configurationService: ConfigurationService) {
 }
 
 @NgModule({
-	declarations: [AppComponent, HomeComponent],
+	declarations: [AppComponent, HomeComponent, AdminComponent, AddFaqItemComponent],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
