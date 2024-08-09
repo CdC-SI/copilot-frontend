@@ -1,6 +1,6 @@
 export enum FaqItemFields {
 	ID = 'id',
-	QUESTION = 'question',
+	QUESTION = 'text',
 	ANSWER = 'answer',
 	SOURCE = 'url',
 	LANGUAGE = 'language'
