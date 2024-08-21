@@ -71,7 +71,7 @@ export class HomeComponent implements OnInit {
 		const question = this.messages[this.messages.length - 2];
 		const answer = this.messages[this.messages.length - 1];
 		const language = this.translateService.currentLang;
-		this.adminService.setLlmAnswerToInsert({id: answer.faqItemId, question: question.message, answer: answer.message, url: answer.url, language});
+		this.adminService.setLlmAnswerToInsert({id: answer.faqItemId, text: question.message, answer: answer.message, url: answer.url, language});
 		void this.router.navigate(['/admin']);
 	}
 

@@ -12,6 +12,9 @@ export class HighlightTextPipe implements PipeTransform {
 	 * It sets a span with the class ut-highlight-text surrounding the text to highlight
 	 */
 	transform(originalText: string, textToHighligh: string): string {
+		if (!originalText) {
+			return '';
+		}
 		const highlightedText = originalText.replace(new RegExp(textToHighligh, 'gi'), str => `<span class="zco-highlight-text">${str}</span>`);
 		return `<span>${highlightedText}</span>`;
 	}
