@@ -1,0 +1,10 @@
+<div *ngIf="message.source === ChatMessageSource.USER">
+	{{ message.message }}
+</div>
+<div *ngIf="message.source !== ChatMessageSource.USER">
+	<div class="flex-column">
+		<markdown [data]="message.message"></markdown>
+		<a class="mt4 mb4" *ngIf="!!message.url" [href]="message.url">{{ message.url }}</a>
+		<zco-message-action [hidden]="message.beingSpoken" [message]="message" [previousMessage]="previousMessage"></zco-message-action>
+	</div>
+</div>

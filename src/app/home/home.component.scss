@@ -1,83 +1,74 @@
 @use '@oblique/oblique/styles/scss/core/variables';
+@use '@oblique/oblique/styles/scss/core/palette';
 @use '@oblique/oblique/styles/scss/core/mixins/layout';
 
 :host {
-  height: 100%;
-  display: flex;
-  padding-left: 20vw;
-  padding-right: 20vw;
-  margin-bottom: 15vh;
-  flex-direction: column;
-  align-items: center;
+	height: 100%;
+	display: flex;
+	padding-left: 20vw;
+	padding-right: 20vw;
+	margin-bottom: 15vh;
+	flex-direction: column;
+	align-items: center;
 
-  .logo {
-    opacity: 0.2;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+	.logo {
+		opacity: 0.2;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 
-    img {
-      width: 300px;
-    }
-  }
+		img {
+			width: 300px;
+		}
+	}
 
-  .message {
-    width: 100%;
-    display: grid;
-    flex-direction: column;
-  }
+	.ia-avatar {
+		width: 20px;
+		height: fit-content;
+	}
 
-  .my-message {
-    border-radius: 1.5rem;
-    padding: 16px;
-    background: variables.$ob-gray-extra-light;
-    max-width: 48%;
-    justify-self: end;
-    margin-top: 16px;
-    margin-bottom: 16px
-  }
+	.message {
+		width: 100%;
+		display: grid;
+		flex-direction: column;
+	}
 
-  .ia-message {
-    display: flex;
-    width: 100%;
-    justify-self: start;
-    margin-top: 16px;
-    margin-bottom: 16px;
+	.my-message {
+		border-radius: 1.5rem;
+		padding: 16px;
+		background: palette.$ob-white;
+		max-width: 48%;
+		justify-self: end;
+		margin-top: 16px;
+		margin-bottom: 16px
+	}
 
-    img {
-      width: 20px;
-    }
-  }
+	.ia-message {
+		display: flex;
+		width: 100%;
+		justify-self: start;
+		margin-top: 16px;
+		margin-bottom: 16px;
+	}
 
-  .llm-message-actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100px;
-  }
+	.question-container {
+		background-color: palette.$ob-secondary-50;
+		position: fixed;
+		bottom: 0;
+		padding-bottom: 10vh;
+		padding-right: 20vw;
+		padding-left: 20vw;
+		margin-right: 16px;
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
 
-  .llm-message-actions {
-	cursor: pointer;
-  }
-
-  .question-container {
-    background: #ffffff;
-    position: fixed;
-    bottom: 0;
-    padding-bottom: 10vh;
-    padding-right: 20vw;
-    padding-left: 20vw;
-    margin-right: 16px;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    button {
-      margin-bottom: 20px;
-      margin-right: 4px;
-      margin-left: 4px;
-    }
-  }
+		button {
+			margin-bottom: 20px;
+			margin-right: 4px;
+			margin-left: 4px;
+		}
+	}
 }

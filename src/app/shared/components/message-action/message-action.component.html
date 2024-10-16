@@ -1,0 +1,21 @@
+<mat-icon class="llm-message-action" [matTooltip]="'edit.answer' | translate" [svgIcon]="'pen'" (click)="openFaqItemDialog()"></mat-icon>
+<mat-icon class="llm-message-action" [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs-up'"></mat-icon>
+<mat-icon class="llm-message-action" [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs-down'"></mat-icon>
+<mat-icon class="llm-message-action" [matTooltip]="'read.aloud' | translate" [svgIcon]="'audio'" (click)="speak()"></mat-icon>
+
+<ng-template #addFaqItemDialog>
+	<h4 mat-dialog-title>{{ "edit.question.answer" | translate }}</h4>
+	<div mat-dialog-content class="mt16" ngForm>
+		<zco-faq-item-edit class="mt16" [formControl]="faqItemFrmCtrl"></zco-faq-item-edit>
+	</div>
+	<div mat-dialog-actions>
+		<button class="red-button" mat-button [obButton]="'secondary'" matDialogClose>
+			<mat-icon svgIcon="cancel"></mat-icon>
+			{{ "cancel" | translate }}
+		</button>
+		<button mat-button [obButton]="'primary'" [mat-dialog-close]="true">
+			<mat-icon svgIcon="checkmark"></mat-icon>
+			{{ "confirm" | translate }}
+		</button>
+	</div>
+</ng-template>

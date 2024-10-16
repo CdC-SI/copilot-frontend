@@ -80,6 +80,7 @@
             },
             "development": {
               "buildTarget": "zas-eak-copilot-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

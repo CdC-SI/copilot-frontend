@@ -1,0 +1,12 @@
+@use '@oblique/oblique/styles/scss/core/variables';
+@use '@oblique/oblique/styles/scss/core/mixins/layout';
+
+.message {
+	width: 100%;
+	display: grid;
+	flex-direction: column;
+}
+
+a {
+	font-style: italic;
+}
