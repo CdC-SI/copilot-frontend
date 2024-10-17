@@ -1,8 +1,0 @@
-{
-  "/apy": {
-    "target": "https://copilot-d.apps.openshift-d.mgnt.zas.admin.ch",
-    "secure": false,
-    "changeOrigin": true,
-    "logLevel": "debug"
-  }
-}
