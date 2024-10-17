@@ -17,8 +17,24 @@
 	margin-top: 4px;
 }
 
+.mt16 {
+	margin-top: 16px !important;
+}
+
+.mt8 {
+	margin-top: 8px;
+}
+
 .mb4 {
 	margin-bottom: 4px;
+}
+
+.mb32 {
+	margin-bottom: 32px;
+}
+
+.mb16 {
+	margin-bottom: 16px;
 }
 
 .mt8 {
@@ -38,6 +54,11 @@
 	flex-direction: column;
 }
 
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+
 .blink  {
 	animation-duration: .8s;
 	animation-name: blink;
@@ -49,4 +70,15 @@
 	0%   { opacity:1; }
 	40%   {opacity:0; }
 	100% { opacity:1; }
+}
+
+main#content {
+	background-color: palette.$ob-secondary-50
+}
+
+.mdc-dialog__title {
+	font-size: 24px !important;
+	&::before {
+		display: none !important;
+	}
 }

@@ -1,0 +1,20 @@
+@use '@oblique/oblique/styles/scss/core/variables';
+@use '@oblique/oblique/styles/scss/core/mixins/layout';
+
+:host {
+	display: flex;
+	flex: 1;
+	width: 100%;
+	flex-direction: row;
+
+	mat-icon {
+		padding: 4px;
+		font-size: 24px;
+
+		&:hover {
+			cursor: pointer;
+			background: variables.$ob-gray-dark;
+			color: white;
+		}
+	}
+}

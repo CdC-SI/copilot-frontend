@@ -41,9 +41,9 @@ export class ConfigurationService {
 		});
 
 		this.masterLayoutConfig.homePageRoute = '/home';
-		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = true;
+		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayLanguages = true;
-		this.masterLayoutConfig.header.serviceNavigation.displayProfile = true;
+		this.masterLayoutConfig.header.serviceNavigation.displayProfile = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayInfo = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayMessage = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayApplications = false;
@@ -66,6 +66,7 @@ export class ConfigurationService {
 	}
 
 	private configureInterceptor() {
+		this.interceptorConfig.api.spinner = false;
 		this.interceptorConfig.api.notification.active = false;
 	}
 }

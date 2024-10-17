@@ -9,9 +9,12 @@ import {HighlightTextPipe} from './pipes/highlight-text.pipe';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MarkdownModule} from 'ngx-markdown';
 import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
+import {ChatMessageComponent} from './components/chat-message/chat-message.component';
+import {MessageActionComponent} from './components/message-action/message-action.component';
+import {FaqItemEditComponent} from './components/faq-item-edit/faq-item-edit.component';
 
 @NgModule({
-	declarations: [AutocompleteInputComponent, ConfirmDialogComponent],
+	declarations: [AutocompleteInputComponent, ConfirmDialogComponent, ChatMessageComponent, MessageActionComponent, FaqItemEditComponent],
 	imports: [CommonModule, FormsModule, ReactiveFormsModule, ObliqueModule, MaterialModule, TranslateModule, BrowserAnimationsModule, MarkdownModule.forRoot()],
 	exports: [
 		CommonModule,
@@ -23,7 +26,9 @@ import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog
 		TranslateModule,
 		BrowserAnimationsModule,
 		MarkdownModule,
-		ConfirmDialogComponent
+		ConfirmDialogComponent,
+		ChatMessageComponent,
+		FaqItemEditComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

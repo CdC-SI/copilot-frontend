@@ -5,6 +5,7 @@ import {Injectable} from '@angular/core';
 })
 export class SpeechService {
 	private voices: SpeechSynthesisVoice[] = [];
+
 	constructor() {
 		speechSynthesis.getVoices();
 		if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -13,9 +14,11 @@ export class SpeechService {
 			};
 		}
 	}
+
 	getVoice(lang: string) {
 		return this.voices.find(voice => voice.lang.includes(lang));
 	}
+
 	private populateVoices() {
 		this.voices = speechSynthesis.getVoices().filter(voice => {
 			return ['de-CH', 'en-GB', 'fr-CH', 'it-IT'].includes(voice.lang);

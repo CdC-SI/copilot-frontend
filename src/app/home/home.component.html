@@ -2,30 +2,16 @@
 	<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
 </div>
 
-<div *ngFor="let message of messages; let last = last" class="message">
-	<div *ngIf="message.source === ChatMessageSource.USER" class="my-message">
-		{{ message.message }}
-	</div>
-	<div *ngIf="message.source !== ChatMessageSource.USER" class="ia-message">
-		<div class="h100">
-			<img [ngClass]="last && chatIsSpeaking ? 'blink' : ''" class="mr16" src="./assets/images/copilot_logo.png" alt="copilot-logo" />
-		</div>
-		<div class="flex-column">
-			<markdown [data]="message.message"></markdown>
-			<a style="font-style: italic" class="mt4 mb4" *ngIf="!!message.url" [href]="message.url">{{ message.url }}</a>
-			<p class="llm-message-actions" *ngIf="!chatIsSpeaking">
-				<mat-icon class="llm-message-action" [matTooltip]="'llm.message.edit' | translate" [svgIcon]="'pen'" (click)="editLLMAnswer()"></mat-icon>
-				<mat-icon class="llm-message-action" [matTooltip]="'llm.message.upvote' | translate" [svgIcon]="'thumbs-up'"></mat-icon>
-				<mat-icon class="llm-message-action" [matTooltip]="'llm.message.downvote' | translate" [svgIcon]="'thumbs-down'"></mat-icon>
-				<mat-icon
-					class="llm-message-action"
-					[matTooltip]="'llm.message.audio' | translate"
-					[svgIcon]="'audio'"
-					[color]="message.beingSpoken ? 'warn' : 'primary'"
-					(click)="speak(message)"
-				></mat-icon>
-			</p>
-		</div>
+<div *ngFor="let message of messages; let last = last; let i = index" class="message">
+	<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
+		<img
+			[hidden]="message.source === ChatMessageSource.USER"
+			[ngClass]="last && message.beingSpoken ? 'blink' : ''"
+			class="mr16 ia-avatar"
+			src="./assets/images/copilot_logo.png"
+			alt="copilot-logo"
+		/>
+		<zco-chat-message [message]="message" [previousMessage]="i > 0 ? messages[i - 1] : null"></zco-chat-message>
 	</div>
 </div>
 
@@ -39,10 +25,10 @@
 		[optionService]="getSearchProposalFunction"
 		[minLength]="0"
 		[formControl]="searchCtrl"
-		(optionSelected)="selectOption($event)"
+		(optionSelected)="selectFaqOption($event)"
 	/>
 
-	<button type="submit" mat-icon-button [obButton]="'primary'" (click)="send()">
+	<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
 		<mat-icon svgIcon="paper-plane"></mat-icon>
 	</button>
 
