@@ -53,16 +53,12 @@ export class ConfigurationService {
 		return this.envConfiguration;
 	}
 
-	ragApi(subPath: string): string {
-		return `${this.envConfiguration.apiUrl}/rag${subPath}`;
+	backendApi(subPath: string): string {
+		return `${this.envConfiguration.apiUrl}${subPath}`;
 	}
 
-	autocompleteApi(subPath: string): string {
-		return `${this.envConfiguration.apiUrl}/autocomplete${subPath}`;
-	}
-
-	indexingApi(subPath: string): string {
-		return `${this.envConfiguration.apiUrl}/indexing${subPath}`;
+	javaBackendApi(subPath: string): string {
+		return `${this.envConfiguration.javaApiUrl}${subPath}`;
 	}
 
 	private configureInterceptor() {

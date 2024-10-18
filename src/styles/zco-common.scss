@@ -1,8 +1,13 @@
 @use "@oblique/oblique/styles/scss/core/variables";
 @use "@oblique/oblique/styles/scss/core/palette";
+@use "sass:map";
 
 .h100 {
 	height: 100%;
+}
+
+.w100 {
+	width: 100%;
 }
 
 .mr8 {
@@ -33,6 +38,14 @@
 	margin-bottom: 32px;
 }
 
+.w50 {
+	width: 50%;
+}
+
+.flex-1 {
+	flex: 1;
+}
+
 .mb16 {
 	margin-bottom: 16px;
 }
@@ -54,6 +67,14 @@
 	flex-direction: column;
 }
 
+.aic {
+	align-items: center;
+}
+
+.jcsb {
+	justify-content: space-between;
+}
+
 .flex-row {
 	display: flex;
 	flex-direction: row;
@@ -73,12 +94,43 @@
 }
 
 main#content {
-	background-color: palette.$ob-secondary-50
+	background-color: palette.$ob-secondary-50;
+	padding: 0;
+}
+
+.ob-column-content {
+	padding: 0 !important;
 }
 
 .mdc-dialog__title {
 	font-size: 24px !important;
 	&::before {
 		display: none !important;
+	}
+}
+
+.save-button {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+@media (min-width: map.get(variables.$ob-grid-breakpoints, "md")) {
+	zco-home {
+		.ob-column-layout {
+			.ob-column-left,
+			.ob-column-right {
+				flex-basis: 16vw;
+				max-width: 16vw;
+			}
+
+			.ob-column-left.ob-collapsed {
+				margin-left: -16vw;
+			}
+
+			.ob-column-right.ob-collapsed {
+				margin-right: -16vw;
+			}
+		}
 	}
 }

@@ -24,5 +24,11 @@
   "fr": "Français",
   "en": "Anglais",
   "de": "Allemand",
-  "it": "Italien"
+  "it": "Italien",
+  "sign.in": "S'inscrire",
+  "create": "créer",
+  "confirm.password": "Confirmer le mot de passe",
+  "password": "Mot de passe",
+  "username": "Nom d'utilisateur",
+  "create.copilot.account": "Créer un compte ZAS/EAK CopilotGPT"
 }

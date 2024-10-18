@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {ChatMessage, ChatMessageSource} from '../../services/chat-message';
+import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 
 @Component({
 	selector: 'zco-chat-message',

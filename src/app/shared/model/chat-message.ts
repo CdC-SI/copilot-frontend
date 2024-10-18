@@ -6,6 +6,7 @@ export interface ChatMessage {
 	url?: string;
 	beingSpoken?: boolean;
 	lang?: string;
+	inError?: boolean;
 }
 
 export enum ChatMessageSource {
