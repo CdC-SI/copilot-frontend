@@ -5,6 +5,9 @@
 	]"
 >
 	<ng-container obHeaderTitle>ZAS/EAK CopilotGPT</ng-container>
+	<ng-template #obHeaderControl>
+		<button class="mr32" mat-button [obButton]="'primary'" (click)="openSignUpDialog()">S'enregistrer</button>
+	</ng-template>
 	<ng-container obFooterInfo>
 		<p>ZAS / EAK CopilotGPT</p>
 		<p>&copy; 2024 <span> ZAS </span></p>

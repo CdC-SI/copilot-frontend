@@ -1,0 +1,55 @@
+<ng-container [formGroup]="formGroup">
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "Modèle" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.LLM_MODEL">
+			<mat-option *ngFor="let model of CHAT_REQUEST_FORM_OPTIONS.LLM_MODEL" [value]="model">{{ model }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "Tag" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.TAG" multiple>
+			<mat-option *ngFor="let tag of CHAT_REQUEST_FORM_OPTIONS.TAGS" [value]="tag">{{ tag }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "Source" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.SOURCE">
+			<mat-option *ngFor="let source of CHAT_REQUEST_FORM_OPTIONS.SOURCES" [value]="source">{{ source }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "Retrieval method" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.RETRIEVAL_METHOD">
+			<mat-option *ngFor="let method of CHAT_REQUEST_FORM_OPTIONS.RETRIEVAL_METHODS" [value]="method">{{ method }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "Style de réponse" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
+			<mat-option *ngFor="let style of CHAT_REQUEST_FORM_OPTIONS.STYLES" [value]="style">{{ style }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "Memory" | translate }}</mat-label>
+		<input type="number" matInput [formControlName]="FORM_FIELDS.K_MEMORY" />
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-slide-toggle [formControlName]="FORM_FIELDS.AUTOCOMPLETE">
+		{{ "Autocomplete" | translate }}
+	</mat-slide-toggle>
+
+	<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.RAG">
+		{{ "RAG" | translate }}
+	</mat-slide-toggle>
+</ng-container>

@@ -1,12 +1,12 @@
 import {Component, Input, TemplateRef, ViewChild} from '@angular/core';
-import {ChatMessage} from '../../services/chat-message';
 import {SpeechService} from '../../services/speech.service';
 import {TranslateService} from '@ngx-translate/core';
 import {FormControl, Validators} from '@angular/forms';
 import {IFaqItem} from '../../model/faq';
 import {MatDialog} from '@angular/material/dialog';
-import {AdminService} from '../../services/admin.service';
 import {ObNotificationService} from '@oblique/oblique';
+import {ChatMessage} from '../../model/chat-message';
+import {FaqItemsService} from '../../services/faq-items.service';
 
 @Component({
 	selector: 'zco-message-action',
@@ -24,16 +24,20 @@ export class MessageActionComponent {
 		private readonly speechService: SpeechService,
 		private readonly translateService: TranslateService,
 		private readonly dialog: MatDialog,
-		private readonly adminService: AdminService,
+		private readonly faqItemsService: FaqItemsService,
 		private readonly notif: ObNotificationService
 	) {}
 
 	speak = (): void => {
 		speechSynthesis.cancel();
-		this.message.beingSpoken = !this.message.beingSpoken;
 		if (this.message.beingSpoken) {
-			this.speakMessage(this.message);
+			this.message.beingSpoken = false;
+			return;
 		}
+
+		this.speechService.speechStartEvent.next(true);
+		this.message.beingSpoken = true;
+		this.speakMessage(this.message);
 	};
 
 	speakMessage = (message: ChatMessage): void => {
@@ -42,6 +46,7 @@ export class MessageActionComponent {
 		speech.rate = 1.5;
 		speech.pitch = 1;
 		speech.voice = this.speechService.getVoice(message.lang || this.translateService.currentLang);
+		speech.onend = () => (this.message.beingSpoken = false);
 		speechSynthesis.speak(speech);
 	};
 
@@ -61,7 +66,7 @@ export class MessageActionComponent {
 	}
 
 	saveFaqItem(faqItem: IFaqItem) {
-		this.adminService.addFaqItem(faqItem).subscribe(next => {
+		this.faqItemsService.add(faqItem).subscribe(next => {
 			this.notif.success('edit.item.success');
 		});
 	}

@@ -1,5 +1,12 @@
-.save-button {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-end;
+:host {
+
+	form {
+		padding: 16px;
+	}
+
+	.save-button {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+	}
 }

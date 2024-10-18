@@ -1,6 +1,6 @@
 import {HttpClient, HttpEvent} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {RagRequest} from '../model/rag';
+import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable} from 'rxjs';
 
@@ -13,8 +13,8 @@ export class RagService {
 		private readonly config: ConfigurationService
 	) {}
 
-	process(ragRequest: RagRequest): Observable<HttpEvent<string>> {
+	process(ragRequest: ChatRequest): Observable<HttpEvent<string>> {
 		const headers = {'Content-Type': 'application/json', Accept: 'text/event-stream'};
-		return this.http.post(this.config.ragApi('/query'), ragRequest, {headers, reportProgress: true, observe: 'events', responseType: 'text'});
+		return this.http.post(this.config.backendApi('/rag/query'), ragRequest, {headers, reportProgress: true, observe: 'events', responseType: 'text'});
 	}
 }

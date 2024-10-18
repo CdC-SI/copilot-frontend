@@ -1,38 +1,68 @@
-<div class="logo" *ngIf="messages.length <= 0">
-	<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
-</div>
-
-<div *ngFor="let message of messages; let last = last; let i = index" class="message">
-	<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
-		<img
-			[hidden]="message.source === ChatMessageSource.USER"
-			[ngClass]="last && message.beingSpoken ? 'blink' : ''"
-			class="mr16 ia-avatar"
-			src="./assets/images/copilot_logo.png"
-			alt="copilot-logo"
-		/>
-		<zco-chat-message [message]="message" [previousMessage]="i > 0 ? messages[i - 1] : null"></zco-chat-message>
+<ob-column-layout class="h100" [left]="true" [right]="true">
+	<div column-left-content class="h100">
+		<mat-card class="h100">
+			<mat-card-header class="flex-row aic jcsb">
+				<mat-card-title class="mt16">{{ "Historique" | translate }}</mat-card-title>
+				<button mat-icon-button [obButton]="'primary'" (click)="newChat()">
+					<mat-icon svgIcon="speech-bubble"></mat-icon>
+				</button>
+			</mat-card-header>
+			<mat-card-content></mat-card-content>
+		</mat-card>
 	</div>
-</div>
 
-<form class="question-container" ngForm>
-	<ut-autocomplete-input
-		class="mr8"
-		[required]="false"
-		[i18nLabel]="'enter.message'"
-		[optionLabelFn]="searchOptionLabelFn"
-		[inputLabelFn]="searchOptionLabelFn"
-		[optionService]="getSearchProposalFunction"
-		[minLength]="0"
-		[formControl]="searchCtrl"
-		(optionSelected)="selectFaqOption($event)"
-	/>
+	<div column-main-content class="chat-container">
+		<div class="logo" *ngIf="messages.length <= 0">
+			<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+		</div>
+		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
 
-	<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
-		<mat-icon svgIcon="paper-plane"></mat-icon>
-	</button>
+		<div class="message-container">
+			<div *ngFor="let message of messages; let last = last; let i = index" class="message">
+				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
+					<img
+						[hidden]="message.source === ChatMessageSource.USER"
+						[ngClass]="last && !message.isCompleted ? 'blink' : ''"
+						class="mr16 ia-avatar"
+						src="./assets/images/copilot_logo.png"
+						alt="copilot-logo"
+					/>
+					<zco-chat-message [message]="message" [previousMessage]="i > 0 ? messages[i - 1] : null"></zco-chat-message>
+				</div>
+			</div>
+		</div>
 
-	<button type="button" mat-icon-button (click)="clearChat()" [obButton]="'secondary'">
-		<mat-icon svgIcon="trash"></mat-icon>
-	</button>
-</form>
+		<form class="question-container" ngForm>
+			<ut-autocomplete-input
+				class="mr8"
+				[required]="false"
+				[i18nLabel]="'enter.message'"
+				[optionLabelFn]="searchOptionLabelFn"
+				[inputLabelFn]="searchOptionLabelFn"
+				[optionService]="getSearchProposalFunction"
+				[minLength]="0"
+				[formControl]="searchCtrl"
+				(optionSelected)="selectFaqOption($event)"
+			/>
+
+			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
+				<mat-icon svgIcon="paper-plane"></mat-icon>
+			</button>
+
+			<button type="button" mat-icon-button (click)="clearChat()" [obButton]="'secondary'">
+				<mat-icon svgIcon="trash"></mat-icon>
+			</button>
+		</form>
+	</div>
+
+	<div column-right-content class="h100" op>
+		<mat-card class="h100">
+			<mat-card-header>
+				<mat-card-title class="mt16">{{ "Paramètres" | translate }}</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<zco-chat-configuration-edit [formControl]="chatConfigCtrl"></zco-chat-configuration-edit>
+			</mat-card-content>
+		</mat-card>
+	</div>
+</ob-column-layout>

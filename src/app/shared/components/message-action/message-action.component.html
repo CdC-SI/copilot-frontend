@@ -1,7 +1,12 @@
-<mat-icon class="llm-message-action" [matTooltip]="'edit.answer' | translate" [svgIcon]="'pen'" (click)="openFaqItemDialog()"></mat-icon>
-<mat-icon class="llm-message-action" [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs-up'"></mat-icon>
-<mat-icon class="llm-message-action" [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs-down'"></mat-icon>
-<mat-icon class="llm-message-action" [matTooltip]="'read.aloud' | translate" [svgIcon]="'audio'" (click)="speak()"></mat-icon>
+<mat-icon [matTooltip]="'edit.answer' | translate" [svgIcon]="'pen'" (click)="openFaqItemDialog()"></mat-icon>
+<mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs-up'"></mat-icon>
+<mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs-down'"></mat-icon>
+<mat-icon
+	[ngClass]="message.beingSpoken ? 'being-spoken' : ''"
+	[matTooltip]="'read.aloud' | translate"
+	[svgIcon]="message.beingSpoken ? 'audio-mute' : 'audio'"
+	(click)="speak()"
+></mat-icon>
 
 <ng-template #addFaqItemDialog>
 	<h4 mat-dialog-title>{{ "edit.question.answer" | translate }}</h4>

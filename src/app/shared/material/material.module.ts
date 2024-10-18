@@ -21,6 +21,7 @@ import {MatListModule} from '@angular/material/list';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 
 @NgModule({
 	imports: [
@@ -44,7 +45,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 		MatListModule,
 		MatChipsModule,
 		MatDialogModule,
-		MatSidenavModule
+		MatSidenavModule,
+		MatSlideToggleModule
 	],
 	exports: [
 		MatButtonModule,
@@ -69,7 +71,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 		MatListModule,
 		MatChipsModule,
 		MatDialogModule,
-		MatSidenavModule
+		MatSidenavModule,
+		MatSlideToggleModule
 	],
 	providers: [
 		{

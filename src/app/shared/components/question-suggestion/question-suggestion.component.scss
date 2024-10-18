@@ -1,0 +1,18 @@
+@use '@oblique/oblique/styles/scss/core/variables';
+@use '@oblique/oblique/styles/scss/core/palette';
+
+.typing-output {
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+	font-size: 18px;
+	font-style: italic;
+	color: palette.$ob-secondary-300;
+	height: 150px;
+}
+
+
+span {
+	font-size: 35px;
+	color: variables.$ob-primary;
+}

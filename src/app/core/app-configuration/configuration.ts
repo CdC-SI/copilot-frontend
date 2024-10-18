@@ -8,6 +8,7 @@ export interface Configuration {
 	patterns: string[];
 	pamsConfig?: ObIPamsConfiguration;
 	apiUrl?: string;
+	javaApiUrl?: string;
 }
 
 export const ZCO_CONFIGURATIONS_TOKEN = new InjectionToken('zco-configuration');
@@ -23,7 +24,8 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: 'http://localhost:8207/'
 		},
 		production: false,
-		apiUrl: '/apy'
+		apiUrl: '/apy',
+		javaApiUrl: '/api'
 	},
 	{
 		patterns: ['-d.apps.openshift'],
