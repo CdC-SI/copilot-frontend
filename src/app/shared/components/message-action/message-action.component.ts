@@ -30,10 +30,14 @@ export class MessageActionComponent {
 
 	speak = (): void => {
 		speechSynthesis.cancel();
-		this.message.beingSpoken = !this.message.beingSpoken;
 		if (this.message.beingSpoken) {
-			this.speakMessage(this.message);
+			this.message.beingSpoken = false;
+			return;
 		}
+
+		this.speechService.speechStartEvent.next(true);
+		this.message.beingSpoken = true;
+		this.speakMessage(this.message);
 	};
 
 	speakMessage = (message: ChatMessage): void => {
@@ -42,6 +46,7 @@ export class MessageActionComponent {
 		speech.rate = 1.5;
 		speech.pitch = 1;
 		speech.voice = this.speechService.getVoice(message.lang || this.translateService.currentLang);
+		speech.onend = () => (this.message.beingSpoken = false);
 		speechSynthesis.speak(speech);
 	};
 

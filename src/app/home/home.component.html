@@ -22,7 +22,7 @@
 				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
 					<img
 						[hidden]="message.source === ChatMessageSource.USER"
-						[ngClass]="last && message.beingSpoken ? 'blink' : ''"
+						[ngClass]="last && !message.isCompleted ? 'blink' : ''"
 						class="mr16 ia-avatar"
 						src="./assets/images/copilot_logo.png"
 						alt="copilot-logo"

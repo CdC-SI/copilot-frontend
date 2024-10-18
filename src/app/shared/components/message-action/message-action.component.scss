@@ -1,4 +1,5 @@
 @use '@oblique/oblique/styles/scss/core/variables';
+@use '@oblique/oblique/styles/scss/core/palette';
 @use '@oblique/oblique/styles/scss/core/mixins/layout';
 
 :host {
@@ -16,5 +17,9 @@
 			background: variables.$ob-gray-dark;
 			color: white;
 		}
+	}
+
+	.being-spoken {
+		color: palette.$ob-red-300;
 	}
 }

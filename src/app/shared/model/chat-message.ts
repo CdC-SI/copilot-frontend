@@ -5,6 +5,7 @@ export interface ChatMessage {
 	timestamp: Date;
 	url?: string;
 	beingSpoken?: boolean;
+	isCompleted?: boolean;
 	lang?: string;
 	inError?: boolean;
 }
