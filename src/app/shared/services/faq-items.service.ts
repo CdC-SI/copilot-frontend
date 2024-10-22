@@ -2,8 +2,8 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
-import { IQuestion } from "../model/answer";
-import { IFaqItem } from "../model/faq";
+import {IQuestion} from '../model/answer';
+import {IFaqItem} from '../model/faq';
 
 @Injectable({
 	providedIn: 'root'
@@ -15,7 +15,7 @@ export class FaqItemsService {
 	) {}
 
 	search(requested: string): Observable<IQuestion[]> {
-		return this.http.get<IQuestion[]>(this.config.backendApi('/autocomplete/'), {params: new HttpParams().set('question', requested)});
+		return this.http.get<IQuestion[]>(this.config.javaBackendApi('/faq-items'), {params: new HttpParams().set('question', requested)});
 	}
 
 	add(faqItem: IFaqItem): Observable<any> {

@@ -5,7 +5,7 @@ import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
 import {ANCHOR_TAG_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
-import { SpeechService } from "../shared/services/speech.service";
+import {SpeechService} from '../shared/services/speech.service';
 
 @Component({
 	selector: 'zco-home',
@@ -81,8 +81,8 @@ export class HomeComponent implements OnInit {
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
 		this.ragService.process(clearNullAndEmpty({query: this.searchCtrl.value, ...this.chatConfigCtrl.value})).subscribe({
-			next: event => {
-				this.buildResponseWithLLMEvent(this.messages[this.messages.length - 1], event);
+			next: chunk => {
+				this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
 				this.cdr.markForCheck();
 			},
 			error: () => {
@@ -95,12 +95,12 @@ export class HomeComponent implements OnInit {
 		this.clearSearch();
 	}
 
-	buildResponseWithLLMEvent(partialChatMessage: ChatMessage, event: any): void {
-		const partialText = event.partialText || '';
+	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
+		const partialText = chunk;
 		if (!partialText) return;
 
 		const anchorTagMatch = ANCHOR_TAG_REGEX.exec(partialText);
-		partialChatMessage.message = partialText.replace(ANCHOR_TAG_REGEX, '').trim();
+		partialChatMessage.message += partialText.replace(ANCHOR_TAG_REGEX, '');
 		if (anchorTagMatch) {
 			partialChatMessage.url = anchorTagMatch[1];
 			partialChatMessage.isCompleted = true;
