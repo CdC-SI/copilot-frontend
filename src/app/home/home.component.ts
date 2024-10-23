@@ -6,6 +6,8 @@ import {RagService} from '../shared/services/rag.service';
 import {ANCHOR_TAG_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
+import {IUser} from '../shared/model/user';
+import {UserService} from '../shared/services/user.service';
 
 @Component({
 	selector: 'zco-home',
@@ -25,7 +27,8 @@ export class HomeComponent implements OnInit {
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
 		private readonly renderer: Renderer2,
-		private readonly speechService: SpeechService
+		private readonly speechService: SpeechService,
+		private readonly userService: UserService
 	) {}
 
 	ngOnInit() {
@@ -34,6 +37,10 @@ export class HomeComponent implements OnInit {
 				message.beingSpoken = false;
 			});
 		});
+	}
+
+	isAuthenticated(): boolean {
+		return this.userService.isAuthenticated();
 	}
 
 	closeRightPanel() {

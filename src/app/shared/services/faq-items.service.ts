@@ -15,11 +15,11 @@ export class FaqItemsService {
 	) {}
 
 	search(requested: string): Observable<IQuestion[]> {
-		return this.http.get<IQuestion[]>(this.config.javaBackendApi('/faq-items'), {params: new HttpParams().set('question', requested)});
+		return this.http.get<IQuestion[]>(this.config.backendApi('/faq-items'), {params: new HttpParams().set('question', requested)});
 	}
 
 	add(faqItem: IFaqItem): Observable<any> {
 		const headers = {'Content-Type': 'application/json', Accept: 'application/json'};
-		return this.http.put(this.config.backendApi('/indexing/data'), faqItem, {headers});
+		return this.http.put(this.config.backendApi('/faq-items'), faqItem, {headers});
 	}
 }

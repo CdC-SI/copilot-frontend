@@ -24,6 +24,7 @@ import {ConfigurationService} from './core/app-configuration/configuration.servi
 import {ZCO_CONFIGURATIONS, ZCO_CONFIGURATIONS_TOKEN} from './core/app-configuration/configuration';
 import {SharedModule} from './shared/shared.module';
 import {AdminComponent} from './admin/admin.component';
+import {JwtInterceptor} from './shared/interceptors/jwt.interceptor';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -56,7 +57,8 @@ function bannerFactory(configurationService: ConfigurationService) {
 		{provide: LOCALE_ID, useValue: 'de-CH'},
 		{provide: APP_INITIALIZER, useFactory: appInitializerFactory, deps: [ConfigurationService], multi: true},
 		{provide: OB_BANNER, useFactory: bannerFactory, deps: [ConfigurationService]},
-		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true}
+		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true},
+		{provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true}
 	],
 	bootstrap: [AppComponent]
 })

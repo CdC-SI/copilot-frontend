@@ -57,10 +57,6 @@ export class ConfigurationService {
 		return `${this.envConfiguration.apiUrl}${subPath}`;
 	}
 
-	javaBackendApi(subPath: string): string {
-		return `${this.envConfiguration.javaApiUrl}${subPath}`;
-	}
-
 	private configureInterceptor() {
 		this.interceptorConfig.api.spinner = false;
 		this.interceptorConfig.api.notification.active = false;

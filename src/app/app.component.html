@@ -1,12 +1,13 @@
-<ob-master-layout
-	[navigation]="[
-		{ url: 'home', label: 'home' },
-		{ url: 'admin', label: 'admin' },
-	]"
->
+<ob-master-layout [navigation]="getNavigation()">
 	<ng-container obHeaderTitle>ZAS/EAK CopilotGPT</ng-container>
 	<ng-template #obHeaderControl>
-		<button class="mr32" mat-button [obButton]="'primary'" (click)="openSignUpDialog()">S'enregistrer</button>
+		<div *ngIf="userNotAuthenticated()">
+			<button class="mr16" mat-button [obButton]="'primary'" (click)="openSignUpDialog()">{{ "sign.up" | translate }}</button>
+			<button mat-button [obButton]="'primary'" (click)="openSignInDialog()">{{ "sign.in" | translate }}</button>
+		</div>
+		<div *ngIf="userAuthenticated()">
+			<button mat-button [obButton]="'primary'" (click)="logout()">{{ "logout" | translate }}</button>
+		</div>
 	</ng-template>
 	<ng-container obFooterInfo>
 		<p>ZAS / EAK CopilotGPT</p>

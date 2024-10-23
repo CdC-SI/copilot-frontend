@@ -25,6 +25,15 @@
   "en": "Englisch",
   "de": "Deutsch",
   "it": "Italienisch",
-  "sign.in": "S'inscrire",
-  "create.copilot.account": "Créer un compte ZAS/EAK CopilotGPT"
+  "sign.in": "Anmelden",
+  "sign.up": "Registrieren",
+  "login": "Verbindung",
+  "logout": "Abmelden",
+  "create": "Anmeldung",
+  "password": "Passwort",
+  "confirm.password": "Passwort bestätigen",
+  "username": "Benutzername",
+  "create.copilot.account": "ZAS/EAK CopilotGPT-Konto erstellen",
+  "login.copilot.account": "Mit einem ZAS/EAK CopilotGPT-Konto anmelden",
+  "login.fail": "Falscher Benutzername oder falsches Passwort"
 }

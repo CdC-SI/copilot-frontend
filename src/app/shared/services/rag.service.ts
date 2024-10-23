@@ -11,7 +11,7 @@ export class RagService {
 
 	process(ragRequest: ChatRequest): Observable<string> {
 		return new Observable<string>(observer => {
-			fetch(this.config.javaBackendApi('/conversations'), {
+			fetch(this.config.backendApi('/conversations'), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json', Accept: 'text/event-stream'},
 				body: JSON.stringify(ragRequest)

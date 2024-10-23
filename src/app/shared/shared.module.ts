@@ -15,6 +15,7 @@ import {FaqItemEditComponent} from './components/faq-item-edit/faq-item-edit.com
 import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {ChatConfigurationEditComponent} from './components/chat-configuration-edit/chat-configuration-edit.component';
 import { QuestionSuggestionComponent } from './components/question-suggestion/question-suggestion.component';
+import { SignInComponent } from './components/sign-in/sign-in.component';
 
 @NgModule({
 	declarations: [
@@ -25,7 +26,8 @@ import { QuestionSuggestionComponent } from './components/question-suggestion/qu
 		FaqItemEditComponent,
 		SignUpComponent,
 		ChatConfigurationEditComponent,
-  QuestionSuggestionComponent
+  QuestionSuggestionComponent,
+  SignInComponent
 	],
 	imports: [CommonModule, FormsModule, ReactiveFormsModule, ObliqueModule, MaterialModule, TranslateModule, BrowserAnimationsModule, MarkdownModule.forRoot()],
 	exports: [

@@ -1,7 +1,7 @@
 export interface IUser {
 	username: string;
 	password?: string;
-	roles: Role[]
+	roles: Role[];
 }
 
 export enum UserFormFields {
@@ -10,7 +10,12 @@ export enum UserFormFields {
 	CONFIRM_PASSWORD = 'confirmPassword'
 }
 
+export enum LoginFormFields {
+	USERNAME = 'username',
+	PASSWORD = 'password'
+}
+
 export enum Role {
-	ADMIN,
-	USER
+	ADMIN = 'ADMIN',
+	USER = 'USER'
 }
