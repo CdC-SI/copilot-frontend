@@ -1,6 +1,6 @@
 <ng-container [formGroup]="formGroup">
 	<mat-form-field obErrorMessages>
-		<mat-label>{{ "Modèle" | translate }}</mat-label>
+		<mat-label>{{ "parameters.model" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.LLM_MODEL">
 			<mat-option *ngFor="let model of CHAT_REQUEST_FORM_OPTIONS.LLM_MODEL" [value]="model">{{ model }}</mat-option>
 		</mat-select>
@@ -8,31 +8,31 @@
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
-		<mat-label>{{ "Tag" | translate }}</mat-label>
-		<mat-select [formControlName]="FORM_FIELDS.TAG" multiple>
+		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
 			<mat-option *ngFor="let tag of CHAT_REQUEST_FORM_OPTIONS.TAGS" [value]="tag">{{ tag }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
-		<mat-label>{{ "Source" | translate }}</mat-label>
-		<mat-select [formControlName]="FORM_FIELDS.SOURCE">
+		<mat-label>{{ "parameters.sources" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple>
 			<mat-option *ngFor="let source of CHAT_REQUEST_FORM_OPTIONS.SOURCES" [value]="source">{{ source }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
-		<mat-label>{{ "Retrieval method" | translate }}</mat-label>
-		<mat-select [formControlName]="FORM_FIELDS.RETRIEVAL_METHOD">
+		<mat-label>{{ "parameters.retrieval-methods" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.RETRIEVAL_METHODS" multiple>
 			<mat-option *ngFor="let method of CHAT_REQUEST_FORM_OPTIONS.RETRIEVAL_METHODS" [value]="method">{{ method }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
-		<mat-label>{{ "Style de réponse" | translate }}</mat-label>
+		<mat-label>{{ "parameters.response-style" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
 			<mat-option *ngFor="let style of CHAT_REQUEST_FORM_OPTIONS.STYLES" [value]="style">{{ style }}</mat-option>
 		</mat-select>
@@ -40,16 +40,16 @@
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
-		<mat-label>{{ "Memory" | translate }}</mat-label>
+		<mat-label>{{ "parameters.memory" | translate }}</mat-label>
 		<input type="number" matInput [formControlName]="FORM_FIELDS.K_MEMORY" />
 		<mat-error></mat-error>
 	</mat-form-field>
 
 	<mat-slide-toggle [formControlName]="FORM_FIELDS.AUTOCOMPLETE">
-		{{ "Autocomplete" | translate }}
+		{{ "parameters.autocomplete" | translate }}
 	</mat-slide-toggle>
 
 	<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.RAG">
-		{{ "RAG" | translate }}
+		{{ "parameters.rag" | translate }}
 	</mat-slide-toggle>
 </ng-container>

@@ -3,33 +3,28 @@ import {Language} from './answer';
 export interface ChatRequest {
 	query: string;
 	language?: Language;
-	tag?: string[];
-	source?: string[];
-	llm_model?: string;
-	retrieval_method?: string[];
-	k_memory?: number;
-	response_style?: string;
+	tags?: string[];
+	sources?: string[];
+	llmModel?: string;
+	retrievalMethods?: string[];
+	kMemory?: number;
+	responseStyle?: string;
 	autocomplete?: boolean;
 	rag?: boolean;
-	user_uuid?: string;
-	conversation_uuid?: string;
+	conversationId?: string;
 }
 
 export enum ChatRequestConfigFields {
-	QUERY = 'query',
 	LANGUAGE = 'language',
-	TAG = 'tag',
-	SOURCE = 'source',
-	LLM_MODEL = 'llm_model',
-	RETRIEVAL_METHOD = 'retrieval_method',
-	K_MEMORY = 'k_memory',
-	RESPONSE_STYLE = 'response_style',
+	TAGS = 'tags',
+	SOURCES = 'sources',
+	LLM_MODEL = 'llmModel',
+	RETRIEVAL_METHODS = 'retrievalMethods',
+	K_MEMORY = 'kMemory',
+	RESPONSE_STYLE = 'responseStyle',
 	AUTOCOMPLETE = 'autocomplete',
-	RAG = 'rag',
-	USER_UUID = 'user_uuid',
-	CONVERSATION_UUID = 'conversation_uuid'
+	RAG = 'rag'
 }
-
 
 // Mock lists from backend
 export const CHAT_REQUEST_FORM_OPTIONS = {

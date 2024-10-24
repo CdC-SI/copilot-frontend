@@ -14,8 +14,10 @@ import {MessageActionComponent} from './components/message-action/message-action
 import {FaqItemEditComponent} from './components/faq-item-edit/faq-item-edit.component';
 import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {ChatConfigurationEditComponent} from './components/chat-configuration-edit/chat-configuration-edit.component';
-import { QuestionSuggestionComponent } from './components/question-suggestion/question-suggestion.component';
-import { SignInComponent } from './components/sign-in/sign-in.component';
+import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
+import {SignInComponent} from './components/sign-in/sign-in.component';
+import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
+import {MatLine} from '@angular/material/core';
 
 @NgModule({
 	declarations: [
@@ -26,10 +28,21 @@ import { SignInComponent } from './components/sign-in/sign-in.component';
 		FaqItemEditComponent,
 		SignUpComponent,
 		ChatConfigurationEditComponent,
-  QuestionSuggestionComponent,
-  SignInComponent
+		QuestionSuggestionComponent,
+		SignInComponent,
+		ChatHistoryComponent
 	],
-	imports: [CommonModule, FormsModule, ReactiveFormsModule, ObliqueModule, MaterialModule, TranslateModule, BrowserAnimationsModule, MarkdownModule.forRoot()],
+	imports: [
+		CommonModule,
+		FormsModule,
+		ReactiveFormsModule,
+		ObliqueModule,
+		MaterialModule,
+		TranslateModule,
+		BrowserAnimationsModule,
+		MarkdownModule.forRoot(),
+		MatLine
+	],
 	exports: [
 		CommonModule,
 		FormsModule,
@@ -44,7 +57,8 @@ import { SignInComponent } from './components/sign-in/sign-in.component';
 		ChatMessageComponent,
 		FaqItemEditComponent,
 		ChatConfigurationEditComponent,
-		QuestionSuggestionComponent
+		QuestionSuggestionComponent,
+		ChatHistoryComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

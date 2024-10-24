@@ -1,4 +1,5 @@
 export interface ChatMessage {
+	id?: string;
 	faqItemId?: number;
 	message?: string;
 	source: ChatMessageSource;

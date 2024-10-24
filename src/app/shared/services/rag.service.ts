@@ -2,18 +2,27 @@ import {Injectable} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable} from 'rxjs';
+import {TokenService} from './token.service';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class RagService {
-	constructor(private readonly config: ConfigurationService) {}
+	constructor(
+		private readonly config: ConfigurationService,
+		private readonly tokenService: TokenService
+	) {}
 
 	process(ragRequest: ChatRequest): Observable<string> {
+		const headers = new Headers({'Content-Type': 'application/json', Accept: 'text/event-stream'});
+		const token = this.tokenService.getToken();
+		if (token) {
+			headers.append('Authorization', `Bearer ${token}`);
+		}
 		return new Observable<string>(observer => {
 			fetch(this.config.backendApi('/conversations'), {
 				method: 'POST',
-				headers: {'Content-Type': 'application/json', Accept: 'text/event-stream'},
+				headers,
 				body: JSON.stringify(ragRequest)
 			})
 				.then(response => {
@@ -62,11 +71,14 @@ export class RagService {
 	private parseEvent(eventString: string) {
 		const lines = eventString.split('\n');
 		let data = '';
-		for (const line of lines) {
+		lines.forEach((line, index) => {
 			if (line.startsWith('data:')) {
-				data += lines.length > 1 ? `${line.substring(5)}\n` : `${line.substring(5)}`;
+				data += `${line.substring(5)}`;
 			}
-		}
+			if (index < lines.length - 1) {
+				data += '\n';
+			}
+		});
 		return data;
 	}
 }

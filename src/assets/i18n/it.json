@@ -35,5 +35,13 @@
   "username": "Nome utente",
   "create.copilot.account": "Crea un account ZAS/EAK CopilotGPT",
   "login.copilot.account": "Accedi a un account ZAS/EAK CopilotGPT",
-  "login.fail": "Nome utente o password errati"
+  "login.fail": "Nome utente o password errati",
+  "parameters.model": "Modello",
+  "parameters.tags": "Tag",
+  "parameters.sources": "Fonti",
+  "parameters.retrieval-methods": "Metodi di recupero",
+  "parameters.response-style": "Stile di risposta",
+  "parameters.memory": "K-Memory",
+  "parameters.autocomplete": "Autocompletamento",
+  "parameters.rag": "RAG"
 }

@@ -27,27 +27,25 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 	FORM_FIELDS = ChatRequestConfigFields;
 	formGroup: FormGroup;
 	destroyed$ = new Subject<void>();
-	onChange = (value: any) => {};
-	onTouched = () => {};
-
 	constructor(
 		private readonly fb: FormBuilder,
 		private readonly translateService: TranslateService
 	) {}
+	onChange = (value: any) => {};
+
+	onTouched = () => {};
 
 	ngOnInit(): void {
 		this.formGroup = this.fb.group({
 			[this.FORM_FIELDS.LLM_MODEL]: [''],
-			[this.FORM_FIELDS.TAG]: [[]],
+			[this.FORM_FIELDS.TAGS]: [[]],
 			[this.FORM_FIELDS.AUTOCOMPLETE]: [true],
 			[this.FORM_FIELDS.RAG]: [true],
 			[this.FORM_FIELDS.LANGUAGE]: [this.translateService.currentLang],
 			[this.FORM_FIELDS.RESPONSE_STYLE]: [''],
-			[this.FORM_FIELDS.CONVERSATION_UUID]: [''],
-			[this.FORM_FIELDS.USER_UUID]: [''],
 			[this.FORM_FIELDS.K_MEMORY]: [''],
-			[this.FORM_FIELDS.RETRIEVAL_METHOD]: [''],
-			[this.FORM_FIELDS.SOURCE]: ['']
+			[this.FORM_FIELDS.RETRIEVAL_METHODS]: [''],
+			[this.FORM_FIELDS.SOURCES]: ['']
 		});
 
 		this.formGroup.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(value => {

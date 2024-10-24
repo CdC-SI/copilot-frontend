@@ -3,11 +3,13 @@ import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {ANCHOR_TAG_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
+import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {IUser} from '../shared/model/user';
 import {UserService} from '../shared/services/user.service';
+import {ChatHistoryMessage, ChatTitle} from '../shared/model/chat-history';
+import {ConversationService} from '../shared/services/conversation.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-home',
@@ -19,6 +21,8 @@ export class HomeComponent implements OnInit {
 	searchCtrl = new FormControl();
 	chatConfigCtrl = new FormControl();
 	messages: ChatMessage[] = [];
+	conversationTitles: ChatTitle[] = [];
+	currentConversation: ChatTitle;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -28,7 +32,9 @@ export class HomeComponent implements OnInit {
 		private readonly cdr: ChangeDetectorRef,
 		private readonly renderer: Renderer2,
 		private readonly speechService: SpeechService,
-		private readonly userService: UserService
+		private readonly userService: UserService,
+		private readonly conversationService: ConversationService,
+		private readonly translateService: TranslateService
 	) {}
 
 	ngOnInit() {
@@ -36,6 +42,12 @@ export class HomeComponent implements OnInit {
 			this.messages.forEach(message => {
 				message.beingSpoken = false;
 			});
+		});
+		if (this.isAuthenticated()) {
+			this.getConversationTitles();
+		}
+		this.userService.userLoggedIn.subscribe(() => {
+			this.getConversationTitles();
 		});
 	}
 
@@ -53,7 +65,6 @@ export class HomeComponent implements OnInit {
 	getSearchProposalFunction = (text: string) => {
 		return this.autocompleteService.search(text);
 	};
-
 	searchOptionLabelFn = (question: IQuestion): string => question?.text ?? '';
 
 	selectFaqOption(question: IQuestion): void {
@@ -61,6 +72,7 @@ export class HomeComponent implements OnInit {
 		this.addMessage(ChatMessageSource.FAQ, question.answer.text, false, true, question.language, question.id, question.url);
 		this.clearSearch();
 		this.scrollToBottom();
+		this.updateCurrentConversation();
 	}
 
 	clearSearch(): void {
@@ -80,24 +92,35 @@ export class HomeComponent implements OnInit {
 	}
 
 	newChat(): void {
-		// todo
+		if (this.currentConversation) this.currentConversation.selected = false;
+		this.currentConversation = null;
+		this.clearChat();
 	}
 
 	sendToLLM(): void {
 		this.addMessage(ChatMessageSource.USER, this.searchCtrl.value);
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
-		this.ragService.process(clearNullAndEmpty({query: this.searchCtrl.value, ...this.chatConfigCtrl.value})).subscribe({
-			next: chunk => {
-				this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
-				this.cdr.markForCheck();
-			},
-			error: () => {
-				this.messages.pop();
-				this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
-				this.enableSearch();
-			}
-		});
+		this.ragService
+			.process(
+				clearNullAndEmpty({
+					query: this.searchCtrl.value,
+					conversationId: this.currentConversation?.conversationId,
+					language: this.translateService.currentLang,
+					...this.chatConfigCtrl.value
+				})
+			)
+			.subscribe({
+				next: chunk => {
+					this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
+					this.cdr.markForCheck();
+				},
+				error: () => {
+					this.messages.pop();
+					this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
+					this.enableSearch();
+				}
+			});
 
 		this.clearSearch();
 	}
@@ -107,12 +130,19 @@ export class HomeComponent implements OnInit {
 		if (!partialText) return;
 
 		const anchorTagMatch = ANCHOR_TAG_REGEX.exec(partialText);
-		partialChatMessage.message += partialText.replace(ANCHOR_TAG_REGEX, '');
+		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialText);
+		partialChatMessage.message += partialText.replace(ANCHOR_TAG_REGEX, '').replace(MESSAGE_ID_REGEX, '');
 		if (anchorTagMatch) {
 			partialChatMessage.url = anchorTagMatch[1];
 			partialChatMessage.isCompleted = true;
 			this.scrollToBottom();
 			this.enableSearch();
+		}
+		if (messageIdTagMatch) {
+			partialChatMessage.id = messageIdTagMatch[1];
+			if (!this.currentConversation) {
+				this.refreshConversations();
+			}
 		}
 	}
 
@@ -127,5 +157,53 @@ export class HomeComponent implements OnInit {
 				mainContainer.scrollTop = mainContainer.scrollHeight;
 			}
 		});
+	}
+
+	selectConversation(conversation: ChatTitle) {
+		this.conversationService.getConversation(conversation.conversationId).subscribe(messages => {
+			this.currentConversation = conversation;
+			this.messages = messages.map(this.historyMessageToChatMessage);
+			this.scrollToBottom();
+		});
+	}
+	getConversationTitles() {
+		this.conversationService.getConversationTitles().subscribe(conversations => {
+			this.conversationTitles = conversations;
+		});
+	}
+
+	private historyMessageToChatMessage(historyMessage: ChatHistoryMessage): ChatMessage {
+		return {
+			id: historyMessage.messageId,
+			message: historyMessage.message,
+			source: historyMessage.role.toUpperCase() === 'USER' ? ChatMessageSource.USER : ChatMessageSource.LLM,
+			isCompleted: true,
+			timestamp: historyMessage.timestamp,
+			lang: historyMessage.language,
+			url: historyMessage.url,
+			faqItemId: historyMessage.faqItemId
+		};
+	}
+
+	private updateCurrentConversation() {
+		if (!this.isAuthenticated()) return;
+		if (!this.currentConversation) {
+			// initiate conversation
+			this.conversationService.init(this.messages).subscribe(() => {
+				this.refreshConversations();
+			});
+		} else {
+			// update conversation
+		}
+	}
+
+	private refreshConversations() {
+		setTimeout(() => {
+			this.conversationService.getConversationTitles().subscribe(conversations => {
+				this.conversationTitles = conversations;
+				this.currentConversation = conversations[conversations.length - 1];
+				this.currentConversation.selected = true;
+			});
+		}, 1000);
 	}
 }

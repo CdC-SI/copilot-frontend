@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {BehaviorSubject, Observable} from 'rxjs';
@@ -10,6 +10,7 @@ import {TokenService} from './token.service';
 	providedIn: 'root'
 })
 export class UserService {
+	userLoggedIn = new EventEmitter<void>();
 	private readonly $authenticatedUser: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(null);
 	constructor(
 		private readonly http: HttpClient,
@@ -38,6 +39,7 @@ export class UserService {
 	refreshAuthenticatedUser() {
 		this.http.get<IUser>(this.config.backendApi('/users/authenticated')).subscribe(user => {
 			this.$authenticatedUser.next(user);
+			this.userLoggedIn.emit();
 		});
 	}
 

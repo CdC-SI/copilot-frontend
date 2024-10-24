@@ -1,0 +1,13 @@
+@use "@oblique/oblique/styles/scss/core/palette";
+
+.title-selected {
+	background-color: palette.$ob-secondary-50 !important;
+}
+
+.title {
+	cursor: pointer !important;
+}
+
+.title:hover {
+	background-color: palette.$ob-secondary-50;
+}

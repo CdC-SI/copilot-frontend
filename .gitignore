@@ -42,4 +42,4 @@ testem.log
 Thumbs.db
 
 package-lock.json
-proxy.conf.json
+.nx
