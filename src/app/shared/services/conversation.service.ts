@@ -24,4 +24,8 @@ export class ConversationService {
 	init(messages: ChatMessage[]) {
 		return this.http.post(this.config.backendApi('/conversations/init'), messages);
 	}
+
+	update(conversationId: string, messages: ChatMessage[]) {
+		this.http.put(this.config.backendApi(`/conversations/${conversationId}`), messages).subscribe();
+	}
 }

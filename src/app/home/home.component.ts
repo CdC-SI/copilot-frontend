@@ -188,12 +188,11 @@ export class HomeComponent implements OnInit {
 	private updateCurrentConversation() {
 		if (!this.isAuthenticated()) return;
 		if (!this.currentConversation) {
-			// initiate conversation
 			this.conversationService.init(this.messages).subscribe(() => {
 				this.refreshConversations();
 			});
 		} else {
-			// update conversation
+			this.conversationService.update(this.currentConversation.conversationId, this.messages);
 		}
 	}
 
@@ -204,6 +203,6 @@ export class HomeComponent implements OnInit {
 				this.currentConversation = conversations[conversations.length - 1];
 				this.currentConversation.selected = true;
 			});
-		}, 1000);
+		}, 1_500);
 	}
 }
