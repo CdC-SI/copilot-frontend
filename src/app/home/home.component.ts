@@ -192,7 +192,10 @@ export class HomeComponent implements OnInit {
 				this.refreshConversations();
 			});
 		} else {
-			this.conversationService.update(this.currentConversation.conversationId, this.messages);
+			this.conversationService.update(this.currentConversation.conversationId, [
+				this.messages[this.messages.length - 2],
+				this.messages[this.messages.length - 1]
+			]);
 		}
 	}
 
