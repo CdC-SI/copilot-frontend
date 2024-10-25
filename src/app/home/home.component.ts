@@ -10,6 +10,9 @@ import {UserService} from '../shared/services/user.service';
 import {ChatHistoryMessage, ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
+import {Feedback} from '../shared/model/feedback';
+import {FeedbackService} from '../shared/services/feedback.service';
+import {ObNotificationService} from '@oblique/oblique';
 
 @Component({
 	selector: 'zco-home',
@@ -34,7 +37,9 @@ export class HomeComponent implements OnInit {
 		private readonly speechService: SpeechService,
 		private readonly userService: UserService,
 		private readonly conversationService: ConversationService,
-		private readonly translateService: TranslateService
+		private readonly translateService: TranslateService,
+		private readonly feedbackService: FeedbackService,
+		private readonly notif: ObNotificationService
 	) {}
 
 	ngOnInit() {
@@ -169,6 +174,12 @@ export class HomeComponent implements OnInit {
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
 			this.conversationTitles = conversations;
+		});
+	}
+
+	sendFeedback(feedback: Feedback) {
+		this.feedbackService.sendFeeback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
+			this.notif.success('feedback.success');
 		});
 	}
 

@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
+import {Feedback} from '../../model/feedback';
 
 @Component({
 	selector: 'zco-chat-message',
@@ -9,5 +10,10 @@ import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 export class ChatMessageComponent {
 	@Input() previousMessage: ChatMessage;
 	@Input() message: ChatMessage;
+	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
 	protected readonly ChatMessageSource = ChatMessageSource;
+
+	sendFeedback(event: Feedback) {
+		this.feedback.emit(event);
+	}
 }

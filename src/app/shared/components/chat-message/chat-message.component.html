@@ -5,6 +5,11 @@
 	<div class="flex-column">
 		<markdown [data]="message.message"></markdown>
 		<a class="mt4 mb4" *ngIf="!!message.url" [href]="message.url">{{ message.url }}</a>
-		<zco-message-action [hidden]="!message.isCompleted || message.inError" [message]="message" [previousMessage]="previousMessage"></zco-message-action>
+		<zco-message-action
+			[hidden]="!message.isCompleted || message.inError"
+			[message]="message"
+			[previousMessage]="previousMessage"
+			(feedback)="sendFeedback($event)"
+		></zco-message-action>
 	</div>
 </div>

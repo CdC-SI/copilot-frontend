@@ -29,7 +29,7 @@
 						src="./assets/images/copilot_logo.png"
 						alt="copilot-logo"
 					/>
-					<zco-chat-message [message]="message" [previousMessage]="i > 0 ? messages[i - 1] : null"></zco-chat-message>
+					<zco-chat-message [message]="message" [previousMessage]="i > 0 ? messages[i - 1] : null" (feedback)="sendFeedback($event)"></zco-chat-message>
 				</div>
 			</div>
 		</div>

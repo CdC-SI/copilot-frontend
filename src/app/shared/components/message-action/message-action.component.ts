@@ -1,4 +1,4 @@
-import {Component, Input, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
 import {SpeechService} from '../../services/speech.service';
 import {TranslateService} from '@ngx-translate/core';
 import {FormControl, Validators} from '@angular/forms';
@@ -7,6 +7,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
 import {ChatMessage} from '../../model/chat-message';
 import {FaqItemsService} from '../../services/faq-items.service';
+import {UserService} from '../../services/user.service';
+import {Feedback} from '../../model/feedback';
 
 @Component({
 	selector: 'zco-message-action',
@@ -16,16 +18,20 @@ import {FaqItemsService} from '../../services/faq-items.service';
 export class MessageActionComponent {
 	@Input() message: ChatMessage;
 	@Input() previousMessage: ChatMessage;
+	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
 
 	@ViewChild('addFaqItemDialog') addFaqItemDialog: TemplateRef<any>;
+	@ViewChild('negativeFeedbackDialog') negativeFeedbackDialog: TemplateRef<any>;
 	faqItemFrmCtrl = new FormControl<IFaqItem>(null, [Validators.required]);
+	feedbackFrmCtrl = new FormControl<string>(null, [Validators.required]);
 
 	constructor(
 		private readonly speechService: SpeechService,
 		private readonly translateService: TranslateService,
 		private readonly dialog: MatDialog,
 		private readonly faqItemsService: FaqItemsService,
-		private readonly notif: ObNotificationService
+		private readonly notif: ObNotificationService,
+		private readonly userService: UserService
 	) {}
 
 	speak = (): void => {
@@ -50,6 +56,14 @@ export class MessageActionComponent {
 		speechSynthesis.speak(speech);
 	};
 
+	openFeedbackDialog() {
+		this.feedbackFrmCtrl.reset();
+		this.dialog
+			.open(this.negativeFeedbackDialog, {width: '300px'})
+			.afterClosed()
+			.subscribe(result => result && this.negativeFeedback(this.feedbackFrmCtrl.value));
+	}
+
 	openFaqItemDialog() {
 		this.faqItemFrmCtrl.reset();
 		this.faqItemFrmCtrl.patchValue({
@@ -69,5 +83,17 @@ export class MessageActionComponent {
 		this.faqItemsService.add(faqItem).subscribe(next => {
 			this.notif.success('edit.item.success');
 		});
+	}
+
+	authenticatedAsAdmin() {
+		return this.userService.isAuthenticatedAsAdmin();
+	}
+
+	positiveFeedback() {
+		this.feedback.emit({messageId: this.message.id, isPositive: true});
+	}
+
+	private negativeFeedback(comment: string) {
+		this.feedback.emit({messageId: this.message.id, isPositive: false, comment});
 	}
 }

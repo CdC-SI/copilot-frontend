@@ -43,5 +43,9 @@
   "parameters.response-style": "Antwortstil",
   "parameters.memory": "K-Memory",
   "parameters.autocomplete": "Autovervollständigung",
-  "parameters.rag": "RAG"
+  "parameters.rag": "RAG",
+  "feedback.comment": "Warum ist diese Antwort nicht zufriedenstellend?",
+  "feedback.comment.placeholder": "Kommentar hinzufügen...",
+  "send": "Senden",
+  "feedback.success": "Vielen Dank für Ihr Feedback!"
 }
