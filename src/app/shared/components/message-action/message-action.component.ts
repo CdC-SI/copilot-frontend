@@ -59,7 +59,7 @@ export class MessageActionComponent {
 	openFeedbackDialog() {
 		this.feedbackFrmCtrl.reset();
 		this.dialog
-			.open(this.negativeFeedbackDialog, {width: '300px'})
+			.open(this.negativeFeedbackDialog, {width: '500px'})
 			.afterClosed()
 			.subscribe(result => result && this.negativeFeedback(this.feedbackFrmCtrl.value));
 	}

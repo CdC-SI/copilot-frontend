@@ -28,7 +28,7 @@
 <ng-template #negativeFeedbackDialog>
 	<h4 mat-dialog-title>{{ "feedback.comment" | translate }}</h4>
 	<div mat-dialog-content class="mt16" ngForm>
-		<textarea class="mt16" [formControl]="feedbackFrmCtrl" placeholder="{{ 'feedback.comment.placeholder' | translate }}"></textarea>
+		<textarea [formControl]="feedbackFrmCtrl" placeholder="{{ 'feedback.comment.placeholder' | translate }}"></textarea>
 	</div>
 	<div mat-dialog-actions>
 		<button class="red-button" mat-button [obButton]="'secondary'" matDialogClose>
