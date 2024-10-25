@@ -131,19 +131,20 @@ export class HomeComponent implements OnInit {
 	}
 
 	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
-		const partialText = chunk;
-		if (!partialText) return;
+		if (!chunk) return;
 
-		const anchorTagMatch = ANCHOR_TAG_REGEX.exec(partialText);
-		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialText);
-		partialChatMessage.message += partialText.replace(ANCHOR_TAG_REGEX, '').replace(MESSAGE_ID_REGEX, '');
+		partialChatMessage.message += chunk;
+		const anchorTagMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message);
+		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
 		if (anchorTagMatch) {
+			partialChatMessage.message = partialChatMessage.message.replace(ANCHOR_TAG_REGEX, '');
 			partialChatMessage.url = anchorTagMatch[1];
 			partialChatMessage.isCompleted = true;
 			this.scrollToBottom();
 			this.enableSearch();
 		}
 		if (messageIdTagMatch) {
+			partialChatMessage.message = partialChatMessage.message.replace(MESSAGE_ID_REGEX, '');
 			partialChatMessage.id = messageIdTagMatch[1];
 			if (!this.currentConversation) {
 				this.refreshConversations();
