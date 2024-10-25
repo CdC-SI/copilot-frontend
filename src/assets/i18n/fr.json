@@ -47,5 +47,9 @@
   "feedback.comment": "Pourquoi cette réponse n’est-elle pas satisfaisante ?",
   "feedback.comment.placeholder": "Ajoutez un commentaire...",
   "send": "Envoyer",
-  "feedback.success": "Merci pour votre retour !"
+  "feedback.success": "Merci pour votre retour !",
+  "concise": "Concis",
+  "detailed": "Détaillé",
+  "formal": "Formel",
+  "legal": "Juridique"
 }

@@ -2,7 +2,7 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.model" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.LLM_MODEL">
-			<mat-option *ngFor="let model of CHAT_REQUEST_FORM_OPTIONS.LLM_MODEL" [value]="model">{{ model }}</mat-option>
+			<mat-option *ngFor="let model of LLM_MODELS" [value]="model">{{ model }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
@@ -10,7 +10,7 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
-			<mat-option *ngFor="let tag of CHAT_REQUEST_FORM_OPTIONS.TAGS" [value]="tag">{{ tag }}</mat-option>
+			<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ tag }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
@@ -18,7 +18,7 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.sources" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple>
-			<mat-option *ngFor="let source of CHAT_REQUEST_FORM_OPTIONS.SOURCES" [value]="source">{{ source }}</mat-option>
+			<mat-option *ngFor="let source of SOURCES" [value]="source">{{ source }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
@@ -26,7 +26,7 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.retrieval-methods" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.RETRIEVAL_METHODS" multiple>
-			<mat-option *ngFor="let method of CHAT_REQUEST_FORM_OPTIONS.RETRIEVAL_METHODS" [value]="method">{{ method }}</mat-option>
+			<mat-option *ngFor="let method of RETRIEVAL_METHODS" [value]="method">{{ method }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
@@ -34,7 +34,7 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.response-style" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
-			<mat-option *ngFor="let style of CHAT_REQUEST_FORM_OPTIONS.STYLES" [value]="style">{{ style }}</mat-option>
+			<mat-option *ngFor="let style of CHAT_REQUEST_FORM_OPTIONS.STYLES" [value]="style">{{ style | translate }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>

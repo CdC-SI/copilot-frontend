@@ -28,9 +28,5 @@ export enum ChatRequestConfigFields {
 
 // Mock lists from backend
 export const CHAT_REQUEST_FORM_OPTIONS = {
-	LLM_MODEL: ['Model 1', 'Model 2', 'Model 3'],
-	TAGS: ['Tag 1', 'Tag 2', 'Tag 3'],
-	SOURCES: ['Source 1', 'Source 2', 'Source 3'],
-	RETRIEVAL_METHODS: ['Method 1', 'Method 2', 'Method 3'],
-	STYLES: ['Style 1', 'Style 2', 'Style 3']
+	STYLES: ['concise', 'detailed', 'formal', 'legal']
 };

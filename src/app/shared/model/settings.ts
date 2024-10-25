@@ -1,0 +1,6 @@
+export enum SettingsType {
+	LLM_MODEL = 'LLM_MODEL',
+	TAG = 'TAG',
+	SOURCE = 'SOURCE',
+	RETRIEVAL_METHOD = 'RETRIEVAL_METHOD'
+}

@@ -47,5 +47,9 @@
   "feedback.comment": "Warum ist diese Antwort nicht zufriedenstellend?",
   "feedback.comment.placeholder": "Kommentar hinzufügen...",
   "send": "Senden",
-  "feedback.success": "Vielen Dank für Ihr Feedback!"
+  "feedback.success": "Vielen Dank für Ihr Feedback!",
+  "concise": "Kurz",
+  "detailed": "Ausführlich",
+  "formal": "Formell",
+  "legal": "Rechtlich"
 }
