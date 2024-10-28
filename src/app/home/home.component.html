@@ -1,6 +1,6 @@
 <ob-column-layout class="h100" [left]="isAuthenticated()" [right]="isAuthenticated()">
 	<div column-left-content class="h100">
-		<mat-card class="h100">
+		<mat-card class="history-card">
 			<mat-card-header class="flex-row aic jcsb">
 				<mat-card-title class="mt16">{{ "Historique" | translate }}</mat-card-title>
 				<button mat-icon-button [obButton]="'primary'" (click)="newChat()">
@@ -17,8 +17,6 @@
 		<div class="logo" *ngIf="messages.length <= 0">
 			<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
 		</div>
-		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
-
 		<div class="message-container">
 			<div *ngFor="let message of messages; let last = last; let i = index" class="message">
 				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
@@ -33,7 +31,7 @@
 				</div>
 			</div>
 		</div>
-
+		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
 		<form class="question-container" ngForm>
 			<ut-autocomplete-input
 				class="mr8"
@@ -57,8 +55,8 @@
 		</form>
 	</div>
 
-	<div column-right-content class="h100" op>
-		<mat-card class="h100">
+	<div column-right-content class="h100">
+		<mat-card class="configuration-card">
 			<mat-card-header>
 				<mat-card-title class="mt16">{{ "Paramètres" | translate }}</mat-card-title>
 			</mat-card-header>

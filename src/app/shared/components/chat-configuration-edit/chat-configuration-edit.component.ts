@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
 import {CHAT_REQUEST_FORM_OPTIONS, ChatRequestConfigFields} from '../../model/rag';
@@ -43,7 +43,41 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 
 	onTouched = () => {};
 
+	buildForm() {
+		this.formGroup = this.fb.group({
+			[this.FORM_FIELDS.LLM_MODEL]: [''],
+			[this.FORM_FIELDS.TAGS]: [[]],
+			[this.FORM_FIELDS.AUTOCOMPLETE]: [],
+			[this.FORM_FIELDS.RAG]: [],
+			[this.FORM_FIELDS.LANGUAGE]: [this.translateService.currentLang],
+			[this.FORM_FIELDS.RESPONSE_STYLE]: [''],
+			[this.FORM_FIELDS.K_MEMORY]: [''],
+			[this.FORM_FIELDS.RETRIEVAL_METHODS]: [''],
+			[this.FORM_FIELDS.SOURCES]: ['']
+		});
+
+		setTimeout(() => {
+			this.formGroup.patchValue({
+				[this.FORM_FIELDS.AUTOCOMPLETE]: true,
+				[this.FORM_FIELDS.RAG]: true
+			});
+		});
+	}
+
 	ngOnInit(): void {
+		this.buildForm();
+		this.configureForm();
+		this.loadDropdowns();
+	}
+
+	configureForm() {
+		this.formGroup.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(value => {
+			this.onChange(value);
+			this.onTouched();
+		});
+	}
+
+	loadDropdowns() {
 		this.settingsService.getSettings(SettingsType.TAG).subscribe(tags => {
 			this.TAGS = tags.filter(tag => tag && tag !== '');
 		});
@@ -55,23 +89,6 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		});
 		this.settingsService.getSettings(SettingsType.RETRIEVAL_METHOD).subscribe(retrievalMethods => {
 			this.RETRIEVAL_METHODS = retrievalMethods;
-		});
-
-		this.formGroup = this.fb.group({
-			[this.FORM_FIELDS.LLM_MODEL]: [''],
-			[this.FORM_FIELDS.TAGS]: [[]],
-			[this.FORM_FIELDS.AUTOCOMPLETE]: [true],
-			[this.FORM_FIELDS.RAG]: [true],
-			[this.FORM_FIELDS.LANGUAGE]: [this.translateService.currentLang],
-			[this.FORM_FIELDS.RESPONSE_STYLE]: [''],
-			[this.FORM_FIELDS.K_MEMORY]: [''],
-			[this.FORM_FIELDS.RETRIEVAL_METHODS]: [''],
-			[this.FORM_FIELDS.SOURCES]: ['']
-		});
-
-		this.formGroup.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(value => {
-			this.onChange(value);
-			this.onTouched();
 		});
 	}
 

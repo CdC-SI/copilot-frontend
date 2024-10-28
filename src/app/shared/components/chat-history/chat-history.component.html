@@ -1,5 +1,5 @@
 <mat-list role="list">
 	<mat-list-item [class]="title.selected ? 'title-selected' : 'title'" role="listitem" *ngFor="let title of titles" (click)="titleSelected(title)">
-		<p matLine>{{ title.title }}</p>
+		◈ {{ title.title }}
 	</mat-list-item>
 </mat-list>
