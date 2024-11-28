@@ -53,6 +53,10 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			[this.FORM_FIELDS.LANGUAGE]: [this.translateService.currentLang],
 			[this.FORM_FIELDS.RESPONSE_STYLE]: [''],
 			[this.FORM_FIELDS.K_MEMORY]: [''],
+			[this.FORM_FIELDS.K_RETRIEVE]: [''],
+			[this.FORM_FIELDS.MAX_OUTPUT_TOKENS]: [''],
+			[this.FORM_FIELDS.TOP_P]: [''],
+			[this.FORM_FIELDS.TEMPERATURE]: [''],
 			[this.FORM_FIELDS.RETRIEVAL_METHODS]: [''],
 			[this.FORM_FIELDS.SOURCES]: ['']
 		});
