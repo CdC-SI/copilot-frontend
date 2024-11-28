@@ -9,6 +9,7 @@ export interface ChatMessage {
 	isCompleted?: boolean;
 	lang?: string;
 	inError?: boolean;
+	isRetrieving?: boolean;
 }
 
 export enum ChatMessageSource {

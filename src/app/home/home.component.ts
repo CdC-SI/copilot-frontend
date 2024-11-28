@@ -3,7 +3,7 @@ import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
+import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, RETRIEVING_TAG_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
 import {UserService} from '../shared/services/user.service';
@@ -143,9 +143,23 @@ export class HomeComponent implements OnInit {
 	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
 		if (!chunk) return;
 
+		const retrievingTagMatch = RETRIEVING_TAG_REGEX.exec(chunk);
+		if (retrievingTagMatch) {
+			partialChatMessage.message = retrievingTagMatch[1];
+			partialChatMessage.isRetrieving = true;
+			return;
+		}
+
+		// If we were in retrieving state, clear the message before adding new content
+		if (partialChatMessage.isRetrieving) {
+			partialChatMessage.message = '';
+			partialChatMessage.isRetrieving = false;
+		}
+
 		partialChatMessage.message += chunk;
 		const anchorTagMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message);
 		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
+
 		if (anchorTagMatch) {
 			partialChatMessage.message = partialChatMessage.message.replace(ANCHOR_TAG_REGEX, '');
 			partialChatMessage.url = anchorTagMatch[1];
