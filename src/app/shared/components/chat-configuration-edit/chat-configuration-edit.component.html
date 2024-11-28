@@ -20,6 +20,12 @@
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.max_output_tokens" | translate }}</mat-label>
+		<input type="number" matInput [formControlName]="FORM_FIELDS.MAX_OUTPUT_TOKENS" />
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
 			<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ tag }}</mat-option>
@@ -44,6 +50,12 @@
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.k_retrieve" | translate }}</mat-label>
+		<input type="number" matInput [formControlName]="FORM_FIELDS.K_RETRIEVE" />
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.response-style" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
 			<mat-option *ngFor="let style of RESPONSE_STYLE" [value]="style">{{ style | translate }}</mat-option>
@@ -54,18 +66,6 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.memory" | translate }}</mat-label>
 		<input type="number" matInput [formControlName]="FORM_FIELDS.K_MEMORY" />
-		<mat-error></mat-error>
-	</mat-form-field>
-
-	<mat-form-field obErrorMessages>
-		<mat-label>{{ "parameters.k_retrieve" | translate }}</mat-label>
-		<input type="number" matInput [formControlName]="FORM_FIELDS.K_RETRIEVE" />
-		<mat-error></mat-error>
-	</mat-form-field>
-
-	<mat-form-field obErrorMessages>
-		<mat-label>{{ "parameters.max_output_tokens" | translate }}</mat-label>
-		<input type="number" matInput [formControlName]="FORM_FIELDS.MAX_OUTPUT_TOKENS" />
 		<mat-error></mat-error>
 	</mat-form-field>
 
