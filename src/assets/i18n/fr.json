@@ -44,6 +44,7 @@
   "parameters.memory": "K-Mémoire",
   "parameters.autocomplete": "Auto-complétion",
   "parameters.rag": "RAG",
+  "parameters.agentic_rag": "Agentic RAG",
   "feedback.comment": "Pourquoi cette réponse n’est-elle pas satisfaisante ?",
   "feedback.comment.placeholder": "Ajoutez un commentaire...",
   "send": "Envoyer",

@@ -49,6 +49,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			[this.FORM_FIELDS.TAGS]: [[]],
 			[this.FORM_FIELDS.AUTOCOMPLETE]: [],
 			[this.FORM_FIELDS.RAG]: [],
+			[this.FORM_FIELDS.AGENTIC_RAG]: [],
 			[this.FORM_FIELDS.LANGUAGE]: [this.translateService.currentLang],
 			[this.FORM_FIELDS.RESPONSE_STYLE]: [''],
 			[this.FORM_FIELDS.K_MEMORY]: [''],
@@ -59,7 +60,8 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		setTimeout(() => {
 			this.formGroup.patchValue({
 				[this.FORM_FIELDS.AUTOCOMPLETE]: true,
-				[this.FORM_FIELDS.RAG]: true
+				[this.FORM_FIELDS.RAG]: true,
+				[this.FORM_FIELDS.AGENTIC_RAG]: true
 			});
 		});
 	}
