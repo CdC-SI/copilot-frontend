@@ -41,8 +41,3 @@ export enum ChatRequestConfigFields {
 	AGENTIC_RAG = 'agenticRag',
 	IS_FOLLOWUP_Q = 'isFollowUpQ'
 }
-
-// Mock lists from backend
-export const CHAT_REQUEST_FORM_OPTIONS = {
-	STYLES: ['concise', 'detailed', 'formal', 'legal']
-};

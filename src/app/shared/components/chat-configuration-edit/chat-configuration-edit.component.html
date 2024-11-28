@@ -34,7 +34,7 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.response-style" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
-			<mat-option *ngFor="let style of CHAT_REQUEST_FORM_OPTIONS.STYLES" [value]="style">{{ style | translate }}</mat-option>
+			<mat-option *ngFor="let style of RESPONSE_STYLE" [value]="style">{{ style | translate }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>

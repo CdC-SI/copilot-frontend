@@ -1,7 +1,7 @@
 import {AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
-import {CHAT_REQUEST_FORM_OPTIONS, ChatRequestConfigFields} from '../../model/rag';
+import {ChatRequestConfigFields} from '../../model/rag';
 import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
@@ -26,11 +26,11 @@ import {clearNullAndEmpty} from '../../utils/zco-utils';
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatConfigurationEditComponent implements OnInit, OnDestroy, ControlValueAccessor, Validator {
-	CHAT_REQUEST_FORM_OPTIONS = CHAT_REQUEST_FORM_OPTIONS;
 	TAGS: string[] = [];
 	SOURCES: string[] = [];
 	LLM_MODELS: string[] = [];
 	RETRIEVAL_METHODS: string[] = [];
+	RESPONSE_STYLE: string[] = [];
 	FORM_FIELDS = ChatRequestConfigFields;
 	formGroup: FormGroup;
 	destroyed$ = new Subject<void>();
@@ -89,6 +89,9 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		});
 		this.settingsService.getSettings(SettingsType.RETRIEVAL_METHOD).subscribe(retrievalMethods => {
 			this.RETRIEVAL_METHODS = retrievalMethods;
+		});
+		this.settingsService.getSettings(SettingsType.RESPONSE_STYLE).subscribe(styles => {
+			this.RESPONSE_STYLE = styles;
 		});
 	}
 
