@@ -81,6 +81,26 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			this.onChange(value);
 			this.onTouched();
 		});
+
+		// Add mutual exclusivity for RAG toggles
+		const ragControl = this.formGroup.get(this.FORM_FIELDS.RAG);
+		const agenticRagControl = this.formGroup.get(this.FORM_FIELDS.AGENTIC_RAG);
+
+		ragControl?.valueChanges
+			.pipe(takeUntil(this.destroyed$))
+			.subscribe(enabled => {
+				if (enabled) {
+					agenticRagControl?.setValue(false, { emitEvent: false });
+				}
+			});
+
+		agenticRagControl?.valueChanges
+			.pipe(takeUntil(this.destroyed$))
+			.subscribe(enabled => {
+				if (enabled) {
+					ragControl?.setValue(false, { emitEvent: false });
+				}
+			});
 	}
 
 	loadDropdowns() {
