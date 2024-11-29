@@ -11,6 +11,8 @@ export interface ChatMessage {
 	inError?: boolean;
 	isRetrieving?: boolean;
 	isValidating?: boolean;
+	isRouting?: boolean;
+	isAgent?: boolean;
 }
 
 export enum ChatMessageSource {

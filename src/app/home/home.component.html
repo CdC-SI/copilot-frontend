@@ -21,6 +21,8 @@
 			<div *ngFor="let message of messages; let last = last; let i = index" class="message"
 			     [class.retrieving]="message.isRetrieving"
 			     [class.validating]="message.isValidating"
+			     [class.routing]="message.isRouting"
+			     [class.agent]="message.isAgent"
 			     [class.assistant]="message.source !== ChatMessageSource.USER"
 			     [class.user]="message.source === ChatMessageSource.USER">
 				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
