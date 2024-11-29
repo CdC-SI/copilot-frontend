@@ -3,7 +3,7 @@ import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, RETRIEVING_TAG_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
+import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, RETRIEVING_TAG_REGEX, TOPIC_CHECK_REGEX, OFF_TOPIC_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
 import {UserService} from '../shared/services/user.service';
@@ -143,6 +143,20 @@ export class HomeComponent implements OnInit {
 	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
 		if (!chunk) return;
 
+		const topicCheckMatch = TOPIC_CHECK_REGEX.exec(chunk);
+		if (topicCheckMatch) {
+			partialChatMessage.message = topicCheckMatch[1];
+			partialChatMessage.isValidating = true;
+			return;
+		}
+
+		const offTopicMatch = OFF_TOPIC_REGEX.exec(chunk);
+		if (offTopicMatch) {
+			// Remove validation message and handle off-topic response
+			partialChatMessage.isValidating = false;
+			return;
+		}
+
 		const retrievingTagMatch = RETRIEVING_TAG_REGEX.exec(chunk);
 		if (retrievingTagMatch) {
 			partialChatMessage.message = retrievingTagMatch[1];
@@ -150,10 +164,11 @@ export class HomeComponent implements OnInit {
 			return;
 		}
 
-		// If we were in retrieving state, clear the message before adding new content
-		if (partialChatMessage.isRetrieving) {
+		// If we were in retrieving/validating state, clear the message before adding new content
+		if (partialChatMessage.isRetrieving || partialChatMessage.isValidating) {
 			partialChatMessage.message = '';
 			partialChatMessage.isRetrieving = false;
+			partialChatMessage.isValidating = false;
 		}
 
 		partialChatMessage.message += chunk;

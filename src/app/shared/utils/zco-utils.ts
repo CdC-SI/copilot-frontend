@@ -1,6 +1,8 @@
 export const ANCHOR_TAG_REGEX = /<source><a\s+href=['"]([^'"]+)['"][^>]*>(.*?)<\/a><\/source>/gi;
 export const MESSAGE_ID_REGEX = /<message_uuid>(.*)<\/message_uuid>/gi;
 export const RETRIEVING_TAG_REGEX = /<retrieving>(.*?)<\/retrieving>/gi;
+export const TOPIC_CHECK_REGEX = /<topic_check>(.*?)<\/topic_check>/gi;
+export const OFF_TOPIC_REGEX = /<off_topic>(.*?)<\/off_topic>/gi;
 
 // Remove null, undefined and empty string value from object
 export const clearNullAndEmpty = (obj: any): any => {

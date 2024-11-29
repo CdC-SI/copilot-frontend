@@ -10,6 +10,7 @@ export interface ChatMessage {
 	lang?: string;
 	inError?: boolean;
 	isRetrieving?: boolean;
+	isValidating?: boolean;
 }
 
 export enum ChatMessageSource {
