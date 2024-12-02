@@ -106,13 +106,23 @@ export class HomeComponent implements OnInit {
 		this.addMessage(ChatMessageSource.USER, this.searchCtrl.value);
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
+
+		// Convert language code to proper format
+		const languageMap: Record<string, Language> = {
+			'de': Language.DE,
+			'fr': Language.FR,
+			'it': Language.IT
+		};
+		const currentLang = this.translateService.currentLang;
+		const mappedLanguage = languageMap[currentLang as keyof typeof languageMap] || Language.DE;
+
 		this.ragService
 			.process(
 				clearNullAndEmpty({
 					query: this.searchCtrl.value,
 					conversationId: this.currentConversation?.conversationId,
-					language: this.translateService.currentLang,
-					...this.chatConfigCtrl.value
+					...this.chatConfigCtrl.value,
+					language: mappedLanguage
 				})
 			)
 			.subscribe({

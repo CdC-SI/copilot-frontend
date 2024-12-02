@@ -6,11 +6,19 @@ export interface ChatRequest {
 	tags?: string[];
 	sources?: string[];
 	llmModel?: string;
+	topP?: number;
+	temperature?: number;
+	maxOutputTokens?: number;
 	retrievalMethods?: string[];
+	kRetrieve?: number;
 	kMemory?: number;
 	responseStyle?: string;
+	command?: string;
+	commandArgs?: string;
 	autocomplete?: boolean;
 	rag?: boolean;
+	agenticRag?: boolean;
+	isFollowUpQ?: boolean;
 	conversationId?: string;
 }
 
@@ -19,14 +27,17 @@ export enum ChatRequestConfigFields {
 	TAGS = 'tags',
 	SOURCES = 'sources',
 	LLM_MODEL = 'llmModel',
+	TOP_P = 'topP',
+	TEMPERATURE = 'temperature',
+	MAX_OUTPUT_TOKENS = 'maxOutputTokens',
 	RETRIEVAL_METHODS = 'retrievalMethods',
+	K_RETRIEVE = 'kRetrieve',
 	K_MEMORY = 'kMemory',
 	RESPONSE_STYLE = 'responseStyle',
+	COMMAND = 'command',
+	COMMAND_ARGS = 'commandArgs',
 	AUTOCOMPLETE = 'autocomplete',
-	RAG = 'rag'
+	RAG = 'rag',
+	AGENTIC_RAG = 'agenticRag',
+	IS_FOLLOWUP_Q = 'isFollowUpQ'
 }
-
-// Mock lists from backend
-export const CHAT_REQUEST_FORM_OPTIONS = {
-	STYLES: ['concise', 'detailed', 'formal', 'legal']
-};
