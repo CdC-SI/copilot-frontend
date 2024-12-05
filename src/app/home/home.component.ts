@@ -13,6 +13,14 @@ import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
 import {FeedbackService} from '../shared/services/feedback.service';
 import {ObNotificationService} from '@oblique/oblique';
+import {SettingsService} from '../shared/services/settings.service';
+import {SettingsType} from '../shared/model/settings';
+
+// Add interface for command option
+interface CommandOption {
+    text: string;
+    isCommand: true;
+}
 
 @Component({
 	selector: 'zco-home',
@@ -26,6 +34,7 @@ export class HomeComponent implements OnInit {
 	messages: ChatMessage[] = [];
 	conversationTitles: ChatTitle[] = [];
 	currentConversation: ChatTitle;
+	authorizedCommands: string[] = [];
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -39,7 +48,8 @@ export class HomeComponent implements OnInit {
 		private readonly conversationService: ConversationService,
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
-		private readonly notif: ObNotificationService
+		private readonly notif: ObNotificationService,
+		private readonly settingsService: SettingsService
 	) {}
 
 	ngOnInit() {
@@ -53,6 +63,9 @@ export class HomeComponent implements OnInit {
 		}
 		this.userService.userLoggedIn.subscribe(() => {
 			this.getConversationTitles();
+		});
+		this.settingsService.getSettings(SettingsType.AUTHORIZED_COMMANDS).subscribe(commands => {
+			this.authorizedCommands = commands;
 		});
 	}
 
@@ -70,11 +83,23 @@ export class HomeComponent implements OnInit {
 	getSearchProposalFunction = (text: string) => {
 		return this.autocompleteService.search(text);
 	};
-	searchOptionLabelFn = (question: IQuestion): string => question?.text ?? '';
+	searchOptionLabelFn = (item: IQuestion | CommandOption): string => {
+		if ('isCommand' in item) {
+			return item.text;
+		}
+		return item?.text ?? '';
+	};
 
-	selectFaqOption(question: IQuestion): void {
-		this.addMessage(ChatMessageSource.USER, question.text, false, true, question.language, question.id);
-		this.addMessage(ChatMessageSource.FAQ, question.answer.text, false, true, question.language, question.id, question.url);
+	selectFaqOption(option: IQuestion | CommandOption): void {
+		if ('isCommand' in option) {
+			// Just set the input value for commands
+			this.searchCtrl.setValue(option.text);
+			return;
+		}
+
+		// Original FAQ handling
+		this.addMessage(ChatMessageSource.USER, option.text, false, true, option.language, option.id);
+		this.addMessage(ChatMessageSource.FAQ, option.answer.text, false, true, option.language, option.id, option.url);
 		this.clearSearch();
 		this.scrollToBottom();
 		this.updateCurrentConversation();
