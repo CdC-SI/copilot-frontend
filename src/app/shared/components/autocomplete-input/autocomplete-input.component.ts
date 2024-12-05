@@ -112,10 +112,10 @@ export class AutocompleteInputComponent<T extends object> implements OnInit, Con
 		this.formControl.setValue(value);
 	}
 
-	// Update the option label getter to handle both types
+	// Update the option label getter to handle both types and highlight commands
 	getOptionLabel(option: T | CommandOption): string {
 		if ('isCommand' in option) {
-			return option.text;
+			return this.highlightTextPipe.transform(option.text, this.formControl.value);
 		}
 		const optionLbl = this.optionLabelFn(option as T);
 		return this.highlightTextPipe.transform(optionLbl, this.formControl.value);
@@ -142,6 +142,7 @@ export class AutocompleteInputComponent<T extends object> implements OnInit, Con
 		this.formControl = new FormControl('', this.required ? Validators.required : null);
 	}
 
+	// Update getProposalLabelFn to properly handle highlighting for display
 	getProposalLabelFn(): (value: T | CommandOption) => string {
 		return value => {
 			if ('isCommand' in value) {
