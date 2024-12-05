@@ -3,7 +3,7 @@ import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, clearNullAndEmpty} from '../shared/utils/zco-utils';
+import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, RETRIEVING_TAG_REGEX, TOPIC_CHECK_REGEX, OFF_TOPIC_REGEX, clearNullAndEmpty, ROUTING_TAG_REGEX, AGENT_TAG_REGEX} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
 import {UserService} from '../shared/services/user.service';
@@ -143,9 +143,54 @@ export class HomeComponent implements OnInit {
 	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
 		if (!chunk) return;
 
+		const agentTagMatch = AGENT_TAG_REGEX.exec(chunk);
+		if (agentTagMatch) {
+			partialChatMessage.message = agentTagMatch[1];
+			partialChatMessage.isAgent = true;
+			return;
+		}
+
+		const routingTagMatch = ROUTING_TAG_REGEX.exec(chunk);
+		if (routingTagMatch) {
+			partialChatMessage.message = routingTagMatch[1];
+			partialChatMessage.isRouting = true;
+			return;
+		}
+
+		const topicCheckMatch = TOPIC_CHECK_REGEX.exec(chunk);
+		if (topicCheckMatch) {
+			partialChatMessage.message = topicCheckMatch[1];
+			partialChatMessage.isValidating = true;
+			return;
+		}
+
+		const offTopicMatch = OFF_TOPIC_REGEX.exec(chunk);
+		if (offTopicMatch) {
+			// Remove validation message and handle off-topic response
+			partialChatMessage.isValidating = false;
+			return;
+		}
+
+		const retrievingTagMatch = RETRIEVING_TAG_REGEX.exec(chunk);
+		if (retrievingTagMatch) {
+			partialChatMessage.message = retrievingTagMatch[1];
+			partialChatMessage.isRetrieving = true;
+			return;
+		}
+
+		// If we were in retrieving/validating/routing/agent state, clear the message before adding new content
+		if (partialChatMessage.isRetrieving || partialChatMessage.isValidating || partialChatMessage.isRouting || partialChatMessage.isAgent) {
+			partialChatMessage.message = '';
+			partialChatMessage.isRetrieving = false;
+			partialChatMessage.isValidating = false;
+			partialChatMessage.isRouting = false;
+			partialChatMessage.isAgent = false;
+		}
+
 		partialChatMessage.message += chunk;
 		const anchorTagMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message);
 		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
+
 		if (anchorTagMatch) {
 			partialChatMessage.message = partialChatMessage.message.replace(ANCHOR_TAG_REGEX, '');
 			partialChatMessage.url = anchorTagMatch[1];
