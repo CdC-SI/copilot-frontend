@@ -31,6 +31,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 	LLM_MODELS: string[] = [];
 	RETRIEVAL_METHODS: string[] = [];
 	RESPONSE_STYLE: string[] = [];
+	AUTHORIZED_COMMANDS: string[] = [];
 	FORM_FIELDS = ChatRequestConfigFields;
 	formGroup: FormGroup;
 	destroyed$ = new Subject<void>();
@@ -118,6 +119,10 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		});
 		this.settingsService.getSettings(SettingsType.RESPONSE_STYLE).subscribe(styles => {
 			this.RESPONSE_STYLE = styles;
+		});
+		this.settingsService.getSettings(SettingsType.AUTHORIZED_COMMANDS).subscribe(commands => {
+			this.AUTHORIZED_COMMANDS = commands;
+			console.log('Authorized commands:', commands);
 		});
 	}
 
