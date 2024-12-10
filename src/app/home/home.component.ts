@@ -1,4 +1,5 @@
 import {ChangeDetectorRef, Component, OnInit, Renderer2} from '@angular/core';
+import {Observable, of} from 'rxjs';  // Add this import
 import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
@@ -13,6 +14,9 @@ import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
 import {FeedbackService} from '../shared/services/feedback.service';
 import {ObNotificationService} from '@oblique/oblique';
+import {CommandService, Command} from '../shared/services/command.service';
+
+type AutocompleteType = IQuestion | Command;
 
 @Component({
 	selector: 'zco-home',
@@ -26,6 +30,7 @@ export class HomeComponent implements OnInit {
 	messages: ChatMessage[] = [];
 	conversationTitles: ChatTitle[] = [];
 	currentConversation: ChatTitle;
+	isCommandMode = false;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -39,7 +44,8 @@ export class HomeComponent implements OnInit {
 		private readonly conversationService: ConversationService,
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
-		private readonly notif: ObNotificationService
+		private readonly notif: ObNotificationService,
+		private readonly commandService: CommandService
 	) {}
 
 	ngOnInit() {
@@ -67,10 +73,28 @@ export class HomeComponent implements OnInit {
 		}
 	}
 
-	getSearchProposalFunction = (text: string) => {
-		return this.autocompleteService.search(text);
+	getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
+		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
 	};
-	searchOptionLabelFn = (question: IQuestion): string => question?.text ?? '';
+
+	getCommandSuggestions = (text: string): Observable<Command[]> => {
+		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
+	};
+
+	searchOptionLabelFn = (option: AutocompleteType): string => {
+		if (this.isCommandMode && 'name' in option) {
+			return option.name;
+		}
+		return (option as IQuestion)?.text ?? '';
+	};
+
+	handleOptionSelected(value: AutocompleteType): void {
+		if (this.isCommandMode && 'name' in value) {
+			this.searchCtrl.setValue(value.name);
+		} else {
+			this.selectFaqOption(value as IQuestion);
+		}
+	}
 
 	selectFaqOption(question: IQuestion): void {
 		this.addMessage(ChatMessageSource.USER, question.text, false, true, question.language, question.id);
@@ -103,7 +127,10 @@ export class HomeComponent implements OnInit {
 	}
 
 	sendToLLM(): void {
-		this.addMessage(ChatMessageSource.USER, this.searchCtrl.value);
+		const inputText = this.searchCtrl.value;
+		const commandData = this.commandService.parseCommand(inputText);
+
+		this.addMessage(ChatMessageSource.USER, inputText);
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
 
@@ -119,10 +146,14 @@ export class HomeComponent implements OnInit {
 		this.ragService
 			.process(
 				clearNullAndEmpty({
-					query: this.searchCtrl.value,
+					query: inputText,
 					conversationId: this.currentConversation?.conversationId,
 					...this.chatConfigCtrl.value,
-					language: mappedLanguage
+					language: mappedLanguage,
+					command: commandData?.command || null,
+					commandArgs: commandData?.args || null,
+					rag: !commandData,
+					agenticRag: !commandData && this.chatConfigCtrl.value?.agenticRag
 				})
 			)
 			.subscribe({

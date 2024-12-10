@@ -45,10 +45,11 @@
 				[i18nLabel]="'enter.message'"
 				[optionLabelFn]="searchOptionLabelFn"
 				[inputLabelFn]="searchOptionLabelFn"
-				[optionService]="getSearchProposalFunction"
+				[optionService]="isCommandMode ? getCommandSuggestions : getSearchProposalFunction"
 				[minLength]="0"
 				[formControl]="searchCtrl"
-				(optionSelected)="selectFaqOption($event)"
+				(optionSelected)="handleOptionSelected($event)"
+				(inputChange)="isCommandMode = $event.startsWith('/')"
 			/>
 
 			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
