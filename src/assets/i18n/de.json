@@ -55,6 +55,7 @@
   "feedback.success": "Vielen Dank für Ihr Feedback!",
   "concise": "Kurz",
   "detailed": "Ausführlich",
-  "formal": "Formell",
+  "plain": "Einfache",
+  "easy": "Leichte",
   "legal": "Rechtlich"
 }

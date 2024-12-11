@@ -55,6 +55,7 @@
   "feedback.success": "Grazie per il tuo feedback!",
   "concise": "Conciso",
   "detailed": "Dettagliato",
-  "formal": "Formale",
+  "plain": "Semplice",
+  "easy": "Facile",
   "legal": "Legale"
 }
