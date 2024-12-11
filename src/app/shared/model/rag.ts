@@ -13,6 +13,7 @@ export interface ChatRequest {
 	kRetrieve?: number;
 	kMemory?: number;
 	responseStyle?: string;
+	responseFormat?: string;
 	command?: string;
 	commandArgs?: string;
 	autocomplete?: boolean;
@@ -34,6 +35,7 @@ export enum ChatRequestConfigFields {
 	K_RETRIEVE = 'kRetrieve',
 	K_MEMORY = 'kMemory',
 	RESPONSE_STYLE = 'responseStyle',
+	RESPONSE_FORMAT = 'responseFormat',
 	COMMAND = 'command',
 	COMMAND_ARGS = 'commandArgs',
 	AUTOCOMPLETE = 'autocomplete',

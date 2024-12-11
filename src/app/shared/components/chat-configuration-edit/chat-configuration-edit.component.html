@@ -64,6 +64,14 @@
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.response-format" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_FORMAT">
+			<mat-option *ngFor="let style of RESPONSE_FORMAT" [value]="style">{{ style | translate }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.memory" | translate }}</mat-label>
 		<input type="number" matInput [formControlName]="FORM_FIELDS.K_MEMORY" />
 		<mat-error></mat-error>

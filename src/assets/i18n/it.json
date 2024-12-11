@@ -45,6 +45,7 @@
   "parameters.k_retrieve": "K Retrieve",
   "parameters.max_output_tokens": "Max Output Tokens",
   "parameters.response-style": "Stile di risposta",
+  "parameters.response-format": "Formato di risposta",
   "parameters.memory": "K Memory",
   "parameters.autocomplete": "Autocompletamento",
   "parameters.rag": "RAG",
@@ -57,5 +58,7 @@
   "detailed": "Dettagliato",
   "plain": "Semplice (B1)",
   "easy": "Facile (A2)",
-  "legal": "Legale"
+  "legal": "Legale",
+  "condensed": "Condensato",
+  "complete": "Completo"
 }
