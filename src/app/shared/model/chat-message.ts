@@ -13,6 +13,7 @@ export interface ChatMessage {
 	isValidating?: boolean;
 	isRouting?: boolean;
 	isAgent?: boolean;
+	sources?: string[];
 }
 
 export enum ChatMessageSource {

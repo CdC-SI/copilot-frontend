@@ -1,15 +1,30 @@
 <div *ngIf="message.source === ChatMessageSource.USER">
-	{{ message.message }}
+    {{ message.message }}
 </div>
 <div *ngIf="message.source !== ChatMessageSource.USER">
-	<div class="flex-column">
-		<markdown [data]="message.message"></markdown>
-		<a class="mt4 mb4" *ngIf="!!message.url" [href]="message.url">{{ message.url }}</a>
-		<zco-message-action
-			[hidden]="!message.isCompleted || message.inError"
-			[message]="message"
-			[previousMessage]="previousMessage"
-			(feedback)="sendFeedback($event)"
-		></zco-message-action>
-	</div>
+    <div class="flex-column">
+        <markdown [data]="message.message"></markdown>
+
+        <mat-expansion-panel *ngIf="hasMultipleSources" class="sources-panel">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Sources ({{sourcesCount}})
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div *ngFor="let source of message.sources" class="source-item">
+                <a [href]="source" target="_blank" class="source-link">
+                    <span class="material-icons">open_in_new</span>
+                    {{source}}
+                </a>
+            </div>
+        </mat-expansion-panel>
+
+        <zco-message-action
+            [hidden]="!message.isCompleted || message.inError"
+            [message]="message"
+            [previousMessage]="previousMessage"
+            (feedback)="sendFeedback($event)"
+        ></zco-message-action>
+    </div>
 </div>

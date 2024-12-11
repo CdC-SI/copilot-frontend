@@ -98,7 +98,16 @@ export class HomeComponent implements OnInit {
 
 	selectFaqOption(question: IQuestion): void {
 		this.addMessage(ChatMessageSource.USER, question.text, false, true, question.language, question.id);
-		this.addMessage(ChatMessageSource.FAQ, question.answer.text, false, true, question.language, question.id, question.url);
+		this.addMessage(
+			ChatMessageSource.FAQ,
+			question.answer.text,
+			false,
+			true,
+			question.language,
+			question.id,
+			question.url,
+			question.url ? [question.url] : undefined
+		);
 		this.clearSearch();
 		this.scrollToBottom();
 		this.updateCurrentConversation();
@@ -219,27 +228,58 @@ export class HomeComponent implements OnInit {
 		}
 
 		partialChatMessage.message += chunk;
-		const anchorTagMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message);
-		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
 
-		if (anchorTagMatch) {
-			partialChatMessage.message = partialChatMessage.message.replace(ANCHOR_TAG_REGEX, '');
-			partialChatMessage.url = anchorTagMatch[1];
-			partialChatMessage.isCompleted = true;
-			this.scrollToBottom();
-			this.enableSearch();
+		 // Initialize sources array if needed
+		if (!partialChatMessage.sources) {
+			partialChatMessage.sources = [];
 		}
+
+		// Collect all sources from current message content
+		let sourceMatch;
+		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
+			 // Only store the URL
+			const sourceUrl = sourceMatch[1];
+			if (!partialChatMessage.sources.includes(sourceUrl)) {
+				partialChatMessage.sources.push(sourceUrl);
+			}
+			// Remove entire source tag from message
+			partialChatMessage.message = partialChatMessage.message.replace(sourceMatch[0], '');
+		}
+
+		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
 		if (messageIdTagMatch) {
 			partialChatMessage.message = partialChatMessage.message.replace(MESSAGE_ID_REGEX, '');
 			partialChatMessage.id = messageIdTagMatch[1];
+			partialChatMessage.isCompleted = true;
+			this.enableSearch();
 			if (!this.currentConversation) {
 				this.refreshConversations();
 			}
 		}
 	}
 
-	addMessage(source: ChatMessageSource, message: string, inError = false, isCompleted = true, lang?: Language, faqItemId?: number, url?: string) {
-		this.messages.push({faqItemId, message, source, isCompleted, timestamp: new Date(), lang, url, inError, beingSpoken: false});
+	addMessage(
+		source: ChatMessageSource,
+		message: string,
+		inError = false,
+		isCompleted = true,
+		lang?: Language,
+		faqItemId?: number,
+		url?: string,
+		sources?: string[]
+	) {
+		this.messages.push({
+			faqItemId,
+			message,
+			source,
+			isCompleted,
+			timestamp: new Date(),
+			lang,
+			url,
+			inError,
+			beingSpoken: false,
+			sources: sources || []
+		});
 	}
 
 	scrollToBottom(): void {
