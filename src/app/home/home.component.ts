@@ -152,19 +152,21 @@ export class HomeComponent implements OnInit {
 		const currentLang = this.translateService.currentLang;
 		const mappedLanguage = languageMap[currentLang as keyof typeof languageMap] || Language.DE;
 
+		// Handle the three mutually exclusive modes
+		const requestConfig = {
+			query: inputText,
+			conversationId: this.currentConversation?.conversationId,
+			...this.chatConfigCtrl.value,
+			language: mappedLanguage,
+			command: commandData?.command || null,
+			commandArgs: commandData?.args || null,
+			// If in command mode, both RAG modes are false
+			rag: commandData ? false : (this.chatConfigCtrl.value?.rag || false),
+			agenticRag: commandData ? false : (this.chatConfigCtrl.value?.agenticRag || false)
+		};
+
 		this.ragService
-			.process(
-				clearNullAndEmpty({
-					query: inputText,
-					conversationId: this.currentConversation?.conversationId,
-					...this.chatConfigCtrl.value,
-					language: mappedLanguage,
-					command: commandData?.command || null,
-					commandArgs: commandData?.args || null,
-					rag: !commandData,
-					agenticRag: !commandData && this.chatConfigCtrl.value?.agenticRag
-				})
-			)
+			.process(clearNullAndEmpty(requestConfig))
 			.subscribe({
 				next: chunk => {
 					this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
