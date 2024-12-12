@@ -67,7 +67,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			this.formGroup.patchValue({
 				[this.FORM_FIELDS.AUTOCOMPLETE]: true,
 				[this.FORM_FIELDS.RAG]: true,
-				[this.FORM_FIELDS.AGENTIC_RAG]: true
+				[this.FORM_FIELDS.AGENTIC_RAG]: false
 			});
 		});
 	}
