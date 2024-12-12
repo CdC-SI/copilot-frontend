@@ -143,7 +143,6 @@ export class HomeComponent implements OnInit {
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
 
-		// Convert language code to proper format
 		const languageMap: Record<string, Language> = {
 			'de': Language.DE,
 			'fr': Language.FR,
@@ -160,9 +159,10 @@ export class HomeComponent implements OnInit {
 			language: mappedLanguage,
 			command: commandData?.command || null,
 			commandArgs: commandData?.args || null,
-			// If in command mode, both RAG modes are false
 			rag: commandData ? false : (this.chatConfigCtrl.value?.rag || false),
-			agenticRag: commandData ? false : (this.chatConfigCtrl.value?.agenticRag || false)
+			agenticRag: commandData ? false : (this.chatConfigCtrl.value?.agenticRag || false),
+			sourceValidation: this.chatConfigCtrl.value?.sourceValidation || false,
+			topicCheck: this.chatConfigCtrl.value?.topicCheck || false
 		};
 
 		this.ragService

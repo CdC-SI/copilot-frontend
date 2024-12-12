@@ -107,6 +107,14 @@
 			<input type="number" matInput [formControlName]="FORM_FIELDS.K_MEMORY" />
 			<mat-error></mat-error>
 		</mat-form-field>
+
+		<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.SOURCE_VALIDATION">
+			{{ "parameters.source_validation" | translate }}
+		</mat-slide-toggle>
+
+		<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.TOPIC_CHECK">
+			{{ "parameters.topic_check" | translate }}
+		</mat-slide-toggle>
 	</mat-expansion-panel>
 
 	<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.AUTOCOMPLETE">

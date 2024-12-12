@@ -51,6 +51,8 @@
   "parameters.response-format": "Antwortformat",
   "parameters.advanced_chat_parameters": "Erweiterte Chat-Parameter",
   "parameters.memory": "K Memory",
+  "parameters.source_validation": "Quellenvalidierung",
+  "parameters.topic_check": "Themenüberprüfung",
   "parameters.autocomplete": "Autovervollständigung",
   "parameters.rag": "RAG",
   "parameters.agentic_rag": "Agentic RAG",
