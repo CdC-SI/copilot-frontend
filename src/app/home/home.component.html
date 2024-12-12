@@ -23,6 +23,7 @@
 			     [class.validating]="message.isValidating"
 			     [class.routing]="message.isRouting"
 			     [class.agent]="message.isAgent"
+			     [class.tool]="message.isToolUse"
 			     [class.assistant]="message.source !== ChatMessageSource.USER"
 			     [class.user]="message.source === ChatMessageSource.USER">
 				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">

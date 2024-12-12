@@ -14,6 +14,7 @@ export interface ChatMessage {
 	isRouting?: boolean;
 	isAgent?: boolean;
 	sources?: string[];
+	isToolUse?: boolean;
 }
 
 export enum ChatMessageSource {
