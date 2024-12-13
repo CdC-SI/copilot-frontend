@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
 
 	ngOnInit() {
 		this.settingsService.getSettings(SettingsType.PROJECT_VERSION).subscribe(
-			version => this.projectVersion = 'v' + version[0]
+			version => this.projectVersion = version[0]
 		);
 	}
 
