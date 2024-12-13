@@ -1,5 +1,5 @@
 <ob-master-layout [navigation]="getNavigation()">
-	<ng-container obHeaderTitle>ZAS/EAK CopilotGPT {{ projectVersion ? '| ' + projectVersion : '' }}</ng-container>
+	<ng-container obHeaderTitle>ZAS/EAK CopilotGPT</ng-container>
 	<ng-template #obHeaderControl>
 		<div *ngIf="userNotAuthenticated()">
 			<button class="mr16" mat-button [obButton]="'primary'" (click)="openSignUpDialog()">{{ "sign.up" | translate }}</button>
@@ -10,7 +10,7 @@
 		</div>
 	</ng-template>
 	<ng-container obFooterInfo>
-		<p>ZAS / EAK CopilotGPT</p>
+		<p>ZAS / EAK CopilotGPT {{ projectVersion ? '| ' : '' }}<a style="text-decoration: none;" href="https://github.com/CdC-SI/ZAS-EAK-CopilotGPT" target="_blank">{{ projectVersion }}</a></p>
 		<p>&copy; 2024 <span> ZAS </span></p>
 	</ng-container>
 </ob-master-layout>
