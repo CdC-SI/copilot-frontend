@@ -66,5 +66,28 @@
   "easy": "Facile (A2)",
   "legal": "Juridique",
   "condensed": "Condensé",
-  "complete": "Complet"
+  "complete": "Complet",
+  "tags": {
+    "general": "Généralités",
+    "contributions": "Cotisations",
+      "bankruptcy": "Faillite",
+      "ahv_stabilisation_21": "Stabilisation de l’AVS (AVS 21)",
+      "ahv_services": "Prestations de l'AVS",
+      "iv_services": "Prestations de l'AI",
+      "complementary_services": "Prestations complémentaires PC",
+      "transitory_services": "Prestations transitoires",
+      "loss_of_earnings_allowance": "Prestations des APG",
+      "maternity_allowance": "Prestations des AMat",
+      "allowance_for_the_other_parent": "Prestations des AAP",
+      "support_allowance": "Prestations des APC",
+      "adoption_allowance": "Prestations de l‘AAdop",
+      "international": "International",
+      "family_allowances": "Allocations familiales",
+      "accident_insurance": "Assurance-accidents LAA",
+      "occupational_benefits": "Prévoyance professionnelle PP",
+      "health_insurance": "Assurance-maladie LAMal",
+      "annual_modifications": "Modifications annuelles",
+      "hearing_aids": "Appareils auditifs",
+      "akis_online_help": "AKIS Aide En Ligne"
+    }
 }

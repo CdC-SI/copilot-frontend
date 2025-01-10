@@ -66,5 +66,28 @@
   "easy": "Leichte (A2)",
   "legal": "Rechtlich",
   "condensed": "Kondensiert",
-  "complete": "Vollständig"
+  "complete": "Vollständig",
+  "tags": {
+    "general": "Allgemeines",
+    "contributions": "Beiträge",
+    "bankruptcy": "Konkurs",
+    "ahv_stabilisation_21": "Stabilisierung der AHV (AHV 21)",
+    "ahv_services": "Leistungen der AHV",
+    "iv_services": "Leistungen der IV",
+    "complementary_services": "Ergänzungsleistungen EL",
+    "transitory_services": "Überbrückungsleistungen",
+    "loss_of_earnings_allowance": "Leistungen der EO",
+    "maternity_allowance": "Leistungen der MSE",
+    "allowance_for_the_other_parent": "Leistungen der EAE",
+    "support_allowance": "Leistungen der BUE",
+    "adoption_allowance": "Leistungen der AdopE",
+    "international": "International",
+    "family_allowances": "Familienzulagen",
+    "accident_insurance": "Unfallversicherung UVG",
+    "occupational_benefits": "Berufliche Vorsorge BV",
+    "health_insurance": "Krankenversicherung KV",
+    "annual_modifications": "Jährliche Neuerungen",
+    "hearing_aids": "Hörgeräte",
+    "akis_online_help": "AKIS Online-Hilfe"
+  }
 }

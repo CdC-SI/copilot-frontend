@@ -66,5 +66,28 @@
   "easy": "Facile (A2)",
   "legal": "Legale",
   "condensed": "Condensato",
-  "complete": "Completo"
+  "complete": "Completo",
+  "tags": {
+    "general": "Generalità",
+    "contributions": "Contributi",
+    "bankruptcy": "Fallimento",
+    "ahv_stabilisation_21": "Stabilizzazione dell’AVS (AVS 21)",
+    "ahv_services": "Prestazioni dell'AVS",
+    "iv_services": "Prestazioni dell'AI",
+    "complementary_services": "Prestazioni complementari",
+    "transitory_services": "Prestazioni transitorie",
+    "loss_of_earnings_allowance": "Prestazioni dell'IPG",
+    "maternity_allowance": "Prestazioni di maternità",
+    "allowance_for_the_other_parent": "Prestazioni per l'altro genitore",
+    "support_allowance": "Prestazioni di assistenza",
+    "adoption_allowance": "Prestazioni di adozione",
+    "international": "Internazionale",
+    "family_allowances": "Assegni familiari",
+    "accident_insurance": "Assicurazione contro gli infortuni LAINF",
+    "occupational_benefits": "Previdenza professionale PP",
+    "health_insurance": "Assicurazione malattie LAMal",
+    "annual_modifications": "Modifiche annuali",
+    "hearing_aids": "Apparecchi acustici",
+    "akis_online_help": "AKIS Aiuto Online"
+  }
 }
