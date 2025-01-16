@@ -55,6 +55,14 @@ export class SignUpComponent implements OnInit {
 	}
 
 	onConfirmClick(): void {
-		this.dialogRef.close(this.userFrmGrp.getRawValue());
+		const formValue = this.userFrmGrp.getRawValue();
+		const requestBody = {
+			username: formValue[UserFormFields.USERNAME],
+			password: formValue[UserFormFields.PASSWORD],
+			organizations: Array.isArray(formValue[UserFormFields.ORGANIZATION])
+				? formValue[UserFormFields.ORGANIZATION]
+				: [formValue[UserFormFields.ORGANIZATION]]
+		};
+		this.dialogRef.close(requestBody);
 	}
 }

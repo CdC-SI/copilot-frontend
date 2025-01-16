@@ -2,6 +2,7 @@ export interface IUser {
 	username: string;
 	password?: string;
 	roles: Role[];
+	organizations?: string[];
 }
 
 export enum UserFormFields {
