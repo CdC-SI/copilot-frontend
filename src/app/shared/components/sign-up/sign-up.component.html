@@ -17,6 +17,13 @@
 				<mat-label>{{ "confirm.password" | translate }}</mat-label>
 				<input [formControlName]="FORM_FIELDS.CONFIRM_PASSWORD" name="confirm-password" type="password" matInput placeholder="" />
 			</mat-form-field>
+			<mat-form-field obErrorMessages>
+				<mat-label>{{ "organization" | translate }}</mat-label>
+				<mat-select [formControlName]="FORM_FIELDS.ORGANIZATION" multiple>
+					<mat-option *ngFor="let entity of ORGANIZATION" [value]="entity">{{ entity }}</mat-option>
+				</mat-select>
+				<mat-error></mat-error>
+			</mat-form-field>
 		</form>
 	</div>
 </div>

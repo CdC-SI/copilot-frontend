@@ -7,7 +7,8 @@ export interface IUser {
 export enum UserFormFields {
 	USERNAME = 'username',
 	PASSWORD = 'password',
-	CONFIRM_PASSWORD = 'confirmPassword'
+	CONFIRM_PASSWORD = 'confirmPassword',
+	ORGANIZATION = 'organization'
 }
 
 export enum LoginFormFields {
