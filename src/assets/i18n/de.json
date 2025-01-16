@@ -33,6 +33,7 @@
   "password": "Passwort",
   "confirm.password": "Passwort bestätigen",
   "username": "Benutzername",
+  "organization": "Organisation",
   "create.copilot.account": "ZAS/EAK CopilotGPT-Konto erstellen",
   "login.copilot.account": "Mit einem ZAS/EAK CopilotGPT-Konto anmelden",
   "login.fail": "Falscher Benutzername oder falsches Passwort",
