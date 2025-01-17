@@ -15,6 +15,7 @@ import {Feedback} from '../shared/model/feedback';
 import {FeedbackService} from '../shared/services/feedback.service';
 import {ObNotificationService} from '@oblique/oblique';
 import {CommandService, Command} from '../shared/services/command.service';
+import { UploadService } from '../shared/services/upload.service';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -45,7 +46,8 @@ export class HomeComponent implements OnInit {
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
 		private readonly notif: ObNotificationService,
-		private readonly commandService: CommandService
+		private readonly commandService: CommandService,
+		private readonly uploadService: UploadService
 	) {}
 
 	ngOnInit() {
@@ -355,5 +357,27 @@ export class HomeComponent implements OnInit {
 				this.currentConversation.selected = true;
 			});
 		}, 1_500);
+	}
+
+	uploadDoc(): void {
+		const fileInput = document.createElement('input');
+		fileInput.type = 'file';
+		fileInput.accept = '.pdf';
+
+		fileInput.onchange = (e: Event) => {
+			const file = (e.target as HTMLInputElement).files?.[0];
+			if (file) {
+				this.uploadService.uploadPdf(file).subscribe({
+					next: () => {
+						this.notif.success('Document uploaded successfully');
+					},
+					error: () => {
+						this.notif.error('Error uploading document');
+					}
+				});
+			}
+		};
+
+		fileInput.click();
 	}
 }
