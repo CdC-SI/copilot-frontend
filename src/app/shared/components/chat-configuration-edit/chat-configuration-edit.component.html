@@ -51,7 +51,7 @@
 		<mat-form-field obErrorMessages>
 			<mat-label>{{ "parameters.sources" | translate }}</mat-label>
 			<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple>
-				<mat-option *ngFor="let source of SOURCES" [value]="source">{{ source }}</mat-option>
+				<mat-option *ngFor="let source of SOURCES" [value]="source">{{ 'sources.' + source | translate }}</mat-option>
 			</mat-select>
 			<mat-error></mat-error>
 		</mat-form-field>

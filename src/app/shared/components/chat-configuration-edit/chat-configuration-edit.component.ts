@@ -114,7 +114,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			this.TAGS = tags.filter(tag => tag && tag !== '');
 		});
 		this.settingsService.getSettings(SettingsType.SOURCE).subscribe(sources => {
-			this.SOURCES = sources;
+			this.SOURCES = sources.filter(source => source && source !== '');
 		});
 		this.settingsService.getSettings(SettingsType.LLM_MODEL).subscribe(llmModels => {
 			this.LLM_MODELS = llmModels;

@@ -68,6 +68,16 @@
   "legal": "Legale",
   "condensed": "Condensato",
   "complete": "Completo",
+  "sources": {
+    "ahv_iv_memento": "AVS/AI Opuscoli",
+    "ahv_lernbaustein_2024": "Guida all'apprendimento AVS 2024 (EAK)",
+    "akis_online_help": "AKIS Aiuto Online (EAK)",
+    "bsv": "bsv.admin.ch",
+    "eak": "eak.admin.ch",
+    "fedlex": "Fedlex",
+    "practical_guide_eak_fz": "Guida Pratica AFam (EAK)",
+    "sozialversicherungen": "sozialversicherungen.admin.ch"
+  },
   "tags": {
     "general": "Generalità",
     "contributions": "Contributi",
