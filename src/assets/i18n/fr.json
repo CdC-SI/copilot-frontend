@@ -76,7 +76,8 @@
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
     "practical_guide_eak_fz": "Guide Pratique AFam (EAK)",
-    "sozialversicherungen": "sozialversicherungen.admin.ch"
+    "sozialversicherungen": "sozialversicherungen.admin.ch",
+    "user_pdf_upload": "PDF Utilisateur:"
   },
   "tags": {
     "general": "Généralités",
@@ -101,5 +102,5 @@
     "hearing_aids": "Appareils auditifs",
     "akis_online_help": "AKIS Aide En Ligne",
     "lavs": "LAVS"
-    }
+  }
 }

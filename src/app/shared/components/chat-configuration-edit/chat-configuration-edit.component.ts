@@ -130,6 +130,14 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		});
 	}
 
+	isUserPdfUpload(source: string): boolean {
+		return source.startsWith('user_pdf_upload:');
+	}
+
+	getUserPdfFilename(source: string): string {
+		return source.split(':')[1] || '';
+	}
+
 	ngOnDestroy(): void {
 		this.destroyed$.next();
 		this.destroyed$.complete();

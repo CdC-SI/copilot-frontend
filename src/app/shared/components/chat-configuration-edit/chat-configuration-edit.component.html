@@ -51,7 +51,14 @@
 		<mat-form-field obErrorMessages>
 			<mat-label>{{ "parameters.sources" | translate }}</mat-label>
 			<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple>
-				<mat-option *ngFor="let source of SOURCES" [value]="source">{{ 'sources.' + source | translate }}</mat-option>
+				<mat-option *ngFor="let source of SOURCES" [value]="source">
+					<ng-container *ngIf="isUserPdfUpload(source); else regularSource">
+						{{ 'sources.user_pdf_upload' | translate }} {{ getUserPdfFilename(source) }}
+					</ng-container>
+					<ng-template #regularSource>
+						{{ 'sources.' + source | translate }}
+					</ng-template>
+				</mat-option>
 			</mat-select>
 			<mat-error></mat-error>
 		</mat-form-field>

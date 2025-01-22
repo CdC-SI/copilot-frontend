@@ -76,7 +76,8 @@
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
     "practical_guide_eak_fz": "Praxisleitfaden FZ (EAK)",
-    "sozialversicherungen": "sozialversicherungen.admin.ch"
+    "sozialversicherungen": "sozialversicherungen.admin.ch",
+    "user_pdf_upload": "PDF Benutzer:"
   },
   "tags": {
     "general": "Allgemeines",
