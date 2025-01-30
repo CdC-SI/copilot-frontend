@@ -48,5 +48,17 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		},
 		production: false,
 		apiUrl: '/api'
+	},
+	{
+		patterns: ['-a.apps.openshift'],
+		banner: {
+			text: 'AQ'
+		},
+		pamsConfig: {
+			environment: ObEPamsEnvironment.ABN,
+			rootUrl: '/pams/'
+		},
+		production: false,
+		apiUrl: '/api'
 	}
 ];
