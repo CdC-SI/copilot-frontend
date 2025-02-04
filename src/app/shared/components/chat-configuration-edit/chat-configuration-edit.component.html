@@ -66,7 +66,7 @@
 		<mat-form-field obErrorMessages>
 			<mat-label>{{ "parameters.retrieval-methods" | translate }}</mat-label>
 			<mat-select [formControlName]="FORM_FIELDS.RETRIEVAL_METHODS" multiple>
-				<mat-option *ngFor="let method of RETRIEVAL_METHODS" [value]="method">{{ method }}</mat-option>
+				<mat-option *ngFor="let method of RETRIEVAL_METHODS" [value]="method">{{ 'retrievers.' + method | translate }}</mat-option>
 			</mat-select>
 			<mat-error></mat-error>
 		</mat-form-field>

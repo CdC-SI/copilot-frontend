@@ -68,10 +68,18 @@
   "legal": "Rechtlich",
   "condensed": "Kondensiert",
   "complete": "Vollständig",
+  "retrievers": {
+    "top_k_retriever": "Top K",
+    "query_rewriting_retriever": "Query Rewriting",
+    "contextual_compression_retriever": "Contextual Compression",
+    "rag_fusion_retriever": "RAG Fusion",
+    "bm25": "BM25",
+    "reranking": "Reranking"
+  },
   "sources": {
     "ahv_iv_memento": "AHV/IV-Merkblätter",
     "ahv_lernbaustein_2024": "AHV Lernbaustein 2024 (EAK)",
-    "akis_online_help": "AKIS Online-Hilfe (EAK)",
+    "akis": "AKIS Online-Hilfe (EAK)",
     "bsv": "bsv.admin.ch",
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
