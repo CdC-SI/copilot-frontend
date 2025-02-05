@@ -6,7 +6,7 @@
 		[matTooltip]="title.title"
 		matTooltipPosition="right">
 		<div class="history-item">
-			<span (click)="titleSelected(title)">◈ {{ title.title }}</span>
+			<span (click)="titleSelected(title)">{{ title.title }}</span>
 			<button mat-icon-button (click)="deleteTitle(title); $event.stopPropagation()">
 				<mat-icon>close</mat-icon>
 			</button>
