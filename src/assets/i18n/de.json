@@ -77,6 +77,7 @@
   "create.copilot.account": "ZAS/EAK CopilotGPT-Konto erstellen",
   "login.copilot.account": "Mit einem ZAS/EAK CopilotGPT-Konto anmelden",
   "login.fail": "Falscher Benutzername oder falsches Passwort",
+  "chat_history": "Chat-Verlauf",
   "parameters.advanced_llm_parameters": "Erweiterte LLM-Parameter",
   "parameters.model": "Modell",
   "parameters.temperature": "Temperaturen",
