@@ -8,8 +8,8 @@
 	mat-list-item {
 		padding: 0 4px !important;
 		border-radius: 8px;
-		margin-top: -8px;
-		margin-bottom: -8px;
+		margin-top: -12px;
+		margin-bottom: -12px;
 	}
 
 	.title {
@@ -25,15 +25,30 @@
 		justify-content: space-between;
 		align-items: center;
 		width: 100%;
+		min-width: 0;
 
 		span {
 			cursor: pointer;
 			flex: 1;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			margin-right: 4px
 		}
 
 		button {
 			opacity: 0;
 			transition: opacity 0.2s;
+			flex-shrink: 0;
+			width: 24px;
+			padding: 0;
+			line-height: 24px;
+
+			.mat-icon {
+				font-size: 16px;
+				width: 16px;
+				height: 16px;
+			}
 		}
 	}
 }
