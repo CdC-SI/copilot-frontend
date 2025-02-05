@@ -1,7 +1,47 @@
 {
   "enter.message": "Nachricht eingeben",
-  "home": "Startseite",
+  "chat": "Chat",
   "admin": "Verwaltung",
+  "tips": {
+    "component": "Tipps",
+    "sections": {
+      "getting_started": {
+        "title": "Um zu beginnen",
+        "tips": [
+          "Beginnen Sie Ihre Unterhaltung, indem Sie eine Frage eingeben oder eine vorgeschlagene Frage auswählen",
+          "Versuchen Sie, relevante Schlüsselwörter in die Formulierung Ihrer Frage einzubeziehen",
+          "Drücken Sie Enter oder klicken Sie auf die Schaltfläche Senden, um Ihre Frage zu bearbeiten",
+          "Löschen Sie die Konversation, indem Sie auf die Schaltfläche Löschen klicken"
+        ]
+      },
+      "retrieval": {
+        "title": "Suche nach Dokumenten",
+        "tips": [
+          "Stellen Sie Ihre Fragen zu einem bestimmten Thema",
+          "Wenn der Kopilot Schwierigkeiten hat zu antworten, filtern Sie die Quelle und die Tags manuell",
+          "Hinweis: Diese Filterung wird bald automatisiert"
+        ]
+      },
+      "document_management": {
+        "title": "Verwaltung von Dokumenten",
+        "tips": [
+          "Laden Sie PDFs mithilfe der Download-Schaltfläche herunter",
+          "Stellen Sie dann Ihre Fragen zu den heruntergeladenen Dokumenten",
+          "Übersetzen oder fassen Sie heruntergeladene Dokumente zusammen",
+          "Die Dokumente bleiben 24 Stunden lang verfügbar"
+        ]
+      },
+      "advanced_options": {
+        "title": "Options avancées",
+        "tips": [
+          "Paramétrez le modèle de language dans la section 'Paramètres Avancés LLM'",
+          "Le filtrage manuel des sources (source) et les sujets (tags) dans 'Paramètres Avancés Recherche' améliore la qualité de réponse",
+          "Choisissez le style et format de réponse dans 'Paramètres de réponse'",
+          "L'option de validation des sources dans 'Paramètres Avancés Chat' permet de vérifier la qualité des sources"
+        ]
+      }
+    }
+  },
   "add.question.answer.ask": "Frage/Antwort hinzufügen?",
   "add.question.answer.explanation": "Eine Frage/Antwort wird der Wissensdatenbank hinzugefügt.",
   "add.question.answer.success": "Die Frage/Antwort wurde erfolgreich hinzugefügt",
@@ -110,5 +150,9 @@
     "hearing_aids": "Hörgeräte",
     "akis_online_help": "AKIS Online-Hilfe",
     "lavs": "AHVG"
+  },
+  "legal_basis": {
+    "tos": "Nutzungsbedingungen",
+    "data_protection": "Datenschutz"
   }
 }
