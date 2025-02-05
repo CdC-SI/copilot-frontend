@@ -6,8 +6,10 @@
 	}
 
 	mat-list-item {
-		padding: 4px  !important;
+		padding: 0 4px !important;
 		border-radius: 8px;
+		margin-top: -8px;
+		margin-bottom: -8px;
 	}
 
 	.title {
@@ -16,5 +18,28 @@
 
 	.title:hover {
 		background-color: palette.$ob-secondary-50;
+	}
+
+	.history-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+
+		span {
+			cursor: pointer;
+			flex: 1;
+		}
+
+		button {
+			opacity: 0;
+			transition: opacity 0.2s;
+		}
+	}
+}
+
+.mat-mdc-list-item:hover {
+	.history-item button {
+		opacity: 1;
 	}
 }

@@ -11,6 +11,7 @@ export class ChatHistoryComponent {
 	selected: ChatTitle;
 
 	@Output() readonly conversationSelected = new EventEmitter<ChatTitle>();
+	@Output() readonly conversationDeleted = new EventEmitter<ChatTitle>();
 	@Input() titles!: ChatTitle[] | null;
 	constructor(private readonly conversationService: ConversationService) {}
 
@@ -19,5 +20,15 @@ export class ChatHistoryComponent {
 		title.selected = true;
 		this.selected = title;
 		this.conversationSelected.emit(this.selected);
+	}
+
+	deleteTitle(title: ChatTitle): void {
+		this.conversationService.deleteConversation(title.conversationId).subscribe(() => {
+			const index = this.titles.indexOf(title);
+			if (index > -1) {
+				this.titles.splice(index, 1);
+			}
+			this.conversationDeleted.emit(title);
+		});
 	}
 }

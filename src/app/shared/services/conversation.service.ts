@@ -28,4 +28,9 @@ export class ConversationService {
 	update(conversationId: string, messages: ChatMessage[]) {
 		this.http.put(this.config.backendApi(`/conversations/${conversationId}`), messages).subscribe();
 	}
+
+	deleteConversation(conversationId: string): Observable<void> {
+		// Mock API call - replace with actual API call later
+		return of(void 0);
+	}
 }

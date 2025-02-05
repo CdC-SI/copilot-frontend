@@ -3,9 +3,13 @@
 		[class]="title.selected ? 'title-selected' : 'title'"
 		role="listitem"
 		*ngFor="let title of titles"
-		(click)="titleSelected(title)"
 		[matTooltip]="title.title"
 		matTooltipPosition="right">
-		◈ {{ title.title }}
+		<div class="history-item">
+			<span (click)="titleSelected(title)">◈ {{ title.title }}</span>
+			<button mat-icon-button (click)="deleteTitle(title); $event.stopPropagation()">
+				<mat-icon>close</mat-icon>
+			</button>
+		</div>
 	</mat-list-item>
 </mat-list>
