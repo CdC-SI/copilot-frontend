@@ -40,7 +40,7 @@ export class ConfigurationService {
 			}
 		});
 
-		this.masterLayoutConfig.homePageRoute = '/home';
+		this.masterLayoutConfig.homePageRoute = '/chat';
 		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayLanguages = true;
 		this.masterLayoutConfig.header.serviceNavigation.displayProfile = false;

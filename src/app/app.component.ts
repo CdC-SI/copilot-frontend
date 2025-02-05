@@ -16,10 +16,11 @@ import { SettingsType } from './shared/model/settings';
 	styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-	navigation: ObINavigationLink[] = [{url: '/home', label: 'home'}];
+	navigation: ObINavigationLink[] = [{url: '/chat', label: 'chat'}];
 	navigationAdmin: ObINavigationLink[] = [
-		{url: '/home', label: 'home'},
-		{url: '/admin', label: 'admin'}
+		{url: '/chat', label: 'chat'},
+		{url: '/admin', label: 'admin'},
+		{url: '/tips', label: 'tips.component'}
 	];
 	projectVersion: string;
 
