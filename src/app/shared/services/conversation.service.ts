@@ -32,4 +32,10 @@ export class ConversationService {
 	deleteConversation(id: string): Observable<any> {
 		return this.http.delete(this.config.backendApi(`/conversations/${id}`));
 	}
+
+	renameConversation(id: string, newTitle: string): Observable<any> {
+		// Mock API call - replace with actual API call later
+		//return this.http.put(this.config.backendApi(`/conversations/${id}/title`), { title: newTitle });
+		return of(void 0);
+	}
 }

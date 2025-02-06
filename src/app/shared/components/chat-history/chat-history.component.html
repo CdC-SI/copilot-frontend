@@ -1,15 +1,30 @@
 <mat-list role="list">
-	<mat-list-item
-		[class]="title.selected ? 'title-selected' : 'title'"
-		role="listitem"
-		*ngFor="let title of titles"
-		[matTooltip]="title.title"
-		matTooltipPosition="right">
-		<div class="history-item">
-			<span (click)="titleSelected(title)">{{ title.title }}</span>
-			<button mat-icon-button (click)="deleteTitle(title); $event.stopPropagation()">
-				<mat-icon>close</mat-icon>
-			</button>
-		</div>
-	</mat-list-item>
+    <mat-list-item
+        [class]="title.selected ? 'title-selected' : 'title'"
+        role="listitem"
+        *ngFor="let title of titles"
+        [matTooltip]="title.title"
+        matTooltipPosition="right">
+        <div class="history-item">
+            <ng-container *ngIf="editingTitle !== title; else editMode">
+                <span (click)="titleSelected(title)">{{ title.title }}</span>
+                <div class="actions">
+                    <button mat-icon-button (click)="startRename(title, $event)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="deleteTitle(title); $event.stopPropagation()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
+            </ng-container>
+            <ng-template #editMode>
+                <input matInput
+                    [(ngModel)]="tempTitle"
+                    (keyup.enter)="saveRename(title)"
+                    (keyup.escape)="cancelRename()"
+                    (click)="$event.stopPropagation()"
+                    #titleInput>
+            </ng-template>
+        </div>
+    </mat-list-item>
 </mat-list>

@@ -50,11 +50,73 @@
 				height: 16px;
 			}
 		}
+
+		.actions {
+			display: flex;
+			opacity: 0;
+			transition: opacity 0.2s;
+
+			button {
+				width: 24px;
+				padding: 0;
+				line-height: 24px;
+
+				.mat-icon {
+					font-size: 16px;
+					width: 16px;
+					height: 16px;
+				}
+
+				border-radius: 4px;
+				margin-left: 2px;
+
+				&:hover {
+					background-color: rgba(0, 0, 0, 0.04);
+				}
+
+				&:first-child:hover {  // edit button
+					background-color: #908e8e;
+					color: #000000;
+				}
+
+				&:last-child:hover {   // delete button
+					background-color: #ffebee;
+					color: #d32f2f;
+				}
+			}
+		}
+
+		input {
+			position: static;       // Changed from relative to avoid event blocking
+			z-index: 1000;
+			width: 100%;
+			border: none;
+			background-color: white;
+			padding: 8px 0;
+			margin: 0;
+			font-size: inherit;
+			font-family: inherit;
+			border-bottom: 1px solid palette.$ob-secondary-500;
+			outline: none;
+			height: auto;           // Changed from fixed height
+			min-height: 24px;      // Added min-height
+			line-height: 24px;
+			box-sizing: border-box;
+			pointer-events: all;    // Added to ensure events are captured
+
+			&:focus {
+				border-bottom: 2px solid palette.$ob-secondary-500;
+			}
+		}
 	}
 }
 
 .mat-mdc-list-item:hover {
 	.history-item button {
+		opacity: 1;
+	}
+
+	.history-item .actions {
 		opacity: 1;
 	}
 }
