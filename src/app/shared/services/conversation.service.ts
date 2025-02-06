@@ -25,12 +25,11 @@ export class ConversationService {
 		return this.http.post(this.config.backendApi('/conversations/init'), messages);
 	}
 
-	update(conversationId: string, messages: ChatMessage[]) {
-		this.http.put(this.config.backendApi(`/conversations/${conversationId}`), messages).subscribe();
+	update(id: string, messages: ChatMessage[]) {
+		this.http.put(this.config.backendApi(`/conversations/${id}`), messages).subscribe();
 	}
 
-	deleteConversation(conversationId: string): Observable<void> {
-		// Mock API call - replace with actual API call later
-		return of(void 0);
+	deleteConversation(id: string): Observable<any> {
+		return this.http.delete(this.config.backendApi(`/conversations/${id}`));
 	}
 }
