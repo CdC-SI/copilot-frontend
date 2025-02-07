@@ -34,8 +34,6 @@ export class ConversationService {
 	}
 
 	renameConversation(id: string, newTitle: string): Observable<any> {
-		// Mock API call - replace with actual API call later
-		//return this.http.put(this.config.backendApi(`/conversations/${id}/title`), { title: newTitle });
-		return of(void 0);
+		return this.http.put(this.config.backendApi(`/conversations/${id}/title`), { title: newTitle });
 	}
 }
