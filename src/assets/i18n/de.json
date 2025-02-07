@@ -32,7 +32,7 @@
         ]
       },
       "advanced_options": {
-        "title": "Options avancées",
+        "title": "Erweiterte Optionen",
         "tips": [
           "Stellen Sie das Sprachmodell im Abschnitt 'Erweiterte LLM-Einstellungen' ein",
           "Die manuelle Filterung von Quellen (source) und Themen (tags) in 'Erweiterte Sucheinstellungen' verbessert die Antwortqualität",
