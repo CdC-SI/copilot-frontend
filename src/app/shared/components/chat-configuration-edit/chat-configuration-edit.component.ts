@@ -70,7 +70,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 				[this.FORM_FIELDS.AUTOCOMPLETE]: true,
 				[this.FORM_FIELDS.RAG]: true,
 				[this.FORM_FIELDS.AGENTIC_RAG]: false,
-				[this.FORM_FIELDS.SOURCE_VALIDATION]: false,
+				[this.FORM_FIELDS.SOURCE_VALIDATION]: true,
 				[this.FORM_FIELDS.TOPIC_CHECK]: false
 			});
 		});
