@@ -34,10 +34,10 @@
       "advanced_options": {
         "title": "Options avancées",
         "tips": [
-          "Paramétrez le modèle de language dans la section 'Paramètres Avancés LLM'",
-          "Le filtrage manuel des sources (source) et les sujets (tags) dans 'Paramètres Avancés Recherche' améliore la qualité de réponse",
-          "Choisissez le style et format de réponse dans 'Paramètres de réponse'",
-          "L'option de validation des sources dans 'Paramètres Avancés Chat' permet de vérifier la qualité des sources"
+          "Stellen Sie das Sprachmodell im Abschnitt 'Erweiterte LLM-Einstellungen' ein",
+          "Die manuelle Filterung von Quellen (source) und Themen (tags) in 'Erweiterte Sucheinstellungen' verbessert die Antwortqualität",
+          "Wählen Sie den Stil und das Format der Antwort in 'Antworteinstellungen'",
+          "Die Option zur Überprüfung von Quellen in 'Erweiterte Chat-Einstellungen' ermöglicht es, die Qualität der Quellen zu überprüfen"
         ]
       }
     }
