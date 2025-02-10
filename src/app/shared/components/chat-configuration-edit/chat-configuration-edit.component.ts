@@ -125,12 +125,26 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			});
 	}
 
+	private sortByTranslation(items: string[], prefix: string): string[] {
+		return items.sort((a, b) => {
+			const translationA = this.translateService.instant(`${prefix}.${a}`);
+			const translationB = this.translateService.instant(`${prefix}.${b}`);
+			return translationA.localeCompare(translationB);
+		});
+	}
+
 	loadDropdowns() {
 		this.settingsService.getSettings(SettingsType.TAG).subscribe(tags => {
-			this.TAGS = tags.filter(tag => tag && tag !== '');
+			this.TAGS = this.sortByTranslation(
+				tags.filter(tag => tag && tag !== ''),
+				'tags'
+			);
 		});
 		this.settingsService.getSettings(SettingsType.SOURCE).subscribe(sources => {
-			this.SOURCES = sources.filter(source => source && source !== '');
+			this.SOURCES = this.sortByTranslation(
+				sources.filter(source => source && source !== ''),
+				'sources'
+			);
 		});
 		this.settingsService.getSettings(SettingsType.LLM_MODEL).subscribe(llmModels => {
 			this.LLM_MODELS = llmModels;
