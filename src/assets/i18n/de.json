@@ -119,14 +119,15 @@
   },
   "sources": {
     "ahv_iv_memento": "AHV/IV-Merkblätter",
-    "ahv_lernbaustein_2024": "AHV Lernbaustein 2024 (EAK)",
-    "akis": "AKIS Online-Hilfe (EAK)",
+    "ahv_lernbaustein_2024": "AHV Lernbaustein 2024",
+    "akis": "AKIS Online-Hilfe",
     "bsv": "bsv.admin.ch",
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
-    "practical_guide_eak_fz": "Praxisleitfaden FZ (EAK)",
+    "practical_guide_eak_fz": "Praxisleitfaden FZ",
     "sozialversicherungen": "sozialversicherungen.admin.ch",
-    "user_pdf_upload": "PDF Benutzer:"
+    "user_pdf_upload": "PDF Benutzer:",
+    "user_edit": "SurveyPipeline - Benutzereingabe"
   },
   "tags": {
     "general": "Allgemeines",

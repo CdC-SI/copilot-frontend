@@ -119,14 +119,15 @@
   },
   "sources": {
     "ahv_iv_memento": "AVS/AI Opuscoli",
-    "ahv_lernbaustein_2024": "Guida all'apprendimento AVS 2024 (EAK)",
-    "akis": "AKIS Aiuto Online (EAK)",
+    "ahv_lernbaustein_2024": "Guida all'apprendimento AVS 2024",
+    "akis": "AKIS Aiuto Online",
     "bsv": "bsv.admin.ch",
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
-    "practical_guide_eak_fz": "Guida Pratica AFam (EAK)",
+    "practical_guide_eak_fz": "Guida Pratica AFam",
     "sozialversicherungen": "sozialversicherungen.admin.ch",
-    "user_pdf_upload": "PDF Utente:"
+    "user_pdf_upload": "PDF Utente:",
+    "user_edit": "SurveyPipeline - Input dell'utente"
   },
   "tags": {
     "general": "Generalità",
