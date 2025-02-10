@@ -72,7 +72,7 @@
   "create": "Iscriviti",
   "password": "Password",
   "confirm.password": "Conferma la password",
-  "username": "Nome utente",
+  "username": "Email",
   "organization": "Organizzazione",
   "create.copilot.account": "Crea un account ZAS/EAK CopilotGPT",
   "login.copilot.account": "Accedi a un account ZAS/EAK CopilotGPT",
