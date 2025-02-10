@@ -7,6 +7,7 @@ import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
 import {clearNullAndEmpty} from '../../utils/zco-utils';
 import {UserService} from '../../services/user.service';
+import {SettingsEventService} from '../../services/settings-event.service';
 
 @Component({
 	selector: 'zco-chat-configuration-edit',
@@ -40,7 +41,8 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		private readonly fb: FormBuilder,
 		private readonly translateService: TranslateService,
 		private readonly settingsService: SettingsService,
-		private readonly userService: UserService
+		private readonly userService: UserService,
+		private readonly settingsEventService: SettingsEventService
 	) {}
 	onChange = (value: any) => {};
 
@@ -84,6 +86,12 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		this.loadDropdowns();
 
 		this.userService.userLoggedIn
+			.pipe(takeUntil(this.destroyed$))
+			.subscribe(() => {
+				this.loadDropdowns();
+			});
+
+		this.settingsEventService.settingsNeedRefresh
 			.pipe(takeUntil(this.destroyed$))
 			.subscribe(() => {
 				this.loadDropdowns();
