@@ -6,6 +6,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
 import {clearNullAndEmpty} from '../../utils/zco-utils';
+import {UserService} from '../../services/user.service';
 
 @Component({
 	selector: 'zco-chat-configuration-edit',
@@ -38,7 +39,8 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 	constructor(
 		private readonly fb: FormBuilder,
 		private readonly translateService: TranslateService,
-		private readonly settingsService: SettingsService
+		private readonly settingsService: SettingsService,
+		private readonly userService: UserService
 	) {}
 	onChange = (value: any) => {};
 
@@ -80,6 +82,12 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		this.buildForm();
 		this.configureForm();
 		this.loadDropdowns();
+
+		this.userService.userLoggedIn
+			.pipe(takeUntil(this.destroyed$))
+			.subscribe(() => {
+				this.loadDropdowns();
+			});
 	}
 
 	configureForm() {
