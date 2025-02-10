@@ -9,7 +9,8 @@ export enum UserFormFields {
 	USERNAME = 'username',
 	PASSWORD = 'password',
 	CONFIRM_PASSWORD = 'confirmPassword',
-	ORGANIZATION = 'organization'
+	ORGANIZATION = 'organization',
+	GCU = 'gcu'
 }
 
 export enum LoginFormFields {

@@ -24,6 +24,9 @@
 				</mat-select>
 				<mat-error></mat-error>
 			</mat-form-field>
+			<mat-checkbox [formControlName]="FORM_FIELDS.GCU" name="accept-gcu" class="mb16">
+				<a href="./assets/Nutzungsvereinbarung%20für%20Mitarbeitende.pdf" target="_blank">{{ "gcu" | translate }}</a>
+			</mat-checkbox>
 		</form>
 	</div>
 </div>

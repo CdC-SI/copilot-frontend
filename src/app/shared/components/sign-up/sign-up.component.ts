@@ -38,7 +38,8 @@ export class SignUpComponent implements OnInit {
 				[UserFormFields.PASSWORD]: ['', Validators.required],
 				[UserFormFields.USERNAME]: ['', Validators.required],
 				[UserFormFields.CONFIRM_PASSWORD]: ['', Validators.required],
-				[UserFormFields.ORGANIZATION]: [[], Validators.required]
+				[UserFormFields.ORGANIZATION]: [[], Validators.required],
+				[UserFormFields.GCU]: [false, Validators.requiredTrue]
 			},
 			{validators: this.customPasswordMatching.bind(this)}
 		);
@@ -59,9 +60,7 @@ export class SignUpComponent implements OnInit {
 		const requestBody = {
 			username: formValue[UserFormFields.USERNAME],
 			password: formValue[UserFormFields.PASSWORD],
-			organizations: Array.isArray(formValue[UserFormFields.ORGANIZATION])
-				? formValue[UserFormFields.ORGANIZATION]
-				: [formValue[UserFormFields.ORGANIZATION]]
+			organizations: Array.isArray(formValue[UserFormFields.ORGANIZATION]) ? formValue[UserFormFields.ORGANIZATION] : [formValue[UserFormFields.ORGANIZATION]]
 		};
 		this.dialogRef.close(requestBody);
 	}
