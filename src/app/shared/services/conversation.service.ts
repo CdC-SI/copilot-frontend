@@ -29,11 +29,11 @@ export class ConversationService {
 		this.http.put(this.config.backendApi(`/conversations/${id}`), messages).subscribe();
 	}
 
-	deleteConversation(id: string): Observable<any> {
-		return this.http.delete(this.config.backendApi(`/conversations/${id}`));
+	deleteConversation(id: string) {
+		return this.http.delete<void>(this.config.backendApi(`/conversations/${id}`));
 	}
 
 	renameConversation(id: string, newTitle: string): Observable<any> {
-		return this.http.put(this.config.backendApi(`/conversations/${id}/title`), {title: newTitle});
+		return this.http.put<void>(this.config.backendApi(`/conversations/titles/${id}`), {newTitle});
 	}
 }

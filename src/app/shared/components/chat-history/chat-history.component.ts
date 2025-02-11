@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ConversationService} from '../../services/conversation.service';
 import {ChatTitle} from '../../model/chat-history';
 
@@ -42,11 +42,10 @@ export class ChatHistoryComponent {
 
 	saveRename(title: ChatTitle): void {
 		if (this.tempTitle.trim() && this.tempTitle !== title.title) {
-			this.conversationService.renameConversation(title.conversationId, this.tempTitle)
-				.subscribe(() => {
-					title.title = this.tempTitle;
-					this.editingTitle = null;
-				});
+			this.conversationService.renameConversation(title.conversationId, this.tempTitle).subscribe(() => {
+				title.title = this.tempTitle;
+				this.editingTitle = null;
+			});
 		} else {
 			this.editingTitle = null;
 		}
