@@ -1,12 +1,12 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 
 @Injectable({
-    providedIn: 'root'
+	providedIn: 'root'
 })
 export class SettingsEventService {
-    settingsNeedRefresh = new EventEmitter<void>();
+	settingsNeedRefresh = new EventEmitter<void>();
 
-    emitSettingsRefresh() {
-        this.settingsNeedRefresh.emit();
-    }
+	emitSettingsRefresh() {
+		this.settingsNeedRefresh.emit();
+	}
 }

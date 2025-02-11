@@ -26,6 +26,7 @@ import {FeedbackService} from '../shared/services/feedback.service';
 import {ObNotificationService} from '@oblique/oblique';
 import {Command, CommandService} from '../shared/services/command.service';
 import {UploadService} from '../shared/services/upload.service';
+import {SettingsEventService} from '../shared/services/settings-event.service';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -57,7 +58,8 @@ export class ChatComponent implements OnInit {
 		private readonly feedbackService: FeedbackService,
 		private readonly notif: ObNotificationService,
 		private readonly commandService: CommandService,
-		private readonly uploadService: UploadService
+		private readonly uploadService: UploadService,
+		private readonly settingsEventService: SettingsEventService
 	) {}
 
 	ngOnInit() {
@@ -347,6 +349,7 @@ export class ChatComponent implements OnInit {
 				this.uploadService.uploadPdf(file).subscribe({
 					next: () => {
 						this.notif.success('upload.success');
+						this.settingsEventService.emitSettingsRefresh();
 					},
 					error: err => {
 						if (err.statusText === 'Unknown Error') {

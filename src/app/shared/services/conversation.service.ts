@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ChatHistoryMessage, ChatTitle} from '../model/chat-history';
-import {ChatMessage, ChatMessageSource} from '../model/chat-message';
+import {ChatMessage} from '../model/chat-message';
 
 @Injectable({
 	providedIn: 'root'
@@ -34,6 +34,6 @@ export class ConversationService {
 	}
 
 	renameConversation(id: string, newTitle: string): Observable<any> {
-		return this.http.put(this.config.backendApi(`/conversations/${id}/title`), { title: newTitle });
+		return this.http.put(this.config.backendApi(`/conversations/${id}/title`), {title: newTitle});
 	}
 }

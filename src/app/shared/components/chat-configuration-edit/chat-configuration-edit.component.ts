@@ -85,17 +85,13 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		this.configureForm();
 		this.loadDropdowns();
 
-		this.userService.userLoggedIn
-			.pipe(takeUntil(this.destroyed$))
-			.subscribe(() => {
-				this.loadDropdowns();
-			});
+		this.userService.userLoggedIn.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+			this.loadDropdowns();
+		});
 
-		this.settingsEventService.settingsNeedRefresh
-			.pipe(takeUntil(this.destroyed$))
-			.subscribe(() => {
-				this.loadDropdowns();
-			});
+		this.settingsEventService.settingsNeedRefresh.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+			this.loadDropdowns();
+		});
 	}
 
 	configureForm() {
@@ -108,28 +104,16 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		const ragControl = this.formGroup.get(this.FORM_FIELDS.RAG);
 		const agenticRagControl = this.formGroup.get(this.FORM_FIELDS.AGENTIC_RAG);
 
-		ragControl?.valueChanges
-			.pipe(takeUntil(this.destroyed$))
-			.subscribe(enabled => {
-				if (enabled) {
-					agenticRagControl?.setValue(false, { emitEvent: false });
-				}
-			});
+		ragControl?.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(enabled => {
+			if (enabled) {
+				agenticRagControl?.setValue(false, {emitEvent: false});
+			}
+		});
 
-		agenticRagControl?.valueChanges
-			.pipe(takeUntil(this.destroyed$))
-			.subscribe(enabled => {
-				if (enabled) {
-					ragControl?.setValue(false, { emitEvent: false });
-				}
-			});
-	}
-
-	private sortByTranslation(items: string[], prefix: string): string[] {
-		return items.sort((a, b) => {
-			const translationA = this.translateService.instant(`${prefix}.${a}`);
-			const translationB = this.translateService.instant(`${prefix}.${b}`);
-			return translationA.localeCompare(translationB);
+		agenticRagControl?.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(enabled => {
+			if (enabled) {
+				ragControl?.setValue(false, {emitEvent: false});
+			}
 		});
 	}
 
@@ -199,5 +183,13 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 
 	validate(): ValidationErrors | null {
 		return this.formGroup.valid ? null : {invalidForm: {valid: false}};
+	}
+
+	private sortByTranslation(items: string[], prefix: string): string[] {
+		return items.sort((a, b) => {
+			const translationA = this.translateService.instant(`${prefix}.${a}`);
+			const translationB = this.translateService.instant(`${prefix}.${b}`);
+			return translationA.localeCompare(translationB);
+		});
 	}
 }
