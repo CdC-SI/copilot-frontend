@@ -24,8 +24,15 @@
 				</mat-select>
 				<mat-error></mat-error>
 			</mat-form-field>
+			<mat-checkbox [formControlName]="FORM_FIELDS.CONFIDENTIALITY" name="accept-gcu">
+				<a href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Datenschutzerklaerung.pdf" target="_blank">
+					{{ "confidentiality.read" | translate }}
+				</a>
+			</mat-checkbox>
 			<mat-checkbox [formControlName]="FORM_FIELDS.GCU" name="accept-gcu" class="mb16">
-				<a href="./assets/Nutzungsvereinbarung%20für%20Mitarbeitende.pdf" target="_blank">{{ "gcu" | translate }}</a>
+				<a href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Nutzungsvereinbarung-Mitarbeitende.pdf" target="_blank">
+					{{ "gcu.read" | translate }}
+				</a>
 			</mat-checkbox>
 		</form>
 	</div>

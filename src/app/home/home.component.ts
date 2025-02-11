@@ -1,10 +1,20 @@
 import {ChangeDetectorRef, Component, OnInit, Renderer2} from '@angular/core';
-import {Observable, of} from 'rxjs';  // Add this import
+import {Observable, of} from 'rxjs'; // Add this import
 import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {ANCHOR_TAG_REGEX, MESSAGE_ID_REGEX, RETRIEVING_TAG_REGEX, TOPIC_CHECK_REGEX, OFF_TOPIC_REGEX, clearNullAndEmpty, ROUTING_TAG_REGEX, AGENT_TAG_REGEX, TOOL_TAG_REGEX} from '../shared/utils/zco-utils';
+import {
+	AGENT_TAG_REGEX,
+	ANCHOR_TAG_REGEX,
+	MESSAGE_ID_REGEX,
+	OFF_TOPIC_REGEX,
+	RETRIEVING_TAG_REGEX,
+	ROUTING_TAG_REGEX,
+	TOOL_TAG_REGEX,
+	TOPIC_CHECK_REGEX,
+	clearNullAndEmpty
+} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
 import {UserService} from '../shared/services/user.service';
@@ -14,8 +24,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
 import {FeedbackService} from '../shared/services/feedback.service';
 import {ObNotificationService} from '@oblique/oblique';
-import {CommandService, Command} from '../shared/services/command.service';
-import { UploadService } from '../shared/services/upload.service';
+import {Command, CommandService} from '../shared/services/command.service';
+import {UploadService} from '../shared/services/upload.service';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -146,12 +156,12 @@ export class HomeComponent implements OnInit {
 		this.disableSearch();
 
 		const languageMap: Record<string, Language> = {
-			'de': Language.DE,
-			'fr': Language.FR,
-			'it': Language.IT
+			de: Language.DE,
+			fr: Language.FR,
+			it: Language.IT
 		};
 		const currentLang = this.translateService.currentLang;
-		const mappedLanguage = languageMap[currentLang as keyof typeof languageMap] || Language.DE;
+		const mappedLanguage = languageMap[currentLang] || Language.DE;
 
 		// Handle the three mutually exclusive modes
 		const requestConfig = {
@@ -161,25 +171,23 @@ export class HomeComponent implements OnInit {
 			language: mappedLanguage,
 			command: commandData?.command || null,
 			commandArgs: commandData?.args || null,
-			rag: commandData ? false : (this.chatConfigCtrl.value?.rag || false),
-			agenticRag: commandData ? false : (this.chatConfigCtrl.value?.agenticRag || false),
+			rag: commandData ? false : this.chatConfigCtrl.value?.rag || false,
+			agenticRag: commandData ? false : this.chatConfigCtrl.value?.agenticRag || false,
 			sourceValidation: this.chatConfigCtrl.value?.sourceValidation || false,
 			topicCheck: this.chatConfigCtrl.value?.topicCheck || false
 		};
 
-		this.ragService
-			.process(clearNullAndEmpty(requestConfig))
-			.subscribe({
-				next: chunk => {
-					this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
-					this.cdr.markForCheck();
-				},
-				error: () => {
-					this.messages.pop();
-					this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
-					this.enableSearch();
-				}
-			});
+		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
+			next: chunk => {
+				this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
+				this.cdr.markForCheck();
+			},
+			error: () => {
+				this.messages.pop();
+				this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
+				this.enableSearch();
+			}
+		});
 
 		this.clearSearch();
 	}
@@ -230,7 +238,13 @@ export class HomeComponent implements OnInit {
 		}
 
 		// If we were in retrieving/validating/routing/agent state, clear the message before adding new content
-		if (partialChatMessage.isRetrieving || partialChatMessage.isValidating || partialChatMessage.isRouting || partialChatMessage.isAgent || partialChatMessage.isToolUse) {
+		if (
+			partialChatMessage.isRetrieving ||
+			partialChatMessage.isValidating ||
+			partialChatMessage.isRouting ||
+			partialChatMessage.isAgent ||
+			partialChatMessage.isToolUse
+		) {
 			partialChatMessage.message = '';
 			partialChatMessage.isRetrieving = false;
 			partialChatMessage.isValidating = false;
@@ -241,7 +255,7 @@ export class HomeComponent implements OnInit {
 
 		partialChatMessage.message += chunk;
 
-		 // Initialize sources array if needed
+		// Initialize sources array if needed
 		if (!partialChatMessage.sources) {
 			partialChatMessage.sources = [];
 		}
@@ -249,7 +263,7 @@ export class HomeComponent implements OnInit {
 		// Collect all sources from current message content
 		let sourceMatch;
 		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
-			 // Only store the URL
+			// Only store the URL
 			const sourceUrl = sourceMatch[1];
 			if (!partialChatMessage.sources.includes(sourceUrl)) {
 				partialChatMessage.sources.push(sourceUrl);
@@ -322,6 +336,32 @@ export class HomeComponent implements OnInit {
 		});
 	}
 
+	uploadDoc(): void {
+		const fileInput = document.createElement('input');
+		fileInput.type = 'file';
+		fileInput.accept = '.pdf';
+
+		fileInput.onchange = (e: Event) => {
+			const file = (e.target as HTMLInputElement).files?.[0];
+			if (file) {
+				this.uploadService.uploadPdf(file).subscribe({
+					next: () => {
+						this.notif.success('upload.success');
+					},
+					error: err => {
+						if (err.statusText === 'Unknown Error') {
+							this.notif.error('upload.error');
+						} else {
+							this.notif.error(err.error['MESSAGE']);
+						}
+					}
+				});
+			}
+		};
+
+		fileInput.click();
+	}
+
 	private historyMessageToChatMessage(historyMessage: ChatHistoryMessage): ChatMessage {
 		return {
 			id: historyMessage.messageId,
@@ -330,8 +370,8 @@ export class HomeComponent implements OnInit {
 			isCompleted: true,
 			timestamp: historyMessage.timestamp,
 			lang: historyMessage.language,
-			url: historyMessage.url,
-			faqItemId: historyMessage.faqItemId
+			faqItemId: historyMessage.faqItemId,
+			sources: historyMessage.sources
 		};
 	}
 
@@ -357,27 +397,5 @@ export class HomeComponent implements OnInit {
 				this.currentConversation.selected = true;
 			});
 		}, 1_500);
-	}
-
-	uploadDoc(): void {
-		const fileInput = document.createElement('input');
-		fileInput.type = 'file';
-		fileInput.accept = '.pdf';
-
-		fileInput.onchange = (e: Event) => {
-			const file = (e.target as HTMLInputElement).files?.[0];
-			if (file) {
-				this.uploadService.uploadPdf(file).subscribe({
-					next: () => {
-						this.notif.success('Document uploaded successfully');
-					},
-					error: () => {
-						this.notif.error('Error uploading document');
-					}
-				});
-			}
-		};
-
-		fileInput.click();
 	}
 }

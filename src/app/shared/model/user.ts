@@ -10,6 +10,7 @@ export enum UserFormFields {
 	PASSWORD = 'password',
 	CONFIRM_PASSWORD = 'confirmPassword',
 	ORGANIZATION = 'organization',
+	CONFIDENTIALITY = 'confidentiality',
 	GCU = 'gcu'
 }
 

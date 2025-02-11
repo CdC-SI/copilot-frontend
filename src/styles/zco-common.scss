@@ -2,6 +2,11 @@
 @use "@oblique/oblique/styles/scss/core/palette";
 @use "sass:map";
 
+.footer-link {
+	text-decoration: none !important;
+	color: white !important;
+}
+
 .h100 {
 	height: 100%;
 }

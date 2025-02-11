@@ -39,6 +39,7 @@ export class SignUpComponent implements OnInit {
 				[UserFormFields.USERNAME]: ['', Validators.required],
 				[UserFormFields.CONFIRM_PASSWORD]: ['', Validators.required],
 				[UserFormFields.ORGANIZATION]: [[], Validators.required],
+				[UserFormFields.CONFIDENTIALITY]: [false, Validators.requiredTrue],
 				[UserFormFields.GCU]: [false, Validators.requiredTrue]
 			},
 			{validators: this.customPasswordMatching.bind(this)}

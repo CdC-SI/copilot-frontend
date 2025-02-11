@@ -10,7 +10,18 @@
 		</div>
 	</ng-template>
 	<ng-container obFooterInfo>
-		<p>ZAS / EAK CopilotGPT {{ projectVersion ? '| ' : '' }}<a style="text-decoration: none; color: white;" href="https://github.com/CdC-SI/ZAS-EAK-CopilotGPT" target="_blank">{{ projectVersion }}</a></p>
-		<p>&copy; 2024 <span> ZAS </span></p>
+		<p>
+			<span>ZAS / EAK CopilotGPT {{ projectVersion ? "| " : "" }}</span>
+			<a class="footer-link" href="https://github.com/CdC-SI/ZAS-EAK-CopilotGPT" target="_blank">{{ projectVersion }}</a>
+		</p>
+		<p>
+			&copy; 2025 <span> ZAS | </span>
+			<a class="footer-link" href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Nutzungsvereinbarung-Mitarbeitende.pdf" target="_blank">
+				{{ "gcu" | translate }} | 
+			</a>
+			<a class="footer-link" href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Datenschutzerklaerung.pdf" target="_blank">
+				{{ "confidentiality" | translate }}
+			</a>
+		</p>
 	</ng-container>
 </ob-master-layout>
