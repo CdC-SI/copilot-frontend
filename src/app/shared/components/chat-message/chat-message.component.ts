@@ -16,4 +16,20 @@ export class ChatMessageComponent {
 	sendFeedback(event: Feedback) {
 		this.feedback.emit(event);
 	}
+
+    /**
+     * Returns the number of sources available for the current message
+     * @returns number of sources or 0 if no sources available
+     */
+    get sourcesCount(): number {
+        return this.message?.sources?.length || 0;
+    }
+
+    /**
+     * Checks if the message has any sources to display
+     * @returns true if message has one or more sources
+     */
+    get hasMultipleSources(): boolean {
+        return this.sourcesCount > 0;
+    }
 }

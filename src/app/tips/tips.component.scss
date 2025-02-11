@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  padding: 16px;
+
+  .tips-container {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    h2 {
+      margin-bottom: 24px;
+    }
+  }
+
+  .tips-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .tip-card {
+    height: 100%;
+
+    mat-card-header {
+      margin-bottom: 16px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 0;
+
+      li {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}

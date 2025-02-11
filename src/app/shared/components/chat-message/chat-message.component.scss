@@ -1,12 +1,47 @@
-@use '@oblique/oblique/styles/scss/core/variables';
+@use '@oblique/oblique/styles/scss/core/variables' as *;
 @use '@oblique/oblique/styles/scss/core/mixins/layout';
 
 .message {
-	width: 100%;
-	display: grid;
-	flex-direction: column;
+    width: 100%;
+    display: grid;
+    flex-direction: column;
 }
 
 a {
-	font-style: italic;
+    font-style: italic;
+}
+
+.sources-panel {
+    margin-top: 1rem;
+    background: $ob-light;
+    border: none;
+
+    ::ng-deep .mat-expansion-panel-header {
+        padding: 0 16px;
+        height: 40px;
+
+        .mat-expansion-panel-header-title {
+            color: $ob-primary;
+            font-size: 0.9rem;
+        }
+    }
+}
+
+.source-item {
+    padding: 4px 0;
+
+    .source-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: $ob-primary;
+
+        .source-icon {
+            margin-right: 8px;
+        }
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }

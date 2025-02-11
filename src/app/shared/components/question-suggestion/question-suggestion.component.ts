@@ -10,7 +10,17 @@ export class QuestionSuggestionComponent implements OnInit {
 		'Jusqu’à quand dois-je payer des cotisations AVS ?',
 		'Comment l’âge de la retraite des femmes est-il relevé ?',
 		'Que puis-je faire si ma rente AI ne me suffit pas pour vivre ?',
-		'Peut-on utiliser la fortune de 50 milliards pour financer la 13e rente AVS ?'
+		'Peut-on utiliser la fortune de 50 milliards pour financer la 13e rente AVS ?',
+		'Wann endet meine AHV-Beitragspflicht?',
+		'Was bedeutet «im Sinne der AHV dauerhaft voll erwerbstätig»?',
+		'Wem und wann wird die Mutterschaftsentschädigung ausgezahlt?',
+		'Ab wann erhalte ich die Betreuungsentschädigung und wie lange?',
+		'Bis zu welchem Höchstbetrag werden Krankheits- und Behinderungskosten vergütet?',
+		'Quando sono considerato/a datore di lavoro per l’AVS?',
+		'A partire da quando è versata l’indennità di maternità e per quanto tempo?',
+		'A quanto ammonta l’indennità di assistenza?',
+		'Sugli assegni familiari vanno pagati i contributi sociali?',
+		'Sono divorziato/a / Sono separato/a e vivo con i miei figli: a chi spettano gli assegni familiari?'
 	];
 
 	currentSentence: string = '';

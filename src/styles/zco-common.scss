@@ -2,6 +2,11 @@
 @use "@oblique/oblique/styles/scss/core/palette";
 @use "sass:map";
 
+.footer-link {
+	text-decoration: none !important;
+	color: white !important;
+}
+
 .h100 {
 	height: 100%;
 }
@@ -116,7 +121,7 @@ main#content {
 }
 
 @media (min-width: map.get(variables.$ob-grid-breakpoints, "md")) {
-	zco-home {
+	zco-chat {
 		.ob-column-layout {
 			.ob-column-left,
 			.ob-column-right {

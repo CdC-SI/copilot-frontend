@@ -19,7 +19,8 @@ import localeFRCH from '@angular/common/locales/fr-CH';
 import localeITCH from '@angular/common/locales/it-CH';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {TranslateModule} from '@ngx-translate/core';
-import {HomeComponent} from './home/home.component';
+import {ChatComponent} from './chat/chat.component';
+import {TipsComponent} from './tips/tips.component';
 import {ConfigurationService} from './core/app-configuration/configuration.service';
 import {ZCO_CONFIGURATIONS, ZCO_CONFIGURATIONS_TOKEN} from './core/app-configuration/configuration';
 import {SharedModule} from './shared/shared.module';
@@ -39,7 +40,7 @@ function bannerFactory(configurationService: ConfigurationService) {
 }
 
 @NgModule({
-	declarations: [AppComponent, HomeComponent, AdminComponent],
+	declarations: [AppComponent, ChatComponent, AdminComponent, TipsComponent],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,

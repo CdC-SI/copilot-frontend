@@ -33,11 +33,12 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 	@Input() required = true;
 	@Input() minLength = 0;
 
-	@Input() optionService: (searchText: string) => Observable<any>;
+	@Input() optionService: (searchText: string) => Observable<T[]>;
 	@Input() inputLabelFn: (value: T) => string;
 	@Input() optionLabelFn: (value: T) => string;
 
 	@Output() readonly optionSelected = new EventEmitter<T>();
+	@Output() readonly inputChange = new EventEmitter<string>();
 
 	@ViewChild('itemFilterInput', {static: true}) itemFilterInput: ElementRef;
 
@@ -65,6 +66,7 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 			)
 			.subscribe(value => {
 				this.options = this.formControl.value?.length > this.minLength ? this.optionService(this.formControl.value) : of([]);
+				this.inputChange.emit(value);
 				this.cdr.markForCheck();
 				this._onChange(value);
 			});

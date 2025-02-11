@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 import {UserFormFields} from '../../model/user';
 import {MatDialogRef} from '@angular/material/dialog';
+import {SettingsService} from '../../services/settings.service';
+import {SettingsType} from '../../model/settings';
 
 @Component({
 	selector: 'zco-sign-up',
@@ -10,15 +12,24 @@ import {MatDialogRef} from '@angular/material/dialog';
 })
 export class SignUpComponent implements OnInit {
 	FORM_FIELDS = UserFormFields;
+	ORGANIZATION: string[] = [];
 	userFrmGrp: FormGroup;
 
 	constructor(
 		private readonly fb: FormBuilder,
+		private readonly settingsService: SettingsService,
 		public dialogRef: MatDialogRef<SignUpComponent>
 	) {}
 
 	ngOnInit() {
 		this.buildForm();
+		this.loadOrganizations();
+	}
+
+	loadOrganizations() {
+		this.settingsService.getSettings(SettingsType.ORGANIZATION).subscribe(organization => {
+			this.ORGANIZATION = organization;
+		});
 	}
 
 	buildForm() {
@@ -26,7 +37,10 @@ export class SignUpComponent implements OnInit {
 			{
 				[UserFormFields.PASSWORD]: ['', Validators.required],
 				[UserFormFields.USERNAME]: ['', Validators.required],
-				[UserFormFields.CONFIRM_PASSWORD]: ['', Validators.required]
+				[UserFormFields.CONFIRM_PASSWORD]: ['', Validators.required],
+				[UserFormFields.ORGANIZATION]: [[], Validators.required],
+				[UserFormFields.CONFIDENTIALITY]: [false, Validators.requiredTrue],
+				[UserFormFields.GCU]: [false, Validators.requiredTrue]
 			},
 			{validators: this.customPasswordMatching.bind(this)}
 		);
@@ -43,6 +57,12 @@ export class SignUpComponent implements OnInit {
 	}
 
 	onConfirmClick(): void {
-		this.dialogRef.close(this.userFrmGrp.getRawValue());
+		const formValue = this.userFrmGrp.getRawValue();
+		const requestBody = {
+			username: formValue[UserFormFields.USERNAME],
+			password: formValue[UserFormFields.PASSWORD],
+			organizations: Array.isArray(formValue[UserFormFields.ORGANIZATION]) ? formValue[UserFormFields.ORGANIZATION] : [formValue[UserFormFields.ORGANIZATION]]
+		};
+		this.dialogRef.close(requestBody);
 	}
 }

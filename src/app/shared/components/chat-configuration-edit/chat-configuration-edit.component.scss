@@ -1,5 +1,12 @@
 :host {
 	display: flex;
 	flex-direction: column;
+}
 
+::ng-deep .mat-expansion-panel-header-title {
+	font-weight: bold;
+}
+
+mat-expansion-panel {
+	margin-bottom: 16px;
 }

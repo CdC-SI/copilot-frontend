@@ -71,6 +71,41 @@
 		width: 100%;
 		display: grid;
 		flex-direction: column;
+
+		&.retrieving {
+			opacity: 0.7;
+			font-style: italic;
+			color: var(--theme-text-light);
+			animation: glow 1.5s ease-in-out infinite;
+		}
+
+		&.validating {
+			opacity: 0.7;
+			font-style: italic;
+			color: var(--theme-text-light);
+			animation: glow 1.5s ease-in-out infinite;
+		}
+
+		&.routing {
+			opacity: 0.7;
+			font-style: italic;
+			color: var(--theme-text-light);
+			animation: glow 1.5s ease-in-out infinite;
+		}
+
+		&.agent {
+			opacity: 0.7;
+			font-style: italic;
+			color: var(--theme-text-light);
+			animation: glow 1.5s ease-in-out infinite;
+		}
+
+		&.tool {
+			opacity: 0.7;
+			font-style: italic;
+			color: var(--theme-text-light);
+			animation: glow 1.5s ease-in-out infinite;
+		}
 	}
 
 	.my-message {
@@ -89,5 +124,20 @@
 		justify-self: start;
 		margin-top: 16px;
 		margin-bottom: 16px;
+	}
+}
+
+@keyframes glow {
+	0% {
+		opacity: 0.7;
+		text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+	}
+	50% {
+		opacity: 1;
+		text-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+	}
+	100% {
+		opacity: 0.7;
+		text-shadow: 0 0 0 rgba(0, 0, 0, 0);
 	}
 }

@@ -12,6 +12,6 @@ export interface ChatHistoryMessage {
 	role: string;
 	timestamp: Date;
 	language: string;
-	url?: string;
 	faqItemId?: number;
+	sources?: string[];
 }

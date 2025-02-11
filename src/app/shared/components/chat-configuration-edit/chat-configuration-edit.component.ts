@@ -6,6 +6,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
 import {clearNullAndEmpty} from '../../utils/zco-utils';
+import {UserService} from '../../services/user.service';
+import {SettingsEventService} from '../../services/settings-event.service';
 
 @Component({
 	selector: 'zco-chat-configuration-edit',
@@ -31,13 +33,16 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 	LLM_MODELS: string[] = [];
 	RETRIEVAL_METHODS: string[] = [];
 	RESPONSE_STYLE: string[] = [];
+	RESPONSE_FORMAT: string[] = [];
 	FORM_FIELDS = ChatRequestConfigFields;
 	formGroup: FormGroup;
 	destroyed$ = new Subject<void>();
 	constructor(
 		private readonly fb: FormBuilder,
 		private readonly translateService: TranslateService,
-		private readonly settingsService: SettingsService
+		private readonly settingsService: SettingsService,
+		private readonly userService: UserService,
+		private readonly settingsEventService: SettingsEventService
 	) {}
 	onChange = (value: any) => {};
 
@@ -52,20 +57,25 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			[this.FORM_FIELDS.AGENTIC_RAG]: [],
 			[this.FORM_FIELDS.LANGUAGE]: [this.translateService.currentLang],
 			[this.FORM_FIELDS.RESPONSE_STYLE]: [''],
+			[this.FORM_FIELDS.RESPONSE_FORMAT]: [''],
 			[this.FORM_FIELDS.K_MEMORY]: [''],
 			[this.FORM_FIELDS.K_RETRIEVE]: [''],
 			[this.FORM_FIELDS.MAX_OUTPUT_TOKENS]: [''],
 			[this.FORM_FIELDS.TOP_P]: [''],
 			[this.FORM_FIELDS.TEMPERATURE]: [''],
 			[this.FORM_FIELDS.RETRIEVAL_METHODS]: [''],
-			[this.FORM_FIELDS.SOURCES]: ['']
+			[this.FORM_FIELDS.SOURCES]: [''],
+			[this.FORM_FIELDS.SOURCE_VALIDATION]: [''],
+			[this.FORM_FIELDS.TOPIC_CHECK]: ['']
 		});
 
 		setTimeout(() => {
 			this.formGroup.patchValue({
 				[this.FORM_FIELDS.AUTOCOMPLETE]: true,
 				[this.FORM_FIELDS.RAG]: true,
-				[this.FORM_FIELDS.AGENTIC_RAG]: true
+				[this.FORM_FIELDS.AGENTIC_RAG]: false,
+				[this.FORM_FIELDS.SOURCE_VALIDATION]: true,
+				[this.FORM_FIELDS.TOPIC_CHECK]: false
 			});
 		});
 	}
@@ -74,6 +84,14 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		this.buildForm();
 		this.configureForm();
 		this.loadDropdowns();
+
+		this.userService.userLoggedIn.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+			this.loadDropdowns();
+		});
+
+		this.settingsEventService.settingsNeedRefresh.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+			this.loadDropdowns();
+		});
 	}
 
 	configureForm() {
@@ -86,29 +104,31 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		const ragControl = this.formGroup.get(this.FORM_FIELDS.RAG);
 		const agenticRagControl = this.formGroup.get(this.FORM_FIELDS.AGENTIC_RAG);
 
-		ragControl?.valueChanges
-			.pipe(takeUntil(this.destroyed$))
-			.subscribe(enabled => {
-				if (enabled) {
-					agenticRagControl?.setValue(false, { emitEvent: false });
-				}
-			});
+		ragControl?.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(enabled => {
+			if (enabled) {
+				agenticRagControl?.setValue(false, {emitEvent: false});
+			}
+		});
 
-		agenticRagControl?.valueChanges
-			.pipe(takeUntil(this.destroyed$))
-			.subscribe(enabled => {
-				if (enabled) {
-					ragControl?.setValue(false, { emitEvent: false });
-				}
-			});
+		agenticRagControl?.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(enabled => {
+			if (enabled) {
+				ragControl?.setValue(false, {emitEvent: false});
+			}
+		});
 	}
 
 	loadDropdowns() {
 		this.settingsService.getSettings(SettingsType.TAG).subscribe(tags => {
-			this.TAGS = tags.filter(tag => tag && tag !== '');
+			this.TAGS = this.sortByTranslation(
+				tags.filter(tag => tag && tag !== ''),
+				'tags'
+			);
 		});
 		this.settingsService.getSettings(SettingsType.SOURCE).subscribe(sources => {
-			this.SOURCES = sources;
+			this.SOURCES = this.sortByTranslation(
+				sources.filter(source => source && source !== ''),
+				'sources'
+			);
 		});
 		this.settingsService.getSettings(SettingsType.LLM_MODEL).subscribe(llmModels => {
 			this.LLM_MODELS = llmModels;
@@ -119,6 +139,17 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		this.settingsService.getSettings(SettingsType.RESPONSE_STYLE).subscribe(styles => {
 			this.RESPONSE_STYLE = styles;
 		});
+		this.settingsService.getSettings(SettingsType.RESPONSE_FORMAT).subscribe(formats => {
+			this.RESPONSE_FORMAT = formats;
+		});
+	}
+
+	isUserPdfUpload(source: string): boolean {
+		return source.startsWith('user_pdf_upload:');
+	}
+
+	getUserPdfFilename(source: string): string {
+		return source.split(':')[1] || '';
 	}
 
 	ngOnDestroy(): void {
@@ -152,5 +183,13 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 
 	validate(): ValidationErrors | null {
 		return this.formGroup.valid ? null : {invalidForm: {valid: false}};
+	}
+
+	private sortByTranslation(items: string[], prefix: string): string[] {
+		return items.sort((a, b) => {
+			const translationA = this.translateService.instant(`${prefix}.${a}`);
+			const translationB = this.translateService.instant(`${prefix}.${b}`);
+			return translationA.localeCompare(translationB);
+		});
 	}
 }

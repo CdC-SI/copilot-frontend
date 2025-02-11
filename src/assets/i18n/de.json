@@ -1,7 +1,56 @@
 {
+  "upload.success": "Die Datei wurde erfolgreich hochgeladen",
+  "upload.error": "Fehler beim Hochladen der Datei",
+  "FILE_TOO_LARGE": "Die Datei ist zu groß",
+  "FILE_CONTENT_INVALID": "Der Inhalt der Datei entspricht nicht ihrer Erweiterung",
+  "FILE_TYPE_UNSUPPORTED": "Der Dateityp wird nicht unterstützt",
+  "gcu": "Nutzungsvereinbarung",
+  "confidentiality": "Datenschutzerklärung",
+  "gcu.read": "Ich habe die Nutzungsvereinbarung gelesen und stimme ihr zu",
+  "confidentiality.read": "Ich habe die Datenschutzerklärung gelesen und stimme ihr zu",
   "enter.message": "Nachricht eingeben",
-  "home": "Startseite",
+  "chat": "Chat",
   "admin": "Verwaltung",
+  "tips": {
+    "component": "Tipps",
+    "sections": {
+      "getting_started": {
+        "title": "Um zu beginnen",
+        "tips": [
+          "Beginnen Sie Ihre Unterhaltung, indem Sie eine Frage eingeben oder eine vorgeschlagene Frage auswählen",
+          "Versuchen Sie, relevante Schlüsselwörter in die Formulierung Ihrer Frage einzubeziehen",
+          "Drücken Sie Enter oder klicken Sie auf die Schaltfläche Senden, um Ihre Frage zu bearbeiten",
+          "Löschen Sie die Konversation, indem Sie auf die Schaltfläche Löschen klicken"
+        ]
+      },
+      "retrieval": {
+        "title": "Suche nach Dokumenten",
+        "tips": [
+          "Stellen Sie Ihre Fragen zu einem bestimmten Thema",
+          "Wenn der Kopilot Schwierigkeiten hat zu antworten, filtern Sie die Quelle und die Tags manuell",
+          "Hinweis: Diese Filterung wird bald automatisiert"
+        ]
+      },
+      "document_management": {
+        "title": "Verwaltung von Dokumenten",
+        "tips": [
+          "Laden Sie PDFs mithilfe der Download-Schaltfläche herunter",
+          "Stellen Sie dann Ihre Fragen zu den heruntergeladenen Dokumenten",
+          "Übersetzen oder fassen Sie heruntergeladene Dokumente zusammen",
+          "Die Dokumente bleiben 24 Stunden lang verfügbar"
+        ]
+      },
+      "advanced_options": {
+        "title": "Erweiterte Optionen",
+        "tips": [
+          "Stellen Sie das Sprachmodell im Abschnitt 'Erweiterte LLM-Einstellungen' ein",
+          "Die manuelle Filterung von Quellen (source) und Themen (tags) in 'Erweiterte Sucheinstellungen' verbessert die Antwortqualität",
+          "Wählen Sie den Stil und das Format der Antwort in 'Antworteinstellungen'",
+          "Die Option zur Überprüfung von Quellen in 'Erweiterte Chat-Einstellungen' ermöglicht es, die Qualität der Quellen zu überprüfen"
+        ]
+      }
+    }
+  },
   "add.question.answer.ask": "Frage/Antwort hinzufügen?",
   "add.question.answer.explanation": "Eine Frage/Antwort wird der Wissensdatenbank hinzugefügt.",
   "add.question.answer.success": "Die Frage/Antwort wurde erfolgreich hinzugefügt",
@@ -32,20 +81,29 @@
   "create": "Anmeldung",
   "password": "Passwort",
   "confirm.password": "Passwort bestätigen",
-  "username": "Benutzername",
+  "username": "Email",
+  "organization": "Organisation",
   "create.copilot.account": "ZAS/EAK CopilotGPT-Konto erstellen",
   "login.copilot.account": "Mit einem ZAS/EAK CopilotGPT-Konto anmelden",
   "login.fail": "Falscher Benutzername oder falsches Passwort",
+  "chat_history": "Chat-Verlauf",
+  "parameters.advanced_llm_parameters": "Erweiterte LLM-Parameter",
   "parameters.model": "Modell",
   "parameters.temperature": "Temperaturen",
   "parameters.top_p": "Top P",
+  "parameters.advanced_retrieval_parameters": "Erweiterte Einstellungen Suche",
   "parameters.tags": "Tags",
   "parameters.sources": "Quellen",
   "parameters.retrieval-methods": "Abrufmethoden",
   "parameters.k_retrieve": "K Retrieve",
   "parameters.max_output_tokens": "Max Output Tokens",
+  "parameters.advanced_answer_format": "Antwort-Einstellungen",
   "parameters.response-style": "Antwortstil",
+  "parameters.response-format": "Antwortformat",
+  "parameters.advanced_chat_parameters": "Erweiterte Chat-Parameter",
   "parameters.memory": "K Memory",
+  "parameters.source_validation": "Quellenvalidierung",
+  "parameters.topic_check": "Themenüberprüfung",
   "parameters.autocomplete": "Autovervollständigung",
   "parameters.rag": "RAG",
   "parameters.agentic_rag": "Agentic RAG",
@@ -55,6 +113,57 @@
   "feedback.success": "Vielen Dank für Ihr Feedback!",
   "concise": "Kurz",
   "detailed": "Ausführlich",
-  "formal": "Formell",
-  "legal": "Rechtlich"
+  "plain": "Einfache (B1)",
+  "easy": "Leichte (A2)",
+  "legal": "Rechtlich",
+  "condensed": "Kondensiert",
+  "complete": "Vollständig",
+  "retrievers": {
+    "top_k_retriever": "Top K",
+    "query_rewriting_retriever": "Query Rewriting",
+    "contextual_compression_retriever": "Contextual Compression",
+    "rag_fusion_retriever": "RAG Fusion",
+    "bm25": "BM25",
+    "reranking": "Reranking"
+  },
+  "sources": {
+    "ahv_iv_memento": "AHV/IV-Merkblätter",
+    "ahv_lernbaustein_2024": "AHV Lernbaustein 2024",
+    "akis": "AKIS Online-Hilfe",
+    "bsv": "bsv.admin.ch",
+    "eak": "eak.admin.ch",
+    "fedlex": "Fedlex",
+    "practical_guide_eak_fz": "Praxisleitfaden FZ",
+    "sozialversicherungen": "sozialversicherungen.admin.ch",
+    "user_pdf_upload": "PDF Benutzer:",
+    "user_edit": "SurveyPipeline - Benutzereingabe"
+  },
+  "tags": {
+    "general": "Allgemeines",
+    "contributions": "Beiträge",
+    "bankruptcy": "Konkurs",
+    "ahv_stabilisation_21": "Stabilisierung der AHV (AHV 21)",
+    "ahv_services": "Leistungen der AHV",
+    "iv_services": "Leistungen der IV",
+    "complementary_services": "Ergänzungsleistungen EL",
+    "transitory_services": "Überbrückungsleistungen",
+    "loss_of_earnings_allowance": "Leistungen der EO",
+    "maternity_allowance": "Leistungen der MSE",
+    "allowance_for_the_other_parent": "Leistungen der EAE",
+    "support_allowance": "Leistungen der BUE",
+    "adoption_allowance": "Leistungen der AdopE",
+    "international": "International",
+    "family_allowances": "Familienzulagen",
+    "accident_insurance": "Unfallversicherung UVG",
+    "occupational_benefits": "Berufliche Vorsorge BV",
+    "health_insurance": "Krankenversicherung KV",
+    "annual_modifications": "Jährliche Neuerungen",
+    "hearing_aids": "Hörgeräte",
+    "akis_online_help": "AKIS Online-Hilfe",
+    "lavs": "AHVG"
+  },
+  "legal_basis": {
+    "tos": "Nutzungsbedingungen",
+    "data_protection": "Datenschutz"
+  }
 }

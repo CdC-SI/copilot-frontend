@@ -11,8 +11,8 @@ class PermissionService {
 		private readonly userService: UserService
 	) {}
 	canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
-		if (state.url === '/admin' && !this.userService.isAuthenticatedAsAdmin()) {
-			return this.router.createUrlTree(['/home']);
+		if ((state.url === '/admin' || state.url === '/tips') && !this.userService.isAuthenticatedAsAdmin()) {
+			return this.router.createUrlTree(['/chat']);
 		}
 
 		return true;

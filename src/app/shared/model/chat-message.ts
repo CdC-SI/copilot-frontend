@@ -9,6 +9,12 @@ export interface ChatMessage {
 	isCompleted?: boolean;
 	lang?: string;
 	inError?: boolean;
+	isRetrieving?: boolean;
+	isValidating?: boolean;
+	isRouting?: boolean;
+	isAgent?: boolean;
+	sources?: string[];
+	isToolUse?: boolean;
 }
 
 export enum ChatMessageSource {

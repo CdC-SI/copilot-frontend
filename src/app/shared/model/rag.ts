@@ -13,11 +13,14 @@ export interface ChatRequest {
 	kRetrieve?: number;
 	kMemory?: number;
 	responseStyle?: string;
+	responseFormat?: string;
 	command?: string;
 	commandArgs?: string;
 	autocomplete?: boolean;
 	rag?: boolean;
 	agenticRag?: boolean;
+	sourceValidation?: boolean;
+	topicCheck?: boolean;
 	isFollowUpQ?: boolean;
 	conversationId?: string;
 }
@@ -34,10 +37,13 @@ export enum ChatRequestConfigFields {
 	K_RETRIEVE = 'kRetrieve',
 	K_MEMORY = 'kMemory',
 	RESPONSE_STYLE = 'responseStyle',
+	RESPONSE_FORMAT = 'responseFormat',
 	COMMAND = 'command',
 	COMMAND_ARGS = 'commandArgs',
 	AUTOCOMPLETE = 'autocomplete',
 	RAG = 'rag',
 	AGENTIC_RAG = 'agenticRag',
+	SOURCE_VALIDATION = 'sourceValidation',
+	TOPIC_CHECK = 'topicCheck',
 	IS_FOLLOWUP_Q = 'isFollowUpQ'
 }

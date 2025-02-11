@@ -6,6 +6,10 @@ import {IUser, Role} from '../model/user';
 import {IToken} from '../model/token';
 import {TokenService} from './token.service';
 
+export interface UserRegistrationResponse {
+  userId: string;
+}
+
 @Injectable({
 	providedIn: 'root'
 })
@@ -22,9 +26,8 @@ export class UserService {
 		}
 	}
 
-	createAccount(user: IUser): Observable<any> {
-		const headers = {'Content-Type': 'application/json', Accept: 'text/plain'};
-		return this.http.post(this.config.backendApi('/users'), user, {headers});
+	createAccount(user: IUser): Observable<UserRegistrationResponse> {
+		return this.http.post<UserRegistrationResponse>(this.config.backendApi('/users'), user);
 	}
 
 	login(user: IUser): Observable<IToken> {

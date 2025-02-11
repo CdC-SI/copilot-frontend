@@ -17,6 +17,23 @@
 				<mat-label>{{ "confirm.password" | translate }}</mat-label>
 				<input [formControlName]="FORM_FIELDS.CONFIRM_PASSWORD" name="confirm-password" type="password" matInput placeholder="" />
 			</mat-form-field>
+			<mat-form-field obErrorMessages>
+				<mat-label>{{ "organization" | translate }}</mat-label>
+				<mat-select [formControlName]="FORM_FIELDS.ORGANIZATION" multiple>
+					<mat-option *ngFor="let entity of ORGANIZATION" [value]="entity">{{ entity }}</mat-option>
+				</mat-select>
+				<mat-error></mat-error>
+			</mat-form-field>
+			<mat-checkbox [formControlName]="FORM_FIELDS.CONFIDENTIALITY" name="accept-gcu">
+				<a href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Datenschutzerklaerung.pdf" target="_blank">
+					{{ "confidentiality.read" | translate }}
+				</a>
+			</mat-checkbox>
+			<mat-checkbox [formControlName]="FORM_FIELDS.GCU" name="accept-gcu" class="mb16">
+				<a href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Nutzungsvereinbarung-Mitarbeitende.pdf" target="_blank">
+					{{ "gcu.read" | translate }}
+				</a>
+			</mat-checkbox>
 		</form>
 	</div>
 </div>

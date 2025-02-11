@@ -2,7 +2,7 @@
 	<div column-left-content class="h100">
 		<mat-card class="history-card">
 			<mat-card-header class="flex-row aic jcsb">
-				<mat-card-title class="mt16">{{ "Historique" | translate }}</mat-card-title>
+				<mat-card-title class="mt16">{{ "chat_history" | translate }}</mat-card-title>
 				<button mat-icon-button [obButton]="'primary'" (click)="newChat()">
 					<mat-icon svgIcon="speech-bubble"></mat-icon>
 				</button>
@@ -18,7 +18,17 @@
 			<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
 		</div>
 		<div class="message-container">
-			<div *ngFor="let message of messages; let last = last; let i = index" class="message">
+			<div
+				*ngFor="let message of messages; let last = last; let i = index"
+				class="message"
+				[class.retrieving]="message.isRetrieving"
+				[class.validating]="message.isValidating"
+				[class.routing]="message.isRouting"
+				[class.agent]="message.isAgent"
+				[class.tool]="message.isToolUse"
+				[class.assistant]="message.source !== ChatMessageSource.USER"
+				[class.user]="message.source === ChatMessageSource.USER"
+			>
 				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
 					<img
 						[hidden]="message.source === ChatMessageSource.USER"
@@ -39,10 +49,11 @@
 				[i18nLabel]="'enter.message'"
 				[optionLabelFn]="searchOptionLabelFn"
 				[inputLabelFn]="searchOptionLabelFn"
-				[optionService]="getSearchProposalFunction"
+				[optionService]="isCommandMode ? getCommandSuggestions : getSearchProposalFunction"
 				[minLength]="0"
 				[formControl]="searchCtrl"
-				(optionSelected)="selectFaqOption($event)"
+				(optionSelected)="handleOptionSelected($event)"
+				(inputChange)="isCommandMode = $event.startsWith('/')"
 			/>
 
 			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
@@ -51,6 +62,10 @@
 
 			<button type="button" mat-icon-button (click)="clearChat()" [obButton]="'secondary'">
 				<mat-icon svgIcon="trash"></mat-icon>
+			</button>
+
+			<button *ngIf="isAuthenticated()" type="button" mat-icon-button (click)="uploadDoc()" [obButton]="'secondary'">
+				<mat-icon svgIcon="upload"></mat-icon>
 			</button>
 		</form>
 	</div>
