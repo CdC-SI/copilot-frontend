@@ -1,13 +1,15 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {HomeComponent} from './home/home.component';
+import {ChatComponent} from './chat/chat.component';
 import {AdminComponent} from './admin/admin.component';
+import {TipsComponent} from './tips/tips.component';
 import {AdminGuard} from './shared/services/admin.guard';
 
 const routes: Routes = [
-	{path: '', redirectTo: 'home', pathMatch: 'full'},
-	{path: 'home', component: HomeComponent},
-	{path: 'admin', component: AdminComponent, canActivate: [AdminGuard]}
+	{path: '', redirectTo: 'chat', pathMatch: 'full'},
+	{path: 'chat', component: ChatComponent},
+	{path: 'admin', component: AdminComponent, canActivate: [AdminGuard]},
+	{path: 'tips', component: TipsComponent},
 ];
 
 @NgModule({

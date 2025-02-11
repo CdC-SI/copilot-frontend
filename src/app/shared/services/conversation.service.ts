@@ -25,7 +25,15 @@ export class ConversationService {
 		return this.http.post(this.config.backendApi('/conversations/init'), messages);
 	}
 
-	update(conversationId: string, messages: ChatMessage[]) {
-		this.http.put(this.config.backendApi(`/conversations/${conversationId}`), messages).subscribe();
+	update(id: string, messages: ChatMessage[]) {
+		this.http.put(this.config.backendApi(`/conversations/${id}`), messages).subscribe();
+	}
+
+	deleteConversation(id: string): Observable<any> {
+		return this.http.delete(this.config.backendApi(`/conversations/${id}`));
+	}
+
+	renameConversation(id: string, newTitle: string): Observable<any> {
+		return this.http.put(this.config.backendApi(`/conversations/${id}/title`), { title: newTitle });
 	}
 }

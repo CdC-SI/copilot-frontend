@@ -9,8 +9,48 @@
   "gcu.read": "Ich habe die Nutzungsvereinbarung gelesen und stimme ihr zu",
   "confidentiality.read": "Ich habe die Datenschutzerklärung gelesen und stimme ihr zu",
   "enter.message": "Nachricht eingeben",
-  "home": "Startseite",
+  "chat": "Chat",
   "admin": "Verwaltung",
+  "tips": {
+    "component": "Tipps",
+    "sections": {
+      "getting_started": {
+        "title": "Um zu beginnen",
+        "tips": [
+          "Beginnen Sie Ihre Unterhaltung, indem Sie eine Frage eingeben oder eine vorgeschlagene Frage auswählen",
+          "Versuchen Sie, relevante Schlüsselwörter in die Formulierung Ihrer Frage einzubeziehen",
+          "Drücken Sie Enter oder klicken Sie auf die Schaltfläche Senden, um Ihre Frage zu bearbeiten",
+          "Löschen Sie die Konversation, indem Sie auf die Schaltfläche Löschen klicken"
+        ]
+      },
+      "retrieval": {
+        "title": "Suche nach Dokumenten",
+        "tips": [
+          "Stellen Sie Ihre Fragen zu einem bestimmten Thema",
+          "Wenn der Kopilot Schwierigkeiten hat zu antworten, filtern Sie die Quelle und die Tags manuell",
+          "Hinweis: Diese Filterung wird bald automatisiert"
+        ]
+      },
+      "document_management": {
+        "title": "Verwaltung von Dokumenten",
+        "tips": [
+          "Laden Sie PDFs mithilfe der Download-Schaltfläche herunter",
+          "Stellen Sie dann Ihre Fragen zu den heruntergeladenen Dokumenten",
+          "Übersetzen oder fassen Sie heruntergeladene Dokumente zusammen",
+          "Die Dokumente bleiben 24 Stunden lang verfügbar"
+        ]
+      },
+      "advanced_options": {
+        "title": "Erweiterte Optionen",
+        "tips": [
+          "Stellen Sie das Sprachmodell im Abschnitt 'Erweiterte LLM-Einstellungen' ein",
+          "Die manuelle Filterung von Quellen (source) und Themen (tags) in 'Erweiterte Sucheinstellungen' verbessert die Antwortqualität",
+          "Wählen Sie den Stil und das Format der Antwort in 'Antworteinstellungen'",
+          "Die Option zur Überprüfung von Quellen in 'Erweiterte Chat-Einstellungen' ermöglicht es, die Qualität der Quellen zu überprüfen"
+        ]
+      }
+    }
+  },
   "add.question.answer.ask": "Frage/Antwort hinzufügen?",
   "add.question.answer.explanation": "Eine Frage/Antwort wird der Wissensdatenbank hinzugefügt.",
   "add.question.answer.success": "Die Frage/Antwort wurde erfolgreich hinzugefügt",
@@ -41,11 +81,12 @@
   "create": "Anmeldung",
   "password": "Passwort",
   "confirm.password": "Passwort bestätigen",
-  "username": "Benutzername",
+  "username": "Email",
   "organization": "Organisation",
   "create.copilot.account": "ZAS/EAK CopilotGPT-Konto erstellen",
   "login.copilot.account": "Mit einem ZAS/EAK CopilotGPT-Konto anmelden",
   "login.fail": "Falscher Benutzername oder falsches Passwort",
+  "chat_history": "Chat-Verlauf",
   "parameters.advanced_llm_parameters": "Erweiterte LLM-Parameter",
   "parameters.model": "Modell",
   "parameters.temperature": "Temperaturen",
@@ -87,14 +128,15 @@
   },
   "sources": {
     "ahv_iv_memento": "AHV/IV-Merkblätter",
-    "ahv_lernbaustein_2024": "AHV Lernbaustein 2024 (EAK)",
-    "akis": "AKIS Online-Hilfe (EAK)",
+    "ahv_lernbaustein_2024": "AHV Lernbaustein 2024",
+    "akis": "AKIS Online-Hilfe",
     "bsv": "bsv.admin.ch",
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
-    "practical_guide_eak_fz": "Praxisleitfaden FZ (EAK)",
+    "practical_guide_eak_fz": "Praxisleitfaden FZ",
     "sozialversicherungen": "sozialversicherungen.admin.ch",
-    "user_pdf_upload": "PDF Benutzer:"
+    "user_pdf_upload": "PDF Benutzer:",
+    "user_edit": "SurveyPipeline - Benutzereingabe"
   },
   "tags": {
     "general": "Allgemeines",
@@ -119,5 +161,9 @@
     "hearing_aids": "Hörgeräte",
     "akis_online_help": "AKIS Online-Hilfe",
     "lavs": "AHVG"
+  },
+  "legal_basis": {
+    "tos": "Nutzungsbedingungen",
+    "data_protection": "Datenschutz"
   }
 }

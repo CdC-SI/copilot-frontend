@@ -9,8 +9,48 @@
   "gcu.read": "Ho letto i termini e le condizioni generali",
   "confidentiality.read": "Ho letto l'informativa sulla privacy",
   "enter.message": "Inserisci un messaggio",
-  "home": "Home",
+  "chat": "Chat",
   "admin": "Amministrazione",
+  "tips": {
+    "component": "Consigli",
+    "sections": {
+      "getting_started": {
+        "title": "Per iniziare",
+        "tips": [
+          "Iniziare la conversazione digitando una domanda o selezionando una domanda suggerita",
+          "Cercate di includere parole chiave pertinenti nella formulazione della domanda",
+          "Premete Invio o cliccate sul pulsante Invia per elaborare la vostra domanda",
+          "Eliminare la conversazione facendo clic sul pulsante Elimina"
+        ]
+      },
+      "retrieval": {
+        "title": "Ricerca documenti",
+        "tips": [
+          "Fate le vostre domande su un argomento specifico",
+          "Se il copilota ha difficoltà a rispondere, filtrate manualmente la fonte e i tag",
+          "Nota: questo filtraggio sarà presto automatizzato"
+        ]
+      },
+      "document_management": {
+        "title": "Gestione dei documenti",
+        "tips": [
+          "Scaricare i PDF utilizzando il pulsante di download",
+          "Quindi ponete le vostre domande sui documenti scaricati",
+          "Tradurre o sintetizzare i documenti scaricati",
+          "I documenti rimangono disponibili per 24 ore"
+        ]
+      },
+      "advanced_options": {
+        "title": "Opzioni avanzate",
+        "tips": [
+          "Impostare il modello linguistico nella sezione “Parametri LLM Avanzati”",
+          "Il filtraggio manuale delle fonti e dei tag in “Parametri Ricerca Avanzati” migliora la qualità delle risposte",
+          "Scegliete lo stile e il formato della risposta in “Parametri della risposta”",
+          "L'opzione di convalida della fonte in “Parametri Chat Avanzati” consente di verificare la qualità delle fonti"
+        ]
+      }
+    }
+  },
   "add.question.answer.ask": "Aggiungere una domanda/risposta?",
   "add.question.answer.explanation": "Una domanda/risposta sarà aggiunta alla base di conoscenza.",
   "add.question.answer.success": "La domanda/risposta è stata aggiunta con successo",
@@ -41,11 +81,12 @@
   "create": "Iscriviti",
   "password": "Password",
   "confirm.password": "Conferma la password",
-  "username": "Nome utente",
+  "username": "Email",
   "organization": "Organizzazione",
   "create.copilot.account": "Crea un account ZAS/EAK CopilotGPT",
   "login.copilot.account": "Accedi a un account ZAS/EAK CopilotGPT",
   "login.fail": "Nome utente o password errati",
+  "chat_history": "Cronologia",
   "parameters.advanced_llm_parameters": "Parametri LLM Avanzati",
   "parameters.model": "Modello",
   "parameters.temperature": "Temperatura",
@@ -87,14 +128,15 @@
   },
   "sources": {
     "ahv_iv_memento": "AVS/AI Opuscoli",
-    "ahv_lernbaustein_2024": "Guida all'apprendimento AVS 2024 (EAK)",
-    "akis": "AKIS Aiuto Online (EAK)",
+    "ahv_lernbaustein_2024": "Guida all'apprendimento AVS 2024",
+    "akis": "AKIS Aiuto Online",
     "bsv": "bsv.admin.ch",
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
-    "practical_guide_eak_fz": "Guida Pratica AFam (EAK)",
+    "practical_guide_eak_fz": "Guida Pratica AFam",
     "sozialversicherungen": "sozialversicherungen.admin.ch",
-    "user_pdf_upload": "PDF Utente:"
+    "user_pdf_upload": "PDF Utente:",
+    "user_edit": "SurveyPipeline - Input dell'utente"
   },
   "tags": {
     "general": "Generalità",
@@ -119,5 +161,9 @@
     "hearing_aids": "Apparecchi acustici",
     "akis_online_help": "AKIS Aiuto Online",
     "lavs": "LAVS"
+  },
+  "legal_basis": {
+    "tos": "Termini di servizio",
+    "data_protection": "Protezione dei dati"
   }
 }

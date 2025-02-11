@@ -30,11 +30,11 @@ import {UploadService} from '../shared/services/upload.service';
 type AutocompleteType = IQuestion | Command;
 
 @Component({
-	selector: 'zco-home',
-	templateUrl: './home.component.html',
-	styleUrls: ['./home.component.scss']
+	selector: 'zco-chat',
+	templateUrl: './chat.component.html',
+	styleUrls: ['./chat.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class ChatComponent implements OnInit {
 	Object = Object;
 	searchCtrl = new FormControl();
 	chatConfigCtrl = new FormControl();

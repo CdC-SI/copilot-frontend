@@ -9,8 +9,48 @@
   "gcu.read": "J’ai lu les conditions générales d’utilisation",
   "confidentiality.read": "J’ai lu la politique de confidentialité",
   "enter.message": "Entrer un message",
-  "home": "Accueil",
+  "chat": "Chat",
   "admin": "Administration",
+  "tips": {
+    "component": "Conseils",
+    "sections": {
+      "getting_started": {
+        "title": "Pour commencer",
+        "tips": [
+          "Commencez votre conversation en tapant une question ou en sélectionnant une question suggérée",
+          "Essayez d'inclure des mots-clefs pertinents dans la formulation de votre question",
+          "Appuyez sur Enter ou cliquez sur le bouton envoyer pour traiter votre question",
+          "Effacez la conversation en cliquant sur le bouton effacer"
+        ]
+      },
+      "retrieval": {
+        "title": "Recherche de documents",
+        "tips": [
+          "Posez vos questions sur un sujet particulier",
+          "Si le copilote peine à répondre, filtrez la source et les tags manuellement",
+          "Note: ce filtrage sera bientôt automatisé"
+        ]
+      },
+      "document_management": {
+        "title": "Gestion des documents",
+        "tips": [
+          "Téléchargez des PDF en utilisant le bouton de téléchargement",
+          "Posez ensuite vos questions sur les documents téléchargés",
+          "Traduisez ou résumez les documents téléchargés",
+          "Les documents restent disponibles durant 24 heures"
+        ]
+      },
+      "advanced_options": {
+        "title": "Options avancées",
+        "tips": [
+          "Paramétrez le modèle de language dans la section 'Paramètres Avancés LLM'",
+          "Le filtrage manuel des sources (source) et les sujets (tags) dans 'Paramètres Avancés Recherche' améliore la qualité de réponse",
+          "Choisissez le style et format de réponse dans 'Paramètres de réponse'",
+          "L'option de validation des sources dans 'Paramètres Avancés Chat' permet de vérifier la qualité des sources"
+        ]
+      }
+    }
+  },
   "add.question.answer.ask": "Ajouter une question/réponse ?",
   "add.question.answer.explanation": "Une question/réponse sera ajoutée à la base de connaissance.",
   "add.question.answer.success": "La question/réponse a été ajoutée avec succès",
@@ -41,11 +81,12 @@
   "create": "Inscription",
   "password": "Mot de passe",
   "confirm.password": "Confirmer le mot de passe",
-  "username": "Nom d'utilisateur",
+  "username": "Email",
   "organization": "Organisation",
   "create.copilot.account": "Créer un compte ZAS/EAK CopilotGPT",
   "login.copilot.account": "Se connecter à un compte ZAS/EAK CopilotGPT",
   "login.fail": "Utilisateur ou mot de passe incorrect",
+  "chat_history": "Historique",
   "parameters.advanced_llm_parameters": "Paramètres Avancés LLM",
   "parameters.model": "Modèle",
   "parameters.temperature": "Température",
@@ -87,14 +128,15 @@
   },
   "sources": {
     "ahv_iv_memento": "AVS/AI Mémentos",
-    "ahv_lernbaustein_2024": "Guide d'apprentissage AVS 2024 (EAK)",
-    "akis": "AKIS Aide En-Ligne (EAK)",
+    "ahv_lernbaustein_2024": "Guide d'apprentissage AVS 2024",
+    "akis": "AKIS Aide En-Ligne",
     "bsv": "bsv.admin.ch",
     "eak": "eak.admin.ch",
     "fedlex": "Fedlex",
-    "practical_guide_eak_fz": "Guide Pratique AFam (EAK)",
+    "practical_guide_eak_fz": "Guide Pratique AFam",
     "sozialversicherungen": "sozialversicherungen.admin.ch",
-    "user_pdf_upload": "PDF Utilisateur:"
+    "user_pdf_upload": "PDF Utilisateur:",
+    "user_edit": "SurveyPipeline - Saisie utilisateur"
   },
   "tags": {
     "general": "Généralités",
@@ -119,5 +161,9 @@
     "hearing_aids": "Appareils auditifs",
     "akis_online_help": "AKIS Aide En Ligne",
     "lavs": "LAVS"
+  },
+  "legal_basis": {
+    "tos": "Conditions d'utilisation",
+    "data_protection": "Protection des données"
   }
 }
