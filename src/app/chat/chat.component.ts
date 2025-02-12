@@ -184,9 +184,12 @@ export class ChatComponent implements OnInit {
 				this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
 				this.cdr.markForCheck();
 			},
-			error: () => {
-				this.messages.pop();
-				this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
+			error: err => {
+				if (err.message !== 'network error') {
+					// TODO dirty fix to handle the 'error net::ERR_INCOMPLETE_CHUNKED_ENCODING' issue
+					this.messages.pop();
+					this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
+				}
 				this.enableSearch();
 			}
 		});
