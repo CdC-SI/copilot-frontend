@@ -346,7 +346,7 @@ export class ChatComponent implements OnInit {
 		fileInput.onchange = (e: Event) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (file) {
-				this.uploadService.uploadPdf(file).subscribe({
+				this.uploadService.uploadPdf(file, this.currentConversation?.conversationId).subscribe({
 					next: () => {
 						this.notif.success('upload.success');
 						this.settingsEventService.emitSettingsRefresh();
