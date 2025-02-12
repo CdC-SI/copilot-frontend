@@ -165,5 +165,21 @@
   "legal_basis": {
     "tos": "Termini di servizio",
     "data_protection": "Protezione dei dati"
+  },
+  "action_suggestions": {
+    "translate": "Tradurre",
+    "summarize": "Riassumere",
+    "explain": "Spiegare",
+    "reformulate": "Riformulare",
+    "draft": "Scrittura",
+    "more": "Altre",
+    "prefixes": {
+      "translate": "Traducete l'ultimo messaggio in ",
+      "summarize": "Riassumete la conversazione ",
+      "explain": "Spiegatemi in un linguaggio semplice il concetto di ",
+      "reformulate": "Riformulate il vostro ultimo messaggio con un linguaggio semplice",
+      "draft": "Aiutatemi a scrivere un testo su ",
+      "more": ""
+    }
   }
 }
