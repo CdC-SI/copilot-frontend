@@ -18,6 +18,7 @@ import {QuestionSuggestionComponent} from './components/question-suggestion/ques
 import {SignInComponent} from './components/sign-in/sign-in.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
 import {MatLine} from '@angular/material/core';
+import { ActionSuggestionsComponent } from './components/action-suggestions/action-suggestions.component';
 
 @NgModule({
 	declarations: [
@@ -30,7 +31,8 @@ import {MatLine} from '@angular/material/core';
 		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
 		SignInComponent,
-		ChatHistoryComponent
+		ChatHistoryComponent,
+		ActionSuggestionsComponent
 	],
 	imports: [
 		CommonModule,
@@ -58,7 +60,8 @@ import {MatLine} from '@angular/material/core';
 		FaqItemEditComponent,
 		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
-		ChatHistoryComponent
+		ChatHistoryComponent,
+		ActionSuggestionsComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

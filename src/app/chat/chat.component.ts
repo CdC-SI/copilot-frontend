@@ -404,4 +404,9 @@ export class ChatComponent implements OnInit {
 			});
 		}, 1_500);
 	}
+
+	handleSuggestionAction(action: string): void {
+		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
+		this.searchCtrl.setValue(prefix);
+	}
 }
