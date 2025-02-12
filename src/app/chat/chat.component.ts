@@ -185,9 +185,11 @@ export class ChatComponent implements OnInit {
 				this.cdr.markForCheck();
 			},
 			error: err => {
-				console.log(err);
-				this.messages.pop();
-				this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
+				if (err.message !== 'network error') {
+					// TODO dirty fix to handle the 'error net::ERR_INCOMPLETE_CHUNKED_ENCODING' issue
+					this.messages.pop();
+					this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
+				}
 				this.enableSearch();
 			}
 		});
