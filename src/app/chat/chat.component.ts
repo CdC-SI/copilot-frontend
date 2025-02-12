@@ -184,7 +184,8 @@ export class ChatComponent implements OnInit {
 				this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
 				this.cdr.markForCheck();
 			},
-			error: () => {
+			error: err => {
+				console.log(err);
 				this.messages.pop();
 				this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
 				this.enableSearch();
