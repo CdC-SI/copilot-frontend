@@ -10,6 +10,13 @@
 		<mat-error></mat-error>
 	</mat-form-field>
 	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
+			<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ 'tags.' + tag | translate }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+	<mat-form-field obErrorMessages>
 		<mat-label>{{ "url.source" | translate }}</mat-label>
 		<input [formControlName]="FORM_FIELDS.SOURCE" name="source" type="text" matInput placeholder="" />
 		<mat-error></mat-error>
