@@ -15,6 +15,9 @@ export interface ChatMessage {
 	isAgent?: boolean;
 	sources?: string[];
 	isToolUse?: boolean;
+	isProcessingIntent?: boolean;
+	isProcessingSources?: boolean;
+	isProcessingTags?: boolean;
 }
 
 export enum ChatMessageSource {
