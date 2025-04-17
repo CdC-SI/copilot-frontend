@@ -2,6 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
+import {AuthenticationService, LocalStorageService} from 'zas-design-system';
 
 @Injectable({
 	providedIn: 'root'
@@ -14,13 +15,20 @@ export class ConfigurationService {
 		@Inject(WINDOW) private readonly window: Window,
 		private readonly masterLayoutConfig: ObMasterLayoutConfig,
 		private readonly router: Router,
-		private readonly interceptorConfig: ObHttpApiInterceptorConfig
+		private readonly interceptorConfig: ObHttpApiInterceptorConfig,
+		private readonly localStorageService: LocalStorageService,
+		private readonly authenticationService: AuthenticationService
 	) {}
 
 	preInitialize() {
 		this.loadConfigurationForEnv();
 		this.configureMasterLayout();
 		this.configureInterceptor();
+		this.configureAuthentication();
+	}
+
+	configureAuthentication() {
+		this.authenticationService.login();
 	}
 
 	loadConfigurationForEnv() {
