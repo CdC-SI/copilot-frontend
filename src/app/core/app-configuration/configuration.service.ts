@@ -1,4 +1,4 @@
-import {Inject, Injectable, isDevMode} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
@@ -37,7 +37,7 @@ export class ConfigurationService {
 			{matchUrlRegex: '^https://.*copilot\\..*', gatewayUrl: 'https://gateway.zas.admin.ch'}
 		]);
 		this.environmentService.setMockToken(MOCK_TOKEN);
-		this.environmentService.isLocalhostEnvironment(isDevMode());
+		this.environmentService.isLocalhostEnvironment(this.envConfiguration.local);
 		this.environmentService.load().pipe(
 			tap(() => {
 				this.authenticationService.login();
