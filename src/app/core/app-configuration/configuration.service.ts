@@ -37,7 +37,7 @@ export class ConfigurationService {
 			{matchUrlRegex: '^https://.*copilot\\..*', gatewayUrl: 'https://gateway.zas.admin.ch'}
 		]);
 		this.environmentService.setMockToken(MOCK_TOKEN);
-		this.environmentService.isLocalhostEnvironment(false);
+		this.environmentService.isLocalhostEnvironment(this.envConfiguration.local);
 		void firstValueFrom(
 			this.environmentService.load().pipe(
 				tap(() => {
