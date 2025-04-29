@@ -1,0 +1,19 @@
+.action-suggestions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 0 16px;
+  width: 100%;
+
+  .suggestion-button {
+    border-radius: 20px;
+    flex: 1;
+    white-space: nowrap;
+    min-width: 120px;
+
+    &:hover {
+      transform: translateY(-1px);
+      transition: transform 0.2s ease;
+    }
+  }
+}

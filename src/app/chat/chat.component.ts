@@ -11,6 +11,9 @@ import {
 	OFF_TOPIC_REGEX,
 	RETRIEVING_TAG_REGEX,
 	ROUTING_TAG_REGEX,
+	INTENT_TAG_REGEX,
+	SOURCE_TAG_REGEX,
+	TAGS_TAG_REGEX,
 	TOOL_TAG_REGEX,
 	TOPIC_CHECK_REGEX,
 	clearNullAndEmpty
@@ -207,6 +210,27 @@ export class ChatComponent implements OnInit {
 			return;
 		}
 
+		const intentTagMatch = INTENT_TAG_REGEX.exec(chunk);
+		if (intentTagMatch) {
+			partialChatMessage.message = intentTagMatch[1];
+			partialChatMessage.isProcessingIntent = true;
+			return;
+		}
+
+		const sourceTagMatch = SOURCE_TAG_REGEX.exec(chunk);
+		if (sourceTagMatch) {
+			partialChatMessage.message = sourceTagMatch[1];
+			partialChatMessage.isProcessingSources = true;
+			return;
+		}
+
+		const tagsTagMatch = TAGS_TAG_REGEX.exec(chunk);
+		if (tagsTagMatch) {
+			partialChatMessage.message = tagsTagMatch[1];
+			partialChatMessage.isProcessingTags = true;
+			return;
+		}
+
 		const agentTagMatch = AGENT_TAG_REGEX.exec(chunk);
 		if (agentTagMatch) {
 			partialChatMessage.message = agentTagMatch[1];
@@ -248,7 +272,10 @@ export class ChatComponent implements OnInit {
 			partialChatMessage.isValidating ||
 			partialChatMessage.isRouting ||
 			partialChatMessage.isAgent ||
-			partialChatMessage.isToolUse
+			partialChatMessage.isToolUse ||
+			partialChatMessage.isProcessingIntent ||
+			partialChatMessage.isProcessingSources ||
+			partialChatMessage.isProcessingTags
 		) {
 			partialChatMessage.message = '';
 			partialChatMessage.isRetrieving = false;
@@ -256,6 +283,9 @@ export class ChatComponent implements OnInit {
 			partialChatMessage.isRouting = false;
 			partialChatMessage.isAgent = false;
 			partialChatMessage.isToolUse = false;
+			partialChatMessage.isProcessingIntent = false;
+			partialChatMessage.isProcessingSources = false;
+			partialChatMessage.isProcessingTags = false;
 		}
 
 		partialChatMessage.message += chunk;
@@ -349,7 +379,7 @@ export class ChatComponent implements OnInit {
 		fileInput.onchange = (e: Event) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (file) {
-				this.uploadService.uploadPdf(file).subscribe({
+				this.uploadService.uploadPdf(file, this.currentConversation?.conversationId).subscribe({
 					next: () => {
 						this.notif.success('upload.success');
 						this.settingsEventService.emitSettingsRefresh();
@@ -403,5 +433,10 @@ export class ChatComponent implements OnInit {
 				this.currentConversation.selected = true;
 			});
 		}, 1_500);
+	}
+
+	handleSuggestionAction(action: string): void {
+		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
+		this.searchCtrl.setValue(prefix);
 	}
 }

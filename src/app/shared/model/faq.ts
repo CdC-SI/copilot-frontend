@@ -3,7 +3,8 @@ export enum FaqItemFields {
 	QUESTION = 'text',
 	ANSWER = 'answer',
 	SOURCE = 'url',
-	LANGUAGE = 'language'
+	LANGUAGE = 'language',
+	TAGS = 'tags'
 }
 
 export interface IFaqItem {
@@ -12,4 +13,5 @@ export interface IFaqItem {
 	answer: string;
 	url: string;
 	language: string;
+	tags?: string[];
 }

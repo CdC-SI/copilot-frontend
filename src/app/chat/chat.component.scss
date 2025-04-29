@@ -106,6 +106,15 @@
 			color: var(--theme-text-light);
 			animation: glow 1.5s ease-in-out infinite;
 		}
+
+		&.processing-intent,
+		&.processing-sources,
+		&.processing-tags {
+			opacity: 0.7;
+			font-style: italic;
+			color: var(--theme-text-light);
+			animation: glow 1.5s ease-in-out infinite;
+		}
 	}
 
 	.my-message {
