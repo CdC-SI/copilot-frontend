@@ -2,25 +2,49 @@ import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
+import {AuthenticationService, EnvironmentService} from 'zas-design-system';
+import {firstValueFrom, tap} from 'rxjs';
+import {MOCK_TOKEN} from './token';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ConfigurationService {
 	private envConfiguration: Configuration;
-
 	constructor(
 		@Inject(ZCO_CONFIGURATIONS_TOKEN) private readonly configurations: Configuration[],
 		@Inject(WINDOW) private readonly window: Window,
 		private readonly masterLayoutConfig: ObMasterLayoutConfig,
 		private readonly router: Router,
-		private readonly interceptorConfig: ObHttpApiInterceptorConfig
+		private readonly interceptorConfig: ObHttpApiInterceptorConfig,
+		private readonly authenticationService: AuthenticationService,
+		private readonly environmentService: EnvironmentService
 	) {}
 
 	preInitialize() {
 		this.loadConfigurationForEnv();
 		this.configureMasterLayout();
 		this.configureInterceptor();
+		this.configureAuthentication();
+	}
+
+	configureAuthentication() {
+		this.environmentService.setEnvironmentConfigs([
+			{matchUrlRegex: '^http[s]?://localhost.*', gatewayUrl: 'https://gateway-d.zas.admin.ch'},
+			{matchUrlRegex: '^https://.*copilot-d\\..*', gatewayUrl: 'https://gateway-d.zas.admin.ch'},
+			{matchUrlRegex: '^https://.*copilot-r\\..*', gatewayUrl: 'https://gateway-r.zas.admin.ch'},
+			{matchUrlRegex: '^https://.*copilot-a\\..*', gatewayUrl: 'https://gateway-a.zas.admin.ch'},
+			{matchUrlRegex: '^https://.*copilot\\..*', gatewayUrl: 'https://gateway.zas.admin.ch'}
+		]);
+		this.environmentService.setMockToken(MOCK_TOKEN);
+		this.environmentService.isLocalhostEnvironment(this.envConfiguration.local);
+		void firstValueFrom(
+			this.environmentService.load().pipe(
+				tap(() => {
+					this.authenticationService.login();
+				})
+			)
+		);
 	}
 
 	loadConfigurationForEnv() {
