@@ -1,12 +1,8 @@
 <ob-master-layout [navigation]="getNavigation()">
 	<ng-container obHeaderTitle>ZAS/EAK CopilotGPT</ng-container>
 	<ng-template #obHeaderControl>
-		<div *ngIf="userNotAuthenticated()">
-			<button class="mr16" mat-button [obButton]="'primary'" (click)="openSignUpDialog()">{{ "sign.up" | translate }}</button>
-			<button mat-button [obButton]="'primary'" (click)="openSignInDialog()">{{ "sign.in" | translate }}</button>
-		</div>
-		<div *ngIf="userAuthenticated()">
-			<button mat-button [obButton]="'primary'" (click)="logout()">{{ "logout" | translate }}</button>
+		<div>
+			{{ getDisplayName() }}
 		</div>
 	</ng-template>
 	<ng-container obFooterInfo>
@@ -25,3 +21,21 @@
 		</p>
 	</ng-container>
 </ob-master-layout>
+
+<ng-template #userNotRegisteredDialog>
+	<h2 mat-dialog-title>{{ "copilot.register.info.title" | translate }}</h2>
+	<div mat-dialog-content>
+		<p>{{ "copilot.register.info.text.1" | translate }}</p>
+		<p>{{ "copilot.register.info.text.2" | translate }}</p>
+	</div>
+	<div mat-dialog-actions class="mt16">
+		<button mat-button [obButton]="'tertiary'" [mat-dialog-close]="false">
+			<mat-icon svgIcon="cancel"></mat-icon>
+			{{ "continue.guest" | translate }}
+		</button>
+		<button mat-button [obButton]="'primary'" [mat-dialog-close]="true">
+			<mat-icon svgIcon="arrow-right"></mat-icon>
+			{{ "copilot.register" | translate }}
+		</button>
+	</div>
+</ng-template>
