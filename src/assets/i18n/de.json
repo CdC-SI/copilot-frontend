@@ -1,4 +1,9 @@
 {
+  "copilot.register.info.title": "Sie sind als Gast angemeldet",
+  "copilot.register.info.text.1": "Als Gast können Sie die einfache Suche auf Basis öffentlicher FAQs nutzen.",
+  "copilot.register.info.text.2": "Um alle Funktionen der Anwendung zu nutzen, erstellen Sie bitte ein Konto.",
+  "continue.guest": "Als Gast fortfahren",
+  "copilot.register": "Konto erstellen",
   "upload.success": "Die Datei wurde erfolgreich hochgeladen",
   "upload.error": "Fehler beim Hochladen der Datei",
   "FILE_TOO_LARGE": "Die Datei ist zu groß",
@@ -82,6 +87,8 @@
   "password": "Passwort",
   "confirm.password": "Passwort bestätigen",
   "username": "Email",
+  "firstName": "Vorname",
+  "lastName": "Nachname",
   "organization": "Organisation",
   "create.copilot.account": "ZAS/EAK CopilotGPT-Konto erstellen",
   "login.copilot.account": "Mit einem ZAS/EAK CopilotGPT-Konto anmelden",

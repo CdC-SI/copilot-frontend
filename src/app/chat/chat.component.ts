@@ -27,6 +27,7 @@ import {ObNotificationService} from '@oblique/oblique';
 import {Command, CommandService} from '../shared/services/command.service';
 import {UploadService} from '../shared/services/upload.service';
 import {SettingsEventService} from '../shared/services/settings-event.service';
+import {Role} from '../shared/model/user';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -68,16 +69,15 @@ export class ChatComponent implements OnInit {
 				message.beingSpoken = false;
 			});
 		});
-		if (this.isAuthenticated()) {
-			this.getConversationTitles();
-		}
-		this.userService.userLoggedIn.subscribe(() => {
-			this.getConversationTitles();
+		this.userService.$authenticatedUser.subscribe(user => {
+			if (user.roles?.includes(Role.USER)) {
+				this.getConversationTitles();
+			}
 		});
 	}
 
-	isAuthenticated(): boolean {
-		return this.userService.isAuthenticated();
+	isRegistered(): boolean {
+		return this.userService.isRegistered();
 	}
 
 	closeRightPanel() {
@@ -382,7 +382,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	private updateCurrentConversation() {
-		if (!this.isAuthenticated()) return;
+		if (!this.isRegistered()) return;
 		if (!this.currentConversation) {
 			this.conversationService.init(this.messages).subscribe(() => {
 				this.refreshConversations();

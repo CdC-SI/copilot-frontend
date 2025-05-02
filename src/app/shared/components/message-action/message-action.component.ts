@@ -86,7 +86,7 @@ export class MessageActionComponent {
 	}
 
 	authenticatedAsAdmin() {
-		return this.userService.isAuthenticatedAsAdmin();
+		return this.userService.hasAdminRole();
 	}
 
 	positiveFeedback() {

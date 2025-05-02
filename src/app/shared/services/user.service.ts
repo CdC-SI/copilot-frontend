@@ -1,60 +1,50 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {IUser, Role} from '../model/user';
-import {IToken} from '../model/token';
-import {TokenService} from './token.service';
 
 export interface UserRegistrationResponse {
-  userId: string;
+	userId: string;
 }
 
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
-	userLoggedIn = new EventEmitter<void>();
-	private readonly $authenticatedUser: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(null);
+	readonly $authenticatedUser: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(null);
 	constructor(
 		private readonly http: HttpClient,
-		private readonly config: ConfigurationService,
-		private readonly tokenService: TokenService
+		private readonly config: ConfigurationService
 	) {
-		if (this.tokenService.getToken()) {
-			this.refreshAuthenticatedUser();
-		}
+		this.refreshAuthenticatedUser();
 	}
 
 	createAccount(user: IUser): Observable<UserRegistrationResponse> {
 		return this.http.post<UserRegistrationResponse>(this.config.backendApi('/users'), user);
 	}
 
-	login(user: IUser): Observable<IToken> {
-		const headers = {'Content-Type': 'application/json', Accept: 'application/json'};
-		return this.http.post<IToken>(this.config.backendApi('/auth'), user, {headers});
-	}
-
-	logout() {
-		this.$authenticatedUser.next(null);
-	}
-
 	refreshAuthenticatedUser() {
-		this.http.get<IUser>(this.config.backendApi('/users/authenticated')).subscribe(user => {
-			this.$authenticatedUser.next(user);
-			this.userLoggedIn.emit();
+		this.http.get<IUser>(this.config.backendApi('/users/authenticated')).subscribe({
+			next: user => {
+				this.$authenticatedUser.next(user);
+			}
 		});
 	}
 
-	getAuthenticatedUser(): Observable<IUser | null> {
-		return this.$authenticatedUser.asObservable();
-	}
-
-	isAuthenticatedAsAdmin(): boolean {
+	hasAdminRole(): boolean {
 		return this.$authenticatedUser.getValue()?.roles.includes(Role.ADMIN);
 	}
 
-	isAuthenticated() {
-		return !!this.$authenticatedUser.getValue();
+	isRegistered() {
+		return this.$authenticatedUser.getValue()?.roles.includes(Role.USER);
+	}
+
+	displayName() {
+		const user = this.$authenticatedUser.getValue();
+		if (user?.firstName && user?.lastName) {
+			return `${user.firstName} ${user.lastName}`;
+		}
+		return '';
 	}
 }

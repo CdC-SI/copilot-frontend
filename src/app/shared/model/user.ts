@@ -1,22 +1,16 @@
 export interface IUser {
-	username: string;
-	password?: string;
+	firstName?: string;
+	lastName?: string;
 	roles: Role[];
 	organizations?: string[];
 }
 
 export enum UserFormFields {
-	USERNAME = 'username',
-	PASSWORD = 'password',
-	CONFIRM_PASSWORD = 'confirmPassword',
+	FIRSTNAME = 'firstName',
+	LASTNAME = 'lastName',
 	ORGANIZATION = 'organization',
 	CONFIDENTIALITY = 'confidentiality',
 	GCU = 'gcu'
-}
-
-export enum LoginFormFields {
-	USERNAME = 'username',
-	PASSWORD = 'password'
 }
 
 export enum Role {

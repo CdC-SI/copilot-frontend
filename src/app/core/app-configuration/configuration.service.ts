@@ -4,7 +4,7 @@ import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique
 import {NavigationEnd, Router} from '@angular/router';
 import {AuthenticationService, EnvironmentService} from 'zas-design-system';
 import {firstValueFrom, tap} from 'rxjs';
-import {MOCK_TOKEN} from './token';
+import {MOCK_USER_TOKEN} from './token';
 
 @Injectable({
 	providedIn: 'root'
@@ -36,7 +36,7 @@ export class ConfigurationService {
 			{matchUrlRegex: '^https://.*copilot-a\\..*', gatewayUrl: 'https://gateway-a.zas.admin.ch'},
 			{matchUrlRegex: '^https://.*copilot\\..*', gatewayUrl: 'https://gateway.zas.admin.ch'}
 		]);
-		this.environmentService.setMockToken(MOCK_TOKEN);
+		this.environmentService.setMockToken(MOCK_USER_TOKEN);
 		this.environmentService.isLocalhostEnvironment(this.envConfiguration.local);
 		void firstValueFrom(
 			this.environmentService.load().pipe(

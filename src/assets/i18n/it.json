@@ -1,4 +1,9 @@
 {
+  "copilot.register.info.title": "Sei connesso come ospite",
+  "copilot.register.info.text.1": "Come ospite puoi utilizzare la ricerca semplice basata sulle FAQ pubbliche.",
+  "copilot.register.info.text.2": "Per accedere a tutte le funzionalità dell'applicazione, crea un account.",
+  "continue.guest": "Continua come ospite",
+  "copilot.register": "Crea un account",
   "upload.success": "Il file è stato caricato con successo",
   "upload.error": "Errore durante il caricamento del file",
   "FILE_TOO_LARGE": "Il file è troppo grande",
@@ -82,6 +87,8 @@
   "password": "Password",
   "confirm.password": "Conferma la password",
   "username": "Email",
+  "firstName": "Nome",
+  "lastName": "Cognome",
   "organization": "Organizzazione",
   "create.copilot.account": "Crea un account ZAS/EAK CopilotGPT",
   "login.copilot.account": "Accedi a un account ZAS/EAK CopilotGPT",

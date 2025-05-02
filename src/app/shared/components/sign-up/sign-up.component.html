@@ -6,16 +6,12 @@
 	<div class="flex-column flex-1" ngForm>
 		<form [formGroup]="userFrmGrp">
 			<mat-form-field obErrorMessages>
-				<mat-label>{{ "username" | translate }}</mat-label>
-				<input [formControlName]="FORM_FIELDS.USERNAME" name="username" type="text" matInput placeholder="" />
+				<mat-label>{{ "firstName" | translate }}</mat-label>
+				<input [formControlName]="FORM_FIELDS.FIRSTNAME" name="firstName" type="text" matInput placeholder="" />
 			</mat-form-field>
 			<mat-form-field obErrorMessages>
-				<mat-label>{{ "password" | translate }}</mat-label>
-				<input [formControlName]="FORM_FIELDS.PASSWORD" name="password" type="password" matInput placeholder="" />
-			</mat-form-field>
-			<mat-form-field obErrorMessages>
-				<mat-label>{{ "confirm.password" | translate }}</mat-label>
-				<input [formControlName]="FORM_FIELDS.CONFIRM_PASSWORD" name="confirm-password" type="password" matInput placeholder="" />
+				<mat-label>{{ "lastName" | translate }}</mat-label>
+				<input [formControlName]="FORM_FIELDS.LASTNAME" name="lastName" type="text" matInput placeholder="" />
 			</mat-form-field>
 			<mat-form-field obErrorMessages>
 				<mat-label>{{ "organization" | translate }}</mat-label>

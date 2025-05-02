@@ -1,4 +1,9 @@
 {
+  "copilot.register.info.title": "Vous êtes connecté en tant qu’invité",
+  "copilot.register.info.text.1": "En tant qu’invité vous pouvez utiliser la recherche simple basée sur les FAQ publiques.",
+  "copilot.register.info.text.2": "Pour accéder à toutes les fonctionnalités de l’application, veuillez créer un compte.",
+  "continue.guest": "Continuer en tant qu’invité",
+  "copilot.register": "Créer un compte",
   "upload.success": "Le fichier a été uploadé avec succès",
   "upload.error": "Erreur lors de l'upload du fichier",
   "FILE_TOO_LARGE": "Le fichier est trop volumineux",
@@ -82,6 +87,8 @@
   "password": "Mot de passe",
   "confirm.password": "Confirmer le mot de passe",
   "username": "Email",
+  "firstName": "Prénom",
+  "lastName": "Nom",
   "organization": "Organisation",
   "create.copilot.account": "Créer un compte ZAS/EAK CopilotGPT",
   "login.copilot.account": "Se connecter à un compte ZAS/EAK CopilotGPT",
