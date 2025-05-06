@@ -1,0 +1,22 @@
+.icon-status {
+	margin-left: 8px;
+	height: 24px;
+	width: 24px;
+	vertical-align: text-bottom;
+}
+
+.icon-status-active {
+	color: green !important;
+}
+
+.icon-status-inactive {
+	color: red !important;
+}
+
+.icon-status-pending {
+	color: orange !important;
+}
+
+.icon-status-guest {
+	color: blue !important;
+}

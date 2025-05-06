@@ -27,7 +27,7 @@ import {ObNotificationService} from '@oblique/oblique';
 import {Command, CommandService} from '../shared/services/command.service';
 import {UploadService} from '../shared/services/upload.service';
 import {SettingsEventService} from '../shared/services/settings-event.service';
-import {Role} from '../shared/model/user';
+import {Role, UserStatus} from '../shared/model/user';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -70,7 +70,7 @@ export class ChatComponent implements OnInit {
 			});
 		});
 		this.userService.$authenticatedUser.subscribe(user => {
-			if (user.roles?.includes(Role.USER)) {
+			if (user && user.status === UserStatus.ACTIVE) {
 				this.getConversationTitles();
 			}
 		});
@@ -78,13 +78,6 @@ export class ChatComponent implements OnInit {
 
 	isRegistered(): boolean {
 		return this.userService.isRegistered();
-	}
-
-	closeRightPanel() {
-		const element = document.querySelector('.ob-column-right');
-		if (element) {
-			this.renderer.addClass(element, 'ob-collapsed');
-		}
 	}
 
 	getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {

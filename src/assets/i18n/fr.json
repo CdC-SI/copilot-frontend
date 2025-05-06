@@ -1,4 +1,10 @@
 {
+  "copilot.account.status.info.active": "Compte actif",
+  "copilot.account.status.info.inactive": "Compte inactif",
+  "copilot.account.status.info.pending": "Compte en attente d'activation",
+  "copilot.account.status.info.guest": "Compte invité",
+  "copilot.account.inactive": "Votre compte est inactif, veuillez contacter les administrateurs.",
+  "copilot.account.pending.activation": "Votre compte n’est pas encore activé, il le sera bientôt.",
   "copilot.register.info.title": "Vous êtes connecté en tant qu’invité",
   "copilot.register.info.text.1": "En tant qu’invité vous pouvez utiliser la recherche simple basée sur les FAQ publiques.",
   "copilot.register.info.text.2": "Pour accéder à toutes les fonctionnalités de l’application, veuillez créer un compte.",

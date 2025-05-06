@@ -3,6 +3,12 @@
 	<ng-template #obHeaderControl>
 		<div>
 			{{ getDisplayName() }}
+			<mat-icon
+				*ngIf="displayIconStatus()"
+				[svgIcon]="getIconStatus().icon"
+				[class]="'icon-status icon-status-' + getIconStatus().status"
+				[matTooltip]="'copilot.account.status.info.' + getIconStatus().status | translate"
+			/>
 		</div>
 	</ng-template>
 	<ng-container obFooterInfo>

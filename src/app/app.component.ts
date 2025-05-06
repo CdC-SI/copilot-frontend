@@ -4,7 +4,7 @@ import {UserService} from './shared/services/user.service';
 import {ObINavigationLink, ObNotificationService} from '@oblique/oblique';
 import {SettingsService} from './shared/services/settings.service';
 import {SettingsType} from './shared/model/settings';
-import {IUser, Role} from './shared/model/user';
+import {IUser, UserStatus} from './shared/model/user';
 import {SignUpComponent} from './shared/components/sign-up/sign-up.component';
 
 @Component({
@@ -32,15 +32,21 @@ export class AppComponent implements OnInit {
 	ngOnInit() {
 		this.settingsService.getSettings(SettingsType.PROJECT_VERSION).subscribe(version => (this.projectVersion = version[0]));
 		this.userService.$authenticatedUser.subscribe(user => {
-			if (!user.roles?.includes(Role.USER)) {
-				this.dialog
-					.open(this.userNotRegisteredDialog)
-					.afterClosed()
-					.subscribe((registerUser: boolean) => {
-						if (registerUser) {
-							this.openSignUpDialog();
-						}
-					});
+			if (user) {
+				switch (user.status) {
+					case UserStatus.ACTIVE:
+						// nothing to do
+						break;
+					case UserStatus.PENDING_ACTIVATION:
+						this.notif.warning('copilot.account.pending.activation');
+						break;
+					case UserStatus.INACTIVE:
+						this.notif.error('copilot.account.inactive');
+						break;
+					case UserStatus.GUEST:
+						this.openRegisterDialog();
+						break;
+				}
 			}
 		});
 	}
@@ -51,6 +57,34 @@ export class AppComponent implements OnInit {
 
 	getDisplayName() {
 		return this.userService.displayName();
+	}
+
+	displayIconStatus() {
+		return !!this.userService.userStatus();
+	}
+
+	getIconStatus() {
+		switch (this.userService.userStatus()) {
+			case UserStatus.ACTIVE:
+				return {status: 'active', icon: 'checkmark-circle'};
+			case UserStatus.PENDING_ACTIVATION:
+				return {status: 'pending', icon: 'user-cog'};
+			case UserStatus.INACTIVE:
+				return {status: 'inactive', icon: 'warning-circle'};
+			case UserStatus.GUEST:
+				return {status: 'guest', icon: 'user-pen'};
+		}
+	}
+
+	private openRegisterDialog() {
+		this.dialog
+			.open(this.userNotRegisteredDialog)
+			.afterClosed()
+			.subscribe((registerUser: boolean) => {
+				if (registerUser) {
+					this.openSignUpDialog();
+				}
+			});
 	}
 
 	private openSignUpDialog() {
@@ -64,10 +98,10 @@ export class AppComponent implements OnInit {
 		this.userService.createAccount(user).subscribe({
 			next: () => {
 				this.userService.refreshAuthenticatedUser();
-				this.notif.success('Registration successful');
+				this.notif.success('copilot.account.created');
 			},
 			error: () => {
-				this.notif.error('Registration failed');
+				this.notif.error('copilot.account.error');
 			}
 		});
 	}

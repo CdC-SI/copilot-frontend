@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {IUser, Role} from '../model/user';
+import {IUser, Role, UserStatus} from '../model/user';
 
 export interface UserRegistrationResponse {
 	userId: string;
@@ -37,7 +37,15 @@ export class UserService {
 	}
 
 	isRegistered() {
-		return this.$authenticatedUser.getValue()?.roles.includes(Role.USER);
+		return this.$authenticatedUser.getValue()?.status === UserStatus.ACTIVE;
+	}
+
+	userStatus() {
+		const user = this.$authenticatedUser.getValue();
+		if (user) {
+			return user.status;
+		}
+		return null;
 	}
 
 	displayName() {

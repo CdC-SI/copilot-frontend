@@ -7,7 +7,7 @@ import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
 import {UserService} from '../../services/user.service';
 import {SettingsEventService} from '../../services/settings-event.service';
-import {Role} from '../../model/user';
+import {Role, UserStatus} from '../../model/user';
 
 @Component({
 	selector: 'zco-chat-configuration-edit',
@@ -86,7 +86,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		this.loadDropdowns();
 
 		this.userService.$authenticatedUser.subscribe(user => {
-			if (user.roles?.includes(Role.USER)) {
+			if (user && user.status === UserStatus.ACTIVE) {
 				this.loadDropdowns();
 			}
 		});
