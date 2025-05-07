@@ -4,7 +4,7 @@ import {UserFormFields} from '../../model/user';
 import {MatDialogRef} from '@angular/material/dialog';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
-import {UserService} from '../../services/user.service';
+import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
 	selector: 'zco-sign-up',
@@ -19,7 +19,7 @@ export class SignUpComponent implements OnInit {
 	constructor(
 		private readonly fb: FormBuilder,
 		private readonly settingsService: SettingsService,
-		private readonly userService: UserService,
+		private readonly authService: AuthenticationServiceV2,
 		public dialogRef: MatDialogRef<SignUpComponent>
 	) {}
 
@@ -36,8 +36,8 @@ export class SignUpComponent implements OnInit {
 
 	buildForm() {
 		this.userFrmGrp = this.fb.group({
-			[UserFormFields.FIRSTNAME]: [this.userService.$authenticatedUser.getValue()?.firstName, Validators.required],
-			[UserFormFields.LASTNAME]: [this.userService.$authenticatedUser.getValue()?.lastName, Validators.required],
+			[UserFormFields.FIRSTNAME]: [this.authService.$authenticatedUser.getValue()?.firstName, Validators.required],
+			[UserFormFields.LASTNAME]: [this.authService.$authenticatedUser.getValue()?.lastName, Validators.required],
 			[UserFormFields.ORGANIZATION]: [[], Validators.required],
 			[UserFormFields.CONFIDENTIALITY]: [false, Validators.requiredTrue],
 			[UserFormFields.GCU]: [false, Validators.requiredTrue]

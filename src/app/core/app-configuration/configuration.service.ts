@@ -2,9 +2,13 @@ import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
-import {AuthenticationService, EnvironmentService} from 'zas-design-system';
-import {firstValueFrom, tap} from 'rxjs';
+import {EnvironmentService} from 'zas-design-system';
+import {BehaviorSubject, firstValueFrom, map, mergeMap, of, switchMap, tap} from 'rxjs';
 import {MOCK_USER_TOKEN} from './token';
+import {AuthenticationServiceV2} from '../../shared/services/auth.service';
+import {UserService} from '../../shared/services/user.service';
+import {IUser} from '../../shared/model/user';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
 	providedIn: 'root'
@@ -17,20 +21,21 @@ export class ConfigurationService {
 		private readonly masterLayoutConfig: ObMasterLayoutConfig,
 		private readonly router: Router,
 		private readonly interceptorConfig: ObHttpApiInterceptorConfig,
-		private readonly authenticationService: AuthenticationService,
-		private readonly environmentService: EnvironmentService
+		private readonly authenticationService: AuthenticationServiceV2,
+		private readonly environmentService: EnvironmentService,
+		private readonly http: HttpClient
 	) {}
 
 	preInitialize() {
 		this.loadConfigurationForEnv();
 		this.configureMasterLayout();
 		this.configureInterceptor();
-		this.configureAuthentication();
+		return this.configureAuthentication();
 	}
 
 	configureAuthentication() {
 		this.environmentService.setEnvironmentConfigs([
-			{matchUrlRegex: '^http[s]?://localhost.*', gatewayUrl: 'https://gateway-d.zas.admin.ch'},
+			{matchUrlRegex: '^http[s]?://localhost.*', gatewayUrl: 'http://localhost:9998'},
 			{matchUrlRegex: '^https://.*copilot-d\\..*', gatewayUrl: 'https://gateway-d.zas.admin.ch'},
 			{matchUrlRegex: '^https://.*copilot-r\\..*', gatewayUrl: 'https://gateway-r.zas.admin.ch'},
 			{matchUrlRegex: '^https://.*copilot-a\\..*', gatewayUrl: 'https://gateway-a.zas.admin.ch'},
@@ -38,10 +43,24 @@ export class ConfigurationService {
 		]);
 		this.environmentService.setMockToken(MOCK_USER_TOKEN);
 		this.environmentService.isLocalhostEnvironment(this.envConfiguration.local);
+
 		void firstValueFrom(
 			this.environmentService.load().pipe(
-				tap(() => {
-					this.authenticationService.login();
+				mergeMap(env => {
+					if (!this.envConfiguration.local) {
+						this.authenticationService.login();
+						return this.authenticationService.getFullToken().pipe(
+							switchMap(() =>
+								this.getUser().pipe(
+									map(user => {
+										this.authenticationService.$authenticatedUser.next(user);
+										return env;
+									})
+								)
+							)
+						);
+					}
+					return of(env);
 				})
 			)
 		);
@@ -84,5 +103,9 @@ export class ConfigurationService {
 	private configureInterceptor() {
 		this.interceptorConfig.api.spinner = false;
 		this.interceptorConfig.api.notification.active = false;
+	}
+
+	private getUser() {
+		return this.http.get<IUser>(this.backendApi('/users/authenticated'));
 	}
 }
