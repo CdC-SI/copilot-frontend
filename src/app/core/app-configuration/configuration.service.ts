@@ -60,7 +60,12 @@ export class ConfigurationService {
 							)
 						);
 					}
-					return of(env);
+					return this.getUser().pipe(
+						map(user => {
+							this.authenticationService.$authenticatedUser.next(user);
+							return env;
+						})
+					);
 				})
 			)
 		);

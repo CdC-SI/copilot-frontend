@@ -24,7 +24,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: 'http://localhost:8207/'
 		},
 		production: false,
-		local: false,
+		local: true,
 		apiUrl: '/api'
 	},
 	{
