@@ -35,33 +35,15 @@ export class AuthenticationServiceV2 {
 	/**
 	 * Login case on app startup, we have a token
 	 */
-	login(zasTrigram?: string): void {
+	login(): void {
 		// eslint-disable-next-line prefer-regex-literals
 		const match: RegExpExecArray | null = RegExp('[?&]ACCESS_TOKEN').exec(this.window.location.search);
 		/*
 		 * No token on startup, redirect to /v2/authenticate
 		 */
 		if (!match) {
-			// url zasTrigram have always priority from zasTrigram parameter (from cache or whatever...)
-			if (this.window.location.href.includes('zasTrigram=')) {
-				// Clean url with remove zasTrigram if exists. keep only first.
-				// if for some reasons we keep &zasTrigram=xxx&zasTrigram=yyy. Gateway will understand zasTrigram=xxx,yyy (403 in the end)
-				const url = this.removeParameterFromUrl(this.window.location.href, 'zasTrigram');
-				// dealing with ?zasTrigram
-				const urlCleanUp = url.replace('?zasTrigram', '&zasTrigram');
-				// force trigram from url
-				this.window.location.replace(`${this.environmentService.current?.gatewayUrl}/v2/authenticate?redirect=${urlCleanUp}`);
-			} else {
-				if (zasTrigram !== null && zasTrigram !== undefined) {
-					// force trigram in parameter
-					const urlWithTrigramParameter = `${this.environmentService.current?.gatewayUrl}/v2/authenticate?redirect=${this.window.location.href}&zasTrigram=${zasTrigram}`;
-					this.window.location.replace(urlWithTrigramParameter);
-				} else {
-					// let gateway choose default trigram
-					const defaultUrl = `${this.environmentService.current?.gatewayUrl}/v2/authenticate?redirect=${this.window.location.href}`;
-					this.window.location.replace(defaultUrl);
-				}
-			}
+			const defaultUrl = `${this.environmentService.current?.gatewayUrl}/v2/authenticate-eiam?redirect=${this.window.location.href}`;
+			this.window.location.replace(defaultUrl);
 		}
 	}
 
@@ -80,9 +62,9 @@ export class AuthenticationServiceV2 {
 		this.window.location.replace(`${this.environmentService.current?.gatewayUrl}/v2/logout?redirect=${redirect}`);
 	}
 
-	getFullToken(filteringApp: string[] = []): Observable<string> {
+	getFullToken(): Observable<string> {
 		return this.http
-			.get<string>(`${this.environmentService.current?.gatewayUrl}/v2/fulltoken`, {
+			.get<string>(`${this.environmentService.current?.gatewayUrl}/v2/fulltoken-eiam`, {
 				withCredentials: true
 			})
 			.pipe(
