@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable} from 'rxjs';
-import {AuthenticationService} from 'zas-design-system';
+import {AuthenticationServiceV2} from './auth.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -10,7 +10,7 @@ import {AuthenticationService} from 'zas-design-system';
 export class RagService {
 	constructor(
 		private readonly config: ConfigurationService,
-		private readonly authService: AuthenticationService
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	process(ragRequest: ChatRequest): Observable<string> {
