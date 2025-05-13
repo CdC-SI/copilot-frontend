@@ -56,7 +56,7 @@
 				(inputChange)="isCommandMode = $event.startsWith('/')"
 			/>
 
-			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
+			<button type="submit" matTooltip="test" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
 				<mat-icon svgIcon="paper-plane"></mat-icon>
 			</button>
 
