@@ -15,7 +15,6 @@ import {FaqItemEditComponent} from './components/faq-item-edit/faq-item-edit.com
 import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {ChatConfigurationEditComponent} from './components/chat-configuration-edit/chat-configuration-edit.component';
 import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
-import {SignInComponent} from './components/sign-in/sign-in.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
 import {MatLine} from '@angular/material/core';
 import { ActionSuggestionsComponent } from './components/action-suggestions/action-suggestions.component';
@@ -30,9 +29,7 @@ import { ActionSuggestionsComponent } from './components/action-suggestions/acti
 		SignUpComponent,
 		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
-		SignInComponent,
-		ChatHistoryComponent,
-		ActionSuggestionsComponent
+		ChatHistoryComponent
 	],
 	imports: [
 		CommonModule,

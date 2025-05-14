@@ -20,7 +20,6 @@ import {
 } from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {UserService} from '../shared/services/user.service';
 import {ChatHistoryMessage, ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -30,6 +29,8 @@ import {ObNotificationService} from '@oblique/oblique';
 import {Command, CommandService} from '../shared/services/command.service';
 import {UploadService} from '../shared/services/upload.service';
 import {SettingsEventService} from '../shared/services/settings-event.service';
+import {UserStatus} from '../shared/model/user';
+import {AuthenticationServiceV2} from '../shared/services/auth.service';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -53,9 +54,8 @@ export class ChatComponent implements OnInit {
 		private readonly autocompleteService: FaqItemsService,
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
-		private readonly renderer: Renderer2,
 		private readonly speechService: SpeechService,
-		private readonly userService: UserService,
+		private readonly authService: AuthenticationServiceV2,
 		private readonly conversationService: ConversationService,
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
@@ -71,23 +71,15 @@ export class ChatComponent implements OnInit {
 				message.beingSpoken = false;
 			});
 		});
-		if (this.isAuthenticated()) {
-			this.getConversationTitles();
-		}
-		this.userService.userLoggedIn.subscribe(() => {
-			this.getConversationTitles();
+		this.authService.$authenticatedUser.subscribe(user => {
+			if (user && user.status === UserStatus.ACTIVE) {
+				this.getConversationTitles();
+			}
 		});
 	}
 
-	isAuthenticated(): boolean {
-		return this.userService.isAuthenticated();
-	}
-
-	closeRightPanel() {
-		const element = document.querySelector('.ob-column-right');
-		if (element) {
-			this.renderer.addClass(element, 'ob-collapsed');
-		}
+	isRegistered(): boolean {
+		return this.authService.isRegistered();
 	}
 
 	getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
@@ -412,7 +404,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	private updateCurrentConversation() {
-		if (!this.isAuthenticated()) return;
+		if (!this.isRegistered()) return;
 		if (!this.currentConversation) {
 			this.conversationService.init(this.messages).subscribe(() => {
 				this.refreshConversations();

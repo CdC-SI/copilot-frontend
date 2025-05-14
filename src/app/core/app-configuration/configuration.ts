@@ -4,6 +4,7 @@ import {InjectionToken} from '@angular/core';
 
 export interface Configuration {
 	production: boolean;
+	local: boolean;
 	banner: ObIBanner;
 	patterns: string[];
 	pamsConfig?: ObIPamsConfiguration;
@@ -23,6 +24,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: 'http://localhost:8207/'
 		},
 		production: false,
+		local: true,
 		apiUrl: '/api'
 	},
 	{
@@ -35,6 +37,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: '/pams/'
 		},
 		production: false,
+		local: false,
 		apiUrl: '/api'
 	},
 	{
@@ -47,6 +50,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: '/pams/'
 		},
 		production: false,
+		local: false,
 		apiUrl: '/api'
 	},
 	{
@@ -59,6 +63,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			rootUrl: '/pams/'
 		},
 		production: false,
+		local: false,
 		apiUrl: '/api'
 	}
 ];
