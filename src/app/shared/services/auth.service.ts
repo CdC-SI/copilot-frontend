@@ -117,6 +117,14 @@ export class AuthenticationServiceV2 {
 		return '';
 	}
 
+	username() {
+		const user = this.$authenticatedUser.getValue();
+		if (user) {
+			return user.username;
+		}
+		return '';
+	}
+
 	/**
 	 * Removed a parameter from url if url is not compliant
 	 */

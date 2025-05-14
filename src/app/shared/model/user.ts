@@ -1,9 +1,11 @@
 export interface IUser {
+	username: string;
 	firstName?: string;
 	lastName?: string;
 	status: UserStatus;
 	roles: Role[];
 	organizations?: string[];
+	actions?: IUserAction[];
 }
 
 export enum UserStatus {
@@ -24,4 +26,10 @@ export enum UserFormFields {
 export enum Role {
 	ADMIN = 'ADMIN',
 	USER = 'USER'
+}
+
+export interface IUserAction {
+	id: 'validate' | 'reactivate' | 'deactivate' | 'promote' | 'demote';
+	icon: string;
+	tooltip: string;
 }

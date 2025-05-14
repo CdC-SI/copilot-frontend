@@ -26,6 +26,7 @@ import {ZCO_CONFIGURATIONS, ZCO_CONFIGURATIONS_TOKEN} from './core/app-configura
 import {SharedModule} from './shared/shared.module';
 import {AdminComponent} from './admin/admin.component';
 import {BlueGatewayInterceptorV2} from './shared/interceptors/blue-gateway-interceptor-v2.service';
+import {MatProgressBar} from '@angular/material/progress-bar';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -51,7 +52,8 @@ function bannerFactory(configurationService: ConfigurationService) {
 		HttpClientModule,
 		TranslateModule.forRoot(multiTranslateLoader()),
 		ObExternalLinkModule,
-		SharedModule
+		SharedModule,
+		MatProgressBar
 	],
 	providers: [
 		{provide: ZCO_CONFIGURATIONS_TOKEN, useValue: ZCO_CONFIGURATIONS},

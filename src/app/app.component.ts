@@ -54,7 +54,7 @@ export class AppComponent implements OnInit {
 	}
 
 	getNavigation() {
-		return this.authService.hasAdminRole() ? this.navigationAdmin : this.navigation;
+		return this.authService.hasAdminRole() && this.authService.userStatus() === UserStatus.ACTIVE ? this.navigationAdmin : this.navigation;
 	}
 
 	getDisplayName() {
@@ -78,7 +78,7 @@ export class AppComponent implements OnInit {
 		}
 	}
 
-	private openRegisterDialog() {
+	openRegisterDialog() {
 		this.dialog
 			.open(this.userNotRegisteredDialog)
 			.afterClosed()

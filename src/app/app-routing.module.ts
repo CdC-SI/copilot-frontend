@@ -9,7 +9,7 @@ const routes: Routes = [
 	{path: '', redirectTo: 'chat', pathMatch: 'full'},
 	{path: 'chat', component: ChatComponent},
 	{path: 'admin', component: AdminComponent, canActivate: [AdminGuard]},
-	{path: 'tips', component: TipsComponent},
+	{path: 'tips', component: TipsComponent}
 ];
 
 @NgModule({
