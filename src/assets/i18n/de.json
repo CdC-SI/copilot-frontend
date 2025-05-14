@@ -197,5 +197,21 @@
   "legal_basis": {
     "tos": "Nutzungsbedingungen",
     "data_protection": "Datenschutz"
+  },
+  "action_suggestions": {
+    "translate": "Übersetzen",
+    "summarize": "Zusammenfassen",
+    "explain": "Erklären",
+    "reformulate": "Umformulieren",
+    "draft": "Schreiben",
+    "more": "Mehr",
+    "prefixes": {
+      "translate": "Übersetze die letzte Nachricht ins ",
+      "summarize": "Fasst das Gespräch zusammen",
+      "explain": "Erkläre mir in einfacher Sprache das Konzept von ",
+      "reformulate": "Formuliere deine letzte Nachricht in einfacher Sprache um",
+      "draft": "Helfen Sie mir, einen Text zu schreiben über",
+      "more": ""
+    }
   }
 }

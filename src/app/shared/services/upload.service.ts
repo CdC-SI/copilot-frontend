@@ -13,11 +13,14 @@ export class UploadService {
 		private readonly translateService: TranslateService
 	) {}
 
-	uploadPdf(file: File) {
+	uploadPdf(file: File, conversationId?: string) {
 		const formData = new FormData();
 		formData.append('multipartFile', file, file.name);
 		formData.append('embed', 'true');
 		formData.append('lang', this.translateService.currentLang);
+		if (conversationId) {
+			formData.append('conversationId', conversationId);
+		}
 
 		return this.http.post<void>(this.config.backendApi('/documents/upload'), formData);
 	}

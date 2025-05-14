@@ -42,6 +42,10 @@
 			</div>
 		</div>
 		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
+		<zco-action-suggestions
+			*ngIf="isAuthenticated()"
+			(actionSelected)="handleSuggestionAction($event)">
+		</zco-action-suggestions>
 		<form class="question-container" ngForm>
 			<ut-autocomplete-input
 				class="mr8"

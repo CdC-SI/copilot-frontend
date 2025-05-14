@@ -17,6 +17,7 @@ import {ChatConfigurationEditComponent} from './components/chat-configuration-ed
 import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
 import {MatLine} from '@angular/material/core';
+import { ActionSuggestionsComponent } from './components/action-suggestions/action-suggestions.component';
 
 @NgModule({
 	declarations: [
@@ -56,7 +57,8 @@ import {MatLine} from '@angular/material/core';
 		FaqItemEditComponent,
 		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
-		ChatHistoryComponent
+		ChatHistoryComponent,
+		ActionSuggestionsComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

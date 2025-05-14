@@ -2,6 +2,11 @@ import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit} from '@ang
 import {FaqItemFields, IFaqItem} from '../../model/faq';
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
+import {TranslateService} from '@ngx-translate/core';
+import {SettingsService} from '../../services/settings.service';
+import {SettingsType} from '../../model/settings';
+import {UserService} from '../../services/user.service';
+import {SettingsEventService} from '../../services/settings-event.service';
 
 @Component({
 	selector: 'zco-faq-item-edit',
@@ -28,8 +33,15 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 	destroyed$ = new Subject<void | null>();
 	languages = ['de', 'fr', 'it', 'en'];
 	@Input() editMode: boolean;
+	TAGS: string[] = [];
 
-	constructor(private readonly fb: FormBuilder) {}
+	constructor(
+		private readonly fb: FormBuilder,
+		private readonly translateService: TranslateService,
+		private readonly settingsService: SettingsService,
+		private readonly userService: UserService,
+		private readonly settingsEventService: SettingsEventService
+	) {}
 
 	ngOnInit(): void {
 		this.faqItemFrmGrp = this.fb.group({
@@ -37,7 +49,18 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 			[FaqItemFields.QUESTION]: ['', Validators.required],
 			[FaqItemFields.ANSWER]: ['', Validators.required],
 			[FaqItemFields.SOURCE]: ['', Validators.required],
-			[FaqItemFields.LANGUAGE]: ['', Validators.required]
+			[FaqItemFields.LANGUAGE]: ['', Validators.required],
+			[FaqItemFields.TAGS]: [[]]
+		});
+
+		this.loadTags();
+
+		this.userService.userLoggedIn.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+			this.loadTags();
+		});
+
+		this.settingsEventService.settingsNeedRefresh.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+			this.loadTags();
 		});
 	}
 
@@ -72,5 +95,22 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 		} else {
 			this.faqItemFrmGrp.enable();
 		}
+	}
+
+	private loadTags(): void {
+		this.settingsService.getSettings(SettingsType.TAG).subscribe(tags => {
+			this.TAGS = this.sortByTranslation(
+				tags.filter(tag => tag && tag !== ''),
+				'tags'
+			);
+		});
+	}
+
+	private sortByTranslation(items: string[], prefix: string): string[] {
+		return items.sort((a, b) => {
+			const translationA = this.translateService.instant(`${prefix}.${a}`);
+			const translationB = this.translateService.instant(`${prefix}.${b}`);
+			return translationA.localeCompare(translationB);
+		});
 	}
 }
