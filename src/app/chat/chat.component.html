@@ -1,4 +1,4 @@
-<ob-column-layout class="h100" [left]="isAuthenticated()" [right]="isAuthenticated()">
+<ob-column-layout class="h100" [left]="isRegistered()" [right]="isRegistered()">
 	<div column-left-content class="h100">
 		<mat-card class="history-card">
 			<mat-card-header class="flex-row aic jcsb">
@@ -8,7 +8,7 @@
 				</button>
 			</mat-card-header>
 			<mat-card-content>
-				<zco-chat-history *ngIf="isAuthenticated()" [titles]="conversationTitles" (conversationSelected)="selectConversation($event)"></zco-chat-history>
+				<zco-chat-history *ngIf="isRegistered()" [titles]="conversationTitles" (conversationSelected)="selectConversation($event)"></zco-chat-history>
 			</mat-card-content>
 		</mat-card>
 	</div>
@@ -56,7 +56,7 @@
 				(inputChange)="isCommandMode = $event.startsWith('/')"
 			/>
 
-			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
+			<button type="submit" matTooltip="test" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
 				<mat-icon svgIcon="paper-plane"></mat-icon>
 			</button>
 
@@ -64,7 +64,7 @@
 				<mat-icon svgIcon="trash"></mat-icon>
 			</button>
 
-			<button *ngIf="isAuthenticated()" type="button" mat-icon-button (click)="uploadDoc()" [obButton]="'secondary'">
+			<button *ngIf="isRegistered()" type="button" mat-icon-button (click)="uploadDoc()" [obButton]="'secondary'">
 				<mat-icon svgIcon="upload"></mat-icon>
 			</button>
 		</form>

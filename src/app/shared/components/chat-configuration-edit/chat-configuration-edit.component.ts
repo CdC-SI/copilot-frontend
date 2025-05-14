@@ -1,13 +1,14 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
 import {ChatRequestConfigFields} from '../../model/rag';
 import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
-import {clearNullAndEmpty} from '../../utils/zco-utils';
 import {UserService} from '../../services/user.service';
 import {SettingsEventService} from '../../services/settings-event.service';
+import {Role, UserStatus} from '../../model/user';
+import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
 	selector: 'zco-chat-configuration-edit',
@@ -41,7 +42,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		private readonly fb: FormBuilder,
 		private readonly translateService: TranslateService,
 		private readonly settingsService: SettingsService,
-		private readonly userService: UserService,
+		private readonly authService: AuthenticationServiceV2,
 		private readonly settingsEventService: SettingsEventService
 	) {}
 	onChange = (value: any) => {};
@@ -83,10 +84,11 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 	ngOnInit(): void {
 		this.buildForm();
 		this.configureForm();
-		this.loadDropdowns();
 
-		this.userService.userLoggedIn.pipe(takeUntil(this.destroyed$)).subscribe(() => {
-			this.loadDropdowns();
+		this.authService.$authenticatedUser.subscribe(user => {
+			if (user && user.status === UserStatus.ACTIVE) {
+				this.loadDropdowns();
+			}
 		});
 
 		this.settingsEventService.settingsNeedRefresh.pipe(takeUntil(this.destroyed$)).subscribe(() => {
