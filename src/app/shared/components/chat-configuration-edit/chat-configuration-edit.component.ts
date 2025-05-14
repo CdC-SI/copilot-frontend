@@ -7,7 +7,8 @@ import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
 import {UserService} from '../../services/user.service';
 import {SettingsEventService} from '../../services/settings-event.service';
-import {Role} from '../../model/user';
+import {Role, UserStatus} from '../../model/user';
+import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
 	selector: 'zco-chat-configuration-edit',
@@ -41,7 +42,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 		private readonly fb: FormBuilder,
 		private readonly translateService: TranslateService,
 		private readonly settingsService: SettingsService,
-		private readonly userService: UserService,
+		private readonly authService: AuthenticationServiceV2,
 		private readonly settingsEventService: SettingsEventService
 	) {}
 	onChange = (value: any) => {};
@@ -83,10 +84,9 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 	ngOnInit(): void {
 		this.buildForm();
 		this.configureForm();
-		this.loadDropdowns();
 
-		this.userService.$authenticatedUser.subscribe(user => {
-			if (user.roles?.includes(Role.USER)) {
+		this.authService.$authenticatedUser.subscribe(user => {
+			if (user && user.status === UserStatus.ACTIVE) {
 				this.loadDropdowns();
 			}
 		});

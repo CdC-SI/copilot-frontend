@@ -4,8 +4,9 @@ import {UserService} from './shared/services/user.service';
 import {ObINavigationLink, ObNotificationService} from '@oblique/oblique';
 import {SettingsService} from './shared/services/settings.service';
 import {SettingsType} from './shared/model/settings';
-import {IUser, Role} from './shared/model/user';
+import {IUser, UserStatus} from './shared/model/user';
 import {SignUpComponent} from './shared/components/sign-up/sign-up.component';
+import {AuthenticationServiceV2} from './shared/services/auth.service';
 
 @Component({
 	selector: 'zco-root',
@@ -26,31 +27,66 @@ export class AppComponent implements OnInit {
 		private readonly dialog: MatDialog,
 		private readonly userService: UserService,
 		private readonly settingsService: SettingsService,
-		private readonly notif: ObNotificationService
+		private readonly notif: ObNotificationService,
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	ngOnInit() {
-		this.settingsService.getSettings(SettingsType.PROJECT_VERSION).subscribe(version => (this.projectVersion = version[0]));
-		this.userService.$authenticatedUser.subscribe(user => {
-			if (!user.roles?.includes(Role.USER)) {
-				this.dialog
-					.open(this.userNotRegisteredDialog)
-					.afterClosed()
-					.subscribe((registerUser: boolean) => {
-						if (registerUser) {
-							this.openSignUpDialog();
-						}
-					});
+		this.authService.$authenticatedUser.subscribe(user => {
+			if (user) {
+				this.settingsService.getSettings(SettingsType.PROJECT_VERSION).subscribe(version => (this.projectVersion = version[0]));
+				switch (user.status) {
+					case UserStatus.ACTIVE:
+						// nothing to do
+						break;
+					case UserStatus.PENDING_ACTIVATION:
+						this.notif.warning('copilot.account.pending.activation');
+						break;
+					case UserStatus.INACTIVE:
+						this.notif.error('copilot.account.inactive');
+						break;
+					case UserStatus.GUEST:
+						this.openRegisterDialog();
+						break;
+				}
 			}
 		});
 	}
 
 	getNavigation() {
-		return this.userService.hasAdminRole() ? this.navigationAdmin : this.navigation;
+		return this.authService.hasAdminRole() && this.authService.userStatus() === UserStatus.ACTIVE ? this.navigationAdmin : this.navigation;
 	}
 
 	getDisplayName() {
-		return this.userService.displayName();
+		return this.authService.displayName();
+	}
+
+	displayIconStatus() {
+		return !!this.authService.userStatus();
+	}
+
+	getIconStatus() {
+		switch (this.authService.userStatus()) {
+			case UserStatus.ACTIVE:
+				return {status: 'active', icon: 'checkmark-circle'};
+			case UserStatus.PENDING_ACTIVATION:
+				return {status: 'pending', icon: 'user-cog'};
+			case UserStatus.INACTIVE:
+				return {status: 'inactive', icon: 'warning-circle'};
+			case UserStatus.GUEST:
+				return {status: 'guest', icon: 'user-pen'};
+		}
+	}
+
+	openRegisterDialog() {
+		this.dialog
+			.open(this.userNotRegisteredDialog)
+			.afterClosed()
+			.subscribe((registerUser: boolean) => {
+				if (registerUser) {
+					this.openSignUpDialog();
+				}
+			});
 	}
 
 	private openSignUpDialog() {
@@ -64,10 +100,10 @@ export class AppComponent implements OnInit {
 		this.userService.createAccount(user).subscribe({
 			next: () => {
 				this.userService.refreshAuthenticatedUser();
-				this.notif.success('Registration successful');
+				this.notif.success('copilot.account.created');
 			},
 			error: () => {
-				this.notif.error('Registration failed');
+				this.notif.error('copilot.account.error');
 			}
 		});
 	}

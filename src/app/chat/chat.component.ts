@@ -17,7 +17,6 @@ import {
 } from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {UserService} from '../shared/services/user.service';
 import {ChatHistoryMessage, ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -27,7 +26,8 @@ import {ObNotificationService} from '@oblique/oblique';
 import {Command, CommandService} from '../shared/services/command.service';
 import {UploadService} from '../shared/services/upload.service';
 import {SettingsEventService} from '../shared/services/settings-event.service';
-import {Role} from '../shared/model/user';
+import {UserStatus} from '../shared/model/user';
+import {AuthenticationServiceV2} from '../shared/services/auth.service';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -51,9 +51,8 @@ export class ChatComponent implements OnInit {
 		private readonly autocompleteService: FaqItemsService,
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
-		private readonly renderer: Renderer2,
 		private readonly speechService: SpeechService,
-		private readonly userService: UserService,
+		private readonly authService: AuthenticationServiceV2,
 		private readonly conversationService: ConversationService,
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
@@ -69,22 +68,15 @@ export class ChatComponent implements OnInit {
 				message.beingSpoken = false;
 			});
 		});
-		this.userService.$authenticatedUser.subscribe(user => {
-			if (user.roles?.includes(Role.USER)) {
+		this.authService.$authenticatedUser.subscribe(user => {
+			if (user && user.status === UserStatus.ACTIVE) {
 				this.getConversationTitles();
 			}
 		});
 	}
 
 	isRegistered(): boolean {
-		return this.userService.isRegistered();
-	}
-
-	closeRightPanel() {
-		const element = document.querySelector('.ob-column-right');
-		if (element) {
-			this.renderer.addClass(element, 'ob-collapsed');
-		}
+		return this.authService.isRegistered();
 	}
 
 	getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {

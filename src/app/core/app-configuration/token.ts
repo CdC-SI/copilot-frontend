@@ -1,1 +1,1 @@
-export const MOCK_TOKEN = '';
+export const MOCK_USER_TOKEN = '';
