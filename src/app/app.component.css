@@ -19,4 +19,5 @@
 
 .icon-status-guest {
 	color: blue !important;
+	cursor: pointer;
 }
