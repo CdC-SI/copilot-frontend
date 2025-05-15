@@ -14,4 +14,5 @@ export interface ChatHistoryMessage {
 	language: string;
 	faqItemId?: number;
 	sources?: string[];
+	suggestions?: string[];
 }

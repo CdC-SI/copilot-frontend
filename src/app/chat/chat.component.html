@@ -8,7 +8,12 @@
 				</button>
 			</mat-card-header>
 			<mat-card-content>
-				<zco-chat-history *ngIf="isRegistered()" [titles]="conversationTitles" (conversationSelected)="selectConversation($event)"></zco-chat-history>
+				<zco-chat-history
+					*ngIf="isRegistered()"
+					[titles]="conversationTitles"
+					(conversationSelected)="selectConversation($event)"
+					(conversationDeleted)="deleteConversation($event)"
+				></zco-chat-history>
 			</mat-card-content>
 		</mat-card>
 	</div>
@@ -43,28 +48,32 @@
 		</div>
 		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
 		<zco-action-suggestions
-			*ngIf="isAuthenticated()"
-			(actionSelected)="handleSuggestionAction($event)">
+			*ngIf="isRegistered()"
+			[suggestions]="defaultSuggestions.concat(specificSuggestions || [])"
+			(actionSelected)="handleSuggestionAction($event)"
+		>
 		</zco-action-suggestions>
 		<form class="question-container" ngForm>
+			<textarea *ngIf="displayTextArea" [formControl]="searchCtrl"></textarea>
 			<ut-autocomplete-input
+				*ngIf="!displayTextArea"
 				class="mr8"
 				[required]="false"
 				[i18nLabel]="'enter.message'"
 				[optionLabelFn]="searchOptionLabelFn"
 				[inputLabelFn]="searchOptionLabelFn"
-				[optionService]="isCommandMode ? getCommandSuggestions : getSearchProposalFunction"
+				[optionService]="getOptionService()"
 				[minLength]="0"
 				[formControl]="searchCtrl"
 				(optionSelected)="handleOptionSelected($event)"
 				(inputChange)="isCommandMode = $event.startsWith('/')"
 			/>
 
-			<button type="submit" matTooltip="test" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
+			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
 				<mat-icon svgIcon="paper-plane"></mat-icon>
 			</button>
 
-			<button type="button" mat-icon-button (click)="clearChat()" [obButton]="'secondary'">
+			<button type="button" mat-icon-button (click)="clearSearch()" [obButton]="'secondary'">
 				<mat-icon svgIcon="trash"></mat-icon>
 			</button>
 

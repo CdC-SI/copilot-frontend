@@ -9,6 +9,7 @@ export const SOURCE_TAG_REGEX = /<source_processing>(.*?)<\/source_processing>/g
 export const TAGS_TAG_REGEX = /<tags_processing>(.*?)<\/tags_processing>/gi;
 export const AGENT_TAG_REGEX = /<agent_handoff>(.*?)<\/agent_handoff>/gi;
 export const TOOL_TAG_REGEX = /<tool_use>(.*?)<\/tool_use>/gi;
+export const SUGGESTION_TAG_REGEX = /<suggestion>(.*?)<\/suggestion>/gi;
 
 // Remove null, undefined and empty string value from object
 export const clearNullAndEmpty = (obj: any): any => {

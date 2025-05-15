@@ -14,6 +14,7 @@ export interface ChatMessage {
 	isRouting?: boolean;
 	isAgent?: boolean;
 	sources?: string[];
+	suggestions?: string[];
 	isToolUse?: boolean;
 	isProcessingIntent?: boolean;
 	isProcessingSources?: boolean;
