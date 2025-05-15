@@ -1,5 +1,11 @@
 <div class="action-suggestions">
-	<button *ngFor="let suggestion of suggestions" mat-button [obButton]="'secondary'" class="suggestion-button" (click)="onActionClick(suggestion.action)">
+	<button
+		*ngFor="let suggestion of suggestions"
+		mat-button
+		[obButton]="'secondary'"
+		[class]="'suggestion-button action-' + suggestion.action"
+		(click)="onActionClick(suggestion.action)"
+	>
 		{{ suggestion.text | translate }}
 	</button>
 </div>
