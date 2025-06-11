@@ -1,4 +1,6 @@
 {
+  "zas.user": "ZAS Benutzer",
+  "zas.user.explain": "ZAS Benutzer sind Personen, die ein Konto auf der ZAS/EAK CopilotGPT-Plattform haben.",
   "user.firstName": "Vorname",
   "user.lastName": "Nachname",
   "user.status": "Status",

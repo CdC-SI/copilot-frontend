@@ -52,6 +52,10 @@
 					<th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">{{ "user.roles" | translate }}</th>
 					<td mat-cell *matCellDef="let user">{{ user.roles }}</td>
 				</ng-container>
+				<ng-container matColumnDef="internal">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">{{ "user.internal" | translate }}</th>
+					<td mat-cell *matCellDef="let user">{{ (user.internalUser ? "yes" : "no") | translate }}</td>
+				</ng-container>
 				<ng-container matColumnDef="actions">
 					<th mat-header-cell *matHeaderCellDef scope="col">{{ "user.actions" | translate }}</th>
 					<td mat-cell *matCellDef="let user">
@@ -64,6 +68,30 @@
 				<tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 			</table>
 			<mat-paginator [pageSizeOptions]="[10, 25, 50]" [length]="resultsLength" [pageSize]="pageSize" aria-label="Select page of users"></mat-paginator>
+		</mat-expansion-panel>
+
+		<!-- Upload embedded documents -->
+		<mat-expansion-panel>
+			<mat-expansion-panel-header>
+				<mat-panel-title>{{ "admin.manage.documents" | translate }}</mat-panel-title>
+				<mat-panel-description>{{ "admin.manage.documents.description" | translate }}</mat-panel-description>
+			</mat-expansion-panel-header>
+
+			<ob-file-upload [accept]="['.pdf', '.csv']" [maxFileSize]="10" (uploadEvent)="uploadAdminDocument($event)"></ob-file-upload>
+			<ul>
+				<li *ngFor="let doc of documentsToUpload">
+					<div class="doc-to-upload">
+						{{ doc.fileName }} ({{ doc.fileSize | number: "1.0-0" }} KB)
+						<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)">
+							<mat-icon svgIcon="trash"></mat-icon>
+						</button>
+					</div>
+				</li>
+			</ul>
+			<button mat-button [obButton]="'primary'" (click)="uploadDocuments()" [disabled]="!documentsToUpload.length">
+				<mat-icon svgIcon="upload"></mat-icon>
+				{{ "upload" | translate }}
+			</button>
 		</mat-expansion-panel>
 	</mat-accordion>
 </div>

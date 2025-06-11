@@ -1,8 +1,8 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmDialogComponent} from '../shared/components/confirm-dialog/confirm-dialog.component';
-import {ObNotificationService} from '@oblique/oblique';
+import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {FaqItemsService} from '../shared/services/faq-items.service';
 import {MatTableDataSource} from '@angular/material/table';
 import {IUser, IUserAction, Role, UserStatus} from '../shared/model/user';
@@ -12,6 +12,8 @@ import {MatPaginator} from '@angular/material/paginator';
 import {Observable, Subject, catchError, finalize, map, merge, of, startWith, switchMap} from 'rxjs';
 import {IPage} from '../shared/model/page';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
+import {IDocument} from '../shared/model/document';
+import {UploadService} from '../shared/services/upload.service';
 
 @Component({
 	selector: 'zco-admin',
@@ -20,11 +22,12 @@ import {AuthenticationServiceV2} from '../shared/services/auth.service';
 })
 export class AdminComponent implements OnInit, AfterViewInit {
 	addFaqItemFormGrp: FormGroup;
-	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'actions'];
+	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internal', 'actions'];
 	usersDataSource = new MatTableDataSource<IUser>();
 	resultsLength = 0;
 	pageSize = 10;
 	defaultSort = {active: 'status', direction: 'asc' as const};
+	documentsToUpload: IDocument[] = [];
 
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
@@ -41,7 +44,9 @@ export class AdminComponent implements OnInit, AfterViewInit {
 		deactivate: {id: 'deactivate', icon: 'lock', tooltip: 'admin.actions.deactivate'},
 		reactivate: {id: 'reactivate', icon: 'unlock', tooltip: 'admin.actions.reactivate'},
 		promote: {id: 'promote', icon: 'increase', tooltip: 'admin.actions.promote'},
-		demote: {id: 'demote', icon: 'decrease', tooltip: 'admin.actions.demote'}
+		demote: {id: 'demote', icon: 'decrease', tooltip: 'admin.actions.demote'},
+		internalize: {id: 'internalize', icon: 'eye', tooltip: 'admin.actions.internalize'},
+		externalize: {id: 'externalize', icon: 'eye-slash', tooltip: 'admin.actions.externalize'}
 	};
 
 	private readonly refresh$ = new Subject<void>();
@@ -52,7 +57,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
 		private readonly dialog: MatDialog,
 		private readonly notifService: ObNotificationService,
 		private readonly userService: UserService,
-		private readonly authService: AuthenticationServiceV2
+		private readonly authService: AuthenticationServiceV2,
+		private readonly uploadService: UploadService
 	) {}
 
 	ngOnInit(): void {
@@ -125,14 +131,52 @@ export class AdminComponent implements OnInit, AfterViewInit {
 			case 'demote':
 				call$ = this.userService.demoteUser(user);
 				break;
+			case 'internalize':
+				call$ = this.userService.internalizeUser(user);
+				break;
+			case 'externalize':
+				call$ = this.userService.externalizeUser(user);
+				break;
 		}
 		call$.pipe(finalize(() => this.refresh$.next())).subscribe();
 	}
 
+	uploadAdminDocument(event: ObIUploadEvent) {
+		if (event.type === ObEUploadEventType.CHOSEN) {
+			event.files.forEach(file => {
+				if (file instanceof File) {
+					this.documentsToUpload.push({file, fileName: file.name, fileSize: file.size});
+				}
+			});
+		}
+	}
+
+	removeDocument(doc: IDocument) {
+		this.documentsToUpload.splice(this.documentsToUpload.indexOf(doc), 1);
+	}
+
+	uploadDocuments() {
+		this.uploadService.uploadAdminDocs(this.documentsToUpload).subscribe({
+			next: () => {
+				this.notifService.success('admin.document.upload.success');
+				this.documentsToUpload = [];
+			},
+			error: () => this.notifService.error('admin.document.upload.error')
+		});
+	}
+
 	private getActions(user: IUser): IUserAction[] {
 		const role = user.roles.includes(Role.ADMIN) ? Role.ADMIN : Role.USER;
-		return this.ACTION_MATRIX[user.status][role].map(id => ({
+		const actions = this.ACTION_MATRIX[user.status][role].map(id => ({
 			...this.ACTION_CATALOG[id]
 		}));
+
+		if (user.internalUser) {
+			actions.push(this.ACTION_CATALOG['externalize']);
+		} else {
+			actions.push(this.ACTION_CATALOG['internalize']);
+		}
+
+		return actions;
 	}
 }

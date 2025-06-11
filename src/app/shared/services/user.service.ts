@@ -62,4 +62,12 @@ export class UserService {
 	demoteUser(user: IUser) {
 		return this.http.put<void>(this.config.backendApi(`/users/${user.username}/demote`), user);
 	}
+
+	internalizeUser(user: IUser) {
+		return this.http.put<void>(this.config.backendApi(`/users/${user.username}/internalize`), user);
+	}
+
+	externalizeUser(user: IUser) {
+		return this.http.put<void>(this.config.backendApi(`/users/${user.username}/externalize`), user);
+	}
 }

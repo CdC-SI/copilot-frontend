@@ -1,4 +1,4 @@
-export const ANCHOR_TAG_REGEX = /<source><a\s+href=['"]([^'"]+)['"][^>]*>(.*?)<\/a><\/source>/gi;
+export const ANCHOR_TAG_REGEX = /<source><url>(.*?)<\/url><file>(.*?)<\/file><\/source>/gi;
 export const MESSAGE_ID_REGEX = /<message_uuid>(.*)<\/message_uuid>/gi;
 export const RETRIEVING_TAG_REGEX = /<retrieval>(.*?)<\/retrieval>/gi;
 export const TOPIC_CHECK_REGEX = /<topic_check>(.*?)<\/topic_check>/gi;
