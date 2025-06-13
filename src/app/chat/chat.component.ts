@@ -121,7 +121,7 @@ export class ChatComponent implements OnInit {
 			question.language,
 			question.id,
 			question.url,
-			question.url ? [{type: 'URL', link: question.url}] : undefined
+			question.url ? [{type: this.getSourceType(question.url), link: question.url}] : undefined
 		);
 		this.clearSearch();
 		this.scrollToBottom();
@@ -380,12 +380,12 @@ export class ChatComponent implements OnInit {
 			this.conversationTitles = conversations;
 		});
 	}
+
 	sendFeedback(feedback: Feedback) {
 		this.feedbackService.sendFeeback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
 			this.notif.success('feedback.success');
 		});
 	}
-
 	uploadDoc(): void {
 		const fileInput = document.createElement('input');
 		fileInput.type = 'file';
@@ -417,6 +417,10 @@ export class ChatComponent implements OnInit {
 		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
 		this.displayTextArea = action === 'ii-salary';
 		this.searchCtrl.setValue(prefix);
+	}
+
+	private getSourceType(url: string) {
+		return url.startsWith('http') ? 'URL' : 'FILE';
 	}
 
 	private readonly getCommandSuggestions = (text: string): Observable<Command[]> => {
