@@ -5,6 +5,7 @@ export interface IUser {
 	status: UserStatus;
 	roles: Role[];
 	organizations?: string[];
+	internalUser: boolean;
 	actions?: IUserAction[];
 }
 
@@ -29,7 +30,7 @@ export enum Role {
 }
 
 export interface IUserAction {
-	id: 'validate' | 'reactivate' | 'deactivate' | 'promote' | 'demote';
+	id: 'validate' | 'reactivate' | 'deactivate' | 'promote' | 'demote' | 'internalize' | 'externalize';
 	icon: string;
 	tooltip: string;
 }

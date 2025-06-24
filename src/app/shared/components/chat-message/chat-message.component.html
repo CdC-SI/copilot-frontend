@@ -11,9 +11,12 @@
 			</mat-expansion-panel-header>
 
 			<div *ngFor="let source of message.sources" class="source-item">
-				<a [href]="source" target="_blank" class="source-link">
-					{{ source }}
+				<a *ngIf="source.type === 'URL'" [href]="source.link" target="_blank" class="source-link">
+					{{ source.link }}
 				</a>
+				<span *ngIf="source.type === 'FILE'" class="source-link" (click)="downloadFile(source)">
+					{{ source.link }}
+				</span>
 			</div>
 		</mat-expansion-panel>
 

@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit, Renderer2} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Observable, of} from 'rxjs'; // Add this import
 import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
@@ -21,7 +21,7 @@ import {
 } from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {ChatHistoryMessage, ChatTitle} from '../shared/model/chat-history';
+import {ChatHistoryMessage, ChatTitle, MessageSource} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -121,7 +121,7 @@ export class ChatComponent implements OnInit {
 			question.language,
 			question.id,
 			question.url,
-			question.url ? [question.url] : undefined
+			question.url ? [{type: this.getSourceType(question.url), link: question.url}] : undefined
 		);
 		this.clearSearch();
 		this.scrollToBottom();
@@ -297,9 +297,10 @@ export class ChatComponent implements OnInit {
 		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
 			// Only store the URL
 			const sourceUrl = sourceMatch[1];
-			if (!partialChatMessage.sources.includes(sourceUrl)) {
-				partialChatMessage.sources.push(sourceUrl);
-			}
+			const sourceFile = sourceMatch[2];
+			const source: MessageSource = sourceUrl ? {type: 'URL', link: sourceUrl} : {type: 'FILE', link: sourceFile};
+			partialChatMessage.sources.push(source);
+
 			// Remove entire source tag from message
 			partialChatMessage.message = partialChatMessage.message.replace(sourceMatch[0], '');
 		}
@@ -330,7 +331,7 @@ export class ChatComponent implements OnInit {
 		lang?: Language,
 		faqItemId?: number,
 		url?: string,
-		sources?: string[]
+		sources?: MessageSource[]
 	) {
 		this.messages.push({
 			faqItemId,
@@ -379,12 +380,12 @@ export class ChatComponent implements OnInit {
 			this.conversationTitles = conversations;
 		});
 	}
+
 	sendFeedback(feedback: Feedback) {
 		this.feedbackService.sendFeeback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
 			this.notif.success('feedback.success');
 		});
 	}
-
 	uploadDoc(): void {
 		const fileInput = document.createElement('input');
 		fileInput.type = 'file';
@@ -393,7 +394,7 @@ export class ChatComponent implements OnInit {
 		fileInput.onchange = (e: Event) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (file) {
-				this.uploadService.uploadPdf(file, this.currentConversation?.conversationId).subscribe({
+				this.uploadService.uploadPersonalPdf(file, this.currentConversation?.conversationId).subscribe({
 					next: () => {
 						this.notif.success('upload.success');
 						this.settingsEventService.emitSettingsRefresh();
@@ -416,6 +417,10 @@ export class ChatComponent implements OnInit {
 		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
 		this.displayTextArea = action === 'ii-salary';
 		this.searchCtrl.setValue(prefix);
+	}
+
+	private getSourceType(url: string) {
+		return url.startsWith('http') ? 'URL' : 'FILE';
 	}
 
 	private readonly getCommandSuggestions = (text: string): Observable<Command[]> => {
