@@ -20,6 +20,6 @@ export class FaqItemsService {
 
 	add(faqItem: IFaqItem): Observable<any> {
 		const headers = {'Content-Type': 'application/json', Accept: 'application/json'};
-		return this.http.put(this.config.backendApi('/faq-items'), faqItem, {headers});
+		return this.http.post(this.config.backendApi('/faq-items'), faqItem, {headers});
 	}
 }

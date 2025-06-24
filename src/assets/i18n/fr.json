@@ -1,8 +1,13 @@
 {
+  "yes": "Oui",
+  "no": "Non",
+  "zas.user": "Utilisateur interne à la CdC",
+  "zas.user.explain": "Cette option donne accès aux documents internes de la CdC, elle sera vérifiée par un administrateur.",
   "user.firstName": "Prénom",
   "user.lastName": "Nom",
   "user.status": "Statut",
   "user.roles": "Rôles",
+  "user.internal": "Utilisateur interne",
   "user.actions": "Actions",
   "ACTIVE": "Actif",
   "INACTIVE": "Inactif",
@@ -13,11 +18,15 @@
   "admin.manage.users": "Gestion des utilisateurs",
   "admin.manage.users.description": "Gérer les statuts et rôles des utilisateurs",
   "admin.manage.users.list": "Liste des utilisateurs",
+  "admin.manage.documents": "Gestion des documents",
+  "admin.manage.documents.description": "Uploader les documents (CSV ou PDF) sources pour le RAG",
   "admin.actions.validate": "Valider le compte",
   "admin.actions.deactivate": "Désactiver le compte",
   "admin.actions.reactivate": "Réactiver le compte",
   "admin.actions.promote": "Promouvoir au rôle d'administrateur",
   "admin.actions.demote": "Rétrograder au rôle d'utilisateur",
+  "admin.actions.internalize": "Donner l’accès aux documents internes",
+  "admin.actions.externalize": "Retirer l’accès aux documents internes",
   "copilot.account.status.info.active": "Compte actif",
   "copilot.account.status.info.inactive": "Compte inactif",
   "copilot.account.status.info.pending": "Compte en attente d'activation",
@@ -204,14 +213,14 @@
     "explain": "Expliquer",
     "reformulate": "Reformuler",
     "draft": "Rédaction",
-    "more": "Plus",
+    "ii-salary": "Form AI",
     "prefixes": {
       "translate": "Traduis le dernier message en ",
       "summarize": "Résume moi la conversation ",
       "explain": "Explique moi en language simple le concept de ",
       "reformulate": "Reformule moi ton dernier message en language simple",
       "draft": "Aide moi à rédiger un texte sur ",
-      "more": ""
+      "ii-salary": "Voici les informations nécessaires au calcul :\n1. Année d’éligibilité : 2022\n2. Genre : homme/femme\n3.Salaire effectif avant l’atteinte à la santé :\n\t- Montant : 100 000 CHF\n\t- Année du dernier salaire effectif : 2022\n4. Niveau de compétence avant l’atteinte à la santé : 1/2/3/4\n5. Branche économique avant l’atteinte à la santé : 01-96\n6. Salaire effectif après l’atteinte à la santé :\n\t- Montant : 90 000 CHF\n\t- Année du dernier salaire effectif : 2023\n7. Niveau de compétence après l’atteinte à la santé : 1/2/3/4\n8. Branche économique après l’atteinte à la santé : 01-96\n9. Taux d’activité avant l’atteinte à la santé : 100%\n10. Réduction du taux d’activité après l’atteinte à la santé : 15%\n11. Autres déductions : 0%"
     }
   }
 }

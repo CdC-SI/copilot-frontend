@@ -43,8 +43,13 @@
 			margin-left: 4px;
 		}
 
-		ut-autocomplete-input {
+		ut-autocomplete-input, textarea {
 			width: 50vw;
+		}
+
+		textarea {
+			margin-bottom: 20px;
+			height: 100px;
 		}
 	}
 

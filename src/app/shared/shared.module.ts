@@ -17,7 +17,8 @@ import {ChatConfigurationEditComponent} from './components/chat-configuration-ed
 import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
 import {MatLine} from '@angular/material/core';
-import { ActionSuggestionsComponent } from './components/action-suggestions/action-suggestions.component';
+import {ActionSuggestionsComponent} from './components/action-suggestions/action-suggestions.component';
+import {MatBadge} from '@angular/material/badge';
 
 @NgModule({
 	declarations: [
@@ -29,7 +30,8 @@ import { ActionSuggestionsComponent } from './components/action-suggestions/acti
 		SignUpComponent,
 		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
-		ChatHistoryComponent
+		ChatHistoryComponent,
+		ActionSuggestionsComponent
 	],
 	imports: [
 		CommonModule,
@@ -40,7 +42,8 @@ import { ActionSuggestionsComponent } from './components/action-suggestions/acti
 		TranslateModule,
 		BrowserAnimationsModule,
 		MarkdownModule.forRoot(),
-		MatLine
+		MatLine,
+		MatBadge
 	],
 	exports: [
 		CommonModule,

@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit, Renderer2} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Observable, of} from 'rxjs'; // Add this import
 import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl} from '@angular/forms';
@@ -7,12 +7,13 @@ import {RagService} from '../shared/services/rag.service';
 import {
 	AGENT_TAG_REGEX,
 	ANCHOR_TAG_REGEX,
+	INTENT_TAG_REGEX,
 	MESSAGE_ID_REGEX,
 	OFF_TOPIC_REGEX,
 	RETRIEVING_TAG_REGEX,
 	ROUTING_TAG_REGEX,
-	INTENT_TAG_REGEX,
 	SOURCE_TAG_REGEX,
+	SUGGESTION_TAG_REGEX,
 	TAGS_TAG_REGEX,
 	TOOL_TAG_REGEX,
 	TOPIC_CHECK_REGEX,
@@ -20,7 +21,7 @@ import {
 } from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {ChatHistoryMessage, ChatTitle} from '../shared/model/chat-history';
+import {ChatHistoryMessage, ChatTitle, MessageSource} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -47,6 +48,15 @@ export class ChatComponent implements OnInit {
 	conversationTitles: ChatTitle[] = [];
 	currentConversation: ChatTitle;
 	isCommandMode = false;
+	displayTextArea = false;
+	defaultSuggestions = [
+		{text: 'action_suggestions.translate', action: 'translate'},
+		{text: 'action_suggestions.summarize', action: 'summarize'},
+		{text: 'action_suggestions.explain', action: 'explain'},
+		{text: 'action_suggestions.reformulate', action: 'reformulate'},
+		{text: 'action_suggestions.draft', action: 'draft'}
+	];
+	specificSuggestions: {text: string; action: string}[] = [];
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -82,13 +92,9 @@ export class ChatComponent implements OnInit {
 		return this.authService.isRegistered();
 	}
 
-	getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
-		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
-	};
-
-	getCommandSuggestions = (text: string): Observable<Command[]> => {
-		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
-	};
+	getOptionService() {
+		return this.isCommandMode ? this.getCommandSuggestions : this.currentConversation ? () => of([]) : this.getSearchProposalFunction;
+	}
 
 	searchOptionLabelFn = (option: AutocompleteType): string => {
 		if (this.isCommandMode && 'name' in option) {
@@ -115,7 +121,7 @@ export class ChatComponent implements OnInit {
 			question.language,
 			question.id,
 			question.url,
-			question.url ? [question.url] : undefined
+			question.url ? [{type: this.getSourceType(question.url), link: question.url}] : undefined
 		);
 		this.clearSearch();
 		this.scrollToBottom();
@@ -124,6 +130,7 @@ export class ChatComponent implements OnInit {
 
 	clearSearch(): void {
 		this.searchCtrl.setValue('');
+		this.displayTextArea = false;
 	}
 
 	disableSearch(): void {
@@ -134,14 +141,11 @@ export class ChatComponent implements OnInit {
 		this.searchCtrl.enable();
 	}
 
-	clearChat(): void {
-		this.messages = [];
-	}
-
 	newChat(): void {
 		if (this.currentConversation) this.currentConversation.selected = false;
 		this.currentConversation = null;
-		this.clearChat();
+		this.messages = [];
+		this.specificSuggestions = [];
 	}
 
 	sendToLLM(): void {
@@ -151,6 +155,7 @@ export class ChatComponent implements OnInit {
 		this.addMessage(ChatMessageSource.USER, inputText);
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
+		this.specificSuggestions = [];
 
 		const languageMap: Record<string, Language> = {
 			de: Language.DE,
@@ -292,11 +297,18 @@ export class ChatComponent implements OnInit {
 		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
 			// Only store the URL
 			const sourceUrl = sourceMatch[1];
-			if (!partialChatMessage.sources.includes(sourceUrl)) {
-				partialChatMessage.sources.push(sourceUrl);
-			}
+			const sourceFile = sourceMatch[2];
+			const source: MessageSource = sourceUrl ? {type: 'URL', link: sourceUrl} : {type: 'FILE', link: sourceFile};
+			partialChatMessage.sources.push(source);
+
 			// Remove entire source tag from message
 			partialChatMessage.message = partialChatMessage.message.replace(sourceMatch[0], '');
+		}
+
+		const suggestionMatch = SUGGESTION_TAG_REGEX.exec(partialChatMessage.message);
+		if (suggestionMatch) {
+			partialChatMessage.message = partialChatMessage.message.replace(SUGGESTION_TAG_REGEX, '');
+			this.specificSuggestions.push({text: `action_suggestions.${suggestionMatch[1]}`, action: suggestionMatch[1]});
 		}
 
 		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
@@ -319,7 +331,7 @@ export class ChatComponent implements OnInit {
 		lang?: Language,
 		faqItemId?: number,
 		url?: string,
-		sources?: string[]
+		sources?: MessageSource[]
 	) {
 		this.messages.push({
 			faqItemId,
@@ -348,9 +360,21 @@ export class ChatComponent implements OnInit {
 		this.conversationService.getConversation(conversation.conversationId).subscribe(messages => {
 			this.currentConversation = conversation;
 			this.messages = messages.map(this.historyMessageToChatMessage);
+			this.specificSuggestions = this.messages[this.messages.length - 1].suggestions?.map(suggestion => {
+				return {text: `action_suggestions.${suggestion}`, action: suggestion};
+			});
 			this.scrollToBottom();
 		});
 	}
+
+	deleteConversation(conversation: ChatTitle) {
+		if (conversation.conversationId === this.currentConversation?.conversationId) {
+			this.currentConversation = null;
+			this.messages = [];
+			this.specificSuggestions = [];
+		}
+	}
+
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
 			this.conversationTitles = conversations;
@@ -362,7 +386,6 @@ export class ChatComponent implements OnInit {
 			this.notif.success('feedback.success');
 		});
 	}
-
 	uploadDoc(): void {
 		const fileInput = document.createElement('input');
 		fileInput.type = 'file';
@@ -371,7 +394,7 @@ export class ChatComponent implements OnInit {
 		fileInput.onchange = (e: Event) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (file) {
-				this.uploadService.uploadPdf(file, this.currentConversation?.conversationId).subscribe({
+				this.uploadService.uploadPersonalPdf(file, this.currentConversation?.conversationId).subscribe({
 					next: () => {
 						this.notif.success('upload.success');
 						this.settingsEventService.emitSettingsRefresh();
@@ -390,6 +413,23 @@ export class ChatComponent implements OnInit {
 		fileInput.click();
 	}
 
+	handleSuggestionAction(action: string): void {
+		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
+		this.displayTextArea = action === 'ii-salary';
+		this.searchCtrl.setValue(prefix);
+	}
+
+	private getSourceType(url: string) {
+		return url.startsWith('http') ? 'URL' : 'FILE';
+	}
+
+	private readonly getCommandSuggestions = (text: string): Observable<Command[]> => {
+		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
+	};
+	private readonly getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
+		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
+	};
+
 	private historyMessageToChatMessage(historyMessage: ChatHistoryMessage): ChatMessage {
 		return {
 			id: historyMessage.messageId,
@@ -399,7 +439,8 @@ export class ChatComponent implements OnInit {
 			timestamp: historyMessage.timestamp,
 			lang: historyMessage.language,
 			faqItemId: historyMessage.faqItemId,
-			sources: historyMessage.sources
+			sources: historyMessage.sources,
+			suggestions: historyMessage.suggestions
 		};
 	}
 
@@ -425,10 +466,5 @@ export class ChatComponent implements OnInit {
 				this.currentConversation.selected = true;
 			});
 		}, 1_500);
-	}
-
-	handleSuggestionAction(action: string): void {
-		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
-		this.searchCtrl.setValue(prefix);
 	}
 }
