@@ -1,5 +1,5 @@
 <div *ngIf="message.source === ChatMessageSource.USER">
-	{{ message.message }}
+	<markdown class="no-margin" [data]="message.message"></markdown>
 </div>
 <div *ngIf="message.source !== ChatMessageSource.USER">
 	<div class="flex-column">

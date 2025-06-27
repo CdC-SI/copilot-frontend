@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {Observable, of} from 'rxjs'; // Add this import
+import {Observable, of} from 'rxjs';
 import {FaqItemsService} from '../shared/services/faq-items.service';
-import {FormControl} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
 import {
@@ -32,6 +32,8 @@ import {UploadService} from '../shared/services/upload.service';
 import {SettingsEventService} from '../shared/services/settings-event.service';
 import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
+import {ActionId, FormDef} from '../shared/model/form-definition';
+import {DynamicFormService} from '../shared/services/dynamic-form.service';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -57,6 +59,7 @@ export class ChatComponent implements OnInit {
 		{text: 'action_suggestions.draft', action: 'draft'}
 	];
 	specificSuggestions: {text: string; action: string}[] = [];
+	activeForm?: {def: FormDef; group: FormGroup};
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -72,7 +75,8 @@ export class ChatComponent implements OnInit {
 		private readonly notif: ObNotificationService,
 		private readonly commandService: CommandService,
 		private readonly uploadService: UploadService,
-		private readonly settingsEventService: SettingsEventService
+		private readonly settingsEventService: SettingsEventService,
+		private readonly dfs: DynamicFormService
 	) {}
 
 	ngOnInit() {
@@ -414,9 +418,28 @@ export class ChatComponent implements OnInit {
 	}
 
 	handleSuggestionAction(action: string): void {
-		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
-		this.displayTextArea = action === 'ii-salary';
-		this.searchCtrl.setValue(prefix);
+		if (action === 'ii-salary') {
+			this.activeForm = this.dfs.buildForm(ActionId.II_CALCUL);
+			const lastAssistant = this.messages[this.messages.length - 1];
+			const patch = this.dfs.parseAssistantMessage(this.activeForm.def, lastAssistant.message);
+			this.activeForm.group.patchValue(patch, {emitEvent: false});
+		} else {
+			const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
+			this.searchCtrl.setValue(prefix);
+		}
+	}
+
+	onFormSubmit() {
+		const {def, group} = this.activeForm;
+		const raw = group.getRawValue();
+		const message = this.dfs.hydrate(def, raw);
+		this.activeForm = undefined;
+		this.searchCtrl.setValue(message);
+		this.sendToLLM();
+	}
+
+	onCloseForm() {
+		this.activeForm = undefined;
 	}
 
 	private getSourceType(url: string) {

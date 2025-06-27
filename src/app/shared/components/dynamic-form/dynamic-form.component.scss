@@ -1,0 +1,81 @@
+/* ------ conteneur principal ------------------------------------------ */
+.dynamic-form {
+	position: relative;          /* pour la croix */
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding: 1rem 1.5rem;
+	border-radius: 12px;
+	background: #fafafa;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ------ bouton de fermeture ----------------------------------------- */
+.close-btn {
+	position: absolute;
+	top: -1.5rem;
+	right: -1.5rem;
+	z-index: 1;
+	color: red;
+	font-size: 1.5em;
+}
+
+/* ------ accordéon ---------------------------------------------------- */
+.section-accordion {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+
+	.mat-expansion-panel {
+		border-radius: 8px;
+		overflow: hidden;
+	}
+}
+
+/* ------ grille 3 lignes × colonnes auto pour les champs -------------- */
+.section-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(200px, 1fr));
+	grid-auto-flow: row;
+	gap: 1rem 1.5rem;
+
+	.mat-form-field { width: 100%; }
+}
+
+@media (max-width: 640px) {
+	.section-grid {
+		grid-template-columns: 1fr; /* une seule colonne sous 640px */
+	}
+}
+
+/* ------ bouton Envoyer ---------------------------------------------- */
+.submit-btn {
+	width: 100%;                 /* ligne complète */
+	align-self: flex-end;        /* à droite si moins de 100 % */
+}
+
+/* ---------------------------------------------------------------------
+   Thèmes réutilisables (avant / après)
+   -------------------------------------------------------------------- */
+.block--before {
+	background: rgba(76, 175, 80, 0.05);
+	border-left: 3px solid #4caf50;
+}
+
+.block--after {
+	background: rgba(255, 152, 0, 0.05);
+	border-left: 3px solid #ff9800;
+}
+
+/* ---------------------------------------------------------------------
+   Thème spécifique ii-calcul
+   -------------------------------------------------------------------- */
+.ii-calcul {
+	background: #f3f7fe;
+	border-left: 5px solid #2f4255;
+
+	.mat-expansion-panel-header-title,
+	.mat-expansion-indicator::after {
+		color: #2f4255;
+	}
+}

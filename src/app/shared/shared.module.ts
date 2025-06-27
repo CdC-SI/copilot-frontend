@@ -19,6 +19,7 @@ import {ChatHistoryComponent} from './components/chat-history/chat-history.compo
 import {MatLine} from '@angular/material/core';
 import {ActionSuggestionsComponent} from './components/action-suggestions/action-suggestions.component';
 import {MatBadge} from '@angular/material/badge';
+import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.component';
 
 @NgModule({
 	declarations: [
@@ -31,7 +32,8 @@ import {MatBadge} from '@angular/material/badge';
 		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
-		ActionSuggestionsComponent
+		ActionSuggestionsComponent,
+		DynamicFormComponent
 	],
 	imports: [
 		CommonModule,
@@ -61,7 +63,8 @@ import {MatBadge} from '@angular/material/badge';
 		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
-		ActionSuggestionsComponent
+		ActionSuggestionsComponent,
+		DynamicFormComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })
