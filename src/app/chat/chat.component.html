@@ -46,15 +46,22 @@
 				</div>
 			</div>
 		</div>
+		<zco-dynamic-form
+			class="form-container"
+			*ngIf="activeForm"
+			[def]="activeForm.def"
+			[form]="activeForm.group"
+			(submitted)="onFormSubmit()"
+			(closeForm)="onCloseForm()"
+		></zco-dynamic-form>
 		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
 		<zco-action-suggestions
-			*ngIf="isRegistered()"
+			*ngIf="isRegistered() && !activeForm"
 			[suggestions]="defaultSuggestions.concat(specificSuggestions || [])"
 			(actionSelected)="handleSuggestionAction($event)"
 		>
 		</zco-action-suggestions>
-		<form class="question-container" ngForm>
-			<textarea *ngIf="displayTextArea" [formControl]="searchCtrl"></textarea>
+		<form *ngIf="!activeForm" class="question-container" ngForm>
 			<ut-autocomplete-input
 				*ngIf="!displayTextArea"
 				class="mr8"
