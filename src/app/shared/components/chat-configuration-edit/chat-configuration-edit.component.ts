@@ -5,9 +5,8 @@ import {ChatRequestConfigFields} from '../../model/rag';
 import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
-import {UserService} from '../../services/user.service';
 import {SettingsEventService} from '../../services/settings-event.service';
-import {Role, UserStatus} from '../../model/user';
+import {UserStatus} from '../../model/user';
 import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
@@ -31,8 +30,6 @@ import {AuthenticationServiceV2} from '../../services/auth.service';
 export class ChatConfigurationEditComponent implements OnInit, OnDestroy, ControlValueAccessor, Validator {
 	TAGS: string[] = [];
 	SOURCES: string[] = [];
-	LLM_MODELS: string[] = [];
-	RETRIEVAL_METHODS: string[] = [];
 	RESPONSE_STYLE: string[] = [];
 	RESPONSE_FORMAT: string[] = [];
 	FORM_FIELDS = ChatRequestConfigFields;
@@ -51,33 +48,11 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 
 	buildForm() {
 		this.formGroup = this.fb.group({
-			[this.FORM_FIELDS.LLM_MODEL]: [''],
 			[this.FORM_FIELDS.TAGS]: [[]],
-			[this.FORM_FIELDS.AUTOCOMPLETE]: [],
-			[this.FORM_FIELDS.RAG]: [],
-			[this.FORM_FIELDS.AGENTIC_RAG]: [],
 			[this.FORM_FIELDS.LANGUAGE]: [this.translateService.currentLang],
 			[this.FORM_FIELDS.RESPONSE_STYLE]: [''],
 			[this.FORM_FIELDS.RESPONSE_FORMAT]: [''],
-			[this.FORM_FIELDS.K_MEMORY]: [''],
-			[this.FORM_FIELDS.K_RETRIEVE]: [''],
-			[this.FORM_FIELDS.MAX_OUTPUT_TOKENS]: [''],
-			[this.FORM_FIELDS.TOP_P]: [''],
-			[this.FORM_FIELDS.TEMPERATURE]: [''],
-			[this.FORM_FIELDS.RETRIEVAL_METHODS]: [''],
-			[this.FORM_FIELDS.SOURCES]: [''],
-			[this.FORM_FIELDS.SOURCE_VALIDATION]: [''],
-			[this.FORM_FIELDS.TOPIC_CHECK]: ['']
-		});
-
-		setTimeout(() => {
-			this.formGroup.patchValue({
-				[this.FORM_FIELDS.AUTOCOMPLETE]: true,
-				[this.FORM_FIELDS.RAG]: true,
-				[this.FORM_FIELDS.AGENTIC_RAG]: false,
-				[this.FORM_FIELDS.SOURCE_VALIDATION]: true,
-				[this.FORM_FIELDS.TOPIC_CHECK]: false
-			});
+			[this.FORM_FIELDS.SOURCES]: ['']
 		});
 	}
 
@@ -101,22 +76,6 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 			this.onChange(value);
 			this.onTouched();
 		});
-
-		// Add mutual exclusivity for RAG toggles
-		const ragControl = this.formGroup.get(this.FORM_FIELDS.RAG);
-		const agenticRagControl = this.formGroup.get(this.FORM_FIELDS.AGENTIC_RAG);
-
-		ragControl?.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(enabled => {
-			if (enabled) {
-				agenticRagControl?.setValue(false, {emitEvent: false});
-			}
-		});
-
-		agenticRagControl?.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(enabled => {
-			if (enabled) {
-				ragControl?.setValue(false, {emitEvent: false});
-			}
-		});
 	}
 
 	loadDropdowns() {
@@ -131,12 +90,6 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 				sources.filter(source => source && source !== ''),
 				'sources'
 			);
-		});
-		this.settingsService.getSettings(SettingsType.LLM_MODEL).subscribe(llmModels => {
-			this.LLM_MODELS = llmModels;
-		});
-		this.settingsService.getSettings(SettingsType.RETRIEVAL_METHOD).subscribe(retrievalMethods => {
-			this.RETRIEVAL_METHODS = retrievalMethods;
 		});
 		this.settingsService.getSettings(SettingsType.RESPONSE_STYLE).subscribe(styles => {
 			this.RESPONSE_STYLE = styles;

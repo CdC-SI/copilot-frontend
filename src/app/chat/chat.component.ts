@@ -154,7 +154,6 @@ export class ChatComponent implements OnInit {
 
 	sendToLLM(): void {
 		const inputText = this.searchCtrl.value;
-		const commandData = this.commandService.parseCommand(inputText);
 
 		this.addMessage(ChatMessageSource.USER, inputText);
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
@@ -174,13 +173,7 @@ export class ChatComponent implements OnInit {
 			query: inputText,
 			conversationId: this.currentConversation?.conversationId,
 			...this.chatConfigCtrl.value,
-			language: mappedLanguage,
-			command: commandData?.command || null,
-			commandArgs: commandData?.args || null,
-			rag: commandData ? false : this.chatConfigCtrl.value?.rag || false,
-			agenticRag: commandData ? false : this.chatConfigCtrl.value?.agenticRag || false,
-			sourceValidation: this.chatConfigCtrl.value?.sourceValidation || false,
-			topicCheck: this.chatConfigCtrl.value?.topicCheck || false
+			language: mappedLanguage
 		};
 
 		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({

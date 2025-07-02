@@ -177,9 +177,11 @@
     "practical_guide_eak_fz": "Guide Pratique AFam",
     "sozialversicherungen": "sozialversicherungen.admin.ch",
     "user_pdf_upload": "PDF Utilisateur:",
-    "user_edit": "SurveyPipeline - Saisie utilisateur"
+    "user_edit": "SurveyPipeline - Saisie utilisateur",
+    "csc_afac": "CSC AFac"
   },
   "tags": {
+    "AFac": "Assurance Facultative",
     "general": "Généralités",
     "contributions": "Cotisations",
     "bankruptcy": "Faillite",

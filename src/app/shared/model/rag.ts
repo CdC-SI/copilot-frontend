@@ -29,21 +29,6 @@ export enum ChatRequestConfigFields {
 	LANGUAGE = 'language',
 	TAGS = 'tags',
 	SOURCES = 'sources',
-	LLM_MODEL = 'llmModel',
-	TOP_P = 'topP',
-	TEMPERATURE = 'temperature',
-	MAX_OUTPUT_TOKENS = 'maxOutputTokens',
-	RETRIEVAL_METHODS = 'retrievalMethods',
-	K_RETRIEVE = 'kRetrieve',
-	K_MEMORY = 'kMemory',
 	RESPONSE_STYLE = 'responseStyle',
-	RESPONSE_FORMAT = 'responseFormat',
-	COMMAND = 'command',
-	COMMAND_ARGS = 'commandArgs',
-	AUTOCOMPLETE = 'autocomplete',
-	RAG = 'rag',
-	AGENTIC_RAG = 'agenticRag',
-	SOURCE_VALIDATION = 'sourceValidation',
-	TOPIC_CHECK = 'topicCheck',
-	IS_FOLLOWUP_Q = 'isFollowUpQ'
+	RESPONSE_FORMAT = 'responseFormat'
 }

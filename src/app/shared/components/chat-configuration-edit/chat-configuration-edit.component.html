@@ -1,138 +1,40 @@
 <ng-container [formGroup]="formGroup">
-	<mat-expansion-panel>
-		<mat-expansion-panel-header>
-			<mat-panel-title>
-				{{ "parameters.advanced_llm_parameters" | translate }}
-			</mat-panel-title>
-		</mat-expansion-panel-header>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
+			<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ "tags." + tag | translate }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
 
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.model" | translate }}</mat-label>
-			<mat-select [formControlName]="FORM_FIELDS.LLM_MODEL">
-				<mat-option *ngFor="let model of LLM_MODELS" [value]="model">{{ model }}</mat-option>
-			</mat-select>
-			<mat-error></mat-error>
-		</mat-form-field>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.sources" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple>
+			<mat-option *ngFor="let source of SOURCES" [value]="source">
+				<ng-container *ngIf="isUserPdfUpload(source); else regularSource">
+					{{ "sources.user_pdf_upload" | translate }} {{ getUserPdfFilename(source) }}
+				</ng-container>
+				<ng-template #regularSource>
+					{{ "sources." + source | translate }}
+				</ng-template>
+			</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
 
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.top_p" | translate }}</mat-label>
-			<input type="number" step="0.1" min="0" max="1" matInput [formControlName]="FORM_FIELDS.TOP_P" />
-			<mat-error></mat-error>
-		</mat-form-field>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.response-style" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
+			<mat-option *ngFor="let style of RESPONSE_STYLE" [value]="style">{{ style | translate }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
 
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.temperature" | translate }}</mat-label>
-			<input type="number" step="0.1" min="0" max="2" matInput [formControlName]="FORM_FIELDS.TEMPERATURE" />
-			<mat-error></mat-error>
-		</mat-form-field>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.max_output_tokens" | translate }}</mat-label>
-			<input type="number" matInput [formControlName]="FORM_FIELDS.MAX_OUTPUT_TOKENS" />
-			<mat-error></mat-error>
-		</mat-form-field>
-	</mat-expansion-panel>
-
-	<mat-expansion-panel>
-		<mat-expansion-panel-header>
-			<mat-panel-title>
-				{{ "parameters.advanced_retrieval_parameters" | translate }}
-			</mat-panel-title>
-		</mat-expansion-panel-header>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.tags" | translate }}</mat-label>
-			<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
-				<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ 'tags.' + tag | translate }}</mat-option>
-			</mat-select>
-			<mat-error></mat-error>
-		</mat-form-field>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.sources" | translate }}</mat-label>
-			<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple>
-				<mat-option *ngFor="let source of SOURCES" [value]="source">
-					<ng-container *ngIf="isUserPdfUpload(source); else regularSource">
-						{{ 'sources.user_pdf_upload' | translate }} {{ getUserPdfFilename(source) }}
-					</ng-container>
-					<ng-template #regularSource>
-						{{ 'sources.' + source | translate }}
-					</ng-template>
-				</mat-option>
-			</mat-select>
-			<mat-error></mat-error>
-		</mat-form-field>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.retrieval-methods" | translate }}</mat-label>
-			<mat-select [formControlName]="FORM_FIELDS.RETRIEVAL_METHODS" multiple>
-				<mat-option *ngFor="let method of RETRIEVAL_METHODS" [value]="method">{{ 'retrievers.' + method | translate }}</mat-option>
-			</mat-select>
-			<mat-error></mat-error>
-		</mat-form-field>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.k_retrieve" | translate }}</mat-label>
-			<input type="number" matInput [formControlName]="FORM_FIELDS.K_RETRIEVE" />
-			<mat-error></mat-error>
-		</mat-form-field>
-	</mat-expansion-panel>
-
-	<mat-expansion-panel>
-		<mat-expansion-panel-header>
-			<mat-panel-title>
-				{{ "parameters.advanced_answer_format" | translate }}
-			</mat-panel-title>
-		</mat-expansion-panel-header>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.response-style" | translate }}</mat-label>
-			<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
-				<mat-option *ngFor="let style of RESPONSE_STYLE" [value]="style">{{ style | translate }}</mat-option>
-			</mat-select>
-			<mat-error></mat-error>
-		</mat-form-field>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.response-format" | translate }}</mat-label>
-			<mat-select [formControlName]="FORM_FIELDS.RESPONSE_FORMAT">
-				<mat-option *ngFor="let style of RESPONSE_FORMAT" [value]="style">{{ style | translate }}</mat-option>
-			</mat-select>
-			<mat-error></mat-error>
-		</mat-form-field>
-	</mat-expansion-panel>
-
-	<mat-expansion-panel>
-		<mat-expansion-panel-header>
-			<mat-panel-title>
-				{{ "parameters.advanced_chat_parameters" | translate }}
-			</mat-panel-title>
-		</mat-expansion-panel-header>
-
-		<mat-form-field obErrorMessages>
-			<mat-label>{{ "parameters.memory" | translate }}</mat-label>
-			<input type="number" matInput [formControlName]="FORM_FIELDS.K_MEMORY" />
-			<mat-error></mat-error>
-		</mat-form-field>
-
-		<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.SOURCE_VALIDATION">
-			{{ "parameters.source_validation" | translate }}
-		</mat-slide-toggle>
-
-		<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.TOPIC_CHECK">
-			{{ "parameters.topic_check" | translate }}
-		</mat-slide-toggle>
-	</mat-expansion-panel>
-
-	<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.AUTOCOMPLETE">
-		{{ "parameters.autocomplete" | translate }}
-	</mat-slide-toggle>
-
-	<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.RAG">
-		{{ "parameters.rag" | translate }}
-	</mat-slide-toggle>
-
-	<mat-slide-toggle class="mt16" [formControlName]="FORM_FIELDS.AGENTIC_RAG">
-		{{ "parameters.agentic_rag" | translate }}
-	</mat-slide-toggle>
+	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.response-format" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_FORMAT">
+			<mat-option *ngFor="let style of RESPONSE_FORMAT" [value]="style">{{ style | translate }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
 </ng-container>
