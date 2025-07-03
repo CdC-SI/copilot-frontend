@@ -10,14 +10,7 @@
 				<mat-panel-title> Sources ({{ sourcesCount }}) </mat-panel-title>
 			</mat-expansion-panel-header>
 
-			<div *ngFor="let source of message.sources" class="source-item">
-				<a *ngIf="source.type === 'URL'" [href]="source.link" target="_blank" class="source-link">
-					{{ source.link }}
-				</a>
-				<span *ngIf="source.type === 'FILE'" class="source-link" (click)="downloadFile(source)">
-					{{ source.link }}
-				</span>
-			</div>
+			<zco-source-list [sources]="message.sources"></zco-source-list>
 		</mat-expansion-panel>
 
 		<zco-message-action

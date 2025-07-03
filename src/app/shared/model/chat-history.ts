@@ -20,4 +20,7 @@ export interface ChatHistoryMessage {
 export interface MessageSource {
 	type: string;
 	link: string;
+	pageNumber?: string;
+	subsection?: string;
+	version?: string;
 }

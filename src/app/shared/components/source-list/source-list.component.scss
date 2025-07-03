@@ -1,0 +1,82 @@
+:host {
+	display: block;
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Layout */
+.source-list {
+	display: grid;
+	gap: 1rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.source-card {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 0.75rem;
+	padding: 1rem;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+	transition: box-shadow .2s;
+}
+.source-card:hover {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
+}
+
+.source-header {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	margin-bottom: .5rem;
+}
+
+/* Icons using tiny inline SVGs so no external dep required */
+.source-icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	display: inline-block;
+	background-size: contain;
+	background-repeat: no-repeat;
+	flex: 0 0 1.5rem;
+}
+.source-icon.file {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23445566" d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8z"/><path fill="%2399a" d="M14 2v6h6"/></svg>');
+}
+
+/* Text */
+.source-title {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+	flex: 1 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.source-title a,
+.source-title button {
+	color: #2563eb;
+	text-decoration: none;
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	font: inherit;
+}
+.source-title a:hover,
+.source-title button:hover {
+	text-decoration: underline;
+}
+
+/* Metadata list */
+.source-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin: 0;
+	font-size: .875rem;
+	color: #475569;
+	padding: 0;
+	list-style: none;
+}

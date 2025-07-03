@@ -41,16 +41,5 @@ export class ChatMessageComponent {
 		return this.sourcesCount > 0;
 	}
 
-	downloadFile(source: MessageSource) {
-		this.uploadService.downloadSourceDocument(source.link).subscribe({
-			next: blob => {
-				const pdfBlob = new Blob([blob], {type: 'application/pdf'});
-				const url = window.URL.createObjectURL(pdfBlob);
-				window.open(url, '_blank');
-			},
-			error: () => {
-				this.notifService.error('Erreur lors du téléchargement du fichier');
-			}
-		});
-	}
+	downloadFile(source: MessageSource) {}
 }

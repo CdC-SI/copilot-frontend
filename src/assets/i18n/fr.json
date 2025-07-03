@@ -168,6 +168,7 @@
     "reranking": "Reranking"
   },
   "sources": {
+    "DAA": "Directives d’assujettissement à l’AVS",
     "ahv_iv_memento": "AVS/AI Mémentos",
     "ahv_lernbaustein_2024": "Guide d'apprentissage AVS 2024",
     "akis": "AKIS Aide En-Ligne",
@@ -178,10 +179,11 @@
     "sozialversicherungen": "sozialversicherungen.admin.ch",
     "user_pdf_upload": "PDF Utilisateur:",
     "user_edit": "SurveyPipeline - Saisie utilisateur",
-    "csc_afac": "CSC AFac"
+    "csc_afac": "CSC Assurance Facultative"
   },
   "tags": {
-    "AFac": "Assurance Facultative",
+    "daa": "daa",
+    "AFac": "AFac",
     "general": "Généralités",
     "contributions": "Cotisations",
     "bankruptcy": "Faillite",

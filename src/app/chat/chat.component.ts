@@ -295,7 +295,13 @@ export class ChatComponent implements OnInit {
 			// Only store the URL
 			const sourceUrl = sourceMatch[1];
 			const sourceFile = sourceMatch[2];
-			const source: MessageSource = sourceUrl ? {type: 'URL', link: sourceUrl} : {type: 'FILE', link: sourceFile};
+			const pageNumber = sourceMatch[3];
+			const subSection = sourceMatch[4];
+			const version = sourceMatch[5];
+
+			const source: MessageSource = sourceUrl
+				? {type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version}
+				: {type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
 			partialChatMessage.sources.push(source);
 
 			// Remove entire source tag from message

@@ -20,6 +20,7 @@ import {MatLine} from '@angular/material/core';
 import {ActionSuggestionsComponent} from './components/action-suggestions/action-suggestions.component';
 import {MatBadge} from '@angular/material/badge';
 import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.component';
+import { SourceListComponent } from './components/source-list/source-list.component';
 
 @NgModule({
 	declarations: [
@@ -33,7 +34,8 @@ import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.compo
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
-		DynamicFormComponent
+		DynamicFormComponent,
+  SourceListComponent
 	],
 	imports: [
 		CommonModule,
