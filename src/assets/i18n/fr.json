@@ -183,6 +183,12 @@
   },
   "tags": {
     "daa": "DAA",
+    "CSC - Adhésion": "CSC - Adhésion",
+    "CSC - Cas de sortie": "CSC - Cas de sortie",
+    "CSC - Contentieux": "CSC - Contentieux",
+    "CSC - Exclusion": "CSC - Exclusion",
+    "CSC - Gestion des dossiers": "CSC - Gestion des dossiers",
+    "CSC - Taxation": "CSC - Taxation",
     "AFac": "AFac",
     "general": "Généralités",
     "contributions": "Cotisations",
