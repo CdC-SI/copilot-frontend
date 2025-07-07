@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl, FormGroup} from '@angular/forms';
@@ -34,6 +34,7 @@ import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {ActionId, FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
+import {MatDialog} from '@angular/material/dialog';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -61,6 +62,9 @@ export class ChatComponent implements OnInit {
 	specificSuggestions: {text: string; action: string}[] = [];
 	activeForm?: {def: FormDef; group: FormGroup};
 
+	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
+	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
+
 	protected readonly ChatMessageSource = ChatMessageSource;
 
 	constructor(
@@ -76,7 +80,8 @@ export class ChatComponent implements OnInit {
 		private readonly commandService: CommandService,
 		private readonly uploadService: UploadService,
 		private readonly settingsEventService: SettingsEventService,
-		private readonly dfs: DynamicFormService
+		private readonly dfs: DynamicFormService,
+		private readonly dialog: MatDialog
 	) {}
 
 	ngOnInit() {
@@ -153,6 +158,11 @@ export class ChatComponent implements OnInit {
 	}
 
 	sendToLLM(): void {
+		if (!this.isRegistered()) {
+			this.showDialog();
+			return;
+		}
+
 		const inputText = this.searchCtrl.value;
 
 		this.addMessage(ChatMessageSource.USER, inputText);
@@ -488,5 +498,13 @@ export class ChatComponent implements OnInit {
 				this.currentConversation.selected = true;
 			});
 		}, 1_500);
+	}
+
+	private showDialog() {
+		if (this.authService.userStatus() === UserStatus.GUEST) {
+			this.dialog.open(this.userNotRegisteredDialog);
+		} else {
+			this.dialog.open(this.userPendingTriesToChatDialog);
+		}
 	}
 }
