@@ -139,6 +139,8 @@
   "feedback.success": "Vielen Dank für Ihr Feedback!",
   "sources": {
     "DAA": "Richtlinien zur Beitragsunterstellung in der AHV",
+    "DIN": "Richtlinien zu den Beiträgen der Selbstständigen",
+    "DSD": "Richtlinien zum massgebenden Lohn",
     "ahv_iv_mementos": "AHV/IV-Merkblätter",
     "eak_lernbaustein": "Lernbaustein",
     "akis": "AKIS Online-Hilfe",
@@ -154,6 +156,8 @@
   },
   "tags": {
     "daa": "DAA",
+    "din": "DIN",
+    "dsd": "DSD",
     "CSC - Adhésion": "CSC - Mitgliedschaft",
     "CSC - Cas de sortie": "CSC - Austrittsfall",
     "CSC - Contentieux": "CSC - Streitfall",

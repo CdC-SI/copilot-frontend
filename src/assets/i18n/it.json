@@ -139,6 +139,8 @@
   "feedback.success": "Grazie per il tuo feedback!",
   "sources": {
     "DAA": "Direttive di assoggettamento all’AVS",
+    "DIN": "Direttive sui contributi degli indipendenti",
+    "DSD": "Direttive sul salario determinante",
     "ahv_iv_mementos": "AVS/AI Opuscoli",
     "eak_lernbaustein": "Guida all'apprendimento",
     "akis": "AKIS Aiuto Online",
@@ -154,6 +156,8 @@
   },
   "tags": {
     "daa": "DAA",
+    "din": "DIN",
+    "dsd": "DSD",
     "CSC - Adhésion": "CSC - Adesione",
     "CSC - Cas de sortie": "CSC - Caso di uscita",
     "CSC - Contentieux": "CSC - Contenzioso",

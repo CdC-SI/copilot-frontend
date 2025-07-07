@@ -139,6 +139,8 @@
   "feedback.success": "Merci pour votre retour !",
   "sources": {
     "DAA": "Directives d’assujettissement à l’AVS",
+    "DIN": "Directives sur les cotisations des indépendants",
+    "DSD": "Directives sur le salaire déterminant",
     "ahv_iv_mementos": "AVS/AI Mémentos",
     "eak_lernbaustein": "Guide d'apprentissage",
     "akis": "AKIS Aide En-Ligne",
@@ -154,6 +156,8 @@
   },
   "tags": {
     "daa": "DAA",
+    "din": "DIN",
+    "dsd": "DSD",
     "CSC - Adhésion": "CSC - Adhésion",
     "CSC - Cas de sortie": "CSC - Cas de sortie",
     "CSC - Contentieux": "CSC - Contentieux",
