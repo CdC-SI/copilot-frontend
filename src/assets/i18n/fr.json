@@ -127,6 +127,7 @@
   "create.copilot.account": "Créer un compte ZAS/EAK CopilotGPT",
   "login.copilot.account": "Se connecter à un compte ZAS/EAK CopilotGPT",
   "login.fail": "Utilisateur ou mot de passe incorrect",
+  "chat_history": "Historique",
   "parameters.title": "Paramètres",
   "parameters.tags": "Tags",
   "parameters.sources": "Sources",
