@@ -8,6 +8,7 @@ import {SettingsType} from '../../model/settings';
 import {SettingsEventService} from '../../services/settings-event.service';
 import {UserStatus} from '../../model/user';
 import {AuthenticationServiceV2} from '../../services/auth.service';
+import {MatSelectChange} from '@angular/material/select';
 
 @Component({
 	selector: 'zco-chat-configuration-edit',
@@ -79,12 +80,7 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 	}
 
 	loadDropdowns() {
-		this.settingsService.getSettings(SettingsType.TAG).subscribe(tags => {
-			this.TAGS = this.sortByTranslation(
-				tags.filter(tag => tag && tag !== ''),
-				'tags'
-			);
-		});
+		this.getTags();
 		this.settingsService.getSettings(SettingsType.SOURCE).subscribe(sources => {
 			this.SOURCES = this.sortByTranslation(
 				sources.filter(source => source && source !== ''),
@@ -138,6 +134,33 @@ export class ChatConfigurationEditComponent implements OnInit, OnDestroy, Contro
 
 	validate(): ValidationErrors | null {
 		return this.formGroup.valid ? null : {invalidForm: {valid: false}};
+	}
+
+	filterTags(event: MatSelectChange) {
+		const filterValue = event.value.join(',');
+		if (!filterValue) {
+			this.getTags();
+		} else {
+			this.getFilteredTags(filterValue);
+		}
+	}
+
+	private getTags() {
+		this.settingsService.getSettings(SettingsType.TAG).subscribe(tags => {
+			this.TAGS = this.sortByTranslation(
+				tags.filter(tag => tag && tag !== ''),
+				'tags'
+			);
+		});
+	}
+
+	private getFilteredTags(filterValue: string) {
+		this.settingsService.getFilteredTags(filterValue).subscribe(tags => {
+			this.TAGS = this.sortByTranslation(
+				tags.filter(tag => tag && tag !== ''),
+				'tags'
+			);
+		});
 	}
 
 	private sortByTranslation(items: string[], prefix: string): string[] {

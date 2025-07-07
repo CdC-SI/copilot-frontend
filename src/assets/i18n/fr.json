@@ -127,58 +127,28 @@
   "create.copilot.account": "Créer un compte ZAS/EAK CopilotGPT",
   "login.copilot.account": "Se connecter à un compte ZAS/EAK CopilotGPT",
   "login.fail": "Utilisateur ou mot de passe incorrect",
-  "chat_history": "Historique",
-  "parameters.advanced_llm_parameters": "Paramètres Avancés LLM",
-  "parameters.model": "Modèle",
-  "parameters.temperature": "Température",
-  "parameters.top_p": "Top P",
-  "parameters.advanced_retrieval_parameters": "Paramètres Avancés Recherche",
+  "parameters.title": "Paramètres",
   "parameters.tags": "Tags",
   "parameters.sources": "Sources",
-  "parameters.retrieval-methods": "Méthodes de récupération",
-  "parameters.k_retrieve": "K Retrieve",
-  "parameters.max_output_tokens": "Max Output Tokens",
-  "parameters.advanced_answer_format": "Paramètres de réponse",
   "parameters.response-style": "Style de réponse",
   "parameters.response-format": "Format de réponse",
-  "parameters.advanced_chat_parameters": "Paramètres Avancés Chat",
-  "parameters.memory": "K Mémoire",
-  "parameters.source_validation": "Validation des sources",
-  "parameters.topic_check": "Validation des requêtes",
-  "parameters.autocomplete": "Auto-complétion",
-  "parameters.rag": "RAG",
-  "parameters.agentic_rag": "Agentic RAG",
   "feedback.comment": "Pourquoi cette réponse n’est-elle pas satisfaisante ?",
   "feedback.comment.placeholder": "Ajoutez un commentaire...",
   "send": "Envoyer",
   "feedback.success": "Merci pour votre retour !",
-  "concise": "Concis",
-  "detailed": "Détaillé",
-  "plain": "Simple (B1)",
-  "easy": "Facile (A2)",
-  "legal": "Juridique",
-  "condensed": "Condensé",
-  "complete": "Complet",
-  "retrievers": {
-    "top_k_retriever": "Top K",
-    "query_rewriting_retriever": "Query Rewriting",
-    "contextual_compression_retriever": "Contextual Compression",
-    "rag_fusion_retriever": "RAG Fusion",
-    "bm25": "BM25",
-    "reranking": "Reranking"
-  },
   "sources": {
     "DAA": "Directives d’assujettissement à l’AVS",
-    "ahv_iv_memento": "AVS/AI Mémentos",
-    "ahv_lernbaustein_2024": "Guide d'apprentissage AVS 2024",
+    "ahv_iv_mementos": "AVS/AI Mémentos",
+    "eak_lernbaustein": "Guide d'apprentissage",
     "akis": "AKIS Aide En-Ligne",
     "bsv": "bsv.admin.ch",
-    "eak": "eak.admin.ch",
+    "eak_website": "eak.admin.ch",
     "fedlex": "Fedlex",
-    "practical_guide_eak_fz": "Guide Pratique AFam",
+    "praxisleitfaden_fz": "Guide Pratique AFam",
     "sozialversicherungen": "sozialversicherungen.admin.ch",
     "user_pdf_upload": "PDF Utilisateur:",
     "user_edit": "SurveyPipeline - Saisie utilisateur",
+    "lavs": "LAVS",
     "csc_afac": "CSC Assurance Facultative"
   },
   "tags": {
@@ -212,7 +182,9 @@
     "annual_modifications": "Modifications annuelles",
     "hearing_aids": "Appareils auditifs",
     "akis_online_help": "AKIS Aide En Ligne",
-    "lavs": "LAVS"
+    "lavs": "LAVS",
+    "eak_lernbaustein": "Guide d'apprentissage",
+    "praxisleitfaden_fz": "Guide Pratique AFam"
   },
   "legal_basis": {
     "tos": "Conditions d'utilisation",
@@ -231,7 +203,18 @@
       "explain": "Explique moi en language simple le concept de ",
       "reformulate": "Reformule moi ton dernier message en language simple",
       "draft": "Aide moi à rédiger un texte sur ",
-      "ii-salary": "Voici les informations nécessaires au calcul :\n1. Année d’éligibilité : 2022\n2. Genre : homme/femme\n3.Salaire effectif avant l’atteinte à la santé :\n\t- Montant : 100 000 CHF\n\t- Année du dernier salaire effectif : 2022\n4. Niveau de compétence avant l’atteinte à la santé : 1/2/3/4\n5. Branche économique avant l’atteinte à la santé : 01-96\n6. Salaire effectif après l’atteinte à la santé :\n\t- Montant : 90 000 CHF\n\t- Année du dernier salaire effectif : 2023\n7. Niveau de compétence après l’atteinte à la santé : 1/2/3/4\n8. Branche économique après l’atteinte à la santé : 01-96\n9. Taux d’activité avant l’atteinte à la santé : 100%\n10. Réduction du taux d’activité après l’atteinte à la santé : 15%\n11. Autres déductions : 0%"
+      "more": ""
     }
+  },
+  "style": {
+    "CONCISE": "Concis",
+    "DETAILED": "Détaillé",
+    "PLAIN": "Simple (B1)",
+    "EASY": "Facile (A2)",
+    "LEGAL": "Juridique"
+  },
+  "format": {
+    "CONDENSED": "Condensé",
+    "COMPLETE": "Complet"
   }
 }
