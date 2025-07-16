@@ -2,8 +2,7 @@ import {Injectable} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable} from 'rxjs';
-import {AuthenticationServiceV2} from './auth.service';
-import {EnvironmentService} from 'zas-design-system';
+import {TokenService} from './token.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -11,16 +10,15 @@ import {EnvironmentService} from 'zas-design-system';
 export class RagService {
 	constructor(
 		private readonly config: ConfigurationService,
-		private readonly authService: AuthenticationServiceV2,
-		private readonly environmentService: EnvironmentService
+		private readonly tokenService: TokenService
 	) {}
 
 	process(ragRequest: ChatRequest): Observable<string> {
 		const headers = new Headers({'Content-Type': 'application/json', Accept: 'text/event-stream'});
-		const token = this.environmentService.getIsLocalhostEnvironment() ? this.environmentService.getMockToken() : this.authService.jwtToken;
+		const token = this.tokenService.blueToken;
 
 		if (token) {
-			headers.append('Blue', `Bearer ${token}`);
+			headers.append('Blue', token.value);
 		}
 		return new Observable<string>(observer => {
 			fetch(this.config.backendApi('/conversations'), {

@@ -1,15 +1,7 @@
 <ng-container [formGroup]="formGroup">
 	<mat-form-field obErrorMessages>
-		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
-		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
-			<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ "tags." + tag | translate }}</mat-option>
-		</mat-select>
-		<mat-error></mat-error>
-	</mat-form-field>
-
-	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.sources" | translate }}</mat-label>
-		<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple>
+		<mat-select [formControlName]="FORM_FIELDS.SOURCES" multiple (selectionChange)="filterTags($event)">
 			<mat-option *ngFor="let source of SOURCES" [value]="source">
 				<ng-container *ngIf="isUserPdfUpload(source); else regularSource">
 					{{ "sources.user_pdf_upload" | translate }} {{ getUserPdfFilename(source) }}
@@ -23,9 +15,17 @@
 	</mat-form-field>
 
 	<mat-form-field obErrorMessages>
+		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
+		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
+			<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ "tags." + tag | translate }}</mat-option>
+		</mat-select>
+		<mat-error></mat-error>
+	</mat-form-field>
+
+	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.response-style" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_STYLE">
-			<mat-option *ngFor="let style of RESPONSE_STYLE" [value]="style">{{ style | translate }}</mat-option>
+			<mat-option *ngFor="let style of RESPONSE_STYLE" [value]="style">{{ "style." + style | translate }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
@@ -33,7 +33,7 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.response-format" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.RESPONSE_FORMAT">
-			<mat-option *ngFor="let style of RESPONSE_FORMAT" [value]="style">{{ style | translate }}</mat-option>
+			<mat-option *ngFor="let format of RESPONSE_FORMAT" [value]="format">{{ "format." + format | translate }}</mat-option>
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>

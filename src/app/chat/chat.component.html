@@ -93,7 +93,7 @@
 	<div column-right-content class="h100">
 		<mat-card class="configuration-card">
 			<mat-card-header>
-				<mat-card-title class="mt16">{{ "Paramètres" | translate }}</mat-card-title>
+				<mat-card-title class="mt16">{{ "parameters.title" | translate }}</mat-card-title>
 			</mat-card-header>
 			<mat-card-content>
 				<zco-chat-configuration-edit [formControl]="chatConfigCtrl"></zco-chat-configuration-edit>
@@ -101,3 +101,23 @@
 		</mat-card>
 	</div>
 </ob-column-layout>
+
+<ng-template #userNotRegisteredTriesToChatDialog>
+	<h2 mat-dialog-title>{{ "copilot.register.info.title" | translate }}</h2>
+	<div mat-dialog-content>
+		<p>{{ "copilot.register.info.text.1" | translate }}</p>
+		<p>{{ "copilot.register.info.text.2" | translate }}</p>
+		<p>
+			{{ "copilot.register.info.text.3" | translate }}
+			<mat-icon svgIcon="user-pen" style="color: blue !important" />
+		</p>
+	</div>
+</ng-template>
+
+<ng-template #userPendingTriesToChatDialog>
+	<h2 mat-dialog-title>{{ "copilot.pending.info.title" | translate }}</h2>
+	<div mat-dialog-content>
+		<p>{{ "copilot.pending.info.text.1" | translate }}</p>
+		<p>{{ "copilot.pending.info.text.2" | translate }}</p>
+	</div>
+</ng-template>
