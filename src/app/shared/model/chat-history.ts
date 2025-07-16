@@ -13,5 +13,14 @@ export interface ChatHistoryMessage {
 	timestamp: Date;
 	language: string;
 	faqItemId?: number;
-	sources?: string[];
+	sources?: MessageSource[];
+	suggestions?: string[];
+}
+
+export interface MessageSource {
+	type: string;
+	link: string;
+	pageNumber?: string;
+	subsection?: string;
+	version?: string;
 }

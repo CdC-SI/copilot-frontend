@@ -1,4 +1,4 @@
-<ob-column-layout class="h100" [left]="isAuthenticated()" [right]="isAuthenticated()">
+<ob-column-layout class="h100" [left]="isRegistered()" [right]="isRegistered()">
 	<div column-left-content class="h100">
 		<mat-card class="history-card">
 			<mat-card-header class="flex-row aic jcsb">
@@ -8,7 +8,12 @@
 				</button>
 			</mat-card-header>
 			<mat-card-content>
-				<zco-chat-history *ngIf="isAuthenticated()" [titles]="conversationTitles" (conversationSelected)="selectConversation($event)"></zco-chat-history>
+				<zco-chat-history
+					*ngIf="isRegistered()"
+					[titles]="conversationTitles"
+					(conversationSelected)="selectConversation($event)"
+					(conversationDeleted)="deleteConversation($event)"
+				></zco-chat-history>
 			</mat-card-content>
 		</mat-card>
 	</div>
@@ -41,19 +46,30 @@
 				</div>
 			</div>
 		</div>
+		<zco-dynamic-form
+			class="form-container"
+			*ngIf="activeForm"
+			[def]="activeForm.def"
+			[form]="activeForm.group"
+			(submitted)="onFormSubmit()"
+			(closeForm)="onCloseForm()"
+		></zco-dynamic-form>
 		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
 		<zco-action-suggestions
-			*ngIf="isAuthenticated()"
-			(actionSelected)="handleSuggestionAction($event)">
+			*ngIf="isRegistered() && !activeForm"
+			[suggestions]="defaultSuggestions.concat(specificSuggestions || [])"
+			(actionSelected)="handleSuggestionAction($event)"
+		>
 		</zco-action-suggestions>
-		<form class="question-container" ngForm>
+		<form *ngIf="!activeForm" class="question-container" ngForm>
 			<ut-autocomplete-input
+				*ngIf="!displayTextArea"
 				class="mr8"
 				[required]="false"
 				[i18nLabel]="'enter.message'"
 				[optionLabelFn]="searchOptionLabelFn"
 				[inputLabelFn]="searchOptionLabelFn"
-				[optionService]="isCommandMode ? getCommandSuggestions : getSearchProposalFunction"
+				[optionService]="getOptionService()"
 				[minLength]="0"
 				[formControl]="searchCtrl"
 				(optionSelected)="handleOptionSelected($event)"
@@ -64,11 +80,11 @@
 				<mat-icon svgIcon="paper-plane"></mat-icon>
 			</button>
 
-			<button type="button" mat-icon-button (click)="clearChat()" [obButton]="'secondary'">
+			<button type="button" mat-icon-button (click)="clearSearch()" [obButton]="'secondary'">
 				<mat-icon svgIcon="trash"></mat-icon>
 			</button>
 
-			<button *ngIf="isAuthenticated()" type="button" mat-icon-button (click)="uploadDoc()" [obButton]="'secondary'">
+			<button *ngIf="isRegistered()" type="button" mat-icon-button (click)="uploadDoc()" [obButton]="'secondary'">
 				<mat-icon svgIcon="upload"></mat-icon>
 			</button>
 		</form>
@@ -77,7 +93,7 @@
 	<div column-right-content class="h100">
 		<mat-card class="configuration-card">
 			<mat-card-header>
-				<mat-card-title class="mt16">{{ "Paramètres" | translate }}</mat-card-title>
+				<mat-card-title class="mt16">{{ "parameters.title" | translate }}</mat-card-title>
 			</mat-card-header>
 			<mat-card-content>
 				<zco-chat-configuration-edit [formControl]="chatConfigCtrl"></zco-chat-configuration-edit>
@@ -85,3 +101,23 @@
 		</mat-card>
 	</div>
 </ob-column-layout>
+
+<ng-template #userNotRegisteredTriesToChatDialog>
+	<h2 mat-dialog-title>{{ "copilot.register.info.title" | translate }}</h2>
+	<div mat-dialog-content>
+		<p>{{ "copilot.register.info.text.1" | translate }}</p>
+		<p>{{ "copilot.register.info.text.2" | translate }}</p>
+		<p>
+			{{ "copilot.register.info.text.3" | translate }}
+			<mat-icon svgIcon="user-pen" style="color: blue !important" />
+		</p>
+	</div>
+</ng-template>
+
+<ng-template #userPendingTriesToChatDialog>
+	<h2 mat-dialog-title>{{ "copilot.pending.info.title" | translate }}</h2>
+	<div mat-dialog-content>
+		<p>{{ "copilot.pending.info.text.1" | translate }}</p>
+		<p>{{ "copilot.pending.info.text.2" | translate }}</p>
+	</div>
+</ng-template>

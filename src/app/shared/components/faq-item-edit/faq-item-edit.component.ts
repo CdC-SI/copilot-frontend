@@ -5,8 +5,9 @@ import {Subject, takeUntil} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
-import {UserService} from '../../services/user.service';
 import {SettingsEventService} from '../../services/settings-event.service';
+import {AuthenticationServiceV2} from '../../services/auth.service';
+import {UserStatus} from '../../model/user';
 
 @Component({
 	selector: 'zco-faq-item-edit',
@@ -39,8 +40,8 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 		private readonly fb: FormBuilder,
 		private readonly translateService: TranslateService,
 		private readonly settingsService: SettingsService,
-		private readonly userService: UserService,
-		private readonly settingsEventService: SettingsEventService
+		private readonly settingsEventService: SettingsEventService,
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	ngOnInit(): void {
@@ -55,8 +56,10 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 
 		this.loadTags();
 
-		this.userService.userLoggedIn.pipe(takeUntil(this.destroyed$)).subscribe(() => {
-			this.loadTags();
+		this.authService.$authenticatedUser.pipe(takeUntil(this.destroyed$)).subscribe(user => {
+			if (user && user.status === UserStatus.ACTIVE) {
+				this.loadTags();
+			}
 		});
 
 		this.settingsEventService.settingsNeedRefresh.pipe(takeUntil(this.destroyed$)).subscribe(() => {

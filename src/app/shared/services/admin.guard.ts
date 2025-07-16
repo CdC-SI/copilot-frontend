@@ -1,6 +1,7 @@
 import {ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {Injectable, inject} from '@angular/core';
-import {UserService} from './user.service';
+import {AuthenticationServiceV2} from './auth.service';
+import {UserStatus} from '../model/user';
 
 @Injectable({
 	providedIn: 'root'
@@ -8,10 +9,13 @@ import {UserService} from './user.service';
 class PermissionService {
 	constructor(
 		private readonly router: Router,
-		private readonly userService: UserService
+		private readonly authService: AuthenticationServiceV2
 	) {}
 	canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
-		if ((state.url === '/admin' || state.url === '/tips') && !this.userService.isAuthenticatedAsAdmin()) {
+		if (
+			(state.url.startsWith('/admin') || state.url.startsWith('/tips')) &&
+			(!this.authService.hasAdminRole() || this.authService.userStatus() !== UserStatus.ACTIVE)
+		) {
 			return this.router.createUrlTree(['/chat']);
 		}
 

@@ -1,0 +1,65 @@
+<form class="dynamic-form mat-typography" [ngClass]="def.cssClass" [formGroup]="form" (ngSubmit)="submit()" (keydown.escape)="onEscape()">
+	<button mat-icon-button type="button" class="close-btn" (click)="onEscape()" aria-label="Close">
+		<mat-icon svgIcon="cancel-circle"></mat-icon>
+	</button>
+	<mat-accordion class="section-accordion" multi *ngIf="def.sections; else flat">
+		<mat-expansion-panel *ngFor="let s of def.sections; let idx = index" [ngClass]="s.cssClass || 'section-wrapper'" [expanded]="s.expanded ?? idx === 0">
+			<mat-expansion-panel-header>
+				<mat-panel-title>
+					{{ s.title || "Section " + (idx + 1) }}
+				</mat-panel-title>
+			</mat-expansion-panel-header>
+			<div class="section-grid">
+				<ng-container *ngFor="let c of s.controls">
+					<mat-form-field appearance="outline" [ngSwitch]="c.type" [ngClass]="c.extraClass">
+						<mat-label>{{ c.label }}</mat-label>
+
+						<input *ngSwitchCase="'text'" matInput [formControlName]="c.key" />
+						<input *ngSwitchCase="'number'" matInput type="number" [formControlName]="c.key" />
+						<ng-container *ngSwitchCase="'date'">
+							<input matInput [matDatepicker]="picker" [formControlName]="c.key" />
+							<mat-datepicker-toggle matSuffix [for]="picker" />
+							<mat-datepicker #picker></mat-datepicker>
+						</ng-container>
+						<textarea *ngSwitchCase="'textarea'" matInput rows="3" [formControlName]="c.key"></textarea>
+						<mat-select *ngSwitchCase="'select'" [formControlName]="c.key">
+							<mat-option *ngFor="let option of c.options" [value]="option.value">
+								{{ option.label }}
+							</mat-option>
+						</mat-select>
+
+						<mat-error *ngIf="form.get(c.key)?.invalid && form.touched">{{ c.validationMessage }}</mat-error>
+					</mat-form-field>
+				</ng-container>
+			</div>
+		</mat-expansion-panel>
+	</mat-accordion>
+
+	<ng-template #flat>
+		<div class="section-grid">
+			<ng-container *ngFor="let c of def.controls">
+				<mat-form-field appearance="outline" [ngSwitch]="c.type" [ngClass]="c.extraClass">
+					<mat-label>{{ c.label }}</mat-label>
+
+					<input *ngSwitchCase="'text'" matInput [formControlName]="c.key" />
+					<input *ngSwitchCase="'number'" matInput type="number" [formControlName]="c.key" />
+					<ng-container *ngSwitchCase="'date'">
+						<input matInput [matDatepicker]="pickerFlat" [formControlName]="c.key" />
+						<mat-datepicker-toggle matSuffix [for]="pickerFlat" />
+						<mat-datepicker #pickerFlat></mat-datepicker>
+					</ng-container>
+					<textarea *ngSwitchCase="'textarea'" matInput rows="3" [formControlName]="c.key"></textarea>
+					<mat-select *ngSwitchCase="'select'" [formControlName]="c.key">
+						<mat-option *ngFor="let option of c.options" [value]="option.value">
+							{{ option.label }}
+						</mat-option>
+					</mat-select>
+
+					<mat-error *ngIf="form.get(c.key)?.invalid && form.touched"> Champ requis </mat-error>
+				</mat-form-field>
+			</ng-container>
+		</div>
+	</ng-template>
+
+	<button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="!form.valid">Envoyer</button>
+</form>

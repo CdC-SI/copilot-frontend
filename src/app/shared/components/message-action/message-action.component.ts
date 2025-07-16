@@ -7,8 +7,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
 import {ChatMessage} from '../../model/chat-message';
 import {FaqItemsService} from '../../services/faq-items.service';
-import {UserService} from '../../services/user.service';
 import {Feedback} from '../../model/feedback';
+import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
 	selector: 'zco-message-action',
@@ -31,7 +31,7 @@ export class MessageActionComponent {
 		private readonly dialog: MatDialog,
 		private readonly faqItemsService: FaqItemsService,
 		private readonly notif: ObNotificationService,
-		private readonly userService: UserService
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	speak = (): void => {
@@ -86,7 +86,7 @@ export class MessageActionComponent {
 	}
 
 	authenticatedAsAdmin() {
-		return this.userService.isAuthenticatedAsAdmin();
+		return this.authService.hasAdminRole();
 	}
 
 	positiveFeedback() {

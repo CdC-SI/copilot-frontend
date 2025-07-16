@@ -31,6 +31,10 @@
 		scrollbar-width: none;
 	}
 
+	.form-container {
+		width: 90%;
+	}
+
 	.question-container {
 		background-color: palette.$ob-secondary-50;
 		display: flex;
@@ -43,8 +47,13 @@
 			margin-left: 4px;
 		}
 
-		ut-autocomplete-input {
+		ut-autocomplete-input, textarea {
 			width: 50vw;
+		}
+
+		textarea {
+			margin-bottom: 20px;
+			height: 100px;
 		}
 	}
 

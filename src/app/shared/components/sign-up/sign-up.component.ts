@@ -1,9 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {UserFormFields} from '../../model/user';
 import {MatDialogRef} from '@angular/material/dialog';
-import {SettingsService} from '../../services/settings.service';
-import {SettingsType} from '../../model/settings';
+import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
 	selector: 'zco-sign-up',
@@ -12,57 +11,39 @@ import {SettingsType} from '../../model/settings';
 })
 export class SignUpComponent implements OnInit {
 	FORM_FIELDS = UserFormFields;
-	ORGANIZATION: string[] = [];
 	userFrmGrp: FormGroup;
+	userIsFromZas: boolean = true;
 
 	constructor(
 		private readonly fb: FormBuilder,
-		private readonly settingsService: SettingsService,
+		private readonly authService: AuthenticationServiceV2,
 		public dialogRef: MatDialogRef<SignUpComponent>
 	) {}
 
 	ngOnInit() {
 		this.buildForm();
-		this.loadOrganizations();
-	}
-
-	loadOrganizations() {
-		this.settingsService.getSettings(SettingsType.ORGANIZATION).subscribe(organization => {
-			this.ORGANIZATION = organization;
-		});
 	}
 
 	buildForm() {
-		this.userFrmGrp = this.fb.group(
-			{
-				[UserFormFields.PASSWORD]: ['', Validators.required],
-				[UserFormFields.USERNAME]: ['', Validators.required],
-				[UserFormFields.CONFIRM_PASSWORD]: ['', Validators.required],
-				[UserFormFields.ORGANIZATION]: [[], Validators.required],
-				[UserFormFields.CONFIDENTIALITY]: [false, Validators.requiredTrue],
-				[UserFormFields.GCU]: [false, Validators.requiredTrue]
-			},
-			{validators: this.customPasswordMatching.bind(this)}
-		);
-	}
-
-	public customPasswordMatching(control: AbstractControl): ValidationErrors | null {
-		const password = control.get(UserFormFields.PASSWORD)?.value;
-		const confirmPassword = control.get(UserFormFields.CONFIRM_PASSWORD)?.value;
-		return password === confirmPassword ? null : {passwordMismatchError: true};
-	}
-
-	onCancelClick(): void {
-		this.dialogRef.close('');
+		this.userFrmGrp = this.fb.group({
+			[UserFormFields.FIRSTNAME]: [this.authService.$authenticatedUser.getValue()?.firstName, Validators.required],
+			[UserFormFields.LASTNAME]: [this.authService.$authenticatedUser.getValue()?.lastName, Validators.required],
+			[UserFormFields.CONFIDENTIALITY]: [false, Validators.requiredTrue],
+			[UserFormFields.GCU]: [false, Validators.requiredTrue]
+		});
 	}
 
 	onConfirmClick(): void {
 		const formValue = this.userFrmGrp.getRawValue();
 		const requestBody = {
-			username: formValue[UserFormFields.USERNAME],
-			password: formValue[UserFormFields.PASSWORD],
-			organizations: Array.isArray(formValue[UserFormFields.ORGANIZATION]) ? formValue[UserFormFields.ORGANIZATION] : [formValue[UserFormFields.ORGANIZATION]]
+			firstName: formValue[UserFormFields.FIRSTNAME],
+			lastName: formValue[UserFormFields.LASTNAME],
+			organizations: this.userIsFromZas ? ['ZAS'] : []
 		};
 		this.dialogRef.close(requestBody);
+	}
+
+	onToggleChange() {
+		this.userIsFromZas = !this.userIsFromZas;
 	}
 }

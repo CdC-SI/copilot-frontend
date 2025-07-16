@@ -5,6 +5,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {
 	OB_BANNER,
+	OB_PAMS_CONFIGURATION,
 	ObButtonModule,
 	ObExternalLinkModule,
 	ObHttpApiInterceptor,
@@ -25,7 +26,8 @@ import {ConfigurationService} from './core/app-configuration/configuration.servi
 import {ZCO_CONFIGURATIONS, ZCO_CONFIGURATIONS_TOKEN} from './core/app-configuration/configuration';
 import {SharedModule} from './shared/shared.module';
 import {AdminComponent} from './admin/admin.component';
-import {JwtInterceptor} from './shared/interceptors/jwt.interceptor';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {AuthenticationInterceptor} from './shared/interceptors/authentication-interceptor';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -37,6 +39,10 @@ function appInitializerFactory(configurationService: ConfigurationService) {
 
 function bannerFactory(configurationService: ConfigurationService) {
 	return configurationService.getEnvConfiguration().banner;
+}
+
+function pamsFactory(configurationService: ConfigurationService) {
+	return configurationService.getEnvConfiguration().pamsConfig;
 }
 
 @NgModule({
@@ -51,15 +57,17 @@ function bannerFactory(configurationService: ConfigurationService) {
 		HttpClientModule,
 		TranslateModule.forRoot(multiTranslateLoader()),
 		ObExternalLinkModule,
-		SharedModule
+		SharedModule,
+		MatProgressBar
 	],
 	providers: [
 		{provide: ZCO_CONFIGURATIONS_TOKEN, useValue: ZCO_CONFIGURATIONS},
-		{provide: LOCALE_ID, useValue: 'de-CH'},
+		{provide: LOCALE_ID, useValue: 'fr-CH'},
 		{provide: APP_INITIALIZER, useFactory: appInitializerFactory, deps: [ConfigurationService], multi: true},
 		{provide: OB_BANNER, useFactory: bannerFactory, deps: [ConfigurationService]},
+		{provide: OB_PAMS_CONFIGURATION, useFactory: pamsFactory, deps: [ConfigurationService]},
 		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true},
-		{provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true}
+		{provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true}
 	],
 	bootstrap: [AppComponent]
 })

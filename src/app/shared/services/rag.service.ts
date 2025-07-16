@@ -15,9 +15,10 @@ export class RagService {
 
 	process(ragRequest: ChatRequest): Observable<string> {
 		const headers = new Headers({'Content-Type': 'application/json', Accept: 'text/event-stream'});
-		const token = this.tokenService.getToken();
+		const token = this.tokenService.blueToken;
+
 		if (token) {
-			headers.append('Authorization', `Bearer ${token}`);
+			headers.append('Blue', token.value);
 		}
 		return new Observable<string>(observer => {
 			fetch(this.config.backendApi('/conversations'), {

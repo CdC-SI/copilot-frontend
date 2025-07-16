@@ -11,6 +11,12 @@ a {
     font-style: italic;
 }
 
+.no-margin {
+	::ng-deep p {
+		margin: 0 !important;
+	}
+}
+
 .sources-panel {
     margin-top: 1rem;
     background: $ob-light;
@@ -35,6 +41,7 @@ a {
         align-items: center;
         text-decoration: none;
         color: $ob-primary;
+		cursor: pointer;
 
         .source-icon {
             margin-right: 8px;

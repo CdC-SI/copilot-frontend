@@ -1,18 +1,19 @@
-import {ChangeDetectorRef, Component, OnInit, Renderer2} from '@angular/core';
-import {Observable, of} from 'rxjs'; // Add this import
+import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Observable, of} from 'rxjs';
 import {FaqItemsService} from '../shared/services/faq-items.service';
-import {FormControl} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
 import {
 	AGENT_TAG_REGEX,
 	ANCHOR_TAG_REGEX,
+	INTENT_TAG_REGEX,
 	MESSAGE_ID_REGEX,
 	OFF_TOPIC_REGEX,
 	RETRIEVING_TAG_REGEX,
 	ROUTING_TAG_REGEX,
-	INTENT_TAG_REGEX,
 	SOURCE_TAG_REGEX,
+	SUGGESTION_TAG_REGEX,
 	TAGS_TAG_REGEX,
 	TOOL_TAG_REGEX,
 	TOPIC_CHECK_REGEX,
@@ -20,8 +21,7 @@ import {
 } from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {UserService} from '../shared/services/user.service';
-import {ChatHistoryMessage, ChatTitle} from '../shared/model/chat-history';
+import {ChatHistoryMessage, ChatTitle, MessageSource} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -30,6 +30,11 @@ import {ObNotificationService} from '@oblique/oblique';
 import {Command, CommandService} from '../shared/services/command.service';
 import {UploadService} from '../shared/services/upload.service';
 import {SettingsEventService} from '../shared/services/settings-event.service';
+import {UserStatus} from '../shared/model/user';
+import {AuthenticationServiceV2} from '../shared/services/auth.service';
+import {ActionId, FormDef} from '../shared/model/form-definition';
+import {DynamicFormService} from '../shared/services/dynamic-form.service';
+import {MatDialog} from '@angular/material/dialog';
 
 type AutocompleteType = IQuestion | Command;
 
@@ -46,6 +51,19 @@ export class ChatComponent implements OnInit {
 	conversationTitles: ChatTitle[] = [];
 	currentConversation: ChatTitle;
 	isCommandMode = false;
+	displayTextArea = false;
+	defaultSuggestions = [
+		{text: 'action_suggestions.translate', action: 'translate'},
+		{text: 'action_suggestions.summarize', action: 'summarize'},
+		{text: 'action_suggestions.explain', action: 'explain'},
+		{text: 'action_suggestions.reformulate', action: 'reformulate'},
+		{text: 'action_suggestions.draft', action: 'draft'}
+	];
+	specificSuggestions: {text: string; action: string}[] = [];
+	activeForm?: {def: FormDef; group: FormGroup};
+
+	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
+	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -53,16 +71,17 @@ export class ChatComponent implements OnInit {
 		private readonly autocompleteService: FaqItemsService,
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
-		private readonly renderer: Renderer2,
 		private readonly speechService: SpeechService,
-		private readonly userService: UserService,
+		private readonly authService: AuthenticationServiceV2,
 		private readonly conversationService: ConversationService,
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
 		private readonly notif: ObNotificationService,
 		private readonly commandService: CommandService,
 		private readonly uploadService: UploadService,
-		private readonly settingsEventService: SettingsEventService
+		private readonly settingsEventService: SettingsEventService,
+		private readonly dfs: DynamicFormService,
+		private readonly dialog: MatDialog
 	) {}
 
 	ngOnInit() {
@@ -71,32 +90,20 @@ export class ChatComponent implements OnInit {
 				message.beingSpoken = false;
 			});
 		});
-		if (this.isAuthenticated()) {
-			this.getConversationTitles();
-		}
-		this.userService.userLoggedIn.subscribe(() => {
-			this.getConversationTitles();
+		this.authService.$authenticatedUser.subscribe(user => {
+			if (user && user.status === UserStatus.ACTIVE) {
+				this.getConversationTitles();
+			}
 		});
 	}
 
-	isAuthenticated(): boolean {
-		return this.userService.isAuthenticated();
+	isRegistered(): boolean {
+		return this.authService.isRegistered();
 	}
 
-	closeRightPanel() {
-		const element = document.querySelector('.ob-column-right');
-		if (element) {
-			this.renderer.addClass(element, 'ob-collapsed');
-		}
+	getOptionService() {
+		return this.isCommandMode ? this.getCommandSuggestions : this.currentConversation ? () => of([]) : this.getSearchProposalFunction;
 	}
-
-	getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
-		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
-	};
-
-	getCommandSuggestions = (text: string): Observable<Command[]> => {
-		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
-	};
 
 	searchOptionLabelFn = (option: AutocompleteType): string => {
 		if (this.isCommandMode && 'name' in option) {
@@ -123,7 +130,7 @@ export class ChatComponent implements OnInit {
 			question.language,
 			question.id,
 			question.url,
-			question.url ? [question.url] : undefined
+			question.url ? [{type: this.getSourceType(question.url), link: question.url}] : undefined
 		);
 		this.clearSearch();
 		this.scrollToBottom();
@@ -132,6 +139,7 @@ export class ChatComponent implements OnInit {
 
 	clearSearch(): void {
 		this.searchCtrl.setValue('');
+		this.displayTextArea = false;
 	}
 
 	disableSearch(): void {
@@ -142,23 +150,25 @@ export class ChatComponent implements OnInit {
 		this.searchCtrl.enable();
 	}
 
-	clearChat(): void {
-		this.messages = [];
-	}
-
 	newChat(): void {
 		if (this.currentConversation) this.currentConversation.selected = false;
 		this.currentConversation = null;
-		this.clearChat();
+		this.messages = [];
+		this.specificSuggestions = [];
 	}
 
 	sendToLLM(): void {
+		if (!this.isRegistered()) {
+			this.showDialog();
+			return;
+		}
+
 		const inputText = this.searchCtrl.value;
-		const commandData = this.commandService.parseCommand(inputText);
 
 		this.addMessage(ChatMessageSource.USER, inputText);
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
+		this.specificSuggestions = [];
 
 		const languageMap: Record<string, Language> = {
 			de: Language.DE,
@@ -173,13 +183,7 @@ export class ChatComponent implements OnInit {
 			query: inputText,
 			conversationId: this.currentConversation?.conversationId,
 			...this.chatConfigCtrl.value,
-			language: mappedLanguage,
-			command: commandData?.command || null,
-			commandArgs: commandData?.args || null,
-			rag: commandData ? false : this.chatConfigCtrl.value?.rag || false,
-			agenticRag: commandData ? false : this.chatConfigCtrl.value?.agenticRag || false,
-			sourceValidation: this.chatConfigCtrl.value?.sourceValidation || false,
-			topicCheck: this.chatConfigCtrl.value?.topicCheck || false
+			language: mappedLanguage
 		};
 
 		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
@@ -300,11 +304,24 @@ export class ChatComponent implements OnInit {
 		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
 			// Only store the URL
 			const sourceUrl = sourceMatch[1];
-			if (!partialChatMessage.sources.includes(sourceUrl)) {
-				partialChatMessage.sources.push(sourceUrl);
-			}
+			const sourceFile = sourceMatch[2];
+			const pageNumber = sourceMatch[3];
+			const subSection = sourceMatch[4];
+			const version = sourceMatch[5];
+
+			const source: MessageSource = sourceUrl
+				? {type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version}
+				: {type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
+			partialChatMessage.sources.push(source);
+
 			// Remove entire source tag from message
 			partialChatMessage.message = partialChatMessage.message.replace(sourceMatch[0], '');
+		}
+
+		const suggestionMatch = SUGGESTION_TAG_REGEX.exec(partialChatMessage.message);
+		if (suggestionMatch) {
+			partialChatMessage.message = partialChatMessage.message.replace(SUGGESTION_TAG_REGEX, '');
+			this.specificSuggestions.push({text: `action_suggestions.${suggestionMatch[1]}`, action: suggestionMatch[1]});
 		}
 
 		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
@@ -327,7 +344,7 @@ export class ChatComponent implements OnInit {
 		lang?: Language,
 		faqItemId?: number,
 		url?: string,
-		sources?: string[]
+		sources?: MessageSource[]
 	) {
 		this.messages.push({
 			faqItemId,
@@ -356,9 +373,21 @@ export class ChatComponent implements OnInit {
 		this.conversationService.getConversation(conversation.conversationId).subscribe(messages => {
 			this.currentConversation = conversation;
 			this.messages = messages.map(this.historyMessageToChatMessage);
+			this.specificSuggestions = this.messages[this.messages.length - 1].suggestions?.map(suggestion => {
+				return {text: `action_suggestions.${suggestion}`, action: suggestion};
+			});
 			this.scrollToBottom();
 		});
 	}
+
+	deleteConversation(conversation: ChatTitle) {
+		if (conversation.conversationId === this.currentConversation?.conversationId) {
+			this.currentConversation = null;
+			this.messages = [];
+			this.specificSuggestions = [];
+		}
+	}
+
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
 			this.conversationTitles = conversations;
@@ -370,7 +399,6 @@ export class ChatComponent implements OnInit {
 			this.notif.success('feedback.success');
 		});
 	}
-
 	uploadDoc(): void {
 		const fileInput = document.createElement('input');
 		fileInput.type = 'file';
@@ -379,7 +407,7 @@ export class ChatComponent implements OnInit {
 		fileInput.onchange = (e: Event) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (file) {
-				this.uploadService.uploadPdf(file, this.currentConversation?.conversationId).subscribe({
+				this.uploadService.uploadPersonalPdf(file, this.currentConversation?.conversationId).subscribe({
 					next: () => {
 						this.notif.success('upload.success');
 						this.settingsEventService.emitSettingsRefresh();
@@ -398,6 +426,42 @@ export class ChatComponent implements OnInit {
 		fileInput.click();
 	}
 
+	handleSuggestionAction(action: string): void {
+		if (action === 'ii-salary') {
+			this.activeForm = this.dfs.buildForm(ActionId.II_CALCUL);
+			const lastAssistant = this.messages[this.messages.length - 1];
+			const patch = this.dfs.parseAssistantMessage(this.activeForm.def, lastAssistant.message);
+			this.activeForm.group.patchValue(patch, {emitEvent: false});
+		} else {
+			const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
+			this.searchCtrl.setValue(prefix);
+		}
+	}
+
+	onFormSubmit() {
+		const {def, group} = this.activeForm;
+		const raw = group.getRawValue();
+		const message = this.dfs.hydrate(def, raw);
+		this.activeForm = undefined;
+		this.searchCtrl.setValue(message);
+		this.sendToLLM();
+	}
+
+	onCloseForm() {
+		this.activeForm = undefined;
+	}
+
+	private getSourceType(url: string) {
+		return url.startsWith('http') ? 'URL' : 'FILE';
+	}
+
+	private readonly getCommandSuggestions = (text: string): Observable<Command[]> => {
+		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
+	};
+	private readonly getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
+		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
+	};
+
 	private historyMessageToChatMessage(historyMessage: ChatHistoryMessage): ChatMessage {
 		return {
 			id: historyMessage.messageId,
@@ -407,12 +471,13 @@ export class ChatComponent implements OnInit {
 			timestamp: historyMessage.timestamp,
 			lang: historyMessage.language,
 			faqItemId: historyMessage.faqItemId,
-			sources: historyMessage.sources
+			sources: historyMessage.sources,
+			suggestions: historyMessage.suggestions
 		};
 	}
 
 	private updateCurrentConversation() {
-		if (!this.isAuthenticated()) return;
+		if (!this.isRegistered()) return;
 		if (!this.currentConversation) {
 			this.conversationService.init(this.messages).subscribe(() => {
 				this.refreshConversations();
@@ -435,8 +500,11 @@ export class ChatComponent implements OnInit {
 		}, 1_500);
 	}
 
-	handleSuggestionAction(action: string): void {
-		const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
-		this.searchCtrl.setValue(prefix);
+	private showDialog() {
+		if (this.authService.userStatus() === UserStatus.GUEST) {
+			this.dialog.open(this.userNotRegisteredDialog);
+		} else {
+			this.dialog.open(this.userPendingTriesToChatDialog);
+		}
 	}
 }

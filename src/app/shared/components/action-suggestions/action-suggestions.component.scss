@@ -16,4 +16,11 @@
       transition: transform 0.2s ease;
     }
   }
+
+	.action-ii-salary {
+		animation-duration: .8s;
+		animation-name: blink;
+		animation-iteration-count: 5;
+		transition: none;
+	}
 }

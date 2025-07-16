@@ -2,19 +2,21 @@ import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
+import {IUser} from '../../shared/model/user';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ConfigurationService {
 	private envConfiguration: Configuration;
-
 	constructor(
 		@Inject(ZCO_CONFIGURATIONS_TOKEN) private readonly configurations: Configuration[],
 		@Inject(WINDOW) private readonly window: Window,
 		private readonly masterLayoutConfig: ObMasterLayoutConfig,
 		private readonly router: Router,
-		private readonly interceptorConfig: ObHttpApiInterceptorConfig
+		private readonly interceptorConfig: ObHttpApiInterceptorConfig,
+		private readonly http: HttpClient
 	) {}
 
 	preInitialize() {
@@ -41,12 +43,13 @@ export class ConfigurationService {
 		});
 
 		this.masterLayoutConfig.homePageRoute = '/chat';
-		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = false;
+		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = true;
 		this.masterLayoutConfig.header.serviceNavigation.displayLanguages = true;
 		this.masterLayoutConfig.header.serviceNavigation.displayProfile = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayInfo = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayMessage = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayApplications = false;
+		this.masterLayoutConfig.header.serviceNavigation.pamsAppId = this.getEnvConfiguration().pamsAppId;
 	}
 
 	getEnvConfiguration(): Configuration {

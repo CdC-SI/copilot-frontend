@@ -1,3 +1,5 @@
+import {MessageSource} from './chat-history';
+
 export interface ChatMessage {
 	id?: string;
 	faqItemId?: number;
@@ -13,7 +15,8 @@ export interface ChatMessage {
 	isValidating?: boolean;
 	isRouting?: boolean;
 	isAgent?: boolean;
-	sources?: string[];
+	sources?: MessageSource[];
+	suggestions?: string[];
 	isToolUse?: boolean;
 	isProcessingIntent?: boolean;
 	isProcessingSources?: boolean;

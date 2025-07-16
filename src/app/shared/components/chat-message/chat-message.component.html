@@ -1,5 +1,5 @@
 <div *ngIf="message.source === ChatMessageSource.USER">
-	{{ message.message }}
+	<markdown class="no-margin" [data]="message.message"></markdown>
 </div>
 <div *ngIf="message.source !== ChatMessageSource.USER">
 	<div class="flex-column">
@@ -10,11 +10,7 @@
 				<mat-panel-title> Sources ({{ sourcesCount }}) </mat-panel-title>
 			</mat-expansion-panel-header>
 
-			<div *ngFor="let source of message.sources" class="source-item">
-				<a [href]="source" target="_blank" class="source-link">
-					{{ source }}
-				</a>
-			</div>
+			<zco-source-list [sources]="message.sources"></zco-source-list>
 		</mat-expansion-panel>
 
 		<zco-message-action
