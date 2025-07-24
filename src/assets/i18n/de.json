@@ -157,7 +157,8 @@
     "user_pdf_upload": "PDF Benutzer:",
     "user_edit": "SurveyPipeline - Benutzereingabe",
     "lavs": "AHVG",
-    "csc_afac": "CSC - Freiwillige AHV/IV"
+    "csc_afac": "CSC - Freiwillige AHV/IV",
+    "rh": "Personalwesen"
   },
   "tags": {
     "daa": "DAA",
@@ -170,6 +171,14 @@
     "CSC - Gestion des dossiers": "CSC - Aktenverwaltung",
     "CSC - Taxation": "CSC - Besteuerung",
     "CSC - Opposition": "CSC - Einspruch",
+    "RH - Congés et absences": "Pw - Urlaub und Abwesenheiten",
+    "RH - Encadrement, formation et développement": "Pw - Führung, Ausbildung und Entwicklung",
+    "RH - Éthique et conformité": "Pw - Ethik und Compliance",
+    "RH - Logistique et matériel": "Pw - Logistik und Material",
+    "RH - Prévoyance professionnelle et retraite": "Pw - Berufliche Vorsorge und Ruhestand",
+    "RH - Rémunération et politique salariale": "Pw - Vergütung und Gehaltspolitik",
+    "RH - Temps de travail et télétravail": "Pw - Arbeitszeit und Homeoffice",
+    "RH - Vie familiale et soutien aux parents": "Pw - Familienleben und Unterstützung für Eltern",
     "AFac": "AFac",
     "general": "Allgemeines",
     "contributions": "Beiträge",

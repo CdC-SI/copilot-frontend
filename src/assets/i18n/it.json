@@ -157,7 +157,8 @@
     "user_pdf_upload": "PDF Utente:",
     "user_edit": "SurveyPipeline - Input dell'utente",
     "lavs": "LAVS",
-    "csc_afac": "CSC - AFAC"
+    "csc_afac": "CSC - AFAC",
+    "rh": "Risorse Umane"
   },
   "tags": {
     "daa": "DAA",
@@ -170,6 +171,14 @@
     "CSC - Gestion des dossiers": "CSC - Gestione dei dossier",
     "CSC - Taxation": "CSC - Tassazione",
     "CSC - Opposition": "CSC - Opposizione",
+    "RH - Congés et absences": "RU - Congedi e assenze",
+    "RH - Encadrement, formation et développement": "RU - Inquadramento, formazione e sviluppo",
+    "RH - Éthique et conformité": "RU - Etica e conformità",
+    "RH - Logistique et matériel": "RU - Logistica e materiale",
+    "RH - Prévoyance professionnelle et retraite": "RU - Previdenza professionale e pensionamento",
+    "RH - Rémunération et politique salariale": "RU - Retribuzione e politica salariale",
+    "RH - Temps de travail et télétravail": "RU - Orario di lavoro e telelavoro",
+    "RH - Vie familiale et soutien aux parents": "RU - Vita familiare e sostegno ai genitori",
     "AFac": "AFac",
     "general": "Generalità",
     "contributions": "Contributi",
