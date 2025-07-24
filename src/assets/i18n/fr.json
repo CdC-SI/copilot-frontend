@@ -157,7 +157,8 @@
     "user_pdf_upload": "PDF Utilisateur:",
     "user_edit": "SurveyPipeline - Saisie utilisateur",
     "lavs": "LAVS",
-    "csc_afac": "CSC Assurance Facultative"
+    "csc_afac": "CSC Assurance Facultative",
+    "rh": "Ressources Humaines"
   },
   "tags": {
     "daa": "DAA",
@@ -170,6 +171,14 @@
     "CSC - Gestion des dossiers": "CSC - Gestion des dossiers",
     "CSC - Taxation": "CSC - Taxation",
     "CSC - Opposition": "CSC - Opposition",
+    "RH - Congés et absences": "RH - Congés et absences",
+    "RH - Encadrement, formation et développement": "RH - Encadrement, formation et développement",
+    "RH - Éthique et conformité": "RH - Éthique et conformité",
+    "RH - Logistique et matériel": "RH - Logistique et matériel",
+    "RH - Prévoyance professionnelle et retraite": "RH - Prévoyance professionnelle et retraite",
+    "RH - Rémunération et politique salariale": "RH - Rémunération et politique salariale",
+    "RH - Temps de travail et télétravail": "RH - Temps de travail et télétravail",
+    "RH - Vie familiale et soutien aux parents": "RH - Vie familiale et soutien aux parents",
     "AFac": "AFac",
     "general": "Généralités",
     "contributions": "Cotisations",
