@@ -95,7 +95,7 @@
 				<mat-chip *ngFor="let attachment of attachments; index as i" (removed)="removeAttachment(i)">
 					{{ attachment.name }} ({{ attachment.size / 1000 | number: "1.0-0" }} Ko)
 					<button matChipRemove aria-label="Remove attachment">
-						<mat-icon svgIcon="close"></mat-icon>
+						<mat-icon svgIcon="cancel"></mat-icon>
 					</button>
 				</mat-chip>
 			</mat-chip-listbox>
