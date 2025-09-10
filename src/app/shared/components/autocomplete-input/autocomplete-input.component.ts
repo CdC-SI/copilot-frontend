@@ -39,6 +39,7 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 
 	@Output() readonly optionSelected = new EventEmitter<T>();
 	@Output() readonly inputChange = new EventEmitter<string>();
+	@Output() readonly attachmentsSelected = new EventEmitter<File[]>();
 
 	@ViewChild('itemFilterInput', {static: true}) itemFilterInput: ElementRef;
 
@@ -118,5 +119,12 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 		return value => {
 			return this.optionLabelFn(value) || (value as string);
 		};
+	}
+
+	onFilesChange(event: Event) {
+		const input = event.target as HTMLInputElement;
+		if (!input.files) return;
+		this.attachmentsSelected.emit(Array.from(input.files));
+		input.value = '';
 	}
 }

@@ -74,6 +74,7 @@
 				[formControl]="searchCtrl"
 				(optionSelected)="handleOptionSelected($event)"
 				(inputChange)="isCommandMode = $event.startsWith('/')"
+				(attachmentsSelected)="onAttachmentsSelected($event)"
 			/>
 
 			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
@@ -88,6 +89,17 @@
 				<mat-icon svgIcon="upload"></mat-icon>
 			</button>
 		</form>
+
+		<div *ngIf="attachments.length">
+			<mat-chip-listbox>
+				<mat-chip *ngFor="let attachment of attachments; index as i" (removed)="removeAttachment(i)">
+					{{ attachment.name }} ({{ attachment.size / 1000 | number: "1.0-0" }} Ko)
+					<button matChipRemove aria-label="Remove attachment">
+						<mat-icon svgIcon="close"></mat-icon>
+					</button>
+				</mat-chip>
+			</mat-chip-listbox>
+		</div>
 	</div>
 
 	<div column-right-content class="h100">

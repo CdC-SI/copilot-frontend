@@ -14,17 +14,17 @@ export class RagService {
 	) {}
 
 	process(ragRequest: ChatRequest): Observable<string> {
-		const headers = new Headers({'Content-Type': 'application/json', Accept: 'text/event-stream'});
+		const headers = new Headers({Accept: 'text/event-stream'});
 		const token = this.tokenService.blueToken;
+		if (token) headers.append('Blue', token.value);
 
-		if (token) {
-			headers.append('Blue', token.value);
-		}
+		const form = this.buildFormDataFromChatRequest(ragRequest);
+
 		return new Observable<string>(observer => {
 			fetch(this.config.backendApi('/conversations'), {
 				method: 'POST',
 				headers,
-				body: JSON.stringify(ragRequest)
+				body: form
 			})
 				.then(response => {
 					const reader = response.body.getReader();
@@ -37,6 +37,35 @@ export class RagService {
 					observer.error(error);
 				});
 		});
+	}
+
+	private buildFormDataFromChatRequest(ragRequest: ChatRequest): FormData {
+		const fd = new FormData();
+
+		// required
+		fd.append('query', ragRequest.query);
+
+		// files
+		(ragRequest.attachments ?? []).forEach(f => fd.append('attachments', f, f.name));
+
+		// optional
+		this.append(fd, 'language', ragRequest.language);
+		this.append(fd, 'conversationId', ragRequest.conversationId);
+		this.appendList(fd, 'tags', ragRequest.tags);
+		this.appendList(fd, 'sources', ragRequest.sources);
+
+		return fd;
+	}
+
+	private append(fd: FormData, key: string, value: any) {
+		if (value !== undefined && value !== null) {
+			fd.append(key, String(value));
+		}
+	}
+
+	private appendList(fd: FormData, key: string, list?: (string | number | boolean)[] | null) {
+		if (!list?.length) return;
+		for (const v of list) this.append(fd, key, v);
 	}
 
 	private readStream(reader: ReadableStreamDefaultReader<Uint8Array>, decoder: TextDecoder, buffer: string, observer: any) {
