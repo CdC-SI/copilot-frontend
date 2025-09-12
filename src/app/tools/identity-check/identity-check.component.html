@@ -5,7 +5,7 @@
 			<mat-card-title>{{ "identity-check.title" | translate }}</mat-card-title>
 		</mat-card-header>
 
-		<mat-card-content>
+		<mat-card-content style="display: flex; flex-direction: row; align-items: center; justify-content: space-between">
 			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'NOT_STARTED' || !identityCheckStatus">
 				<mat-icon svgIcon="info-circle" class="status-not-started"></mat-icon>
 				<div class="status-details">
@@ -59,11 +59,111 @@
 					</span>
 				</div>
 			</div>
+
+			<button mat-icon-button [obButton]="'primary'" (click)="refreshStatus()">
+				<mat-icon svgIcon="refresh"></mat-icon>
+			</button>
 		</mat-card-content>
 	</mat-card>
 
-	<button style="margin-top: 16px; width: 100%" mat-raised-button color="primary" (click)="onSubmit()">
+	<button style="margin-top: 16px; width: 100%" mat-raised-button color="primary" (click)="openDialog(userInfoDialog)">
 		<mat-icon svgIcon="arrow-right"></mat-icon>
 		{{ "identity-check.start-new" | translate }}
 	</button>
 </div>
+
+<ng-template #userInfoDialog>
+	<h2 mat-dialog-title>{{ "user-info.title" | translate }}</h2>
+	<div class="webcam-container">
+		<div [hidden]="capturedImage || !stream" style="display: flex; flex-direction: column">
+			<video #video autoplay></video>
+			<button style="width: 100%" mat-raised-button color="primary" type="button" (click)="capturePhoto()">
+				{{ "user-info.capture" | translate }}
+			</button>
+		</div>
+
+		<div *ngIf="capturedImage" style="display: flex; flex-direction: column">
+			<img [src]="capturedImage" alt="{{ 'user-info.previewAlt' | translate }}" />
+			<button mat-raised-button type="button" color="primary" (click)="retakePhoto()">
+				{{ "user-info.retake" | translate }}
+			</button>
+		</div>
+	</div>
+
+	<button mat-raised-button color="primary" type="button" [hidden]="!!stream" (click)="startCamera()" style="margin-bottom: 16px">
+		{{ "user-info.startCamera" | translate }}
+	</button>
+
+	<form [formGroup]="form" (ngSubmit)="submitDialog()" class="user-form">
+		<div class="form-grid">
+			<mat-form-field>
+				<mat-label>{{ "user-info.email" | translate }}</mat-label>
+				<input matInput formControlName="email" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.mobilePhone" | translate }}</mat-label>
+				<input matInput formControlName="mobilePhone" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.dateOfBirth" | translate }}</mat-label>
+				<input matInput formControlName="dateOfBirth" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.street" | translate }}</mat-label>
+				<input matInput formControlName="street" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.streetNr" | translate }}</mat-label>
+				<input matInput formControlName="streetNr" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.zip" | translate }}</mat-label>
+				<input matInput formControlName="zip" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.city" | translate }}</mat-label>
+				<input matInput formControlName="city" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.country" | translate }}</mat-label>
+				<input matInput formControlName="country" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.nationality" | translate }}</mat-label>
+				<input matInput formControlName="nationality" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.idNumber" | translate }}</mat-label>
+				<input matInput formControlName="idNumber" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.idType" | translate }}</mat-label>
+				<input matInput formControlName="idType" />
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>{{ "user-info.gender" | translate }}</mat-label>
+				<input matInput formControlName="gender" />
+			</mat-form-field>
+		</div>
+
+		<div mat-dialog-actions class="actions">
+			<button mat-button type="button" (click)="closeDialog()">
+				{{ "cancel" | translate }}
+			</button>
+			<button mat-raised-button color="primary" type="submit">
+				{{ "submit" | translate }}
+			</button>
+		</div>
+	</form>
+</ng-template>

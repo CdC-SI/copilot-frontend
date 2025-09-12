@@ -15,8 +15,8 @@ export class IdentityCheckService {
 		private readonly http: HttpClient
 	) {}
 
-	startIdentyCheck(): Observable<any> {
-		return this.http.post<any>(this.config.backendApi(this.START_ID_CHECK_URL), {});
+	startIdentyCheck(data: any): Observable<any> {
+		return this.http.post<any>(this.config.backendApi(this.START_ID_CHECK_URL), data);
 	}
 
 	getIdentityCheckStatus(): Observable<any> {

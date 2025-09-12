@@ -111,6 +111,7 @@
   "url.source": "URL della fonte",
   "language": "Lingua",
   "cancel": "Annulla",
+  "submit": "Invia",
   "confirm": "Conferma",
   "add": "Aggiungi",
   "edit": "Modifica",
@@ -260,5 +261,24 @@
   "document-analysis.no-request": "Avviare una richiesta",
   "document-analysis.document-type": "Tipo di documento",
   "document-analysis.target-language": "Lingua di destinazione",
-  "document-analysis.fields-to-extract": "Dati da estrarre"
+  "document-analysis.fields-to-extract": "Dati da estrarre",
+  "user-info": {
+    "title": "Informazioni personali",
+    "capture": "Scatta",
+    "retake": "Riprendi",
+    "previewAlt": "Anteprima del documento",
+    "startCamera": "Fotografare un documento d'identità",
+    "email": "Email",
+    "mobilePhone": "Telefono",
+    "dateOfBirth": "Data di nascita",
+    "street": "Via",
+    "streetNr": "Numero",
+    "zip": "CAP",
+    "city": "Città",
+    "country": "Paese",
+    "nationality": "Nazionalità",
+    "idNumber": "Numero di identità",
+    "idType": "Tipo di identità",
+    "gender": "Genere"
+  }
 }
