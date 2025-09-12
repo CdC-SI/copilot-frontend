@@ -112,6 +112,7 @@
   "url.source": "Quellen-URL",
   "language": "Sprache",
   "cancel": "Abbrechen",
+  "submit": "Absenden",
   "confirm": "Bestätigen",
   "add": "Hinzufügen",
   "edit": "Bearbeiten",
@@ -261,5 +262,24 @@
   "document-analysis.no-request": "Bitte eine Anfrage starten",
   "document-analysis.document-type": "Dokumenttyp",
   "document-analysis.target-language": "Zielsprache",
-  "document-analysis.fields-to-extract": "Zu extrahierende Daten"
+  "document-analysis.fields-to-extract": "Zu extrahierende Daten",
+  "user-info": {
+    "title": "Persönliche Informationen",
+    "capture": "Aufnehmen",
+    "retake": "Erneut aufnehmen",
+    "previewAlt": "Dokumentvorschau",
+    "startCamera": "Ein Ausweisdokument fotografieren",
+    "email": "E-Mail",
+    "mobilePhone": "Telefon",
+    "dateOfBirth": "Geburtsdatum",
+    "street": "Straße",
+    "streetNr": "Hausnummer",
+    "zip": "Postleitzahl",
+    "city": "Stadt",
+    "country": "Land",
+    "nationality": "Nationalität",
+    "idNumber": "Ausweisnummer",
+    "idType": "Ausweisart",
+    "gender": "Geschlecht"
+  }
 }

@@ -60,3 +60,55 @@ mat-icon {
 	font-size: 14px;
 	color: #555;
 }
+
+.webcam-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 24px;
+
+	video, img {
+		width: 320px;
+		height: 240px;
+		border: 1px solid #ccc;
+		border-radius: 8px;
+		object-fit: cover;
+		margin-bottom: 8px;
+	}
+
+	button {
+		align-self: center;
+	}
+}
+
+.user-form {
+	width: 100%;
+
+	.form-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 4px;
+	}
+
+	@media (max-width: 900px) {
+		.form-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 600px) {
+		.form-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 16px;
+
+	button + button {
+		margin-left: 8px;
+	}
+}

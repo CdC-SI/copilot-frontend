@@ -112,6 +112,7 @@
   "url.source": "URL de la source",
   "language": "Langue",
   "cancel": "Annuler",
+  "submit": "Soumettre",
   "confirm": "Confirmer",
   "add": "Ajouter",
   "edit": "Modifier",
@@ -261,5 +262,24 @@
   "document-analysis.no-request": "Veuillez lancer une demande",
   "document-analysis.document-type": "Type du document",
   "document-analysis.target-language": "Langue cible",
-  "document-analysis.fields-to-extract": "Données à extraire"
+  "document-analysis.fields-to-extract": "Données à extraire",
+  "user-info": {
+    "title": "Informations personnelles",
+    "capture": "Capturer",
+    "retake": "Reprendre",
+    "previewAlt": "Aperçu du document",
+    "startCamera": "Photographier un document d'identité",
+    "email": "Email",
+    "mobilePhone": "Téléphone",
+    "dateOfBirth": "Date de naissance",
+    "street": "Rue",
+    "streetNr": "Numéro",
+    "zip": "Code postal",
+    "city": "Ville",
+    "country": "Pays",
+    "nationality": "Nationalité",
+    "idNumber": "Numéro d'identité",
+    "idType": "Type d'identité",
+    "gender": "Genre"
+  }
 }
