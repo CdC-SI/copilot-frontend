@@ -2,6 +2,7 @@ import {Language} from './answer';
 
 export interface ChatRequest {
 	query: string;
+	attachments?: File[];
 	language?: Language;
 	tags?: string[];
 	sources?: string[];

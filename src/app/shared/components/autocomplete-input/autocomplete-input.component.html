@@ -1,6 +1,11 @@
 <mat-form-field>
 	<mat-label>{{ i18nLabel | translate }}</mat-label>
 	<input #itemFilterInput [formControl]="formControl" type="text" matInput [matAutocomplete]="autoInput" />
+	<button mat-icon-button matPrefix type="button" aria-label="Add attachments" (click)="file.click()" [matTooltip]="'add.attachment' | translate">
+		<mat-icon svgIcon="file-plus"></mat-icon>
+	</button>
+	<input #file type="file" multiple hidden (change)="onFilesChange($event)" />
+
 	<mat-autocomplete
 		autoSelectActiveOption="true"
 		autoActiveFirstOption="false"

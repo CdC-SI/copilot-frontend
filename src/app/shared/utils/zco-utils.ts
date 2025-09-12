@@ -10,6 +10,9 @@ export const TAGS_TAG_REGEX = /<tags_processing>(.*?)<\/tags_processing>/gi;
 export const AGENT_TAG_REGEX = /<agent_handoff>(.*?)<\/agent_handoff>/gi;
 export const TOOL_TAG_REGEX = /<tool_use>(.*?)<\/tool_use>/gi;
 export const SUGGESTION_TAG_REGEX = /<suggestion>(.*?)<\/suggestion>/gi;
+export const OCR_TAG_REGEX = /<ocr>(.*?)<\/ocr>/gi;
+export const II_TARIFFS_TAG_REGEX = /<ii_tariffs>(.*?)<\/ii_tariffs>/gi;
+export const II_TARIFFS_ANSWER_TAG_REGEX = /<ii_tariffs_answer>(.*?)<\/ii_tariffs_answer>/gi;
 
 // Remove null, undefined and empty string value from object
 export const clearNullAndEmpty = (obj: any): any => {
