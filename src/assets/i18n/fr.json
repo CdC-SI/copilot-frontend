@@ -55,6 +55,7 @@
   "confidentiality.read": "J’ai lu la politique de confidentialité",
   "enter.message": "Entrer un message",
   "chat": "Chat",
+  "tools": "Outils",
   "admin": "Administration",
   "tips": {
     "component": "Conseils",
@@ -238,5 +239,27 @@
   "format": {
     "CONDENSED": "Condensé",
     "COMPLETE": "Complet"
-  }
+  },
+  "documentAnalysis": "Analyse intelligente de document",
+  "identityCheck": "Vérification d'identité",
+  "back": "Retour",
+  "validate": "Valider",
+  "identity-check.title": "Vérification d'identité",
+  "identity-check.not-started": "Aucune vérification lancée",
+  "identity-check.initiated": "Vérification lancée",
+  "identity-check.review-pending": "Vérification en cours de revue",
+  "identity-check.success": "Identité validée avec succès",
+  "identity-check.rejected": "Vérification rejetée",
+  "identity-check.error": "Erreur lors de la vérification",
+  "identity-check.last-update": "Dernière mise à jour :",
+  "identity-check.start-new": "Lancer une nouvelle vérification",
+  "document-analysis.title": "Document à analyser",
+  "document-analysis.cancel": "Annuler l'analyse",
+  "document-analysis.extract": "Extraire des données",
+  "document-analysis.translate": "Traduire",
+  "document-analysis.results": "Résultats",
+  "document-analysis.no-request": "Veuillez lancer une demande",
+  "document-analysis.document-type": "Type du document",
+  "document-analysis.target-language": "Langue cible",
+  "document-analysis.fields-to-extract": "Données à extraire"
 }

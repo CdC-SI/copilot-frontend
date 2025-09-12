@@ -1,0 +1,69 @@
+<div class="life-check-container">
+	<!-- Carte principale -->
+	<mat-card class="check-card">
+		<mat-card-header>
+			<mat-card-title>{{ "identity-check.title" | translate }}</mat-card-title>
+		</mat-card-header>
+
+		<mat-card-content>
+			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'NOT_STARTED' || !identityCheckStatus">
+				<mat-icon svgIcon="info-circle" class="status-not-started"></mat-icon>
+				<div class="status-details">
+					<span class="status-text">{{ "identity-check.not-started" | translate }}</span>
+				</div>
+			</div>
+
+			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'initiated'">
+				<mat-icon svgIcon="random" class="status-initiated"></mat-icon>
+				<div class="status-details">
+					<span class="status-text">{{ "identity-check.initiated" | translate }}</span>
+					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
+						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
+					</span>
+				</div>
+			</div>
+
+			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'reviewPending'">
+				<mat-icon svgIcon="clock" class="status-pending"></mat-icon>
+				<div class="status-details">
+					<span class="status-text">{{ "identity-check.review-pending" | translate }}</span>
+				</div>
+			</div>
+
+			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'identificationSuccessful'">
+				<mat-icon svgIcon="checkmark" class="status-success"></mat-icon>
+				<div class="status-details">
+					<span class="status-text">{{ "identity-check.success" | translate }}</span>
+					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
+						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
+					</span>
+				</div>
+			</div>
+
+			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'identificationRejected'">
+				<mat-icon svgIcon="cancel-circle" class="status-failed"></mat-icon>
+				<div class="status-details">
+					<span class="status-text">{{ "identity-check.rejected" | translate }}</span>
+					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
+						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
+					</span>
+				</div>
+			</div>
+
+			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'error'">
+				<mat-icon svgIcon="alert" class="status-error"></mat-icon>
+				<div class="status-details">
+					<span class="status-text">{{ "identity-check.error" | translate }}</span>
+					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
+						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
+					</span>
+				</div>
+			</div>
+		</mat-card-content>
+	</mat-card>
+
+	<button style="margin-top: 16px; width: 100%" mat-raised-button color="primary" (click)="onSubmit()">
+		<mat-icon svgIcon="arrow-right"></mat-icon>
+		{{ "identity-check.start-new" | translate }}
+	</button>
+</div>

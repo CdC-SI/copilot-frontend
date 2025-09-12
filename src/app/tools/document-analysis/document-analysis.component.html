@@ -1,0 +1,121 @@
+<div class="card-container">
+	<div style="display: flex; flex-direction: row; min-width: 100%">
+		<mat-card style="flex: 1; margin-right: 4px; height: fit-content">
+			<mat-card-header style="display: flex; flex-direction: row; justify-content: space-between">
+				<mat-card-title>{{ "document-analysis.title" | translate }}</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<ob-file-upload
+					class="d-flex mb16"
+					(uploadEvent)="uploadDocumentEvent($event)"
+					[accept]="['.jpeg', '.jpg', '.png']"
+					[maxFileSize]="10"
+					[multiple]="true"
+					[singleRequest]="false"
+				></ob-file-upload>
+				<app-file-preview style="margin-top: 8px" *ngIf="documentCtrl.value" [file]="documentCtrl.value.file"></app-file-preview>
+			</mat-card-content>
+			<mat-card-actions *ngIf="!!documentCtrl.value" style="display: flex; flex-direction: column; align-items: flex-start; margin-top: 32px">
+				<button *ngIf="requestSubscription" mat-button [obButton]="'secondary'" (click)="cancelRequest()">
+					<mat-icon svgIcon="cancel"></mat-icon>
+					{{ "document-analysis.cancel" | translate }}
+				</button>
+				<button
+					*ngIf="!requestSubscription"
+					style="margin-bottom: 16px; width: 100%; justify-content: flex-start"
+					mat-button
+					[obButton]="'primary'"
+					(click)="openExtractDataDialog()"
+				>
+					<mat-icon svgIcon="arrow-right"></mat-icon>
+					{{ "document-analysis.extract" | translate }}
+				</button>
+				<button *ngIf="!requestSubscription" style="width: 100%; justify-content: flex-start" mat-button [obButton]="'primary'" (click)="openTranslateDialog()">
+					<mat-icon svgIcon="arrow-right"></mat-icon>
+					{{ "document-analysis.translate" | translate }}
+				</button>
+			</mat-card-actions>
+		</mat-card>
+
+		<mat-card style="flex: 1; margin-left: 4px; justify-content: flex-start" [formGroup]="visionFrmGrp">
+			<mat-card-header style="display: flex; flex-direction: row; justify-content: space-between">
+				<mat-card-title>{{ "document-analysis.results" | translate }}</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<ng-container *ngIf="loading">
+					<div *ngFor="let _ of [1, 2, 3, 4, 5, 6, 7, 8, 9]" class="skeleton-field">
+						<div class="skeleton skeleton-input"></div>
+					</div>
+				</ng-container>
+
+				<ob-alert *ngIf="allVisionCtrlName.length <= 0 && !translation && !loading" style="margin-left: 0 !important">
+					{{ "document-analysis.no-request" | translate }}
+				</ob-alert>
+
+				<ng-container *ngIf="allVisionCtrlName.length > 0 && !loading">
+					<div style="margin-top: 8px">
+						<span>{{ "document-analysis.document-type" | translate }}: </span>
+						<mat-chip class="success">{{ documentType?.type }}</mat-chip>
+					</div>
+
+					<div style="margin-top: 16px" *ngFor="let ctrlName of allVisionCtrlName">
+						<mat-form-field>
+							<mat-label>{{ ctrlName }}</mat-label>
+							<input [formControlName]="ctrlName" [name]="ctrlName" type="text" matInput placeholder="" />
+							<mat-error></mat-error>
+						</mat-form-field>
+					</div>
+				</ng-container>
+
+				<ng-container *ngIf="!!translation && !loading">
+					<div style="margin-top: 16px">
+						<markdown [data]="translation"></markdown>
+					</div>
+				</ng-container>
+			</mat-card-content>
+		</mat-card>
+	</div>
+</div>
+
+<ng-template #translateDialog>
+	<div mat-dialog-content>
+		<mat-form-field>
+			<mat-label>{{ "document-analysis.target-language" | translate }}</mat-label>
+			<input [formControl]="languageCtrl" type="text" matInput placeholder="" />
+		</mat-form-field>
+	</div>
+	<div mat-dialog-actions class="mt16">
+		<button mat-button [obButton]="'primary'" [mat-dialog-close]="true">
+			<mat-icon svgIcon="arrow-right"></mat-icon>
+			{{ "validate" | translate }}
+		</button>
+	</div>
+</ng-template>
+
+<ng-template #extractDataDialog>
+	<div mat-dialog-content>
+		<mat-form-field style="margin-top: 16px">
+			<mat-label>{{ "document-analysis.fields-to-extract" | translate }}</mat-label>
+			<mat-chip-grid #chipGrid aria-label="Enter emails" [formControl]="fieldCtrl">
+				<mat-chip-row *ngFor="let field of requestFields" (removed)="removeRecipient(field)" [editable]="true" (edited)="editRecipient(field, $event)">
+					{{ field }}
+					<mat-icon svgIcon="cancel-circle" matChipRemove />
+				</mat-chip-row>
+				<input
+					[matChipInputFor]="chipGrid"
+					[matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+					[matChipInputAddOnBlur]="true"
+					(matChipInputTokenEnd)="addRecipient($event)"
+					placeholder=""
+				/>
+			</mat-chip-grid>
+			<mat-error></mat-error>
+		</mat-form-field>
+	</div>
+	<div mat-dialog-actions>
+		<button mat-button [obButton]="'primary'" [mat-dialog-close]="true">
+			<mat-icon svgIcon="arrow-right"></mat-icon>
+			{{ "validate" | translate }}
+		</button>
+	</div>
+</ng-template>

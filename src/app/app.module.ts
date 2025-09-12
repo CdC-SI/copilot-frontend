@@ -28,6 +28,9 @@ import {SharedModule} from './shared/shared.module';
 import {AdminComponent} from './admin/admin.component';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {AuthenticationInterceptor} from './shared/interceptors/authentication-interceptor';
+import {ToolsHomeComponent} from './tools/tools-home/tools-home.component';
+import {DocumentAnalysisComponent} from './tools/document-analysis/document-analysis.component';
+import { IdentityCheckComponent } from './tools/identity-check/identity-check.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -46,7 +49,7 @@ function pamsFactory(configurationService: ConfigurationService) {
 }
 
 @NgModule({
-	declarations: [AppComponent, ChatComponent, AdminComponent, TipsComponent],
+	declarations: [AppComponent, ChatComponent, AdminComponent, TipsComponent, ToolsHomeComponent, DocumentAnalysisComponent, IdentityCheckComponent],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,

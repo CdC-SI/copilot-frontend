@@ -55,6 +55,7 @@
   "confidentiality.read": "Ich habe die Datenschutzerklärung gelesen und stimme ihr zu",
   "enter.message": "Nachricht eingeben",
   "chat": "Chat",
+  "tools": "Werkzeuge",
   "admin": "Verwaltung",
   "tips": {
     "component": "Tipps",
@@ -238,5 +239,27 @@
   "format": {
     "CONDENSED": "Kondensiert",
     "COMPLETE": "Vollständig"
-  }
+  },
+  "documentAnalysis": "Intelligente Dokumentanalyse",
+  "identityCheck": "Identitätsprüfung",
+  "back": "Zurück",
+  "validate": "Bestätigen",
+  "identity-check.title": "Identitätsprüfung",
+  "identity-check.not-started": "Keine Überprüfung gestartet",
+  "identity-check.initiated": "Überprüfung gestartet",
+  "identity-check.review-pending": "Überprüfung wird geprüft",
+  "identity-check.success": "Identität erfolgreich bestätigt",
+  "identity-check.rejected": "Überprüfung abgelehnt",
+  "identity-check.error": "Fehler bei der Überprüfung",
+  "identity-check.last-update": "Letzte Aktualisierung:",
+  "identity-check.start-new": "Neue Überprüfung starten",
+  "document-analysis.title": "Dokument zu analysieren",
+  "document-analysis.cancel": "Analyse abbrechen",
+  "document-analysis.extract": "Daten extrahieren",
+  "document-analysis.translate": "Übersetzen",
+  "document-analysis.results": "Ergebnisse",
+  "document-analysis.no-request": "Bitte eine Anfrage starten",
+  "document-analysis.document-type": "Dokumenttyp",
+  "document-analysis.target-language": "Zielsprache",
+  "document-analysis.fields-to-extract": "Zu extrahierende Daten"
 }
