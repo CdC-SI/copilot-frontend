@@ -1,0 +1,33 @@
+.skeleton {
+	background: linear-gradient(90deg, #e4e4e4 25%, #f0f0f0 50%, #e4e4e4 75%);
+	background-size: 200% 100%;
+	animation: loadingAnimation 1.5s infinite;
+}
+
+.card-container {
+	padding: 16px;
+}
+
+.skeleton-text {
+	display: inline-block;
+	width: 60%;
+	height: 16px;
+	border-radius: 4px;
+}
+
+.skeleton-input {
+	display: block;
+	height: 32px;
+	width: 80%;
+	border-radius: 4px;
+	margin-top: 32px
+}
+
+@keyframes loadingAnimation {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}

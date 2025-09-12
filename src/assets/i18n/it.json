@@ -55,6 +55,7 @@
   "enter.message": "Inserisci un messaggio",
   "chat": "Chat",
   "admin": "Amministrazione",
+  "tools": "Strumenti",
   "tips": {
     "component": "Consigli",
     "sections": {
@@ -237,5 +238,27 @@
   "format": {
     "CONDENSED": "Condensato",
     "COMPLETE": "Completo"
-  }
+  },
+  "documentAnalysis": "Analisi intelligente del documento",
+  "identityCheck": "Verifica dell'identità",
+  "back": "Indietro",
+  "validate": "Conferma",
+  "identity-check.title": "Verifica dell'identità",
+  "identity-check.not-started": "Nessuna verifica avviata",
+  "identity-check.initiated": "Verifica avviata",
+  "identity-check.review-pending": "Verifica in revisione",
+  "identity-check.success": "Identità confermata con successo",
+  "identity-check.rejected": "Verifica respinta",
+  "identity-check.error": "Errore durante la verifica",
+  "identity-check.last-update": "Ultimo aggiornamento:",
+  "identity-check.start-new": "Avvia una nuova verifica",
+  "document-analysis.title": "Documento da analizzare",
+  "document-analysis.cancel": "Annulla analisi",
+  "document-analysis.extract": "Estrai dati",
+  "document-analysis.translate": "Traduci",
+  "document-analysis.results": "Risultati",
+  "document-analysis.no-request": "Avviare una richiesta",
+  "document-analysis.document-type": "Tipo di documento",
+  "document-analysis.target-language": "Lingua di destinazione",
+  "document-analysis.fields-to-extract": "Dati da estrarre"
 }

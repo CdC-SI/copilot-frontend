@@ -18,7 +18,8 @@ export class AppComponent implements OnInit {
 	navigationAdmin: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
 		{url: '/admin', label: 'admin'},
-		{url: '/tips', label: 'tips.component'}
+		{url: '/tips', label: 'tips.component'},
+		{url: '/tools', label: 'tools'}
 	];
 	projectVersion: string;
 	@ViewChild('userNotRegisteredDialog') userNotRegisteredDialog: TemplateRef<any>;
