@@ -1,0 +1,31 @@
+<div class="button-container" *ngIf="!selectedComponent">
+	<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.DocumentAnalysis)">
+		<mat-icon svgIcon="arrow-right"></mat-icon>
+		{{ "documentAnalysis" | translate }}
+	</button>
+
+	<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.IdentityCheck)">
+		<mat-icon svgIcon="arrow-right"></mat-icon>
+		{{ "identityCheck" | translate }}
+	</button>
+</div>
+
+<ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.DocumentAnalysis">
+	<zco-document-analysis></zco-document-analysis>
+	<div class="button-container">
+		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
+			<mat-icon svgIcon="arrow-left"></mat-icon>
+			{{ "back" | translate }}
+		</button>
+	</div>
+</ng-container>
+
+<ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.IdentityCheck">
+	<zco-identity-check></zco-identity-check>
+	<div class="button-container">
+		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
+			<mat-icon svgIcon="arrow-left"></mat-icon>
+			{{ "back" | translate }}
+		</button>
+	</div>
+</ng-container>

@@ -20,7 +20,8 @@ import {MatLine} from '@angular/material/core';
 import {ActionSuggestionsComponent} from './components/action-suggestions/action-suggestions.component';
 import {MatBadge} from '@angular/material/badge';
 import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.component';
-import { SourceListComponent } from './components/source-list/source-list.component';
+import {SourceListComponent} from './components/source-list/source-list.component';
+import {FilePreviewComponent} from './components/file-preview/file-preview.component';
 
 @NgModule({
 	declarations: [
@@ -35,7 +36,8 @@ import { SourceListComponent } from './components/source-list/source-list.compon
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
-  SourceListComponent
+		SourceListComponent,
+		FilePreviewComponent
 	],
 	imports: [
 		CommonModule,
@@ -66,7 +68,8 @@ import { SourceListComponent } from './components/source-list/source-list.compon
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
-		DynamicFormComponent
+		DynamicFormComponent,
+		FilePreviewComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

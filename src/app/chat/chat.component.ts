@@ -7,8 +7,11 @@ import {RagService} from '../shared/services/rag.service';
 import {
 	AGENT_TAG_REGEX,
 	ANCHOR_TAG_REGEX,
+	II_TARIFFS_ANSWER_TAG_REGEX,
+	II_TARIFFS_TAG_REGEX,
 	INTENT_TAG_REGEX,
 	MESSAGE_ID_REGEX,
+	OCR_TAG_REGEX,
 	OFF_TOPIC_REGEX,
 	RETRIEVING_TAG_REGEX,
 	ROUTING_TAG_REGEX,
@@ -61,6 +64,7 @@ export class ChatComponent implements OnInit {
 	];
 	specificSuggestions: {text: string; action: string}[] = [];
 	activeForm?: {def: FormDef; group: FormGroup};
+	attachments: File[] = [];
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
@@ -181,6 +185,7 @@ export class ChatComponent implements OnInit {
 		// Handle the three mutually exclusive modes
 		const requestConfig = {
 			query: inputText,
+			attachments: this.attachments,
 			conversationId: this.currentConversation?.conversationId,
 			...this.chatConfigCtrl.value,
 			language: mappedLanguage
@@ -202,6 +207,7 @@ export class ChatComponent implements OnInit {
 		});
 
 		this.clearSearch();
+		this.attachments = [];
 	}
 
 	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
@@ -266,6 +272,27 @@ export class ChatComponent implements OnInit {
 		const retrievingTagMatch = RETRIEVING_TAG_REGEX.exec(chunk);
 		if (retrievingTagMatch) {
 			partialChatMessage.message = retrievingTagMatch[1];
+			partialChatMessage.isRetrieving = true;
+			return;
+		}
+
+		const ocrTagMatch = OCR_TAG_REGEX.exec(chunk);
+		if (ocrTagMatch) {
+			partialChatMessage.message = ocrTagMatch[1];
+			partialChatMessage.isRetrieving = true;
+			return;
+		}
+
+		const iiTariffsTagMatch = II_TARIFFS_TAG_REGEX.exec(chunk);
+		if (iiTariffsTagMatch) {
+			partialChatMessage.message = iiTariffsTagMatch[1];
+			partialChatMessage.isRetrieving = true;
+			return;
+		}
+
+		const iiTariffsAnswerTagMatch = II_TARIFFS_ANSWER_TAG_REGEX.exec(chunk);
+		if (iiTariffsAnswerTagMatch) {
+			partialChatMessage.message = iiTariffsAnswerTagMatch[1];
 			partialChatMessage.isRetrieving = true;
 			return;
 		}
@@ -451,6 +478,14 @@ export class ChatComponent implements OnInit {
 		this.activeForm = undefined;
 	}
 
+	onAttachmentsSelected(event: File[]) {
+		this.attachments.push(...event);
+	}
+
+	removeAttachment(index: number) {
+		this.attachments.splice(index, 1);
+	}
+
 	private getSourceType(url: string) {
 		return url.startsWith('http') ? 'URL' : 'FILE';
 	}
@@ -458,6 +493,7 @@ export class ChatComponent implements OnInit {
 	private readonly getCommandSuggestions = (text: string): Observable<Command[]> => {
 		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
 	};
+
 	private readonly getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
 		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
 	};
