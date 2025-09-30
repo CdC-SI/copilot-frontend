@@ -4,7 +4,9 @@
 			<span *ngIf="isFile(source)" class="source-icon file"></span>
 			<h3 class="source-title">
 				<ng-container *ngIf="isUrl(source)">
-					<a [href]="source.link" target="_blank" rel="noopener noreferrer">{{ extractLabel(source.link) }}</a>
+					<a [href]="source.link" target="_blank" rel="noopener noreferrer">
+						{{ extractLabel(source.link) }}
+					</a>
 				</ng-container>
 				<ng-container *ngIf="isFile(source)">
 					<button type="button" (click)="downloadFile(source)">{{ fileName(source.link) }}</button>
@@ -14,14 +16,120 @@
 
 		<ul class="source-meta">
 			<li *ngIf="source.subsection">
-				Section: <strong>{{ source.subsection }}</strong>
+				{{ "sourceList.meta.section" | translate }}:
+				<strong>{{ source.subsection }}</strong>
 			</li>
 			<li *ngIf="source.pageNumber">
-				Page: <strong>{{ source.pageNumber }}</strong>
+				{{ "sourceList.meta.page" | translate }}:
+				<strong>{{ source.pageNumber }}</strong>
 			</li>
 			<li *ngIf="source.version">
-				Version: <strong>{{ source.version }}</strong>
+				{{ "sourceList.meta.version" | translate }}:
+				<strong>{{ source.version }}</strong>
 			</li>
 		</ul>
+
+		<div class="source-actions">
+			<button
+				type="button"
+				class="icon-btn upvote"
+				[class.active]="feedbackById.get(source.documentId) === 'upvote'"
+				(click)="openFeedback(source, 'upvote')"
+				[title]="'sourceList.actions.upvote.title' | translate"
+				[attr.aria-label]="'sourceList.actions.upvote.aria' | translate"
+			>
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<path
+						d="M2 21h4V9H2v12zM22 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13 1 6.59 7.41C6.22 7.78 6 8.3 6 8.86V20c0 1.1.9 2 2 2h7c.82 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V10z"
+					/>
+				</svg>
+				<span class="sr-only">{{ "sourceList.actions.upvote.aria" | translate }}</span>
+			</button>
+
+			<button
+				type="button"
+				class="icon-btn downvote"
+				[class.active]="feedbackById.get(source.documentId) === 'downvote'"
+				(click)="openFeedback(source, 'downvote')"
+				[title]="'sourceList.actions.downvote.title' | translate"
+				[attr.aria-label]="'sourceList.actions.downvote.aria' | translate"
+			>
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<path
+						d="M2 3h4v12H2V3zm20 8c0 1.1-.9 2-2 2h-6.31l.95 4.57.03.32c0 .41-.17.79-.44 1.06L13 23l-6.41-6.41C6.22 16.22 6 15.7 6 15.14V4c0-1.1.9-2 2-2h7c.82 0 1.54.5 1.84 1.22l3.02 7.05c.09.23.14.47.14.73V11z"
+					/>
+				</svg>
+				<span class="sr-only">{{ "sourceList.actions.downvote.aria" | translate }}</span>
+			</button>
+
+			<span class="vote-chip" *ngIf="feedbackById.get(source.documentId) as v" [title]="feedbackComments.get(source.documentId) || ''">
+				<span class="dot" [class.positive]="v === 'upvote'" [class.negative]="v === 'downvote'"></span>
+				<span *ngIf="v === 'upvote'">{{ "sourceList.actions.chip.helpful" | translate }}</span>
+				<span *ngIf="v === 'downvote'">{{ "sourceList.actions.chip.unhelpful" | translate }}</span>
+			</span>
+		</div>
 	</article>
 </section>
+
+<dialog #feedbackDialog class="feedback-dialog" (cancel)="closeFeedback()" (close)="onDialogClosed()">
+	<form method="dialog" (submit)="submitFeedback($event)">
+		<header class="dialog-header">
+			<div class="dialog-vote-icon" [class.up]="selectedVote === 'upvote'" [class.down]="selectedVote === 'downvote'">
+				<svg *ngIf="selectedVote === 'upvote'" viewBox="0 0 24 24" aria-hidden="true">
+					<path
+						d="M2 21h4V9H2v12zM22 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13 1 6.59 7.41C6.22 7.78 6 8.3 6 8.86V20c0 1.1.9 2 2 2h7c.82 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V10z"
+					/>
+				</svg>
+				<svg *ngIf="selectedVote === 'downvote'" viewBox="0 0 24 24" aria-hidden="true">
+					<path
+						d="M2 3h4v12H2V3zm20 8c0 1.1-.9 2-2 2h-6.31l.95 4.57.03.32c0 .41-.17.79-.44 1.06L13 23l-6.41-6.41C6.22 16.22 6 15.7 6 15.14V4c0-1.1.9-2 2-2h7c.82 0 1.54.5 1.84 1.22l3.02 7.05c.09.23.14.47.14.73V11z"
+					/>
+				</svg>
+			</div>
+
+			<div class="dialog-title">
+				<strong *ngIf="!isEditing">
+					{{ (selectedVote === "upvote" ? "sourceList.dialog.title.markHelpful" : "sourceList.dialog.title.markUnhelpful") | translate }}
+				</strong>
+				<strong *ngIf="isEditing">{{ "sourceList.dialog.title.update" | translate }}</strong>
+
+				<div class="dialog-subtitle" *ngIf="selectedSource">
+					{{ isUrl(selectedSource) ? extractLabel(selectedSource.link) : fileName(selectedSource.link) }}
+				</div>
+
+				<div class="prev-info" *ngIf="isEditing">
+					{{ "sourceList.dialog.prev.label" | translate }}
+					<span class="prev-badge" [class.pos]="previousVote === 'upvote'" [class.neg]="previousVote === 'downvote'">
+						{{ (previousVote === "upvote" ? "sourceList.common.helpful" : "sourceList.common.unhelpful") | translate }}
+					</span>
+				</div>
+			</div>
+
+			<button type="button" class="dialog-close" (click)="closeFeedback()" [attr.aria-label]="'sourceList.dialog.ariaClose' | translate">×</button>
+		</header>
+
+		<label class="field">
+			<span>
+				{{ "sourceList.dialog.comment.label" | translate }}
+				<em>{{ "sourceList.dialog.comment.optional" | translate }}</em>
+			</span>
+			<textarea
+				#commentInput
+				[(ngModel)]="comment"
+				name="comment"
+				rows="4"
+				[placeholder]="(isEditing ? 'sourceList.dialog.comment.placeholder.update' : 'sourceList.dialog.comment.placeholder.new') | translate"
+			></textarea>
+		</label>
+
+		<footer class="dialog-actions">
+			<button type="button" class="btn ghost" (click)="closeFeedback()">
+				{{ "sourceList.dialog.actions.cancel" | translate }}
+			</button>
+			<button type="submit" class="btn primary" [disabled]="isSubmitting">
+				<span *ngIf="!isSubmitting">{{ "sourceList.dialog.actions.send" | translate }}</span>
+				<span *ngIf="isSubmitting">{{ "sourceList.dialog.actions.sending" | translate }}</span>
+			</button>
+		</footer>
+	</form>
+</dialog>

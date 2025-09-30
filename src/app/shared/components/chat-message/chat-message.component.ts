@@ -1,9 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 import {Feedback} from '../../model/feedback';
-import {MessageSource} from '../../model/chat-history';
-import {UploadService} from '../../services/upload.service';
-import {ObNotificationService} from '@oblique/oblique';
 
 @Component({
 	selector: 'zco-chat-message',
@@ -13,13 +10,12 @@ import {ObNotificationService} from '@oblique/oblique';
 export class ChatMessageComponent {
 	@Input() previousMessage: ChatMessage;
 	@Input() message: ChatMessage;
+	@Input() conversationId!: string;
 	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
+	sourcePanelOpen: boolean;
 	protected readonly ChatMessageSource = ChatMessageSource;
 
-	constructor(
-		private readonly uploadService: UploadService,
-		private readonly notifService: ObNotificationService
-	) {}
+	constructor() {}
 
 	sendFeedback(event: Feedback) {
 		this.feedback.emit(event);
@@ -40,6 +36,4 @@ export class ChatMessageComponent {
 	get hasMultipleSources(): boolean {
 		return this.sourcesCount > 0;
 	}
-
-	downloadFile(source: MessageSource) {}
 }

@@ -4,3 +4,11 @@ export interface Feedback {
 	comment?: string;
 	conversationId?: string;
 }
+
+export interface SourceFeedback {
+	conversationId: string;
+	messageId: string;
+	documentId: string;
+	isPositive: boolean;
+	comment?: string;
+}
