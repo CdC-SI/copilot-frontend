@@ -3,6 +3,7 @@ import {MessageSource} from '../../model/chat-history';
 import {UploadService} from '../../services/upload.service';
 import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../services/feedback.service';
+import {AuthenticationServiceV2} from '../../services/auth.service';
 
 type FeedbackVote = 'upvote' | 'downvote';
 
@@ -37,7 +38,8 @@ export class SourceListComponent implements OnChanges {
 	constructor(
 		private readonly uploadService: UploadService,
 		private readonly notifService: ObNotificationService,
-		private readonly feedbackService: FeedbackService
+		private readonly feedbackService: FeedbackService,
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	ngOnChanges(changes: SimpleChanges): void {
@@ -150,10 +152,14 @@ export class SourceListComponent implements OnChanges {
 			});
 	}
 
+	authenticatedAsExpert() {
+		return this.authService.hasExpertRole();
+	}
+
 	/* ---------------------- Existing feedbacks ---------------------- */
 
 	private loadExistingFeedbacks(): void {
-		if (!this.conversationId || !this.messageId) return;
+		if (!this.authenticatedAsExpert() || !this.conversationId || !this.messageId) return;
 
 		this.feedbackService.getMySourceFeedbacks(this.conversationId, this.messageId).subscribe({
 			next: rows => {
