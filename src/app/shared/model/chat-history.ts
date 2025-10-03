@@ -23,4 +23,7 @@ export interface MessageSource {
 	pageNumber?: string;
 	subsection?: string;
 	version?: string;
+	documentId?: string;
+	questionId?: string;
+	answerId?: string;
 }
