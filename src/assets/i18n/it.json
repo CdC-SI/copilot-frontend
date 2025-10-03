@@ -173,6 +173,7 @@
   "feedback.comment.placeholder": "Aggiungi un commento...",
   "send": "Invia",
   "feedback.success": "Grazie per il tuo feedback!",
+  "feedback.error": "Invio del feedback non riuscito. Riprova.",
   "sources": {
     "DAA": "Direttive di assoggettamento all’AVS",
     "DIN": "Direttive sui contributi degli indipendenti",

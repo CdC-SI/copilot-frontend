@@ -173,6 +173,7 @@
   "feedback.comment.placeholder": "Kommentar hinzufügen...",
   "send": "Senden",
   "feedback.success": "Vielen Dank für Ihr Feedback!",
+  "feedback.error": "Fehler beim Senden des Feedbacks. Bitte versuchen Sie es erneut.",
   "sources": {
     "DAA": "Richtlinien zur Beitragsunterstellung in der AHV",
     "DIN": "Richtlinien zu den Beiträgen der Selbstständigen",

@@ -173,6 +173,7 @@
   "feedback.comment.placeholder": "Ajoutez un commentaire...",
   "send": "Envoyer",
   "feedback.success": "Merci pour votre retour !",
+  "feedback.error": "Échec de l’envoi du retour. Réessayez.",
   "sources": {
     "DAA": "Directives d’assujettissement à l’AVS",
     "DIN": "Directives sur les cotisations des indépendants",

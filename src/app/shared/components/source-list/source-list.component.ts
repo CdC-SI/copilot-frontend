@@ -140,11 +140,11 @@ export class SourceListComponent implements OnChanges {
 					this.feedbackById.set(documentId, this.selectedVote);
 					if (this.comment) this.feedbackComments.set(documentId, this.comment);
 					this.applyFeedbackToSources();
-					this.notifService.success('Merci pour votre retour.');
+					this.notifService.success('feedback.success');
 					this.closeFeedback();
 				},
 				error: () => {
-					this.notifService.error('Échec de l’envoi du feedback. Réessayez.');
+					this.notifService.error('feedback.error');
 					this.isSubmitting = false;
 				}
 			});
