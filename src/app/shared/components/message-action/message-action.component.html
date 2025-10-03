@@ -1,4 +1,4 @@
-<mat-icon *ngIf="authenticatedAsAdmin()" [matTooltip]="'edit.answer' | translate" [svgIcon]="'pen'" (click)="openFaqItemDialog()"></mat-icon>
+<mat-icon *ngIf="authenticatedAsExpert()" [matTooltip]="'edit.answer' | translate" [svgIcon]="'pen'" (click)="openFaqItemDialog()"></mat-icon>
 <mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs-up'" (click)="openFeedbackDialog(true)"></mat-icon>
 <mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs-down'" (click)="openFeedbackDialog(false)"></mat-icon>
 <mat-icon
