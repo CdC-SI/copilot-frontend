@@ -10,7 +10,7 @@ import {Feedback} from '../../model/feedback';
 export class ChatMessageComponent {
 	@Input() previousMessage: ChatMessage;
 	@Input() message: ChatMessage;
-	@Input() conversationId!: string;
+	@Input() conversationId: string;
 	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
 	sourcePanelOpen: boolean;
 	protected readonly ChatMessageSource = ChatMessageSource;

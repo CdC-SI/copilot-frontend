@@ -43,7 +43,7 @@
 						alt="copilot-logo"
 					/>
 					<zco-chat-message
-						[conversationId]="currentConversation.conversationId"
+						[conversationId]="currentConversation?.conversationId"
 						[message]="message"
 						[previousMessage]="i > 0 ? messages[i - 1] : null"
 						(feedback)="sendFeedback($event)"
