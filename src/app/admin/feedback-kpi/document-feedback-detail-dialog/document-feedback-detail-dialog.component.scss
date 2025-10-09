@@ -1,0 +1,8 @@
+.doc-content { display: grid; gap: 1rem; }
+.meta { display: flex; align-items: center; gap: .5rem; }
+.chip { display: inline-flex; align-items: center; gap: .25rem; padding: .1rem .5rem; border-radius: 9999px; font-weight: 600; background: rgba(0,0,0,.04); }
+.chip.pos { background: rgba(76,175,80,.15); }
+.chip.neg { background: rgba(244,67,54,.15); }
+.qa h3 { margin: .25rem 0; }
+.pos { color: #2e7d32; }
+.neg { color: #c62828; }

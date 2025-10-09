@@ -91,6 +91,12 @@ export class MessageActionComponent {
 	}
 
 	private giveFeedback(comment: string, isPositive: boolean) {
-		this.feedback.emit({messageId: this.message.id, isPositive, comment});
+		this.feedback.emit({
+			messageId: this.message.id,
+			question: this.previousMessage.message,
+			answer: this.message.message,
+			isPositive,
+			comment
+		});
 	}
 }

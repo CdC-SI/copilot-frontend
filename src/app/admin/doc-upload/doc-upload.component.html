@@ -1,0 +1,15 @@
+<ob-file-upload [accept]="['.pdf', '.csv']" [maxFileSize]="10" (uploadEvent)="uploadAdminDocument($event)"></ob-file-upload>
+<ul>
+	<li *ngFor="let doc of documentsToUpload">
+		<div class="doc-to-upload">
+			{{ doc.fileName }} ({{ doc.fileSize | number: "1.0-0" }} KB)
+			<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)">
+				<mat-icon svgIcon="trash"></mat-icon>
+			</button>
+		</div>
+	</li>
+</ul>
+<button mat-button [obButton]="'primary'" (click)="uploadDocuments()" [disabled]="!documentsToUpload.length">
+	<mat-icon svgIcon="upload"></mat-icon>
+	{{ "upload" | translate }}
+</button>

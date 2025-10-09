@@ -1,34 +1,6 @@
-<section class="source-list" *ngIf="sources?.length">
-	<article class="source-card" *ngFor="let source of sources">
-		<header class="source-header">
-			<span *ngIf="isFile(source)" class="source-icon file"></span>
-			<h3 class="source-title">
-				<ng-container *ngIf="isUrl(source)">
-					<a [href]="source.link" target="_blank" rel="noopener noreferrer">
-						{{ extractLabel(source.link) }}
-					</a>
-				</ng-container>
-				<ng-container *ngIf="isFile(source)">
-					<button type="button" (click)="downloadFile(source)">{{ fileName(source.link) }}</button>
-				</ng-container>
-			</h3>
-		</header>
-
-		<ul class="source-meta">
-			<li *ngIf="source.subsection">
-				{{ "sourceList.meta.section" | translate }}:
-				<strong>{{ source.subsection }}</strong>
-			</li>
-			<li *ngIf="source.pageNumber">
-				{{ "sourceList.meta.page" | translate }}:
-				<strong>{{ source.pageNumber }}</strong>
-			</li>
-			<li *ngIf="source.version">
-				{{ "sourceList.meta.version" | translate }}:
-				<strong>{{ source.version }}</strong>
-			</li>
-		</ul>
-
+<section class="source-list" *ngIf="message.sources?.length">
+	<article class="source-card" *ngFor="let source of message.sources">
+		<zco-source [source]="source"></zco-source>
 		<div *ngIf="authenticatedAsExpert()" class="source-actions">
 			<button
 				type="button"
