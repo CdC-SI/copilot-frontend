@@ -1,0 +1,136 @@
+<div class="kpi-root">
+	<div class="toolbar">
+		<mat-button-toggle-group [value]="range" (change)="onRangeChange($event.value)">
+			<mat-button-toggle value="7d">7j</mat-button-toggle>
+			<mat-button-toggle value="30d">30j</mat-button-toggle>
+			<mat-button-toggle value="90d">90j</mat-button-toggle>
+			<mat-button-toggle value="all">All</mat-button-toggle>
+		</mat-button-toggle-group>
+
+		<div class="spacer"></div>
+		<span
+			class="rate"
+			[class.good]="(stats?.positiveRate || 0) >= 0.8"
+			[class.warn]="(stats?.positiveRate || 0) < 0.8 && (stats?.positiveRate || 0) >= 0.6"
+			[class.bad]="(stats?.positiveRate || 0) < 0.6"
+		>
+			{{ stats?.positiveRate || 0 | percent: "1.0-0" }} {{ "satisfaction" | translate }}
+		</span>
+	</div>
+
+	<div class="grid">
+		<!-- Totals card -->
+		<mat-card class="ob-card kpi-card">
+			<mat-card-title>{{ "admin.feedback.global" | translate }}</mat-card-title>
+			<mat-card-content>
+				<div class="totals">
+					<div class="total">
+						<div class="label">{{ "admin.feedback.total" | translate }}</div>
+						<div class="value">{{ stats?.total }}</div>
+					</div>
+					<div class="total">
+						<div class="label">👍</div>
+						<div class="value">{{ stats?.positive }}</div>
+					</div>
+					<div class="total">
+						<div class="label">👎</div>
+						<div class="value">{{ stats?.negative }}</div>
+					</div>
+				</div>
+			</mat-card-content>
+		</mat-card>
+
+		<!-- Doughnut satisfaction -->
+		<mat-card class="ob-card chart-card">
+			<mat-card-title>{{ "admin.feedback.split" | translate }}</mat-card-title>
+			<mat-card-content>
+				<div class="chart">
+					<canvas baseChart [data]="doughnutData" [type]="'doughnut'" [options]="doughnutOpts"></canvas>
+				</div>
+			</mat-card-content>
+		</mat-card>
+
+		<!-- Stacked bar per day -->
+		<mat-card class="ob-card chart-card wide">
+			<mat-card-title>{{ "admin.feedback.timeline" | translate }}</mat-card-title>
+			<mat-card-content>
+				<div class="chart">
+					<canvas baseChart [data]="barData" [type]="'bar'" [options]="barOpts"></canvas>
+				</div>
+			</mat-card-content>
+		</mat-card>
+
+		<!-- Top sources table -->
+		<mat-card class="ob-card table-card">
+			<mat-card-title>{{ "admin.feedback.sources" | translate }}</mat-card-title>
+			<mat-card-content>
+				<table mat-table matSort #topSourcesSort="matSort" [matSortActive]="'pos'" [matSortDirection]="'desc'" [dataSource]="sourcesData" class="ob-table">
+					<ng-container matColumnDef="documentTitle">
+						<th mat-header-cell *matHeaderCellDef>{{ "document.title" | translate }}</th>
+						<td mat-cell *matCellDef="let r">
+							<span *ngIf="r.documentUrl; else plain">{{ r.documentUrl }}</span>
+							<ng-template #plain>{{ r.documentTitle }}</ng-template>
+						</td>
+					</ng-container>
+					<ng-container matColumnDef="neg">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>👎</th>
+						<td mat-cell *matCellDef="let r">{{ r.neg || 0 }}</td>
+					</ng-container>
+					<ng-container matColumnDef="pos">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>👍</th>
+						<td mat-cell *matCellDef="let r">{{ r.pos || 0 }}</td>
+					</ng-container>
+					<ng-container matColumnDef="actions">
+						<th mat-header-cell *matHeaderCellDef></th>
+						<td mat-cell *matCellDef="let r">
+							<button mat-icon-button [obButton]="'secondary'" [matTooltip]="'details' | translate" (click)="openSourceDetail(r)">
+								<mat-icon svgIcon="plus"></mat-icon>
+							</button>
+						</td>
+					</ng-container>
+					<tr mat-header-row *matHeaderRowDef="sourcesDisplayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: sourcesDisplayedColumns"></tr>
+				</table>
+				<mat-paginator #topSourcesPaginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="5"></mat-paginator>
+			</mat-card-content>
+		</mat-card>
+
+		<!-- Latest feedback table -->
+		<mat-card class="ob-card table-card wide">
+			<mat-card-title>{{ "admin.feedback.latest" | translate }}</mat-card-title>
+			<mat-card-content>
+				<table mat-table [dataSource]="latestData" class="ob-table" matSort #latestSort="matSort">
+					<ng-container matColumnDef="timestamp">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header>{{ "date" | translate }}</th>
+						<td mat-cell *matCellDef="let r">{{ r.timestamp | date: "yyyy-MM-dd HH:mm" }}</td>
+					</ng-container>
+					<ng-container matColumnDef="score">
+						<th mat-header-cell *matHeaderCellDef>{{ "score" | translate }}</th>
+						<td mat-cell *matCellDef="let r">
+							<span [class.pos]="r.score === 1" [class.neg]="r.score === -1">{{ r.score === 1 ? "👍" : "👎" }}</span>
+						</td>
+					</ng-container>
+					<ng-container matColumnDef="question">
+						<th mat-header-cell *matHeaderCellDef>{{ "question" | translate }}</th>
+						<td mat-cell *matCellDef="let r">{{ r.question }}</td>
+					</ng-container>
+					<ng-container matColumnDef="comment">
+						<th mat-header-cell *matHeaderCellDef>{{ "comment" | translate }}</th>
+						<td mat-cell *matCellDef="let r">{{ r.comment }}</td>
+					</ng-container>
+					<ng-container matColumnDef="actions">
+						<th mat-header-cell *matHeaderCellDef></th>
+						<td mat-cell *matCellDef="let r">
+							<button mat-icon-button [obButton]="'secondary'" [matTooltip]="'details' | translate" (click)="openDetail(r)">
+								<mat-icon svgIcon="plus"></mat-icon>
+							</button>
+						</td>
+					</ng-container>
+					<tr mat-header-row *matHeaderRowDef="latestDisplayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: latestDisplayedColumns"></tr>
+				</table>
+				<mat-paginator #latestPaginator [pageSizeOptions]="[5, 10, 25]" [pageSize]="5"></mat-paginator>
+			</mat-card-content>
+		</mat-card>
+	</div>
+</div>

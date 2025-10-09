@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>{{ "admin.feedback.source.detail" | translate }} {{ data?.documentTitle || data.documentId }}</h2>
+<mat-dialog-content class="doc-content">
+	<div class="meta">
+		<span class="chip neg">👎 {{ data?.neg || 0 }}</span>
+		<span class="chip pos">👍 {{ data?.pos || 0 }}</span>
+		<span class="chip">Σ {{ data?.neg + data?.pos || 0 }}</span>
+		<a *ngIf="data?.documentUrl; else download" [href]="data?.documentUrl" mat-button>{{ "open" | translate }}</a>
+		<ng-template #download>
+			<button mat-button [obButton]="'secondary'" (click)="downloadFile()">
+				<mat-icon svgIcon="download"></mat-icon>
+				{{ "download" | translate }}
+			</button>
+		</ng-template>
+	</div>
+
+	<mat-accordion>
+		<mat-expansion-panel *ngFor="let item of data.feedbacks">
+			<mat-expansion-panel-header>
+				<mat-panel-title>
+					<span [class.pos]="item.feedbackType === 'POSITIVE'" [class.neg]="item.feedbackType === 'NEGATIVE'">
+						{{ item.feedbackType === "POSITIVE" ? "👍" : "👎" }}
+					</span>
+					{{ item.timestamp | date: "yyyy-MM-dd HH:mm" }}
+				</mat-panel-title>
+				<mat-panel-description>
+					{{ item.comment || ("(no comment)" | translate) }}
+				</mat-panel-description>
+			</mat-expansion-panel-header>
+			<div class="qa">
+				<h3>{{ "question" | translate }}</h3>
+				<p>{{ item.question }}</p>
+				<h3>{{ "answer" | translate }}</h3>
+				<markdown [data]="item.answer"></markdown>
+			</div>
+		</mat-expansion-panel>
+	</mat-accordion>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+	<button mat-button mat-dialog-close [obButton]="'secondary'">{{ "close" | translate }}</button>
+</mat-dialog-actions>

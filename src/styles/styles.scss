@@ -5,3 +5,32 @@
 .pd5 {
 	padding: 5px;
 }
+
+/* 1) Empêcher le scroll du conteneur de surface (outer) */
+.kpi-dialog .mat-mdc-dialog-surface {
+	overflow: hidden; /* 👈 essentiel pour supprimer le 2e scroll */
+}
+
+/* 2) Le SEUL scroll se fait dans mat-dialog-content */
+.kpi-dialog .mat-mdc-dialog-content {
+	max-height: 72vh;   /* ajuste entre 65–80vh selon ton UI */
+	overflow: auto;
+	padding-right: 8px; /* anti scroll-bar overlap */
+}
+
+/* 3) Les blocs internes ne doivent PAS recréer un scroll */
+.kpi-dialog .source-list,
+.kpi-dialog .source-card,
+.kpi-dialog zco-source,
+.kpi-dialog .qa {
+	max-height: none !important;
+	overflow: visible !important;
+}
+
+/* 4) Bonus ergonomie : actions collées en bas */
+.kpi-dialog .mat-mdc-dialog-actions {
+	position: sticky;
+	bottom: 0;
+	background: var(--mat-dialog-container-background, #fff);
+	padding-top: 8px;
+}

@@ -1,9 +1,9 @@
 import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
 import {MessageSource} from '../../model/chat-history';
-import {UploadService} from '../../services/upload.service';
 import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../services/feedback.service';
 import {AuthenticationServiceV2} from '../../services/auth.service';
+import {ChatMessage} from '../../model/chat-message';
 
 type FeedbackVote = 'upvote' | 'downvote';
 
@@ -13,10 +13,10 @@ type FeedbackVote = 'upvote' | 'downvote';
 	styleUrl: './source-list.component.scss'
 })
 export class SourceListComponent implements OnChanges {
-	@Input() sources: MessageSource[] = [];
-	@Input() messageId!: string; // answerId on backend
-	@Input() conversationId!: string; // required by backend
-	@Input() expanded = false; // <— parent toggles this when the list opens
+	@Input() message!: ChatMessage;
+	@Input() question?: string;
+	@Input() conversationId!: string;
+	@Input() expanded = false;
 
 	// dialog state
 	selectedSource: MessageSource | null = null;
@@ -36,7 +36,6 @@ export class SourceListComponent implements OnChanges {
 	private feedbackLoaded = false; // avoid redundant calls
 
 	constructor(
-		private readonly uploadService: UploadService,
 		private readonly notifService: ObNotificationService,
 		private readonly feedbackService: FeedbackService,
 		private readonly authService: AuthenticationServiceV2
@@ -58,9 +57,6 @@ export class SourceListComponent implements OnChanges {
 	isUrl(s: MessageSource): boolean {
 		return s.type === 'URL';
 	}
-	isFile(s: MessageSource): boolean {
-		return s.type === 'FILE';
-	}
 	extractLabel(link: string): string {
 		try {
 			const {hostname, pathname} = new URL(link);
@@ -71,18 +67,6 @@ export class SourceListComponent implements OnChanges {
 	}
 	fileName(path: string): string {
 		return path.split('/').pop() ?? path;
-	}
-
-	/** Download via your existing service */
-	downloadFile(source: MessageSource): void {
-		this.uploadService.downloadSourceDocument(source.link).subscribe({
-			next: blob => {
-				const pdfBlob = new Blob([blob], {type: 'application/pdf'});
-				const url = window.URL.createObjectURL(pdfBlob);
-				window.open(url, '_blank');
-			},
-			error: () => this.notifService.error('Erreur lors du téléchargement du fichier')
-		});
 	}
 
 	/* ---------------------- Feedback flow ---------------------- */
@@ -129,12 +113,14 @@ export class SourceListComponent implements OnChanges {
 		this.isSubmitting = true;
 
 		this.feedbackService
-			.sendFeedback({
+			.sendSourceFeedback({
 				conversationId: this.conversationId,
-				messageId: this.messageId,
+				messageId: this.message.id,
 				documentId,
 				isPositive: this.selectedVote === 'upvote',
-				comment: this.comment?.trim() || undefined
+				comment: this.comment?.trim() || undefined,
+				question: this.question,
+				answer: this.message.message
 			})
 			.subscribe({
 				next: () => {
@@ -159,9 +145,9 @@ export class SourceListComponent implements OnChanges {
 	/* ---------------------- Existing feedbacks ---------------------- */
 
 	private loadExistingFeedbacks(): void {
-		if (!this.authenticatedAsExpert() || !this.conversationId || !this.messageId) return;
+		if (!this.authenticatedAsExpert() || !this.conversationId || !this.message.id) return;
 
-		this.feedbackService.getMySourceFeedbacks(this.conversationId, this.messageId).subscribe({
+		this.feedbackService.getMySourceFeedbacks(this.conversationId, this.message.id).subscribe({
 			next: rows => {
 				// rows: one per source (for this user)
 				for (const r of rows ?? []) {
@@ -182,11 +168,10 @@ export class SourceListComponent implements OnChanges {
 
 	/** Optionally reflect the vote directly on source objects (e.g., UI badges elsewhere) */
 	private applyFeedbackToSources(): void {
-		for (const s of this.sources) {
+		for (const s of this.message.sources) {
 			const id = s.documentId;
-			const v = this.feedbackById.get(id);
 			// @ts-expect-error — decorate if you want to use elsewhere
-			s.userFeedback = v; // 'upvote' | 'downvote' | undefined
+			s.userFeedback = this.feedbackById.get(id); // 'upvote' | 'downvote' | undefined
 		}
 	}
 }

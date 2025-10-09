@@ -1,0 +1,14 @@
+<form [formGroup]="addFaqItemFormGrp">
+	<h4 class="mb16">{{ "add.question.answer" | translate }}</h4>
+	<mat-card class="mat-elevation-z2">
+		<mat-card-content>
+			<zco-faq-item-edit formControlName="faqItem"></zco-faq-item-edit>
+		</mat-card-content>
+		<mat-card-actions>
+			<button mat-button [obButton]="'primary'" (click)="submitFAQItem()" [disabled]="!addFaqItemFormGrp.valid">
+				<mat-icon svgIcon="checkmark"></mat-icon>
+				{{ "add" | translate }}
+			</button>
+		</mat-card-actions>
+	</mat-card>
+</form>

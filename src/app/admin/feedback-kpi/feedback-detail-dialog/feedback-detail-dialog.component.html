@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>{{ "admin.feedback.detail" | translate }}</h2>
+<mat-dialog-content class="dialog-content">
+	<section class="meta">
+		<div>
+			<strong>{{ "date" | translate }}: </strong>{{ data.timestamp | date: "yyyy-MM-dd HH:mm" }}
+		</div>
+		<div>
+			<strong>{{ "score" | translate }}: </strong
+			><span [class.pos]="data.score === 1" [class.neg]="data.score === -1">{{ data.score === 1 ? "👍" : "👎" }}</span>
+		</div>
+		<div *ngIf="data.comment">
+			<strong>{{ "comment" | translate }}: </strong>{{ data.comment }}
+		</div>
+	</section>
+	<section class="qa">
+		<h3>{{ "question" | translate }}</h3>
+		<p>{{ data.question }}</p>
+		<h3>{{ "answer" | translate }}</h3>
+		<markdown [data]="data.answer"></markdown>
+	</section>
+	<section class="source-list" *ngIf="data.sources?.length">
+		<h3>{{ "sources.title" | translate }}</h3>
+		<article class="source-card" *ngFor="let s of data.sources">
+			<zco-source [source]="s"></zco-source>
+		</article>
+	</section>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+	<button mat-button mat-dialog-close [obButton]="'secondary'">{{ "close" | translate }}</button>
+</mat-dialog-actions>
