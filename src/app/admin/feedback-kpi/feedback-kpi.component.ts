@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FeedbackService, TimeRange} from '../../shared/services/feedback.service';
-import {IDocumentFeedbackDetail, IFeedbackStats, IMessageFeedback} from '../../shared/model/feedback';
+import {IDocumentFeedbackDetail, IFeedbackStats, IMessageFeedback, ISourceFeedback} from '../../shared/model/feedback';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
@@ -10,6 +10,7 @@ import {takeUntil} from 'rxjs/operators';
 import {FeedbackDetailDialogComponent} from './feedback-detail-dialog/feedback-detail-dialog.component';
 import {ChartConfiguration, Chart as ChartJS, registerables} from 'chart.js';
 import {DocumentFeedbackDetailDialogComponent} from './document-feedback-detail-dialog/document-feedback-detail-dialog.component';
+
 ChartJS.register(...registerables);
 
 @Component({
@@ -82,64 +83,76 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 		this.refresh();
 	}
 
-	private refresh() {
+	private refresh(): void {
 		const stats$ = this.feedback.stats(this.range);
-		const msgs$ = this.feedback.listMessageFeedback(this.range);
-		const srcs$ = this.feedback.listSourceFeedback(this.range);
+		const messages$ = this.feedback.listMessageFeedback(this.range);
+		const sources$ = this.feedback.listSourceFeedback(this.range);
 
-		combineLatest([stats$, msgs$, srcs$])
+		combineLatest([stats$, messages$, sources$])
 			.pipe(takeUntil(this.destroy$))
-			.subscribe(([stats, msgs, srcs]) => {
-				this.stats = stats;
+			.subscribe(([stats, messages, sources]) => this.updateView(stats, messages, sources));
+	}
 
-				// charts
-				this.doughnutData = {
-					labels: ['👍', '👎'],
-					datasets: [{data: [stats.positive, stats.negative]}]
-				};
+	private updateView(stats: IFeedbackStats, msgs: IMessageFeedback[], srcs: ISourceFeedback[]): void {
+		this.stats = stats;
+		this.updateCharts(stats);
+		this.updateLatestTable(msgs);
+		this.updateSourcesTable(srcs);
+	}
 
-				const labels = stats.perDay.map(d => d.date);
-				const pos = stats.perDay.map(d => d.positive);
-				const neg = stats.perDay.map(d => d.negative);
-				this.barData = {
-					labels,
-					datasets: [
-						{label: '👍', data: pos, stack: 's'},
-						{label: '👎', data: neg, stack: 's'}
-					]
-				};
+	private updateCharts(stats: IFeedbackStats): void {
+		this.doughnutData = {
+			labels: ['👍', '👎'],
+			datasets: [{data: [stats.positive, stats.negative]}]
+		};
 
-				// tables
-				this.latestData.data = msgs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-				setTimeout(() => {
-					// wire after view
-					if (this.latestPaginator) this.latestData.paginator = this.latestPaginator;
-					if (this.latestSort) this.latestData.sort = this.latestSort;
-				});
+		const labels = stats.perDay.map(d => d.date);
+		const pos = stats.perDay.map(d => d.positive);
+		const neg = stats.perDay.map(d => d.negative);
 
-				// Aggregate source stats into a flattened list for the table
-				const docMap = new Map<string, IDocumentFeedbackDetail>();
-				srcs.forEach(s => {
-					const key = s.documentId;
-					const e = docMap.get(key) || {
-						documentId: key,
-						documentTitle: s.documentTitle,
-						documentUrl: s.documentUrl,
-						neg: 0,
-						pos: 0,
-						feedbacks: []
-					};
-					if (s.feedbackType === 'NEGATIVE') e.neg++;
-					else e.pos++;
-					e.feedbacks.push(s);
-					docMap.set(key, e);
-				});
-				this.sourcesData.data = Array.from(docMap.values());
-				setTimeout(() => {
-					// wire after view
-					if (this.sourcesPaginator) this.sourcesData.paginator = this.sourcesPaginator;
-					if (this.sourcesSort) this.sourcesData.sort = this.sourcesSort;
-				});
-			});
+		this.barData = {
+			labels,
+			datasets: [
+				{label: '👍', data: pos, stack: 's'},
+				{label: '👎', data: neg, stack: 's'}
+			]
+		};
+	}
+
+	private updateLatestTable(msgs: IMessageFeedback[]): void {
+		this.latestData.data = (msgs as any).toSorted ? (msgs as any).toSorted(this.sortByTimestampDesc) : [...msgs].sort(this.sortByTimestampDesc);
+
+		// brancher paginator/sort après rendu
+		queueMicrotask(() => {
+			if (this.latestPaginator) this.latestData.paginator = this.latestPaginator;
+			if (this.latestSort) this.latestData.sort = this.latestSort;
+		});
+	}
+	private readonly sortByTimestampDesc = (a: {timestamp: string}, b: {timestamp: string}) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+
+	private updateSourcesTable(sources: ISourceFeedback[]): void {
+		const map = new Map<string, IDocumentFeedbackDetail>();
+
+		for (const s of sources) {
+			const row = map.get(s.documentId) ?? {
+				documentId: s.documentId,
+				documentTitle: s.documentTitle || s.documentId,
+				documentUrl: s.documentUrl,
+				neg: 0,
+				pos: 0,
+				feedbacks: []
+			};
+			if (s.feedbackType === 'NEGATIVE') row.neg++;
+			else row.pos++;
+			row.feedbacks.push(s);
+			map.set(s.documentId, row);
+		}
+
+		this.sourcesData.data = Array.from(map.values());
+
+		queueMicrotask(() => {
+			if (this.sourcesPaginator) this.sourcesData.paginator = this.sourcesPaginator;
+			if (this.sourcesSort) this.sourcesData.sort = this.sourcesSort;
+		});
 	}
 }
