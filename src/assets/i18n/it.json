@@ -105,7 +105,7 @@
   "admin": "Amministrazione",
   "tools": "Strumenti",
   "tips": {
-    "component": "Consigli",
+    "component": "Aiuto",
     "sections": {
       "getting_started": {
         "title": "Per iniziare",
@@ -131,15 +131,6 @@
           "Quindi ponete le vostre domande sui documenti scaricati",
           "Tradurre o sintetizzare i documenti scaricati",
           "I documenti rimangono disponibili per 24 ore"
-        ]
-      },
-      "advanced_options": {
-        "title": "Opzioni avanzate",
-        "tips": [
-          "Impostare il modello linguistico nella sezione “Parametri LLM Avanzati”",
-          "Il filtraggio manuale delle fonti e dei tag in “Parametri Ricerca Avanzati” migliora la qualità delle risposte",
-          "Scegliete lo stile e il formato della risposta in “Parametri della risposta”",
-          "L'opzione di convalida della fonte in “Parametri Chat Avanzati” consente di verificare la qualità delle fonti"
         ]
       }
     }

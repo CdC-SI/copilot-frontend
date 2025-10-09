@@ -20,7 +20,7 @@
 		<th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">{{ "user.roles" | translate }}</th>
 		<td mat-cell *matCellDef="let user">{{ user.roles }}</td>
 	</ng-container>
-	<ng-container matColumnDef="internal">
+	<ng-container matColumnDef="internalUser">
 		<th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">{{ "user.internal" | translate }}</th>
 		<td mat-cell *matCellDef="let user">{{ (user.internalUser ? "yes" : "no") | translate }}</td>
 	</ng-container>

@@ -14,12 +14,15 @@ import {AuthenticationServiceV2} from './shared/services/auth.service';
 	styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-	navigation: ObINavigationLink[] = [];
+	navigation: ObINavigationLink[] = [
+		{url: '/chat', label: 'chat'},
+		{url: '/tips', label: 'tips.component'}
+	];
 	navigationAdmin: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
 		{url: '/admin', label: 'admin'},
-		{url: '/tips', label: 'tips.component'},
-		{url: '/tools', label: 'tools'}
+		{url: '/tools', label: 'tools'},
+		{url: '/tips', label: 'tips.component'}
 	];
 	projectVersion: string;
 	@ViewChild('userNotRegisteredDialog') userNotRegisteredDialog: TemplateRef<any>;

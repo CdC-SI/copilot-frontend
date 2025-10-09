@@ -105,7 +105,7 @@
   "tools": "Werkzeuge",
   "admin": "Verwaltung",
   "tips": {
-    "component": "Tipps",
+    "component": "Helfen",
     "sections": {
       "getting_started": {
         "title": "Um zu beginnen",
@@ -131,15 +131,6 @@
           "Stellen Sie dann Ihre Fragen zu den heruntergeladenen Dokumenten",
           "Übersetzen oder fassen Sie heruntergeladene Dokumente zusammen",
           "Die Dokumente bleiben 24 Stunden lang verfügbar"
-        ]
-      },
-      "advanced_options": {
-        "title": "Erweiterte Optionen",
-        "tips": [
-          "Stellen Sie das Sprachmodell im Abschnitt 'Erweiterte LLM-Einstellungen' ein",
-          "Die manuelle Filterung von Quellen (source) und Themen (tags) in 'Erweiterte Sucheinstellungen' verbessert die Antwortqualität",
-          "Wählen Sie den Stil und das Format der Antwort in 'Antworteinstellungen'",
-          "Die Option zur Überprüfung von Quellen in 'Erweiterte Chat-Einstellungen' ermöglicht es, die Qualität der Quellen zu überprüfen"
         ]
       }
     }

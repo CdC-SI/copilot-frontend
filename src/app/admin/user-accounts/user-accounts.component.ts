@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {IUser, IUserAction, Role, UserStatus} from '../../shared/model/user';
 import {Observable, Subject, catchError, finalize, map, merge, of, startWith, switchMap} from 'rxjs';
@@ -14,7 +14,7 @@ import {MatPaginator} from '@angular/material/paginator';
 	styleUrl: './user-accounts.component.scss'
 })
 export class UserAccountsComponent implements AfterViewInit {
-	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internal', 'actions'];
+	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internalUser', 'actions'];
 	usersDataSource = new MatTableDataSource<IUser>();
 	resultsLength = 0;
 	pageSize = 10;

@@ -105,7 +105,7 @@
   "tools": "Outils",
   "admin": "Administration",
   "tips": {
-    "component": "Conseils",
+    "component": "Aide",
     "sections": {
       "getting_started": {
         "title": "Pour commencer",
@@ -131,15 +131,6 @@
           "Posez ensuite vos questions sur les documents téléchargés",
           "Traduisez ou résumez les documents téléchargés",
           "Les documents restent disponibles durant 24 heures"
-        ]
-      },
-      "advanced_options": {
-        "title": "Options avancées",
-        "tips": [
-          "Paramétrez le modèle de language dans la section 'Paramètres Avancés LLM'",
-          "Le filtrage manuel des sources (source) et les sujets (tags) dans 'Paramètres Avancés Recherche' améliore la qualité de réponse",
-          "Choisissez le style et format de réponse dans 'Paramètres de réponse'",
-          "L'option de validation des sources dans 'Paramètres Avancés Chat' permet de vérifier la qualité des sources"
         ]
       }
     }
