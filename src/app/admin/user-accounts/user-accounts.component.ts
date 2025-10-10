@@ -27,7 +27,8 @@ export class UserAccountsComponent implements AfterViewInit {
 		ACTIVE: {USER: ['deactivate', 'promote'], EXPERT: ['deactivate', 'demote', 'promote'], ADMIN: ['deactivate', 'demote']},
 		PENDING_ACTIVATION: {USER: ['validate'], EXPERT: [], ADMIN: []},
 		INACTIVE: {USER: ['reactivate'], EXPERT: ['reactivate'], ADMIN: ['reactivate']},
-		GUEST: {USER: [], EXPERT: [], ADMIN: []}
+		GUEST: {USER: [], EXPERT: [], ADMIN: []},
+		JOHN_DOE: {USER: [], EXPERT: [], ADMIN: []}
 	};
 
 	ACTION_CATALOG: Record<string, IUserAction> = {
