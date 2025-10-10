@@ -48,10 +48,6 @@ export class UserAccountsComponent implements AfterViewInit {
 	) {}
 
 	ngAfterViewInit(): void {
-		this.reload();
-	}
-
-	reload(): void {
 		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 		merge(this.sort.sortChange, this.paginator.page, this.refresh$)
 			.pipe(
@@ -76,6 +72,10 @@ export class UserAccountsComponent implements AfterViewInit {
 				users.forEach(u => (u.actions = this.getActions(u)));
 				this.usersDataSource.data = users;
 			});
+	}
+
+	reload(): void {
+		this.refresh$.next();
 	}
 
 	onAction(action: string, user: IUser): void {
