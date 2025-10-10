@@ -5,7 +5,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatDialog} from '@angular/material/dialog';
-import {Subject, combineLatest} from 'rxjs';
+import {BehaviorSubject, Subject, combineLatest} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {FeedbackDetailDialogComponent} from './feedback-detail-dialog/feedback-detail-dialog.component';
 import {ChartConfiguration, Chart as ChartJS, registerables} from 'chart.js';
@@ -49,6 +49,7 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	@ViewChild('topSourcesSort') sourcesSort!: MatSort;
 
 	private readonly destroy$ = new Subject<void>();
+	private readonly rangeSubject$ = new BehaviorSubject<TimeRange>('30d');
 
 	constructor(
 		private readonly feedback: FeedbackService,
@@ -56,7 +57,10 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
-		this.refresh();
+		this.rangeSubject$.pipe(takeUntil(this.destroy$)).subscribe(range => {
+			this.range = range;
+			this.fetchData(range);
+		});
 	}
 
 	ngOnDestroy(): void {
@@ -66,8 +70,7 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 
 	onRangeChange(r: TimeRange) {
 		if (this.range !== r) {
-			this.range = r;
-			this.refresh();
+			this.rangeSubject$.next(r);
 		}
 	}
 
@@ -80,13 +83,13 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	}
 
 	reload(): void {
-		this.refresh();
+		this.rangeSubject$.next(this.range);
 	}
 
-	private refresh(): void {
-		const stats$ = this.feedback.stats(this.range);
-		const messages$ = this.feedback.listMessageFeedback(this.range);
-		const sources$ = this.feedback.listSourceFeedback(this.range);
+	private fetchData(range: TimeRange): void {
+		const stats$ = this.feedback.stats(range);
+		const messages$ = this.feedback.listMessageFeedback(range);
+		const sources$ = this.feedback.listSourceFeedback(range);
 
 		combineLatest([stats$, messages$, sources$])
 			.pipe(takeUntil(this.destroy$))

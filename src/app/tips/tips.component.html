@@ -1,16 +1,16 @@
 <div class="tips-container">
-  <h2 class="mb16">{{ "tips.component" | translate }}</h2>
+	<h2 class="mb16">{{ "tips.component" | translate }}</h2>
 
-  <div class="tips-sections">
-    <mat-card class="tip-card mat-elevation-z2" *ngFor="let section of tipSections">
-      <mat-card-header>
-        <mat-card-title>{{ section.titleKey | translate }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <ul>
-          <li *ngFor="let tipKey of section.tipsKeys">{{ tipKey | translate }}</li>
-        </ul>
-      </mat-card-content>
-    </mat-card>
-  </div>
+	<div class="tips-sections">
+		<mat-card class="tip-card mat-elevation-z2" *ngFor="let section of tipSections">
+			<mat-card-header>
+				<mat-card-title>{{ section.titleKey | translate }}</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<ul>
+					<li *ngFor="let tipKey of section.tipsKeys">{{ tipKey | translate }}</li>
+				</ul>
+			</mat-card-content>
+		</mat-card>
+	</div>
 </div>

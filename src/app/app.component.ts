@@ -14,15 +14,19 @@ import {AuthenticationServiceV2} from './shared/services/auth.service';
 	styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-	navigation: ObINavigationLink[] = [];
+	navigation: ObINavigationLink[] = [
+		{url: '/chat', label: 'chat'},
+		{url: '/tips', label: 'tips.component'}
+	];
 	navigationAdmin: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
 		{url: '/admin', label: 'admin'},
-		{url: '/tips', label: 'tips.component'},
-		{url: '/tools', label: 'tools'}
+		{url: '/tools', label: 'tools'},
+		{url: '/tips', label: 'tips.component'}
 	];
 	projectVersion: string;
 	@ViewChild('userNotRegisteredDialog') userNotRegisteredDialog: TemplateRef<any>;
+	@ViewChild('johnDoeInfoDialog') johnDoeInfoDialog: TemplateRef<any>;
 
 	constructor(
 		private readonly dialog: MatDialog,
@@ -48,6 +52,9 @@ export class AppComponent implements OnInit {
 						break;
 					case UserStatus.GUEST:
 						this.openRegisterDialog();
+						break;
+					case UserStatus.JOHN_DOE:
+						this.openJohnDoeInfoDialog();
 						break;
 				}
 			}
@@ -76,6 +83,16 @@ export class AppComponent implements OnInit {
 				return {status: 'inactive', icon: 'warning-circle'};
 			case UserStatus.GUEST:
 				return {status: 'guest', icon: 'user-pen'};
+			case UserStatus.JOHN_DOE:
+				return {status: 'john-doe', icon: 'user'};
+		}
+	}
+
+	openDialog(status: string) {
+		if (status === 'guest') {
+			this.openRegisterDialog();
+		} else if (status === 'john-doe') {
+			this.openJohnDoeInfoDialog();
 		}
 	}
 
@@ -88,6 +105,10 @@ export class AppComponent implements OnInit {
 					this.openSignUpDialog();
 				}
 			});
+	}
+
+	openJohnDoeInfoDialog() {
+		this.dialog.open(this.johnDoeInfoDialog);
 	}
 
 	private openSignUpDialog() {

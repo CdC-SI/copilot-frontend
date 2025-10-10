@@ -44,7 +44,7 @@ export class SourceComponent {
 				const url = window.URL.createObjectURL(pdfBlob);
 				window.open(url, '_blank');
 			},
-			error: () => this.notifService.error('Erreur lors du téléchargement du fichier')
+			error: () => this.notifService.error('sourceList.download.error')
 		});
 	}
 }

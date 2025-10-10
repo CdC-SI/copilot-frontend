@@ -8,7 +8,7 @@
 				[svgIcon]="getIconStatus().icon"
 				[class]="'icon-status icon-status-' + getIconStatus().status"
 				[matTooltip]="'copilot.account.status.info.' + getIconStatus().status | translate"
-				(click)="getIconStatus().status === 'guest' ? openRegisterDialog() : null"
+				(click)="openDialog(getIconStatus().status)"
 			/>
 		</div>
 	</ng-template>
@@ -43,6 +43,21 @@
 		<button mat-button [obButton]="'primary'" [mat-dialog-close]="true">
 			<mat-icon svgIcon="arrow-right"></mat-icon>
 			{{ "copilot.register" | translate }}
+		</button>
+	</div>
+</ng-template>
+
+<ng-template #johnDoeInfoDialog>
+	<h2 mat-dialog-title>{{ "copilot.john-doe.info.title" | translate }}</h2>
+	<div mat-dialog-content>
+		<p>{{ "copilot.john-doe.info.text.1" | translate }}</p>
+		<p>{{ "copilot.john-doe.info.text.2" | translate }}</p>
+		<p>{{ "copilot.john-doe.info.text.3" | translate }}</p>
+	</div>
+	<div mat-dialog-actions class="mt16">
+		<button mat-button [obButton]="'tertiary'" [mat-dialog-close]="false">
+			<mat-icon svgIcon="cancel"></mat-icon>
+			{{ "continue.guest" | translate }}
 		</button>
 	</div>
 </ng-template>
