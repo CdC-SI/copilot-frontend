@@ -35,10 +35,10 @@ import {FeedbackKpiComponent} from './admin/feedback-kpi/feedback-kpi.component'
 import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
 import {FeedbackDetailDialogComponent} from './admin/feedback-kpi/feedback-detail-dialog/feedback-detail-dialog.component';
 import {BaseChartDirective} from 'ng2-charts';
-import { DocumentFeedbackDetailDialogComponent } from './admin/feedback-kpi/document-feedback-detail-dialog/document-feedback-detail-dialog.component';
-import { FaqEditComponent } from './admin/faq-edit/faq-edit.component';
-import { UserAccountsComponent } from './admin/user-accounts/user-accounts.component';
-import { DocUploadComponent } from './admin/doc-upload/doc-upload.component';
+import {DocumentFeedbackDetailDialogComponent} from './admin/feedback-kpi/document-feedback-detail-dialog/document-feedback-detail-dialog.component';
+import {FaqEditComponent} from './admin/faq-edit/faq-edit.component';
+import {UserAccountsComponent} from './admin/user-accounts/user-accounts.component';
+import {DocUploadComponent} from './admin/doc-upload/doc-upload.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -67,10 +67,10 @@ function pamsFactory(configurationService: ConfigurationService) {
 		IdentityCheckComponent,
 		FeedbackKpiComponent,
 		FeedbackDetailDialogComponent,
-  DocumentFeedbackDetailDialogComponent,
-  FaqEditComponent,
-  UserAccountsComponent,
-  DocUploadComponent
+		DocumentFeedbackDetailDialogComponent,
+		FaqEditComponent,
+		UserAccountsComponent,
+		DocUploadComponent
 	],
 	imports: [
 		BrowserModule,

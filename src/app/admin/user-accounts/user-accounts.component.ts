@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {IUser, IUserAction, Role, UserStatus} from '../../shared/model/user';
 import {Observable, Subject, catchError, finalize, map, merge, of, startWith, switchMap} from 'rxjs';
@@ -14,7 +14,7 @@ import {MatPaginator} from '@angular/material/paginator';
 	styleUrl: './user-accounts.component.scss'
 })
 export class UserAccountsComponent implements AfterViewInit {
-	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internal', 'actions'];
+	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internalUser', 'actions'];
 	usersDataSource = new MatTableDataSource<IUser>();
 	resultsLength = 0;
 	pageSize = 10;
@@ -27,7 +27,8 @@ export class UserAccountsComponent implements AfterViewInit {
 		ACTIVE: {USER: ['deactivate', 'promote'], EXPERT: ['deactivate', 'demote', 'promote'], ADMIN: ['deactivate', 'demote']},
 		PENDING_ACTIVATION: {USER: ['validate'], EXPERT: [], ADMIN: []},
 		INACTIVE: {USER: ['reactivate'], EXPERT: ['reactivate'], ADMIN: ['reactivate']},
-		GUEST: {USER: [], EXPERT: [], ADMIN: []}
+		GUEST: {USER: [], EXPERT: [], ADMIN: []},
+		JOHN_DOE: {USER: [], EXPERT: [], ADMIN: []}
 	};
 
 	ACTION_CATALOG: Record<string, IUserAction> = {
@@ -48,10 +49,6 @@ export class UserAccountsComponent implements AfterViewInit {
 	) {}
 
 	ngAfterViewInit(): void {
-		this.reload();
-	}
-
-	reload(): void {
 		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 		merge(this.sort.sortChange, this.paginator.page, this.refresh$)
 			.pipe(
@@ -76,6 +73,10 @@ export class UserAccountsComponent implements AfterViewInit {
 				users.forEach(u => (u.actions = this.getActions(u)));
 				this.usersDataSource.data = users;
 			});
+	}
+
+	reload(): void {
+		this.refresh$.next();
 	}
 
 	onAction(action: string, user: IUser): void {

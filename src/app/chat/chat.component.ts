@@ -68,6 +68,7 @@ export class ChatComponent implements OnInit {
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
+	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -540,6 +541,8 @@ export class ChatComponent implements OnInit {
 	private showDialog() {
 		if (this.authService.userStatus() === UserStatus.GUEST) {
 			this.dialog.open(this.userNotRegisteredDialog);
+		} else if (this.authService.userStatus() === UserStatus.JOHN_DOE) {
+			this.dialog.open(this.johnDoeDialog);
 		} else {
 			this.dialog.open(this.userPendingTriesToChatDialog);
 		}

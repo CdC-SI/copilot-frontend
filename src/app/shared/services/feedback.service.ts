@@ -31,11 +31,6 @@ export class FeedbackService {
 		return this.http.get<ISourceFeedback[]>(this.config.backendApi('/feedback/sources'), {params});
 	}
 
-	getMessageFeedbackById(id: number, includeDetails = true): Observable<IMessageFeedback> {
-		const params = includeDetails ? new HttpParams().set('includeDetails', 'true') : (undefined as any);
-		return this.http.get<IMessageFeedback>(this.config.backendApi(`/feedback/messages/${id}`), {params});
-	}
-
 	public sendAnswerFeedback(feedback: Feedback) {
 		return this.http.post<void>(this.config.backendApi('/conversations/feedbacks?type=answer'), feedback);
 	}
