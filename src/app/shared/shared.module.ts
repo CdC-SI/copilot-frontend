@@ -22,6 +22,7 @@ import {MatBadge} from '@angular/material/badge';
 import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.component';
 import {SourceListComponent} from './components/source-list/source-list.component';
 import {FilePreviewComponent} from './components/file-preview/file-preview.component';
+import {SourceComponent} from './components/source-list/source/source.component';
 
 @NgModule({
 	declarations: [
@@ -37,7 +38,8 @@ import {FilePreviewComponent} from './components/file-preview/file-preview.compo
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
 		SourceListComponent,
-		FilePreviewComponent
+		FilePreviewComponent,
+		SourceComponent
 	],
 	imports: [
 		CommonModule,
@@ -69,7 +71,8 @@ import {FilePreviewComponent} from './components/file-preview/file-preview.compo
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
-		FilePreviewComponent
+		FilePreviewComponent,
+		SourceComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

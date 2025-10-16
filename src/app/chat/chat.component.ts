@@ -68,6 +68,7 @@ export class ChatComponent implements OnInit {
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
+	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
@@ -330,15 +331,16 @@ export class ChatComponent implements OnInit {
 		let sourceMatch;
 		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
 			// Only store the URL
-			const sourceUrl = sourceMatch[1];
-			const sourceFile = sourceMatch[2];
-			const pageNumber = sourceMatch[3];
-			const subSection = sourceMatch[4];
-			const version = sourceMatch[5];
+			const docId = sourceMatch[1];
+			const sourceUrl = sourceMatch[2];
+			const sourceFile = sourceMatch[3];
+			const pageNumber = sourceMatch[4];
+			const subSection = sourceMatch[5];
+			const version = sourceMatch[6];
 
 			const source: MessageSource = sourceUrl
-				? {type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version}
-				: {type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
+				? {documentId: docId, type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version}
+				: {documentId: docId, type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
 			partialChatMessage.sources.push(source);
 
 			// Remove entire source tag from message
@@ -422,7 +424,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	sendFeedback(feedback: Feedback) {
-		this.feedbackService.sendFeeback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
+		this.feedbackService.sendAnswerFeedback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
 			this.notif.success('feedback.success');
 		});
 	}
@@ -539,6 +541,8 @@ export class ChatComponent implements OnInit {
 	private showDialog() {
 		if (this.authService.userStatus() === UserStatus.GUEST) {
 			this.dialog.open(this.userNotRegisteredDialog);
+		} else if (this.authService.userStatus() === UserStatus.JOHN_DOE) {
+			this.dialog.open(this.johnDoeDialog);
 		} else {
 			this.dialog.open(this.userPendingTriesToChatDialog);
 		}

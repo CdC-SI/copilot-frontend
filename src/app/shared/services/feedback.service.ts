@@ -1,8 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
-import {Feedback, SourceFeedback} from '../model/feedback';
+import {Feedback, IFeedbackStats, IMessageFeedback, ISourceFeedback, SourceFeedback} from '../model/feedback';
 import {Observable} from 'rxjs';
+
+export type TimeRange = '7d' | '30d' | '90d' | 'all';
 
 @Injectable({
 	providedIn: 'root'
@@ -13,11 +15,27 @@ export class FeedbackService {
 		private readonly config: ConfigurationService
 	) {}
 
-	public sendFeeback(feedback: Feedback) {
+	stats(range: TimeRange = '30d'): Observable<IFeedbackStats> {
+		const params = new HttpParams().set('range', range);
+		return this.http.get<IFeedbackStats>(this.config.backendApi('/feedback/stats'), {params});
+	}
+
+	listMessageFeedback(range: TimeRange = '30d', includeDetails = true): Observable<IMessageFeedback[]> {
+		let params = new HttpParams().set('range', range);
+		if (includeDetails) params = params.set('includeDetails', 'true');
+		return this.http.get<IMessageFeedback[]>(this.config.backendApi('/feedback/messages'), {params});
+	}
+
+	listSourceFeedback(range: TimeRange = '30d'): Observable<ISourceFeedback[]> {
+		const params = new HttpParams().set('range', range);
+		return this.http.get<ISourceFeedback[]>(this.config.backendApi('/feedback/sources'), {params});
+	}
+
+	public sendAnswerFeedback(feedback: Feedback) {
 		return this.http.post<void>(this.config.backendApi('/conversations/feedbacks?type=answer'), feedback);
 	}
 
-	public sendFeedback(feedback: SourceFeedback) {
+	public sendSourceFeedback(feedback: SourceFeedback) {
 		return this.http.post<void>(this.config.backendApi('/conversations/feedbacks?type=source'), feedback);
 	}
 

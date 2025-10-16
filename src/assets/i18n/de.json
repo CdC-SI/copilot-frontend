@@ -1,4 +1,24 @@
 {
+  "admin.feedback.global": "Übersicht",
+  "admin.feedback.total": "Gesamt",
+  "admin.feedback.split": "Aufteilung",
+  "admin.feedback.timeline": "Zeitverlauf",
+  "admin.feedback.sources": "Am häufigsten gemeldete Quellen",
+  "admin.feedback.latest": "Neueste Feedbacks",
+  "admin.feedback.detail": "Feedback-Details",
+  "admin.manage.feedback": "Feedback",
+  "admin.manage.feedback.description": "KPIs, Statistiken und Details",
+  "admin.feedback.source.detail": "Feedback-Details zu: ",
+  "satisfaction": "Zufriedenheit",
+  "download": "Herunterladen",
+  "open": "Öffnen",
+  "details": "Details",
+  "date": "Datum",
+  "score": "Bewertung",
+  "comment": "Kommentar",
+  "sources.title": "Quellen",
+  "close": "Schließen",
+  "document.title": "Dokument",
   "sourceList.meta.section": "Abschnitt",
   "sourceList.meta.page": "Seite",
   "sourceList.meta.version": "Version",
@@ -59,6 +79,7 @@
   "copilot.account.status.info.inactive": "Inaktives Konto",
   "copilot.account.status.info.pending": "Wartet auf Aktivierung",
   "copilot.account.status.info.guest": "Gastkonto",
+  "copilot.account.status.info.john-doe": "Guest Login",
   "copilot.account.inactive": "Ihr Konto ist inaktiv, bitte kontaktieren Sie die Administratoren.",
   "copilot.account.pending.activation": "Ihr Konto ist noch nicht aktiviert, es wird bald aktiviert.",
   "copilot.account.created": "Kontoanfrage gesendet.",
@@ -69,6 +90,10 @@
   "copilot.pending.info.title": "Ihr Konto wartet auf Validierung",
   "copilot.pending.info.text.1": "Während der Aktivierung können Sie nur Fragen auswählen, die in der Liste der vorgeschlagenen Fragen erscheinen.",
   "copilot.pending.info.text.2": "Um auf alle Funktionen der Anwendung zuzugreifen, warten Sie bitte.",
+  "copilot.john-doe.info.title": "Sie sind über den Gast-Login angemeldet",
+  "copilot.john-doe.info.text.1": "Mit dieser Anmeldemethode können Sie kein persönliches Konto erstellen.",
+  "copilot.john-doe.info.text.2": "Um auf alle Funktionen der Anwendung zuzugreifen, ändern Sie bitte die Authentifizierungsart.",
+  "copilot.john-doe.info.text.3": "Ex : AGOV / CH-LOGIN / FED-LOGIN",
   "continue.guest": "Als Gast fortfahren",
   "copilot.register": "Konto erstellen",
   "upload.success": "Die Datei wurde erfolgreich hochgeladen",
@@ -85,7 +110,7 @@
   "tools": "Werkzeuge",
   "admin": "Verwaltung",
   "tips": {
-    "component": "Tipps",
+    "component": "Helfen",
     "sections": {
       "getting_started": {
         "title": "Um zu beginnen",
@@ -111,15 +136,6 @@
           "Stellen Sie dann Ihre Fragen zu den heruntergeladenen Dokumenten",
           "Übersetzen oder fassen Sie heruntergeladene Dokumente zusammen",
           "Die Dokumente bleiben 24 Stunden lang verfügbar"
-        ]
-      },
-      "advanced_options": {
-        "title": "Erweiterte Optionen",
-        "tips": [
-          "Stellen Sie das Sprachmodell im Abschnitt 'Erweiterte LLM-Einstellungen' ein",
-          "Die manuelle Filterung von Quellen (source) und Themen (tags) in 'Erweiterte Sucheinstellungen' verbessert die Antwortqualität",
-          "Wählen Sie den Stil und das Format der Antwort in 'Antworteinstellungen'",
-          "Die Option zur Überprüfung von Quellen in 'Erweiterte Chat-Einstellungen' ermöglicht es, die Qualität der Quellen zu überprüfen"
         ]
       }
     }
