@@ -36,6 +36,10 @@ export class AuthenticationServiceV2 {
 		return this.$authenticatedUser.getValue()?.roles.includes(Role.ADMIN);
 	}
 
+	hasExpertRole(): boolean {
+		return this.$authenticatedUser.getValue()?.roles.includes(Role.EXPERT) || this.hasAdminRole();
+	}
+
 	isRegistered() {
 		return this.$authenticatedUser.getValue()?.status === UserStatus.ACTIVE;
 	}

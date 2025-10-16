@@ -33,10 +33,10 @@ export class AdminComponent implements OnInit, AfterViewInit {
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
 	ACTION_MATRIX: Record<UserStatus, Record<Role, string[]>> = {
-		ACTIVE: {USER: ['deactivate', 'promote'], ADMIN: ['deactivate', 'demote']},
-		PENDING_ACTIVATION: {USER: ['validate'], ADMIN: []},
-		INACTIVE: {USER: ['reactivate'], ADMIN: ['reactivate']},
-		GUEST: {USER: [], ADMIN: []}
+		ACTIVE: {USER: ['deactivate', 'promote'], EXPERT: ['deactivate', 'demote', 'promote'], ADMIN: ['deactivate', 'demote']},
+		PENDING_ACTIVATION: {USER: ['validate'], EXPERT: [], ADMIN: []},
+		INACTIVE: {USER: ['reactivate'], EXPERT: ['reactivate'], ADMIN: ['reactivate']},
+		GUEST: {USER: [], EXPERT: [], ADMIN: []}
 	};
 
 	ACTION_CATALOG: Record<string, IUserAction> = {
@@ -166,7 +166,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
 	}
 
 	private getActions(user: IUser): IUserAction[] {
-		const role = user.roles.includes(Role.ADMIN) ? Role.ADMIN : Role.USER;
+		let role: Role;
+		if (user.roles.includes(Role.ADMIN)) {
+			role = Role.ADMIN;
+		} else if (user.roles.includes(Role.EXPERT)) {
+			role = Role.EXPERT;
+		} else {
+			role = Role.USER;
+		}
+
 		const actions = this.ACTION_MATRIX[user.status][role].map(id => ({
 			...this.ACTION_CATALOG[id]
 		}));

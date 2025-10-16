@@ -29,7 +29,7 @@
 			</li>
 		</ul>
 
-		<div class="source-actions">
+		<div *ngIf="authenticatedAsExpert()" class="source-actions">
 			<button
 				type="button"
 				class="icon-btn upvote"

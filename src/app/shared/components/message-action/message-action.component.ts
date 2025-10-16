@@ -86,8 +86,8 @@ export class MessageActionComponent {
 		});
 	}
 
-	authenticatedAsAdmin() {
-		return this.authService.hasAdminRole();
+	authenticatedAsExpert() {
+		return this.authService.hasExpertRole();
 	}
 
 	private giveFeedback(comment: string, isPositive: boolean) {
