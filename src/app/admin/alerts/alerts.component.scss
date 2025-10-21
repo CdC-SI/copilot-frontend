@@ -1,0 +1,81 @@
+/* ----- Formulaire ----- */
+.alerts-root {
+	display: grid;
+	gap: 1rem;
+}
+
+.alerts-root mat-card-title {
+	padding: 10px;
+}
+
+.alerts-form {
+	display: grid;
+	gap: 12px;
+}
+
+.top-row {
+	display: grid;
+	grid-template-columns: 220px 1fr 180px; /* level | date | time */
+	gap: 12px;
+	align-items: end;
+}
+
+.texts-accordion {
+	margin-top: 4px;
+}
+
+.texts-col {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 10px;
+}
+
+.default-hint {
+	font-size: .9rem;
+	opacity: .75;
+	margin-top: -4px;
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 6px;
+}
+
+/* Responsive formulaire */
+@media (max-width: 900px) {
+	.top-row {
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+}
+
+@media (max-width: 640px) {
+	.top-row {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ----- Tables ----- */
+.tables {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+}
+
+.tables mat-chip-set {
+	margin-top: 0 !important;
+}
+
+.row-actions {
+	display: flex;
+	justify-content: flex-end;
+	border-bottom: none;
+	gap: 0.5rem;
+}
+
+@media (max-width: 1100px) {
+	.tables {
+		grid-template-columns: 1fr;
+	}
+}
+

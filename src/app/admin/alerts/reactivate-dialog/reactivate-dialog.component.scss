@@ -1,0 +1,14 @@
+.reactivate-content .grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr; /* date | time */
+	gap: 12px;
+}
+
+.actions {
+	display: flex;
+	gap: .5rem;
+}
+
+@media (max-width: 640px) {
+	.reactivate-content .grid { grid-template-columns: 1fr; }
+}

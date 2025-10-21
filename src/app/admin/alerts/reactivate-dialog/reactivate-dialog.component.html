@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>{{ "admin.alerts.reactivate.title" | translate }}</h2>
+
+<mat-dialog-content class="reactivate-content">
+	<form [formGroup]="form" class="grid">
+		<mat-form-field appearance="outline">
+			<mat-label>{{ "admin.alerts.date" | translate }}</mat-label>
+			<input matInput [matDatepicker]="picker" formControlName="date" />
+			<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+			<mat-datepicker #picker></mat-datepicker>
+			<mat-error *ngIf="form.get('date')?.hasError('required')">
+				{{ "admin.alerts.reactivate.date.required" | translate }}
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>{{ "admin.alerts.time" | translate }}</mat-label>
+			<input matInput placeholder="HH:mm" formControlName="time" />
+			<mat-error *ngIf="form.get('time')?.invalid">
+				{{ "admin.alerts.reactivate.time.invalid" | translate }}
+			</mat-error>
+		</mat-form-field>
+	</form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="actions">
+	<button mat-button [obButton]="'secondary'" (click)="cancel()">
+		{{ "cancel" | translate }}
+	</button>
+	<button mat-button [obButton]="'primary'" [disabled]="form.invalid" (click)="submit()">
+		{{ "admin.alerts.reactivate.cta" | translate }}
+	</button>
+</mat-dialog-actions>

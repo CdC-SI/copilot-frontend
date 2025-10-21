@@ -39,6 +39,8 @@ import {DocumentFeedbackDetailDialogComponent} from './admin/feedback-kpi/docume
 import {FaqEditComponent} from './admin/faq-edit/faq-edit.component';
 import {UserAccountsComponent} from './admin/user-accounts/user-accounts.component';
 import {DocUploadComponent} from './admin/doc-upload/doc-upload.component';
+import {AlertsComponent} from './admin/alerts/alerts.component';
+import { ReactivateDialogComponent } from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -70,7 +72,9 @@ function pamsFactory(configurationService: ConfigurationService) {
 		DocumentFeedbackDetailDialogComponent,
 		FaqEditComponent,
 		UserAccountsComponent,
-		DocUploadComponent
+		DocUploadComponent,
+		AlertsComponent,
+  ReactivateDialogComponent
 	],
 	imports: [
 		BrowserModule,
