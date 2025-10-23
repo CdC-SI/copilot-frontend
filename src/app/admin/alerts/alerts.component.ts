@@ -7,7 +7,6 @@ import {Subject, takeUntil} from 'rxjs';
 import {AlertsService, toLocalDateTimeString} from '../../shared/services/alert.service';
 import {AlertLevel, AlertView, CreateAlertDTO} from '../../shared/model/alerts';
 import {ObNotificationService} from '@oblique/oblique';
-import {join} from '@angular/compiler-cli';
 import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ReactivateDialogComponent} from './reactivate-dialog/reactivate-dialog.component';
