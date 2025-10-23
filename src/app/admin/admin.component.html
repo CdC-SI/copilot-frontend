@@ -26,6 +26,18 @@
 			</ng-template>
 		</mat-expansion-panel>
 
+		<!-- Alerts Administration -->
+		<mat-expansion-panel (opened)="OnAlertPanelOpened()">
+			<mat-expansion-panel-header>
+				<mat-panel-title>{{ "admin.alerts.panelTitle" | translate }}</mat-panel-title>
+				<mat-panel-description>{{ "admin.alerts.panelDesc" | translate }}</mat-panel-description>
+			</mat-expansion-panel-header>
+
+			<ng-template matExpansionPanelContent>
+				<zco-admin-alerts #alertsComponent></zco-admin-alerts>
+			</ng-template>
+		</mat-expansion-panel>
+
 		<!-- FAQ Administration -->
 		<mat-expansion-panel togglePosition="after">
 			<mat-expansion-panel-header>

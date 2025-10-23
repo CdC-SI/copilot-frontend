@@ -16,7 +16,7 @@ import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {ChatConfigurationEditComponent} from './components/chat-configuration-edit/chat-configuration-edit.component';
 import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
-import {MatLine} from '@angular/material/core';
+import {MatLine, MatNativeDateModule} from '@angular/material/core';
 import {ActionSuggestionsComponent} from './components/action-suggestions/action-suggestions.component';
 import {MatBadge} from '@angular/material/badge';
 import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.component';
@@ -51,7 +51,8 @@ import {SourceComponent} from './components/source-list/source/source.component'
 		BrowserAnimationsModule,
 		MarkdownModule.forRoot(),
 		MatLine,
-		MatBadge
+		MatBadge,
+		MatNativeDateModule
 	],
 	exports: [
 		CommonModule,
