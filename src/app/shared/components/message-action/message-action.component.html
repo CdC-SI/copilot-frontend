@@ -1,6 +1,6 @@
-<mat-icon *ngIf="authenticatedAsAdmin()" [matTooltip]="'edit.answer' | translate" [svgIcon]="'pen'" (click)="openFaqItemDialog()"></mat-icon>
-<mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs-up'" (click)="positiveFeedback()"></mat-icon>
-<mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs-down'" (click)="openFeedbackDialog()"></mat-icon>
+<mat-icon *ngIf="authenticatedAsExpert()" [matTooltip]="'edit.answer' | translate" [svgIcon]="'pen'" (click)="openFaqItemDialog()"></mat-icon>
+<mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs-up'" (click)="openFeedbackDialog(true)"></mat-icon>
+<mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs-down'" (click)="openFeedbackDialog(false)"></mat-icon>
 <mat-icon
 	[ngClass]="message.beingSpoken ? 'being-spoken' : ''"
 	[matTooltip]="'read.aloud' | translate"
@@ -25,8 +25,8 @@
 	</div>
 </ng-template>
 
-<ng-template #negativeFeedbackDialog>
-	<h4 mat-dialog-title>{{ "feedback.comment" | translate }}</h4>
+<ng-template #feedbackDialog>
+	<h4 mat-dialog-title>{{ feedBackTitle | translate }}</h4>
 	<div mat-dialog-content class="mt16" ngForm>
 		<textarea [formControl]="feedbackFrmCtrl" placeholder="{{ 'feedback.comment.placeholder' | translate }}"></textarea>
 	</div>

@@ -16,12 +16,13 @@ import {SignUpComponent} from './components/sign-up/sign-up.component';
 import {ChatConfigurationEditComponent} from './components/chat-configuration-edit/chat-configuration-edit.component';
 import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
-import {MatLine} from '@angular/material/core';
+import {MatLine, MatNativeDateModule} from '@angular/material/core';
 import {ActionSuggestionsComponent} from './components/action-suggestions/action-suggestions.component';
 import {MatBadge} from '@angular/material/badge';
 import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.component';
 import {SourceListComponent} from './components/source-list/source-list.component';
 import {FilePreviewComponent} from './components/file-preview/file-preview.component';
+import {SourceComponent} from './components/source-list/source/source.component';
 
 @NgModule({
 	declarations: [
@@ -37,7 +38,8 @@ import {FilePreviewComponent} from './components/file-preview/file-preview.compo
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
 		SourceListComponent,
-		FilePreviewComponent
+		FilePreviewComponent,
+		SourceComponent
 	],
 	imports: [
 		CommonModule,
@@ -49,7 +51,8 @@ import {FilePreviewComponent} from './components/file-preview/file-preview.compo
 		BrowserAnimationsModule,
 		MarkdownModule.forRoot(),
 		MatLine,
-		MatBadge
+		MatBadge,
+		MatNativeDateModule
 	],
 	exports: [
 		CommonModule,
@@ -69,7 +72,8 @@ import {FilePreviewComponent} from './components/file-preview/file-preview.compo
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
-		FilePreviewComponent
+		FilePreviewComponent,
+		SourceComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

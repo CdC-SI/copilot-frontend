@@ -13,7 +13,8 @@ export enum UserStatus {
 	PENDING_ACTIVATION = 'PENDING_ACTIVATION',
 	ACTIVE = 'ACTIVE',
 	INACTIVE = 'INACTIVE',
-	GUEST = 'GUEST'
+	GUEST = 'GUEST',
+	JOHN_DOE = 'JOHN_DOE'
 }
 
 export enum UserFormFields {
@@ -26,7 +27,8 @@ export enum UserFormFields {
 
 export enum Role {
 	ADMIN = 'ADMIN',
-	USER = 'USER'
+	USER = 'USER',
+	EXPERT = 'EXPERT'
 }
 
 export interface IUserAction {

@@ -30,7 +30,17 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 import {AuthenticationInterceptor} from './shared/interceptors/authentication-interceptor';
 import {ToolsHomeComponent} from './tools/tools-home/tools-home.component';
 import {DocumentAnalysisComponent} from './tools/document-analysis/document-analysis.component';
-import { IdentityCheckComponent } from './tools/identity-check/identity-check.component';
+import {IdentityCheckComponent} from './tools/identity-check/identity-check.component';
+import {FeedbackKpiComponent} from './admin/feedback-kpi/feedback-kpi.component';
+import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
+import {FeedbackDetailDialogComponent} from './admin/feedback-kpi/feedback-detail-dialog/feedback-detail-dialog.component';
+import {BaseChartDirective} from 'ng2-charts';
+import {DocumentFeedbackDetailDialogComponent} from './admin/feedback-kpi/document-feedback-detail-dialog/document-feedback-detail-dialog.component';
+import {FaqEditComponent} from './admin/faq-edit/faq-edit.component';
+import {UserAccountsComponent} from './admin/user-accounts/user-accounts.component';
+import {DocUploadComponent} from './admin/doc-upload/doc-upload.component';
+import {AlertsComponent} from './admin/alerts/alerts.component';
+import { ReactivateDialogComponent } from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -49,7 +59,23 @@ function pamsFactory(configurationService: ConfigurationService) {
 }
 
 @NgModule({
-	declarations: [AppComponent, ChatComponent, AdminComponent, TipsComponent, ToolsHomeComponent, DocumentAnalysisComponent, IdentityCheckComponent],
+	declarations: [
+		AppComponent,
+		ChatComponent,
+		AdminComponent,
+		TipsComponent,
+		ToolsHomeComponent,
+		DocumentAnalysisComponent,
+		IdentityCheckComponent,
+		FeedbackKpiComponent,
+		FeedbackDetailDialogComponent,
+		DocumentFeedbackDetailDialogComponent,
+		FaqEditComponent,
+		UserAccountsComponent,
+		DocUploadComponent,
+		AlertsComponent,
+  ReactivateDialogComponent
+	],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
@@ -61,7 +87,10 @@ function pamsFactory(configurationService: ConfigurationService) {
 		TranslateModule.forRoot(multiTranslateLoader()),
 		ObExternalLinkModule,
 		SharedModule,
-		MatProgressBar
+		MatProgressBar,
+		MatButtonToggleGroup,
+		MatButtonToggle,
+		BaseChartDirective
 	],
 	providers: [
 		{provide: ZCO_CONFIGURATIONS_TOKEN, useValue: ZCO_CONFIGURATIONS},

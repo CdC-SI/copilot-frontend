@@ -5,12 +5,17 @@
 	<div class="flex-column">
 		<markdown [data]="message.message"></markdown>
 
-		<mat-expansion-panel *ngIf="hasMultipleSources" class="sources-panel">
+		<mat-expansion-panel *ngIf="hasMultipleSources" class="sources-panel" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">
 			<mat-expansion-panel-header>
 				<mat-panel-title> Sources ({{ sourcesCount }}) </mat-panel-title>
 			</mat-expansion-panel-header>
 
-			<zco-source-list [sources]="message.sources"></zco-source-list>
+			<zco-source-list
+				[message]="message"
+				[question]="previousMessage?.message"
+				[conversationId]="conversationId"
+				[expanded]="sourcePanelOpen"
+			></zco-source-list>
 		</mat-expansion-panel>
 
 		<zco-message-action

@@ -21,7 +21,8 @@ export class MessageActionComponent {
 	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
 
 	@ViewChild('addFaqItemDialog') addFaqItemDialog: TemplateRef<any>;
-	@ViewChild('negativeFeedbackDialog') negativeFeedbackDialog: TemplateRef<any>;
+	@ViewChild('feedbackDialog') feedbackDialog: TemplateRef<any>;
+	feedBackTitle: string;
 	faqItemFrmCtrl = new FormControl<IFaqItem>(null, [Validators.required]);
 	feedbackFrmCtrl = new FormControl<string>(null, [Validators.required]);
 
@@ -45,7 +46,6 @@ export class MessageActionComponent {
 		this.message.beingSpoken = true;
 		this.speakMessage(this.message);
 	};
-
 	speakMessage = (message: ChatMessage): void => {
 		const speech = new SpeechSynthesisUtterance();
 		speech.text = message.message;
@@ -56,12 +56,13 @@ export class MessageActionComponent {
 		speechSynthesis.speak(speech);
 	};
 
-	openFeedbackDialog() {
+	openFeedbackDialog(positive: boolean) {
 		this.feedbackFrmCtrl.reset();
+		this.feedBackTitle = positive ? 'feedback.positive' : 'feedback.negative';
 		this.dialog
-			.open(this.negativeFeedbackDialog, {width: '500px'})
+			.open(this.feedbackDialog, {width: '500px'})
 			.afterClosed()
-			.subscribe(result => result && this.negativeFeedback(this.feedbackFrmCtrl.value));
+			.subscribe(result => result && this.giveFeedback(this.feedbackFrmCtrl.value, positive));
 	}
 
 	openFaqItemDialog() {
@@ -85,15 +86,17 @@ export class MessageActionComponent {
 		});
 	}
 
-	authenticatedAsAdmin() {
-		return this.authService.hasAdminRole();
+	authenticatedAsExpert() {
+		return this.authService.hasExpertRole();
 	}
 
-	positiveFeedback() {
-		this.feedback.emit({messageId: this.message.id, isPositive: true});
-	}
-
-	private negativeFeedback(comment: string) {
-		this.feedback.emit({messageId: this.message.id, isPositive: false, comment});
+	private giveFeedback(comment: string, isPositive: boolean) {
+		this.feedback.emit({
+			messageId: this.message.id,
+			question: this.previousMessage.message,
+			answer: this.message.message,
+			isPositive,
+			comment
+		});
 	}
 }
