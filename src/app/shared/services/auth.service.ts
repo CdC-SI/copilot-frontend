@@ -40,6 +40,10 @@ export class AuthenticationServiceV2 {
 		return this.$authenticatedUser.getValue()?.roles.includes(Role.EXPERT) || this.hasAdminRole();
 	}
 
+	hasTranslatorRole() {
+		return this.$authenticatedUser.getValue()?.roles.includes(Role.TRANSLATOR) || this.hasAdminRole();
+	}
+
 	isRegistered() {
 		return this.$authenticatedUser.getValue()?.status === UserStatus.ACTIVE;
 	}

@@ -1,10 +1,10 @@
 <div class="button-container" *ngIf="!selectedComponent">
-	<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.DocumentAnalysis)">
+	<button *ngIf="hasTranslatorRole()" class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.DocumentAnalysis)">
 		<mat-icon svgIcon="arrow-right"></mat-icon>
 		{{ "documentAnalysis" | translate }}
 	</button>
 
-	<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.IdentityCheck)">
+	<button *ngIf="hasAdminRole()" class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.IdentityCheck)">
 		<mat-icon svgIcon="arrow-right"></mat-icon>
 		{{ "identityCheck" | translate }}
 	</button>

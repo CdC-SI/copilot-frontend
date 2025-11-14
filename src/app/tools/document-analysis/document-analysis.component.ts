@@ -6,6 +6,7 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Subscription} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {VisionService} from '../../shared/services/vision.service';
+import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 
 @Component({
 	selector: 'zco-document-analysis',
@@ -33,7 +34,8 @@ export class DocumentAnalysisComponent implements OnInit {
 		private readonly fb: FormBuilder,
 		private readonly visionService: VisionService,
 		private readonly notif: ObNotificationService,
-		private readonly dialogService: MatDialog
+		private readonly dialogService: MatDialog,
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	ngOnInit() {
@@ -146,6 +148,14 @@ export class DocumentAnalysisComponent implements OnInit {
 
 	addCtrlToVisionForm(key: string, value: string) {
 		this.visionFrmGrp.addControl(key, new FormControl(value));
+	}
+
+	hasTranslatorRole(): boolean {
+		return this.authService.hasTranslatorRole();
+	}
+
+	hasAdminRole(): boolean {
+		return this.authService.hasAdminRole();
 	}
 
 	get allVisionCtrlName(): string[] {

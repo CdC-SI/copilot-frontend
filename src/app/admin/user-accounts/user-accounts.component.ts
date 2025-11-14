@@ -24,11 +24,16 @@ export class UserAccountsComponent implements AfterViewInit {
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
 	ACTION_MATRIX: Record<UserStatus, Record<Role, string[]>> = {
-		ACTIVE: {USER: ['deactivate', 'promote'], EXPERT: ['deactivate', 'demote', 'promote'], ADMIN: ['deactivate', 'demote']},
-		PENDING_ACTIVATION: {USER: ['validate'], EXPERT: [], ADMIN: []},
-		INACTIVE: {USER: ['reactivate'], EXPERT: ['reactivate'], ADMIN: ['reactivate']},
-		GUEST: {USER: [], EXPERT: [], ADMIN: []},
-		JOHN_DOE: {USER: [], EXPERT: [], ADMIN: []}
+		ACTIVE: {
+			USER: ['deactivate', 'promote'],
+			EXPERT: ['deactivate', 'demote', 'promote'],
+			TRANSLATOR: ['deactivate', 'demote', 'promote'],
+			ADMIN: ['deactivate', 'demote']
+		},
+		PENDING_ACTIVATION: {USER: ['validate'], EXPERT: [], TRANSLATOR: [], ADMIN: []},
+		INACTIVE: {USER: ['reactivate'], EXPERT: ['reactivate'], TRANSLATOR: ['reactivate'], ADMIN: ['reactivate']},
+		GUEST: {USER: [], EXPERT: [], TRANSLATOR: [], ADMIN: []},
+		JOHN_DOE: {USER: [], EXPERT: [], TRANSLATOR: [], ADMIN: []}
 	};
 
 	ACTION_CATALOG: Record<string, IUserAction> = {

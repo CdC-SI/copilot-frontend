@@ -28,7 +28,8 @@ export enum UserFormFields {
 export enum Role {
 	ADMIN = 'ADMIN',
 	USER = 'USER',
-	EXPERT = 'EXPERT'
+	EXPERT = 'EXPERT',
+	TRANSLATOR = 'TRANSLATOR'
 }
 
 export interface IUserAction {

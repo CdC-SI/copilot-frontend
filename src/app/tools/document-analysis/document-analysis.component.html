@@ -21,7 +21,7 @@
 					{{ "document-analysis.cancel" | translate }}
 				</button>
 				<button
-					*ngIf="!requestSubscription"
+					*ngIf="!requestSubscription && hasAdminRole()"
 					style="margin-bottom: 16px; width: 100%; justify-content: flex-start"
 					mat-button
 					[obButton]="'primary'"
@@ -30,7 +30,13 @@
 					<mat-icon svgIcon="arrow-right"></mat-icon>
 					{{ "document-analysis.extract" | translate }}
 				</button>
-				<button *ngIf="!requestSubscription" style="width: 100%; justify-content: flex-start" mat-button [obButton]="'primary'" (click)="openTranslateDialog()">
+				<button
+					*ngIf="!requestSubscription && hasTranslatorRole()"
+					style="width: 100%; justify-content: flex-start"
+					mat-button
+					[obButton]="'primary'"
+					(click)="openTranslateDialog()"
+				>
 					<mat-icon svgIcon="arrow-right"></mat-icon>
 					{{ "document-analysis.translate" | translate }}
 				</button>
@@ -85,7 +91,7 @@
 		</mat-form-field>
 	</div>
 	<div mat-dialog-actions class="mt16">
-		<button mat-button [obButton]="'primary'" [mat-dialog-close]="true">
+		<button *ngIf="hasTranslatorRole()" mat-button [obButton]="'primary'" [mat-dialog-close]="true">
 			<mat-icon svgIcon="arrow-right"></mat-icon>
 			{{ "validate" | translate }}
 		</button>

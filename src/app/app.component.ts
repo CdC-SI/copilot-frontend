@@ -18,6 +18,11 @@ export class AppComponent implements OnInit {
 		{url: '/chat', label: 'chat'},
 		{url: '/tips', label: 'tips.component'}
 	];
+	navigationTranslator: ObINavigationLink[] = [
+		{url: '/chat', label: 'chat'},
+		{url: '/tools', label: 'tools'},
+		{url: '/tips', label: 'tips.component'}
+	];
 	navigationAdmin: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
 		{url: '/admin', label: 'admin'},
@@ -62,7 +67,9 @@ export class AppComponent implements OnInit {
 	}
 
 	getNavigation() {
-		return this.authService.hasAdminRole() && this.authService.userStatus() === UserStatus.ACTIVE ? this.navigationAdmin : this.navigation;
+		if (this.authService.hasAdminRole() && this.authService.userStatus() === UserStatus.ACTIVE) return this.navigationAdmin;
+		else if (this.authService.hasTranslatorRole()) return this.navigationTranslator;
+		return this.navigation;
 	}
 
 	getDisplayName() {
