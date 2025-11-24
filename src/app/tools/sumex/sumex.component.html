@@ -1,0 +1,295 @@
+<ob-column-layout class="mt16" [left]="true" [right]="false">
+	<mat-card column-left-content>
+		<mat-card-header>
+			<mat-card-title>
+				<div class="flex-row jcsb aic">
+					<h3>Facture scannée</h3>
+					<div class="flex-row aic">
+						<div *ngIf="isLoading" class="spinner-container mr8">
+							<div class="spinner"></div>
+						</div>
+						<button [disabled]="!documentCtrl.value || isLoading" mat-icon-button [obButton]="'primary'" (click)="extractData()">
+							<mat-icon svgIcon="play"></mat-icon>
+						</button>
+						<button class="ml8" mat-icon-button *ngIf="documentCtrl.value" [obButton]="'secondary'" (click)="reinit()">
+							<mat-icon svgIcon="cancel"></mat-icon>
+						</button>
+					</div>
+				</div>
+			</mat-card-title>
+		</mat-card-header>
+		<mat-card-content>
+			<ob-file-upload
+				*ngIf="!documentCtrl.value"
+				class="d-flex mb16"
+				(uploadEvent)="uploadDocumentEvent($event)"
+				[accept]="['.jpeg', '.jpg', '.png']"
+				[maxFileSize]="10"
+				[multiple]="true"
+				[singleRequest]="false"
+			></ob-file-upload>
+			<app-file-preview style="margin-top: 8px" *ngIf="documentCtrl.value" [file]="documentCtrl.value.file"></app-file-preview>
+		</mat-card-content>
+	</mat-card>
+
+	<mat-card column-main-content>
+		<mat-card-header>
+			<mat-card-title></mat-card-title>
+		</mat-card-header>
+		<mat-card-content>
+			<form [formGroup]="invoiceForm">
+				<mat-tab-group>
+					<mat-tab label="Auteur de la facture">
+						<div class="tab-content" formGroupName="author">
+							<mat-form-field obErrorMessages>
+								<mat-label>GLN</mat-label>
+								<input formControlName="gln" name="gln" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>Nom</mat-label>
+								<input formControlName="name" name="name" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>Localité</mat-label>
+								<input formControlName="locality" name="locality" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+						</div>
+					</mat-tab>
+					<mat-tab label="Patient">
+						<div class="tab-content" formGroupName="patient">
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>Nom de famille</mat-label>
+									<input formControlName="lastName" name="lastName" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Prénom</mat-label>
+									<input formControlName="firstName" name="firstName" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+							<mat-form-field obErrorMessages>
+								<mat-label>Rue</mat-label>
+								<input formControlName="street" name="street" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>NPA</mat-label>
+									<input formControlName="postalCode" name="postalCode" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Localité</mat-label>
+									<input formControlName="locality" name="locality" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>Boîte postale</mat-label>
+									<input formControlName="poBox" name="poBox" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Pays</mat-label>
+									<input formControlName="country" name="country" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>Date de naissance</mat-label>
+									<input formControlName="birthday" name="birthday" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Sexe</mat-label>
+									<input formControlName="gender" name="gender" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+							<mat-form-field obErrorMessages>
+								<mat-label>Date de l'accident</mat-label>
+								<input formControlName="accidentDate" name="accidentDate" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>Numéro de l'assuré</mat-label>
+									<input formControlName="insuredPersonNumber" name="insuredPersonNumber" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Numéro de cas</mat-label>
+									<input formControlName="caseNumber" name="caseNumber" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+							<mat-form-field obErrorMessages>
+								<mat-label>Numéro AVS</mat-label>
+								<input formControlName="avsNumber" name="avsNumber" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+						</div>
+					</mat-tab>
+					<mat-tab label="Facture">
+						<div class="tab-content" formGroupName="metaData">
+							<mat-form-field obErrorMessages>
+								<mat-label>Type</mat-label>
+								<input formControlName="type" name="type" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>Traitement du</mat-label>
+									<input formControlName="treatmentFrom" name="treatmentFrom" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Traitement au</mat-label>
+									<input formControlName="treatmentTo" name="treatmentTo" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+							<mat-form-field obErrorMessages>
+								<mat-label>Motif du traitement</mat-label>
+								<input formControlName="treatmentCause" name="treatmentCause" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>Date de création</mat-label>
+									<input formControlName="creationDate" name="creationDate" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Numéro de facture</mat-label>
+									<input formControlName="invoiceNumber" name="invoiceNumber" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+						</div>
+					</mat-tab>
+					<mat-tab label="Services médicaux">
+						<div class="tab-content">
+							<div class="positions-header">
+								<h4>Liste des services médicaux</h4>
+								<button mat-icon-button [obButton]="'primary'" (click)="ajouterPosition()">
+									<mat-icon svgIcon="plus"></mat-icon>
+								</button>
+							</div>
+							<div *ngIf="medicalServices.length > 0" class="positions-table">
+								<div class="positions-table-header">
+									<span class="col-date">Date</span>
+									<span class="col-description">Description</span>
+									<span class="col-tarif">Tarif</span>
+									<span class="col-code">Code</span>
+									<span class="col-quantite">Quantité</span>
+									<span class="col-montant">Montant</span>
+									<span class="col-actions"></span>
+								</div>
+								<div *ngFor="let service of medicalServices.controls; let i = index; trackBy: trackByIndex" class="position-row" [formGroup]="$any(service)">
+									<input class="col-date" formControlName="date" type="text" />
+									<input class="col-description" formControlName="description" type="text" placeholder="Description" />
+									<input class="col-tarif" formControlName="tariff" type="text" placeholder="Tarif" />
+									<input class="col-code" formControlName="code" type="text" placeholder="Code" />
+									<input class="col-quantite" formControlName="quantity" type="text" placeholder="Quantité" />
+									<input class="col-montant" formControlName="amount" type="number" step="0.01" placeholder="Montant" />
+									<div class="col-actions">
+										<button mat-icon-button [obButton]="'primary'" (click)="supprimerPosition(i)">
+											<mat-icon svgIcon="trash"></mat-icon>
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="total-row">
+								<div class="total-label">Total</div>
+								<input class="total-input" formControlName="totalAmount" type="number" step="0.01" placeholder="0.00" />
+							</div>
+							<div class="no-positions" *ngIf="medicalServices.length === 0">
+								<p>Aucun service médical ajouté. Cliquez sur "Ajouter un service" pour commencer.</p>
+							</div>
+						</div>
+					</mat-tab>
+					<mat-tab label="Informations de paiement">
+						<div class="tab-content" formGroupName="paymentInformation">
+							<mat-form-field obErrorMessages>
+								<mat-label>Devise</mat-label>
+								<input formControlName="currency" name="currency" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>Type de transfert</mat-label>
+								<input formControlName="transferType" name="transferType" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>IBAN</mat-label>
+								<input formControlName="iban" name="iban" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>Référence</mat-label>
+								<input formControlName="reference" name="reference" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>Informations supplémentaires</mat-label>
+								<textarea formControlName="additionalInfo" name="additionalInfo" matInput rows="3" placeholder=""></textarea>
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>Nom du créancier</mat-label>
+								<input formControlName="name" name="name" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>Rue du créancier</mat-label>
+								<input formControlName="street" name="street" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<div class="form-row">
+								<mat-form-field obErrorMessages>
+									<mat-label>Pays</mat-label>
+									<input formControlName="country" name="country" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>NPA</mat-label>
+									<input formControlName="postalCode" name="postalCode" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+								<mat-form-field obErrorMessages>
+									<mat-label>Localité</mat-label>
+									<input formControlName="locality" name="locality" type="text" matInput placeholder="" />
+									<mat-error></mat-error>
+								</mat-form-field>
+							</div>
+							<mat-form-field obErrorMessages>
+								<mat-label>BVR</mat-label>
+								<input formControlName="bvr" name="bvr" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+							<mat-form-field obErrorMessages>
+								<mat-label>BIC/SWIFT</mat-label>
+								<input formControlName="bicSwift" name="bicSwift" type="text" matInput placeholder="" />
+								<mat-error></mat-error>
+							</mat-form-field>
+						</div>
+					</mat-tab>
+				</mat-tab-group>
+			</form>
+			<div class="flex-row jce mt16">
+				<button mat-button [obButton]="'primary'" (click)="submitInvoice()">
+					<mat-icon svgIcon="save"></mat-icon>
+					Enregistrer la facture
+				</button>
+			</div>
+		</mat-card-content>
+	</mat-card>
+</ob-column-layout>

@@ -8,6 +8,11 @@
 		<mat-icon svgIcon="arrow-right"></mat-icon>
 		{{ "identityCheck" | translate }}
 	</button>
+
+	<button *ngIf="hasAdminRole()" class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.Sumex)">
+		<mat-icon svgIcon="arrow-right"></mat-icon>
+		{{ "Sumex" | translate }}
+	</button>
 </div>
 
 <ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.DocumentAnalysis">
@@ -22,6 +27,16 @@
 
 <ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.IdentityCheck">
 	<zco-identity-check></zco-identity-check>
+	<div class="button-container">
+		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
+			<mat-icon svgIcon="arrow-left"></mat-icon>
+			{{ "back" | translate }}
+		</button>
+	</div>
+</ng-container>
+
+<ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.Sumex">
+	<zco-sumex></zco-sumex>
 	<div class="button-container">
 		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
 			<mat-icon svgIcon="arrow-left"></mat-icon>

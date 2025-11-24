@@ -4,7 +4,8 @@ import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 
 export enum ToolsComponentType {
 	DocumentAnalysis = 'document-analysis',
-	IdentityCheck = 'identity-check'
+	IdentityCheck = 'identity-check',
+	Sumex = 'sumex'
 }
 
 @Component({
