@@ -33,9 +33,9 @@ export class SumexComponent implements OnInit {
 	buildInvoiceForm() {
 		this.invoiceForm = this.fb.group({
 			author: this.fb.group({
-				gln: [''],
-				name: [''],
-				locality: ['']
+				gln: ['', [Validators.required]],
+				name: ['', [Validators.required]],
+				locality: ['', [Validators.required]]
 			}),
 			patient: this.fb.group({
 				lastName: [''],
@@ -65,7 +65,7 @@ export class SumexComponent implements OnInit {
 			paymentInformation: this.fb.group({
 				currency: ['CHF'],
 				transferType: [''],
-				iban: [''],
+				iban: ['', [Validators.minLength(21), Validators.maxLength(21)]],
 				reference: [''],
 				additionalInfo: [''],
 				name: [''],
@@ -128,6 +128,8 @@ export class SumexComponent implements OnInit {
 		this.visionService.sumex(this.documentCtrl.value.file).subscribe({
 			next: result => {
 				this.invoiceForm.patchValue(result);
+				this.invoiceForm.markAsTouched({onlySelf: false});
+				this.invoiceForm.markAllAsTouched();
 				// @ts-ignore
 				result.medicalServices.forEach(a => {
 					this.ajouterPosition(a);
