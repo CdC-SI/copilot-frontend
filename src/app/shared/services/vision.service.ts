@@ -42,8 +42,7 @@ export class VisionService {
 		return this.http.post<any>(this.config.backendApi('/visualize/sumex'), formData);
 	}
 
-	submitInvoice(invoice: any): Observable<any> {
-		//TODO
-		return new Observable<any>();
+	submitInvoice(invoice: any) {
+		return this.http.post(this.config.backendApi('/sumex-invoices/convert'), invoice, {observe: 'response', responseType: 'blob'});
 	}
 }
