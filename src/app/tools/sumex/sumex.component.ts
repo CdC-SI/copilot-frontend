@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import { ObEUploadEventType, ObIUploadEvent, ObNotificationService } from "@oblique/oblique";
-import { VisionService } from "../../shared/services/vision.service";
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
+import {VisionService} from '../../shared/services/vision.service';
 
 @Component({
 	selector: 'zco-sumex',
@@ -96,7 +96,7 @@ export class SumexComponent implements OnInit {
 	}
 
 	createMedicalService(data?: any): FormGroup {
-		const a= this.fb.group({
+		const a = this.fb.group({
 			date: [''],
 			description: [''],
 			tariff: [''],
@@ -136,7 +136,7 @@ export class SumexComponent implements OnInit {
 				});
 				this.isLoading = false;
 				this.invoiceForm.enable({onlySelf: false});
-				this.notifService.success("La facture a été analysée avec succès.");
+				this.notifService.success('La facture a été analysée avec succès.');
 			},
 			error: () => {
 				this.isLoading = false;
@@ -151,8 +151,31 @@ export class SumexComponent implements OnInit {
 	}
 
 	submitInvoice() {
-		this.visionService.submitInvoice(this.invoiceForm.getRawValue()).subscribe(() => {
-			this.notifService.success("La facture a été soumise avec succès.");
+		this.visionService.submitInvoice(this.invoiceForm.getRawValue()).subscribe({
+			next: response => {
+				this.notifService.success('La facture a été soumise avec succès.');
+				const blob = response.body;
+				if (!blob) return;
+				const contentDisposition = response.headers.get('Content-Disposition') ?? response.headers.get('content-disposition');
+				let filename = 'sumex-invoice.xml';
+				if (contentDisposition) {
+					const matches = /filename\*?=(?:UTF-8'')?("?)([^";]+)\1/.exec(contentDisposition);
+					if (matches && matches[2]) {
+						filename = decodeURIComponent(matches[2]);
+					}
+				}
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = filename;
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+				window.URL.revokeObjectURL(url);
+			},
+			error: () => {
+				this.notifService.error('Une erreur est survenue lors de la soumission de la facture.');
+			}
 		});
 	}
 }
