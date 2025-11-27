@@ -237,20 +237,21 @@
     "user_pdf_upload": "PDF Utilisateur:",
     "user_edit": "SurveyPipeline - Saisie utilisateur",
     "lavs": "LAVS",
-    "csc_afac": "CSC Assurance Facultative",
-    "rh": "Ressources Humaines"
+    "csc_afac": "Assurance Facultative",
+    "rh": "Ressources Humaines",
+    "oaie": "OAIE"
   },
   "tags": {
     "daa": "DAA",
     "din": "DIN",
     "dsd": "DSD",
-    "CSC - Adhésion": "CSC - Adhésion",
-    "CSC - Cas de sortie": "CSC - Cas de sortie",
-    "CSC - Contentieux": "CSC - Contentieux",
-    "CSC - Exclusion": "CSC - Exclusion",
-    "CSC - Gestion des dossiers": "CSC - Gestion des dossiers",
-    "CSC - Taxation": "CSC - Taxation",
-    "CSC - Opposition": "CSC - Opposition",
+    "CSC - Adhésion": "AF - Adhésion",
+    "CSC - Cas de sortie": "AF - Cas de sortie",
+    "CSC - Contentieux": "AF - Contentieux",
+    "CSC - Exclusion": "AF - Exclusion",
+    "CSC - Gestion des dossiers": "AF - Gestion des dossiers",
+    "CSC - Taxation": "AF - Taxation",
+    "CSC - Opposition": "AF - Opposition",
     "RH - Congés et absences": "RH - Congés et absences",
     "RH - Encadrement, formation et développement": "RH - Encadrement, formation et développement",
     "RH - Éthique et conformité": "RH - Éthique et conformité",
@@ -285,7 +286,11 @@
     "akis_online_help": "AKIS Aide En Ligne",
     "lavs": "LAVS",
     "eak_lernbaustein": "Guide d'apprentissage",
-    "praxisleitfaden_fz": "Guide Pratique AFam"
+    "praxisleitfaden_fz": "Guide Pratique AFam",
+    "OAIE - LAI": "OAIE - LAI",
+    "OAIE - RAI": "OAIE - RAI",
+    "OAIE - LPGA": "OAIE - LPGA",
+    "OAIE - CE/883/2004": "OAIE - CE/883/2004"
   },
   "legal_basis": {
     "tos": "Conditions d'utilisation",
