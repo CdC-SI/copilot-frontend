@@ -237,9 +237,10 @@
     "user_pdf_upload": "PDF Utilisateur:",
     "user_edit": "SurveyPipeline - Saisie utilisateur",
     "lavs": "LAVS",
-    "csc_afac": "CSC Assurance Facultative",
+    "csc_afac": "Assurance Facultative",
     "rh": "Ressources Humaines",
-    "oaie": "OAIE"
+    "oaie": "OAIE",
+    "faq_bsv": "FAQ BSV"
   },
   "tags": {
     "daa": "DAA",
