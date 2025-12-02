@@ -288,10 +288,13 @@
     "lavs": "LAVS",
     "eak_lernbaustein": "Guide d'apprentissage",
     "praxisleitfaden_fz": "Guide Pratique AFam",
-    "OAIE - LAI": "OAIE - LAI",
-    "OAIE - RAI": "OAIE - RAI",
-    "OAIE - LPGA": "OAIE - LPGA",
-    "OAIE - CE/883/2004": "OAIE - CE/883/2004"
+    "OAIE - LAI": "LAI",
+    "OAIE - RAI": "RAI",
+    "OAIE - LPGA": "LPGA",
+    "OAIE - CE/883/2004": "CE 883/2004",
+    "OAIE - Conventions Bilatérales": "Conventions Bilatérales",
+    "OAIE - CIRAI": "CIRAI",
+    "OAIE - CPAI": "CPAI"
   },
   "legal_basis": {
     "tos": "Conditions d'utilisation",
