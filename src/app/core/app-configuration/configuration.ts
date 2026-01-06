@@ -9,7 +9,6 @@ export interface Configuration {
 	patterns: string[];
 	pamsConfig?: ObIPamsConfiguration;
 	apiUrl?: string;
-	pamsAppId: string;
 }
 
 export const ZCO_CONFIGURATIONS_TOKEN = new InjectionToken('zco-configuration');
@@ -24,7 +23,6 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			environment: ObEPamsEnvironment.DEV,
 			rootUrl: 'http://localhost:8208/'
 		},
-		pamsAppId: '301470',
 		production: false,
 		local: true,
 		apiUrl: '/copilot/api'
@@ -38,7 +36,6 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			environment: ObEPamsEnvironment.REF,
 			rootUrl: '/pams/'
 		},
-		pamsAppId: '301470',
 		production: false,
 		local: false,
 		apiUrl: '/copilot/api'
@@ -52,7 +49,6 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			environment: ObEPamsEnvironment.REF,
 			rootUrl: '/pams/'
 		},
-		pamsAppId: '301470',
 		production: false,
 		local: false,
 		apiUrl: '/copilot/api'
@@ -66,7 +62,6 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 			environment: ObEPamsEnvironment.ABN,
 			rootUrl: '/pams/'
 		},
-		pamsAppId: '301470',
 		production: false,
 		local: false,
 		apiUrl: '/copilot/api'

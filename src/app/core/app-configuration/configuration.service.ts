@@ -2,6 +2,10 @@ import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
+import {EnvironmentService} from 'zas-design-system';
+import {firstValueFrom, map, mergeMap, switchMap} from 'rxjs';
+import {MOCK_USER_TOKEN} from './token';
+import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 import {IUser} from '../../shared/model/user';
 import {HttpClient} from '@angular/common/http';
 
@@ -16,6 +20,8 @@ export class ConfigurationService {
 		private readonly masterLayoutConfig: ObMasterLayoutConfig,
 		private readonly router: Router,
 		private readonly interceptorConfig: ObHttpApiInterceptorConfig,
+		private readonly authenticationService: AuthenticationServiceV2,
+		private readonly environmentService: EnvironmentService,
 		private readonly http: HttpClient
 	) {}
 
@@ -23,6 +29,13 @@ export class ConfigurationService {
 		this.loadConfigurationForEnv();
 		this.configureMasterLayout();
 		this.configureInterceptor();
+		return this.configureAuthentication();
+	}
+
+	configureAuthentication() {
+		this.setupEnvironmentConfigs();
+		this.setupAuthenticationTokens();
+		void firstValueFrom(this.environmentService.load().pipe(mergeMap(env => this.handleAuthenticationFlow(env))));
 	}
 
 	loadConfigurationForEnv() {
@@ -43,13 +56,12 @@ export class ConfigurationService {
 		});
 
 		this.masterLayoutConfig.homePageRoute = '/chat';
-		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = true;
+		this.masterLayoutConfig.header.serviceNavigation.displayAuthentication = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayLanguages = true;
 		this.masterLayoutConfig.header.serviceNavigation.displayProfile = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayInfo = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayMessage = false;
 		this.masterLayoutConfig.header.serviceNavigation.displayApplications = false;
-		this.masterLayoutConfig.header.serviceNavigation.pamsAppId = this.getEnvConfiguration().pamsAppId;
 	}
 
 	getEnvConfiguration(): Configuration {
@@ -60,8 +72,49 @@ export class ConfigurationService {
 		return `${this.envConfiguration.apiUrl}${subPath}`;
 	}
 
+	private setupEnvironmentConfigs() {
+		this.environmentService.setEnvironmentConfigs([
+			{matchUrlRegex: '^http[s]?://localhost.*', gatewayUrl: 'http://localhost:9998'},
+			{matchUrlRegex: '^https://.*copilot-d\\..*', gatewayUrl: 'https://gateway-d.zas.admin.ch'},
+			{matchUrlRegex: '^https://.*copilot-r\\..*', gatewayUrl: 'https://gateway-r.zas.admin.ch'},
+			{matchUrlRegex: '^https://.*copilot-a\\..*', gatewayUrl: 'https://gateway-a.zas.admin.ch'},
+			{matchUrlRegex: '^https://.*copilot\\..*', gatewayUrl: 'https://gateway.zas.admin.ch'}
+		]);
+	}
+
+	private setupAuthenticationTokens() {
+		this.environmentService.setMockToken(MOCK_USER_TOKEN);
+		this.authenticationService.jwtToken = MOCK_USER_TOKEN;
+		this.environmentService.isLocalhostEnvironment(this.envConfiguration.local);
+	}
+
+	private handleAuthenticationFlow(env: any) {
+		if (!this.envConfiguration.local) {
+			this.authenticationService.login();
+			return this.authenticateAndLoadUser(env);
+		}
+		return this.loadUserAndReturn(env);
+	}
+
+	private authenticateAndLoadUser(env: any) {
+		return this.authenticationService.getFullToken().pipe(switchMap(() => this.loadUserAndReturn(env)));
+	}
+
+	private loadUserAndReturn(env: any) {
+		return this.getUser().pipe(
+			map(user => {
+				this.authenticationService.$authenticatedUser.next(user);
+				return env;
+			})
+		);
+	}
+
 	private configureInterceptor() {
 		this.interceptorConfig.api.spinner = false;
 		this.interceptorConfig.api.notification.active = false;
+	}
+
+	private getUser() {
+		return this.http.get<IUser>(this.backendApi('/users/authenticated'));
 	}
 }
