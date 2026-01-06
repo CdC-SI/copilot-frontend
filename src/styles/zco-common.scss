@@ -7,6 +7,10 @@
 	color: white !important;
 }
 
+.mat-mdc-card-header-text {
+	flex: 1 !important;
+}
+
 .h100 {
 	height: 100%;
 }
@@ -17,6 +21,10 @@
 
 .mr8 {
 	margin-right: 8px;
+}
+
+.ml8 {
+	margin-left: 8px;
 }
 
 .mr16 {
@@ -74,6 +82,14 @@
 
 .aic {
 	align-items: center;
+}
+
+.aie {
+	align-items: end;
+}
+
+.jce {
+	justify-content: end;
 }
 
 .jcsb {
@@ -138,4 +154,25 @@ main#content {
 			}
 		}
 	}
+
+	zco-sumex {
+		.ob-column-layout {
+			.ob-column-left,
+			.ob-column-right {
+				flex-basis: 50vw;
+				max-width: 50vw;
+				margin-right: 16px;
+				padding-right: 16px;
+			}
+
+			.ob-column-left.ob-collapsed {
+				margin-left: -50vw;
+			}
+
+			.ob-column-right.ob-collapsed {
+				margin-right: -50vw;
+			}
+		}
+	}
+
 }

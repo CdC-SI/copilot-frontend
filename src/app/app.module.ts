@@ -40,7 +40,9 @@ import {FaqEditComponent} from './admin/faq-edit/faq-edit.component';
 import {UserAccountsComponent} from './admin/user-accounts/user-accounts.component';
 import {DocUploadComponent} from './admin/doc-upload/doc-upload.component';
 import {AlertsComponent} from './admin/alerts/alerts.component';
-import { ReactivateDialogComponent } from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
+import {ReactivateDialogComponent} from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
+import {SumexComponent} from './tools/sumex/sumex.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -74,7 +76,8 @@ function pamsFactory(configurationService: ConfigurationService) {
 		UserAccountsComponent,
 		DocUploadComponent,
 		AlertsComponent,
-  ReactivateDialogComponent
+		ReactivateDialogComponent,
+		SumexComponent
 	],
 	imports: [
 		BrowserModule,
@@ -90,7 +93,8 @@ function pamsFactory(configurationService: ConfigurationService) {
 		MatProgressBar,
 		MatButtonToggleGroup,
 		MatButtonToggle,
-		BaseChartDirective
+		BaseChartDirective,
+		MatProgressSpinnerModule
 	],
 	providers: [
 		{provide: ZCO_CONFIGURATIONS_TOKEN, useValue: ZCO_CONFIGURATIONS},

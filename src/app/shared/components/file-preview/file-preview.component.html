@@ -1,11 +1,11 @@
-<div *ngIf="previewUrl">
+<div *ngIf="previewUrl" class="file-preview-container">
 	<ng-container *ngIf="isImage; else pdfPreview">
-		<div style="height: 400px; overflow-y: auto">
-			<img [src]="previewUrl" alt="Preview" style="max-width: 100%;"/>
+		<div class="image-preview">
+			<img [src]="previewUrl" alt="Preview"/>
 		</div>
 	</ng-container>
 
 	<ng-template #pdfPreview>
-		<iframe [src]="previewUrl" width="100%" height="400px"></iframe>
+		<iframe [src]="previewUrl" class="pdf-preview"></iframe>
 	</ng-template>
 </div>
