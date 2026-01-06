@@ -7,7 +7,6 @@ export interface Configuration {
 	local: boolean;
 	banner: ObIBanner;
 	patterns: string[];
-	pamsConfig?: ObIPamsConfiguration;
 	apiUrl?: string;
 }
 
@@ -19,22 +18,14 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		banner: {
 			text: 'local'
 		},
-		pamsConfig: {
-			environment: ObEPamsEnvironment.DEV,
-			rootUrl: 'http://localhost:8208/'
-		},
 		production: false,
 		local: true,
 		apiUrl: '/copilot/api'
 	},
 	{
-		patterns: ['-d.zas.admin.ch'],
+		patterns: ['-d.apps.openshift'],
 		banner: {
 			text: 'DEV'
-		},
-		pamsConfig: {
-			environment: ObEPamsEnvironment.REF,
-			rootUrl: '/pams/'
 		},
 		production: false,
 		local: false,
@@ -45,10 +36,6 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		banner: {
 			text: 'REF'
 		},
-		pamsConfig: {
-			environment: ObEPamsEnvironment.REF,
-			rootUrl: '/pams/'
-		},
 		production: false,
 		local: false,
 		apiUrl: '/copilot/api'
@@ -57,10 +44,6 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		patterns: ['-a.zas.admin.ch'],
 		banner: {
 			text: 'AQ'
-		},
-		pamsConfig: {
-			environment: ObEPamsEnvironment.ABN,
-			rootUrl: '/pams/'
 		},
 		production: false,
 		local: false,
