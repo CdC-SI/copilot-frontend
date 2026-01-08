@@ -1,5 +1,4 @@
-import {ObIBanner, ObIPamsConfiguration} from '@oblique/oblique/lib/utilities.model';
-import {ObEPamsEnvironment} from '@oblique/oblique';
+import {ObIBanner} from '@oblique/oblique/lib/utilities.model';
 import {InjectionToken} from '@angular/core';
 
 export interface Configuration {
@@ -23,7 +22,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		apiUrl: '/copilot/api'
 	},
 	{
-		patterns: ['-d.apps.openshift'],
+		patterns: ['-d.zas.admin.ch'],
 		banner: {
 			text: 'DEV'
 		},
