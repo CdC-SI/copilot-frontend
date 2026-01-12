@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
-import {EnvironmentService} from 'zas-design-system';
+import {EnvironmentConfig, EnvironmentService} from 'zas-design-system';
 import {firstValueFrom, map, mergeMap, switchMap} from 'rxjs';
 import {MOCK_USER_TOKEN} from './token';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
@@ -35,7 +35,9 @@ export class ConfigurationService {
 	configureAuthentication() {
 		this.setupEnvironmentConfigs();
 		this.setupAuthenticationTokens();
-		void firstValueFrom(this.environmentService.load().pipe(mergeMap(env => this.handleAuthenticationFlow(env))));
+		firstValueFrom(this.environmentService.load().pipe(mergeMap(env => this.handleAuthenticationFlow(env)))).catch(error => {
+			console.error("Erreur lors de l'initialisation de l'authentification", error);
+		});
 	}
 
 	loadConfigurationForEnv() {
@@ -88,7 +90,7 @@ export class ConfigurationService {
 		this.environmentService.isLocalhostEnvironment(this.envConfiguration.local);
 	}
 
-	private handleAuthenticationFlow(env: any) {
+	private handleAuthenticationFlow(env: EnvironmentConfig) {
 		if (!this.envConfiguration.local) {
 			this.authenticationService.login();
 			return this.authenticateAndLoadUser(env);
@@ -96,11 +98,11 @@ export class ConfigurationService {
 		return this.loadUserAndReturn(env);
 	}
 
-	private authenticateAndLoadUser(env: any) {
+	private authenticateAndLoadUser(env: EnvironmentConfig) {
 		return this.authenticationService.getFullToken().pipe(switchMap(() => this.loadUserAndReturn(env)));
 	}
 
-	private loadUserAndReturn(env: any) {
+	private loadUserAndReturn(env: EnvironmentConfig) {
 		return this.getUser().pipe(
 			map(user => {
 				this.authenticationService.$authenticatedUser.next(user);

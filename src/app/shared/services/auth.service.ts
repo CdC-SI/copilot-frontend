@@ -37,7 +37,7 @@ export class AuthenticationServiceV2 {
 	 */
 	login(): void {
 		// eslint-disable-next-line prefer-regex-literals
-		const match: RegExpExecArray | null = RegExp('[?&]ACCESS_TOKEN').exec(this.window.location.search);
+		const match: RegExpExecArray | null = /[?&]ACCESS_TOKEN/.exec(this.window.location.search);
 		/*
 		 * No token on startup, redirect to /v2/authenticate
 		 */
@@ -77,7 +77,6 @@ export class AuthenticationServiceV2 {
 					}
 					return of(token);
 				}),
-				map(token => token),
 				catchError((err: unknown) => {
 					if (err instanceof HttpErrorResponse) {
 						if (err.status === HttpStatusCode.Unauthorized) {
@@ -135,8 +134,9 @@ export class AuthenticationServiceV2 {
 }
 
 export function cleanUri(uri: string): string {
-	if (uri && uri.indexOf('?') > 0) {
-		return uri.substring(0, uri.indexOf('?'));
+	if (uri) {
+		const questionMarkIndex = uri.indexOf('?');
+		if (questionMarkIndex > 0) return uri.substring(0, questionMarkIndex);
 	}
 	return uri;
 }
