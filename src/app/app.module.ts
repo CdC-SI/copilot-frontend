@@ -5,7 +5,6 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {
 	OB_BANNER,
-	OB_PAMS_CONFIGURATION,
 	ObButtonModule,
 	ObExternalLinkModule,
 	ObHttpApiInterceptor,
@@ -27,7 +26,7 @@ import {ZCO_CONFIGURATIONS, ZCO_CONFIGURATIONS_TOKEN} from './core/app-configura
 import {SharedModule} from './shared/shared.module';
 import {AdminComponent} from './admin/admin.component';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {AuthenticationInterceptor} from './shared/interceptors/authentication-interceptor';
+import {BlueGatewayInterceptorV2} from './shared/interceptors/blue-gateway-interceptor-v2.service';
 import {ToolsHomeComponent} from './tools/tools-home/tools-home.component';
 import {DocumentAnalysisComponent} from './tools/document-analysis/document-analysis.component';
 import {IdentityCheckComponent} from './tools/identity-check/identity-check.component';
@@ -54,10 +53,6 @@ function appInitializerFactory(configurationService: ConfigurationService) {
 
 function bannerFactory(configurationService: ConfigurationService) {
 	return configurationService.getEnvConfiguration().banner;
-}
-
-function pamsFactory(configurationService: ConfigurationService) {
-	return configurationService.getEnvConfiguration().pamsConfig;
 }
 
 @NgModule({
@@ -101,9 +96,8 @@ function pamsFactory(configurationService: ConfigurationService) {
 		{provide: LOCALE_ID, useValue: 'fr-CH'},
 		{provide: APP_INITIALIZER, useFactory: appInitializerFactory, deps: [ConfigurationService], multi: true},
 		{provide: OB_BANNER, useFactory: bannerFactory, deps: [ConfigurationService]},
-		{provide: OB_PAMS_CONFIGURATION, useFactory: pamsFactory, deps: [ConfigurationService]},
 		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true},
-		{provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true}
+		{provide: HTTP_INTERCEPTORS, useClass: BlueGatewayInterceptorV2, multi: true}
 	],
 	bootstrap: [AppComponent]
 })
