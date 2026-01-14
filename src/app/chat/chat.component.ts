@@ -50,7 +50,9 @@ export class ChatComponent implements OnInit {
 	Object = Object;
 	searchCtrl = new FormControl();
 	chatConfigCtrl = new FormControl();
-	messages: ChatMessage[] = [];
+	private readonly conversationMessages: Map<string, ChatMessage[]> = new Map();
+	private activeStreamingConversationId: string | null = null;
+	private readonly NEW_CHAT_KEY = 'NEW_CHAT';
 	conversationTitles: ChatTitle[] = [];
 	currentConversation: ChatTitle;
 	isCommandMode = false;
@@ -71,6 +73,14 @@ export class ChatComponent implements OnInit {
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
+
+	get messages(): ChatMessage[] {
+		const conversationId = this.currentConversation?.conversationId || this.NEW_CHAT_KEY;
+		if (!this.conversationMessages.has(conversationId)) {
+			this.conversationMessages.set(conversationId, []);
+		}
+		return this.conversationMessages.get(conversationId);
+	}
 
 	constructor(
 		private readonly autocompleteService: FaqItemsService,
@@ -158,7 +168,7 @@ export class ChatComponent implements OnInit {
 	newChat(): void {
 		if (this.currentConversation) this.currentConversation.selected = false;
 		this.currentConversation = null;
-		this.messages = [];
+		this.conversationMessages.set(this.NEW_CHAT_KEY, []);
 		this.specificSuggestions = [];
 	}
 
@@ -169,6 +179,9 @@ export class ChatComponent implements OnInit {
 		}
 
 		const inputText = this.searchCtrl.value;
+
+		// Set the active streaming conversation before adding messages
+		this.activeStreamingConversationId = this.currentConversation?.conversationId || this.NEW_CHAT_KEY;
 
 		this.addMessage(ChatMessageSource.USER, inputText);
 		this.addMessage(ChatMessageSource.LLM, '', false, false);
@@ -194,16 +207,31 @@ export class ChatComponent implements OnInit {
 
 		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
 			next: chunk => {
-				this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
+				this.buildResponseWithLLMChunk(chunk);
 				this.cdr.markForCheck();
 			},
 			error: err => {
 				if (err.message !== 'network error') {
 					// TODO dirty fix to handle the 'error net::ERR_INCOMPLETE_CHUNKED_ENCODING' issue
-					this.messages.pop();
-					this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
+					const streamingMessages = this.conversationMessages.get(this.activeStreamingConversationId);
+					if (streamingMessages) {
+						streamingMessages.pop();
+						streamingMessages.push({
+							message: 'Une erreur est survenue. Veuillez réessayer.',
+							source: ChatMessageSource.LLM,
+							timestamp: new Date(),
+							isCompleted: true,
+							inError: true,
+							beingSpoken: false,
+							sources: []
+						});
+					}
 				}
+				this.activeStreamingConversationId = null;
 				this.enableSearch();
+			},
+			complete: () => {
+				this.activeStreamingConversationId = null;
 			}
 		});
 
@@ -211,8 +239,14 @@ export class ChatComponent implements OnInit {
 		this.attachments = [];
 	}
 
-	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
-		if (!chunk) return;
+	buildResponseWithLLMChunk(chunk: string): void {
+		if (!chunk || !this.activeStreamingConversationId) return;
+
+		const streamingMessages = this.conversationMessages.get(this.activeStreamingConversationId);
+		if (!streamingMessages || streamingMessages.length === 0) return;
+
+		const partialChatMessage = streamingMessages.at(-1);
+		if (!partialChatMessage) return;
 
 		const toolTagMatch = TOOL_TAG_REGEX.exec(chunk);
 		if (toolTagMatch) {
@@ -375,7 +409,13 @@ export class ChatComponent implements OnInit {
 		url?: string,
 		sources?: MessageSource[]
 	) {
-		this.messages.push({
+		// Use activeStreamingConversationId if available (during streaming), otherwise use current conversation
+		const conversationId = this.activeStreamingConversationId || this.currentConversation?.conversationId || this.NEW_CHAT_KEY;
+		if (!this.conversationMessages.has(conversationId)) {
+			this.conversationMessages.set(conversationId, []);
+		}
+		const messages = this.conversationMessages.get(conversationId);
+		messages.push({
 			faqItemId,
 			message,
 			source,
@@ -401,10 +441,13 @@ export class ChatComponent implements OnInit {
 	selectConversation(conversation: ChatTitle) {
 		this.conversationService.getConversation(conversation.conversationId).subscribe(messages => {
 			this.currentConversation = conversation;
-			this.messages = messages.map(this.historyMessageToChatMessage);
-			this.specificSuggestions = this.messages[this.messages.length - 1].suggestions?.map(suggestion => {
-				return {text: `action_suggestions.${suggestion}`, action: suggestion};
-			});
+			// Populate the Map with messages from backend
+			const chatMessages = messages.map(this.historyMessageToChatMessage);
+			this.conversationMessages.set(conversation.conversationId, chatMessages);
+			this.specificSuggestions =
+				chatMessages.at(-1)?.suggestions?.map(suggestion => {
+					return {text: `action_suggestions.${suggestion}`, action: suggestion};
+				}) || [];
 			this.scrollToBottom();
 		});
 	}
@@ -412,14 +455,16 @@ export class ChatComponent implements OnInit {
 	deleteConversation(conversation: ChatTitle) {
 		if (conversation.conversationId === this.currentConversation?.conversationId) {
 			this.currentConversation = null;
-			this.messages = [];
+			this.conversationMessages.set(this.NEW_CHAT_KEY, []);
 			this.specificSuggestions = [];
 		}
+		// Clean up the Map entry
+		this.conversationMessages.delete(conversation.conversationId);
 	}
 
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
-			this.conversationTitles = conversations;
+			this.setAndSortConversations(conversations);
 		});
 	}
 
@@ -458,7 +503,7 @@ export class ChatComponent implements OnInit {
 	handleSuggestionAction(action: string): void {
 		if (action === 'ii-salary') {
 			this.activeForm = this.dfs.buildForm(ActionId.II_CALCUL);
-			const lastAssistant = this.messages[this.messages.length - 1];
+			const lastAssistant = this.messages.at(-1);
 			const patch = this.dfs.parseAssistantMessage(this.activeForm.def, lastAssistant.message);
 			this.activeForm.group.patchValue(patch, {emitEvent: false});
 		} else {
@@ -516,26 +561,28 @@ export class ChatComponent implements OnInit {
 
 	private updateCurrentConversation() {
 		if (!this.isRegistered()) return;
-		if (!this.currentConversation) {
+		if (this.currentConversation) {
+			this.conversationService.update(this.currentConversation.conversationId, [this.messages.at(-2), this.messages.at(-1)]);
+		} else {
 			this.conversationService.init(this.messages).subscribe(() => {
 				this.refreshConversations();
 			});
-		} else {
-			this.conversationService.update(this.currentConversation.conversationId, [
-				this.messages[this.messages.length - 2],
-				this.messages[this.messages.length - 1]
-			]);
 		}
 	}
 
 	private refreshConversations() {
 		setTimeout(() => {
 			this.conversationService.getConversationTitles().subscribe(conversations => {
-				this.conversationTitles = conversations;
-				this.currentConversation = conversations[conversations.length - 1];
+				this.setAndSortConversations(conversations);
+				this.currentConversation = this.conversationTitles[0];
 				this.currentConversation.selected = true;
 			});
 		}, 1_500);
+	}
+
+	private setAndSortConversations(conversations: ChatTitle[]) {
+		conversations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+		this.conversationTitles = conversations;
 	}
 
 	private showDialog() {

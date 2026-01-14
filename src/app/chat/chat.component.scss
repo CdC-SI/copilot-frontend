@@ -8,7 +8,31 @@
 
 	.history-card, .configuration-card {
 		height: calc(80vh + 6px);
+	}
+
+	.history-card, .message-container {
 		overflow-y: scroll;
+		scrollbar-width: thin;
+		scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+		/* Webkit browsers (Chrome, Safari, Edge) */
+		&::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: rgba(0, 0, 0, 0.2);
+			border-radius: 10px;
+			transition: background-color 0.2s ease;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background-color: rgba(0, 0, 0, 0.35);
+		}
 	}
 
 	.chat-container {
@@ -24,11 +48,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		width: 50vw;
+		padding: 0 30px;
 		height: 100%;
-		overflow-y: scroll;
-		-ms-overflow-style: none;
-		scrollbar-width: none;
 	}
 
 	.form-container {
