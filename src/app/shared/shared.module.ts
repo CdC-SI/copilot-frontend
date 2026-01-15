@@ -23,6 +23,7 @@ import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.compo
 import {SourceListComponent} from './components/source-list/source-list.component';
 import {FilePreviewComponent} from './components/file-preview/file-preview.component';
 import {SourceComponent} from './components/source-list/source/source.component';
+import {AlertBannerComponent} from './components/alert-banner/alert-banner.component';
 
 @NgModule({
 	declarations: [
@@ -39,7 +40,8 @@ import {SourceComponent} from './components/source-list/source/source.component'
 		DynamicFormComponent,
 		SourceListComponent,
 		FilePreviewComponent,
-		SourceComponent
+		SourceComponent,
+		AlertBannerComponent
 	],
 	imports: [
 		CommonModule,
@@ -73,7 +75,8 @@ import {SourceComponent} from './components/source-list/source/source.component'
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
 		FilePreviewComponent,
-		SourceComponent
+		SourceComponent,
+		AlertBannerComponent
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

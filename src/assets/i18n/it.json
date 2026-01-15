@@ -4,6 +4,7 @@
   "admin.alerts.reactivate.time.invalid": "Ora non valida (HH:mm)",
   "admin.alerts.reactivate.cta": "Riattiva",
   "alert.default.text": "Manutenzione in corso, possibili disservizi.",
+  "alert.close": "Chiudi",
   "admin.alerts.customTexts.title": "Testi personalizzati (opzionale)",
   "admin.alerts.customTexts.desc": "FR / DE / IT",
   "admin.alerts.defaultText.hint": "Se non inserisci alcun testo, verrà usato un messaggio predefinito.",

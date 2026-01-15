@@ -4,6 +4,7 @@
   "admin.alerts.reactivate.time.invalid": "Heure invalide (HH:mm)",
   "admin.alerts.reactivate.cta": "Réactiver",
   "alert.default.text": "L’application est actuellement en maintenance, des perturbations peuvent subvenir lors de vos conversations",
+  "alert.close": "Fermer",
   "admin.alerts.customTexts.title": "Textes personnalisés (optionnel)",
   "admin.alerts.customTexts.desc": "FR / DE / IT",
   "admin.alerts.defaultText.hint": "Sans texte saisi, un message par défaut sera utilisé.",
