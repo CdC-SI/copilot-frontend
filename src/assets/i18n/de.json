@@ -241,7 +241,9 @@
     "csc_afac": "Freiwillige AHV/IV",
     "rh": "Personalwesen",
     "oaie": "IVSTA",
-    "faq_bsv": "FAQ BSV"
+    "faq_bsv": "FAQ BSV",
+    "knowledge_base": "Wissensdatenbank",
+    "zasweb": "ZAS Website"
   },
   "tags": {
     "daa": "DAA",
@@ -305,7 +307,21 @@
     "EAK Entreprises": "Firmen",
     "EAK Particuliers": "Private",
     "EAK Formulaires / Annonces": "Formulare / Meldungen",
-    "EAK La CFC": "Die EAK"
+    "EAK La CFC": "Die EAK",
+    "Adhérer à l'AVS/AI facultative": "Der fakultativen AHV/IV beitreten",
+    "Bases légales et coordination internationale": "Rechtsgrundlagen und internationale Koordination",
+    "Contact": "Kontakt",
+    "Informations": "Informationen",
+    "Informations destinées aux organes d'exécution": "Informationen für Durchführungsorgane",
+    "La CdC": "Die ZAS",
+    "News CdC": "ZAS News",
+    "Paiement des prestations individuelles AVS/AI":"Auszahlung der individuellen AHV/IV-Leistungen",
+    "Partenaires et Instituttions": "Partner und Institutionen",
+    "Particuliers": "Privatpersonen",
+    "Rente d'invalidité": "Invalidenrente",
+    "Rente de vieillesse": "Altersrente",
+    "Services": "Dienstleistungen",
+    "Travailler à la CdC": "Bei der ZAS arbeiten"
   },
   "legal_basis": {
     "tos": "Nutzungsbedingungen",

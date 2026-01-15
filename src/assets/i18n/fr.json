@@ -241,7 +241,9 @@
     "csc_afac": "Assurance Facultative",
     "rh": "Ressources Humaines",
     "oaie": "OAIE",
-    "faq_bsv": "FAQ OFAS"
+    "faq_bsv": "FAQ OFAS",
+    "knowledge_base": "Base de Connaissance Interne",
+    "zasweb": "Site internet CdC"
   },
   "tags": {
     "daa": "DAA",
@@ -305,7 +307,21 @@
     "EAK Entreprises": "Entreprises",
     "EAK Particuliers": "Particuliers",
     "EAK Formulaires / Annonces": "Formulaires / Annonces",
-    "EAK La CFC": "La CFC"
+    "EAK La CFC": "La CFC",
+    "Adhérer à l'AVS/AI facultative": "Adhérer à l'AVS/AI facultative",
+    "Bases légales et coordination internationale": "Bases légales et coordination internationale",
+    "Contact": "Contact",
+    "Informations": "Informations",
+    "Informations destinées aux organes d'exécution": "Informations destinées aux organes d'exécution",
+    "La CdC": "La CdC",
+    "News CdC": "News CdC",
+    "Paiement des prestations individuelles AVS/AI": "Paiement des prestations individuelles AVS/AI",
+    "Partenaires et Instituttions": "Partenaires et Institutions",
+    "Particuliers": "Particuliers",
+    "Rente d'invalidité": "Rente d'invalidité",
+    "Rente de vieillesse": "Rente de vieillesse",
+    "Services": "Services",
+    "Travailler à la CdC": "Travailler à la CdC"
   },
   "legal_basis": {
     "tos": "Conditions d'utilisation",

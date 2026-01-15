@@ -241,7 +241,9 @@
     "csc_afac": "AVS/AI facoltativa",
     "rh": "Risorse Umane",
     "oaie": "UAIE",
-    "faq_bsv": "FAQ UFAS"
+    "faq_bsv": "FAQ UFAS",
+    "knowledge_base": "Base di conoscenza generale",
+    "zasweb": "ZAS Web"
   },
   "tags": {
     "daa": "DAA",
@@ -305,7 +307,21 @@
     "EAK Entreprises": "Aziende",
     "EAK Particuliers": "Privato",
     "EAK Formulaires / Annonces": "Formulari / Annunci",
-    "EAK La CFC": "La CFC"
+    "EAK La CFC": "La CFC",
+    "Adhérer à l'AVS/AI facultative": "Aderire all'AVS/AI facoltativa",
+    "Bases légales et coordination internationale": "Basi legali e coordinamento internazionale",
+    "Contact": "Contatto",
+    "Informations": "Informazioni",
+    "Informations destinées aux organes d'exécution": "Informazioni destinate agli organi d'esecuzione",
+    "La CdC": "La CdC",
+    "News CdC": "News CdC",
+    "Paiement des prestations individuelles AVS/AI": "Pagamento delle prestazioni individuali AVS/AI",
+    "Partenaires et Instituttions": "Partner e Istituzioni",
+    "Particuliers": "Privati",
+    "Rente d'invalidité": "Rendita d'invalidità",
+    "Rente de vieillesse": "Rendita di vecchiaia",
+    "Services": "Servizi",
+    "Travailler à la CdC": "Lavorare alla CdC"
   },
   "legal_basis": {
     "tos": "Termini di servizio",
