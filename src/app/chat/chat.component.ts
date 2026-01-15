@@ -1,45 +1,30 @@
 import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {Observable, of} from 'rxjs';
-import {FaqItemsService} from '../shared/services/faq-items.service';
 import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {
-	AGENT_TAG_REGEX,
-	ANCHOR_TAG_REGEX,
-	II_TARIFFS_ANSWER_TAG_REGEX,
-	II_TARIFFS_TAG_REGEX,
-	INTENT_TAG_REGEX,
-	MESSAGE_ID_REGEX,
-	OCR_TAG_REGEX,
-	OFF_TOPIC_REGEX,
-	RETRIEVING_TAG_REGEX,
-	ROUTING_TAG_REGEX,
-	SOURCE_TAG_REGEX,
-	SUGGESTION_TAG_REGEX,
-	TAGS_TAG_REGEX,
-	TOOL_TAG_REGEX,
-	TOPIC_CHECK_REGEX,
-	clearNullAndEmpty
-} from '../shared/utils/zco-utils';
+import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {ChatHistoryMessage, ChatTitle, MessageSource} from '../shared/model/chat-history';
+import {ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
 import {FeedbackService} from '../shared/services/feedback.service';
 import {ObNotificationService} from '@oblique/oblique';
-import {Command, CommandService} from '../shared/services/command.service';
-import {UploadService} from '../shared/services/upload.service';
-import {SettingsEventService} from '../shared/services/settings-event.service';
 import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
-import {ActionId, FormDef} from '../shared/model/form-definition';
+import {FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
-import {MatDialog} from '@angular/material/dialog';
-
-type AutocompleteType = IQuestion | Command;
+import {
+	AutocompleteType,
+	ChatAutocompleteService,
+	ChatConversationManagerService,
+	ChatFileUploadService,
+	ChatStreamProcessorService,
+	ChatSuggestionService,
+	LANGUAGE_MAP,
+	UserAuthDialogService
+} from './services';
 
 @Component({
 	selector: 'zco-chat',
@@ -50,40 +35,30 @@ export class ChatComponent implements OnInit {
 	Object = Object;
 	searchCtrl = new FormControl();
 	chatConfigCtrl = new FormControl();
-	private readonly conversationMessages: Map<string, ChatMessage[]> = new Map();
-	private activeStreamingConversationId: string | null = null;
-	private readonly NEW_CHAT_KEY = 'NEW_CHAT';
 	conversationTitles: ChatTitle[] = [];
 	currentConversation: ChatTitle;
 	isCommandMode = false;
 	displayTextArea = false;
-	defaultSuggestions = [
-		{text: 'action_suggestions.translate', action: 'translate'},
-		{text: 'action_suggestions.summarize', action: 'summarize'},
-		{text: 'action_suggestions.explain', action: 'explain'},
-		{text: 'action_suggestions.reformulate', action: 'reformulate'},
-		{text: 'action_suggestions.draft', action: 'draft'}
-	];
-	specificSuggestions: {text: string; action: string}[] = [];
 	activeForm?: {def: FormDef; group: FormGroup};
 	attachments: File[] = [];
-
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
-
 	protected readonly ChatMessageSource = ChatMessageSource;
 
 	get messages(): ChatMessage[] {
-		const conversationId = this.currentConversation?.conversationId || this.NEW_CHAT_KEY;
-		if (!this.conversationMessages.has(conversationId)) {
-			this.conversationMessages.set(conversationId, []);
-		}
-		return this.conversationMessages.get(conversationId);
+		return this.conversationManager.getMessages(this.currentConversation?.conversationId);
+	}
+
+	get defaultSuggestions() {
+		return this.suggestionService.getDefaultSuggestions();
+	}
+
+	get specificSuggestions() {
+		return this.suggestionService.getSpecificSuggestions();
 	}
 
 	constructor(
-		private readonly autocompleteService: FaqItemsService,
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
 		private readonly speechService: SpeechService,
@@ -92,11 +67,13 @@ export class ChatComponent implements OnInit {
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
 		private readonly notif: ObNotificationService,
-		private readonly commandService: CommandService,
-		private readonly uploadService: UploadService,
-		private readonly settingsEventService: SettingsEventService,
 		private readonly dfs: DynamicFormService,
-		private readonly dialog: MatDialog
+		private readonly streamProcessor: ChatStreamProcessorService,
+		private readonly conversationManager: ChatConversationManagerService,
+		private readonly suggestionService: ChatSuggestionService,
+		private readonly autocompleteService: ChatAutocompleteService,
+		private readonly authDialogService: UserAuthDialogService,
+		private readonly fileUploadService: ChatFileUploadService
 	) {}
 
 	ngOnInit() {
@@ -113,31 +90,38 @@ export class ChatComponent implements OnInit {
 	}
 
 	isRegistered(): boolean {
-		return this.authService.isRegistered();
+		return this.authDialogService.isRegistered();
 	}
 
 	getOptionService() {
-		return this.isCommandMode ? this.getCommandSuggestions : this.currentConversation ? () => of([]) : this.getSearchProposalFunction;
+		return this.autocompleteService.getOptionService(this.isCommandMode, !!this.currentConversation);
 	}
 
 	searchOptionLabelFn = (option: AutocompleteType): string => {
-		if (this.isCommandMode && 'name' in option) {
-			return option.name;
-		}
-		return (option as IQuestion)?.text ?? '';
+		return this.autocompleteService.getOptionLabel(option, this.isCommandMode);
 	};
 
 	handleOptionSelected(value: AutocompleteType): void {
-		if (this.isCommandMode && 'name' in value) {
+		if (this.autocompleteService.isCommand(value)) {
 			this.searchCtrl.setValue(value.name);
 		} else {
-			this.selectFaqOption(value as IQuestion);
+			this.selectFaqOption(value);
 		}
 	}
 
 	selectFaqOption(question: IQuestion): void {
-		this.addMessage(ChatMessageSource.USER, question.text, false, true, question.language, question.id);
-		this.addMessage(
+		const sourceType = question.url?.startsWith('http') ? 'URL' : 'FILE';
+		this.conversationManager.addMessage(
+			this.currentConversation?.conversationId,
+			ChatMessageSource.USER,
+			question.text,
+			false,
+			true,
+			question.language,
+			question.id
+		);
+		this.conversationManager.addMessage(
+			this.currentConversation?.conversationId,
 			ChatMessageSource.FAQ,
 			question.answer.text,
 			false,
@@ -145,7 +129,7 @@ export class ChatComponent implements OnInit {
 			question.language,
 			question.id,
 			question.url,
-			question.url ? [{type: this.getSourceType(question.url), link: question.url}] : undefined
+			question.url ? [{type: sourceType, link: question.url}] : undefined
 		);
 		this.clearSearch();
 		this.scrollToBottom();
@@ -168,8 +152,8 @@ export class ChatComponent implements OnInit {
 	newChat(): void {
 		if (this.currentConversation) this.currentConversation.selected = false;
 		this.currentConversation = null;
-		this.conversationMessages.set(this.NEW_CHAT_KEY, []);
-		this.specificSuggestions = [];
+		this.conversationManager.initNewChat();
+		this.suggestionService.clearSpecificSuggestions();
 	}
 
 	sendToLLM(): void {
@@ -179,254 +163,9 @@ export class ChatComponent implements OnInit {
 		}
 
 		const inputText = this.searchCtrl.value;
-
-		// Set the active streaming conversation before adding messages
-		this.activeStreamingConversationId = this.currentConversation?.conversationId || this.NEW_CHAT_KEY;
-
-		this.addMessage(ChatMessageSource.USER, inputText);
-		this.addMessage(ChatMessageSource.LLM, '', false, false);
-		this.disableSearch();
-		this.specificSuggestions = [];
-
-		const languageMap: Record<string, Language> = {
-			de: Language.DE,
-			fr: Language.FR,
-			it: Language.IT
-		};
-		const currentLang = this.translateService.currentLang;
-		const mappedLanguage = languageMap[currentLang] || Language.DE;
-
-		// Handle the three mutually exclusive modes
-		const requestConfig = {
-			query: inputText,
-			attachments: this.attachments,
-			conversationId: this.currentConversation?.conversationId,
-			...this.chatConfigCtrl.value,
-			language: mappedLanguage
-		};
-
-		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
-			next: chunk => {
-				this.buildResponseWithLLMChunk(chunk);
-				this.cdr.markForCheck();
-			},
-			error: err => {
-				if (err.message !== 'network error') {
-					// TODO dirty fix to handle the 'error net::ERR_INCOMPLETE_CHUNKED_ENCODING' issue
-					const streamingMessages = this.conversationMessages.get(this.activeStreamingConversationId);
-					if (streamingMessages) {
-						streamingMessages.pop();
-						streamingMessages.push({
-							message: 'Une erreur est survenue. Veuillez réessayer.',
-							source: ChatMessageSource.LLM,
-							timestamp: new Date(),
-							isCompleted: true,
-							inError: true,
-							beingSpoken: false,
-							sources: []
-						});
-					}
-				}
-				this.activeStreamingConversationId = null;
-				this.enableSearch();
-			},
-			complete: () => {
-				this.activeStreamingConversationId = null;
-			}
-		});
-
-		this.clearSearch();
-		this.attachments = [];
-	}
-
-	buildResponseWithLLMChunk(chunk: string): void {
-		if (!chunk || !this.activeStreamingConversationId) return;
-
-		const streamingMessages = this.conversationMessages.get(this.activeStreamingConversationId);
-		if (!streamingMessages || streamingMessages.length === 0) return;
-
-		const partialChatMessage = streamingMessages.at(-1);
-		if (!partialChatMessage) return;
-
-		const toolTagMatch = TOOL_TAG_REGEX.exec(chunk);
-		if (toolTagMatch) {
-			partialChatMessage.message = toolTagMatch[1];
-			partialChatMessage.isToolUse = true;
-			return;
-		}
-
-		const intentTagMatch = INTENT_TAG_REGEX.exec(chunk);
-		if (intentTagMatch) {
-			partialChatMessage.message = intentTagMatch[1];
-			partialChatMessage.isProcessingIntent = true;
-			return;
-		}
-
-		const sourceTagMatch = SOURCE_TAG_REGEX.exec(chunk);
-		if (sourceTagMatch) {
-			partialChatMessage.message = sourceTagMatch[1];
-			partialChatMessage.isProcessingSources = true;
-			return;
-		}
-
-		const tagsTagMatch = TAGS_TAG_REGEX.exec(chunk);
-		if (tagsTagMatch) {
-			partialChatMessage.message = tagsTagMatch[1];
-			partialChatMessage.isProcessingTags = true;
-			return;
-		}
-
-		const agentTagMatch = AGENT_TAG_REGEX.exec(chunk);
-		if (agentTagMatch) {
-			partialChatMessage.message = agentTagMatch[1];
-			partialChatMessage.isAgent = true;
-			return;
-		}
-
-		const routingTagMatch = ROUTING_TAG_REGEX.exec(chunk);
-		if (routingTagMatch) {
-			partialChatMessage.message = routingTagMatch[1];
-			partialChatMessage.isRouting = true;
-			return;
-		}
-
-		const topicCheckMatch = TOPIC_CHECK_REGEX.exec(chunk);
-		if (topicCheckMatch) {
-			partialChatMessage.message = topicCheckMatch[1];
-			partialChatMessage.isValidating = true;
-			return;
-		}
-
-		const offTopicMatch = OFF_TOPIC_REGEX.exec(chunk);
-		if (offTopicMatch) {
-			// Remove validation message and handle off-topic response
-			partialChatMessage.isValidating = false;
-			return;
-		}
-
-		const retrievingTagMatch = RETRIEVING_TAG_REGEX.exec(chunk);
-		if (retrievingTagMatch) {
-			partialChatMessage.message = retrievingTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		const ocrTagMatch = OCR_TAG_REGEX.exec(chunk);
-		if (ocrTagMatch) {
-			partialChatMessage.message = ocrTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		const iiTariffsTagMatch = II_TARIFFS_TAG_REGEX.exec(chunk);
-		if (iiTariffsTagMatch) {
-			partialChatMessage.message = iiTariffsTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		const iiTariffsAnswerTagMatch = II_TARIFFS_ANSWER_TAG_REGEX.exec(chunk);
-		if (iiTariffsAnswerTagMatch) {
-			partialChatMessage.message = iiTariffsAnswerTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		// If we were in retrieving/validating/routing/agent state, clear the message before adding new content
-		if (
-			partialChatMessage.isRetrieving ||
-			partialChatMessage.isValidating ||
-			partialChatMessage.isRouting ||
-			partialChatMessage.isAgent ||
-			partialChatMessage.isToolUse ||
-			partialChatMessage.isProcessingIntent ||
-			partialChatMessage.isProcessingSources ||
-			partialChatMessage.isProcessingTags
-		) {
-			partialChatMessage.message = '';
-			partialChatMessage.isRetrieving = false;
-			partialChatMessage.isValidating = false;
-			partialChatMessage.isRouting = false;
-			partialChatMessage.isAgent = false;
-			partialChatMessage.isToolUse = false;
-			partialChatMessage.isProcessingIntent = false;
-			partialChatMessage.isProcessingSources = false;
-			partialChatMessage.isProcessingTags = false;
-		}
-
-		partialChatMessage.message += chunk;
-
-		// Initialize sources array if needed
-		if (!partialChatMessage.sources) {
-			partialChatMessage.sources = [];
-		}
-
-		// Collect all sources from current message content
-		let sourceMatch;
-		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
-			// Only store the URL
-			const docId = sourceMatch[1];
-			const sourceUrl = sourceMatch[2];
-			const sourceFile = sourceMatch[3];
-			const pageNumber = sourceMatch[4];
-			const subSection = sourceMatch[5];
-			const version = sourceMatch[6];
-
-			const source: MessageSource = sourceUrl
-				? {documentId: docId, type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version}
-				: {documentId: docId, type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
-			partialChatMessage.sources.push(source);
-
-			// Remove entire source tag from message
-			partialChatMessage.message = partialChatMessage.message.replace(sourceMatch[0], '');
-		}
-
-		const suggestionMatch = SUGGESTION_TAG_REGEX.exec(partialChatMessage.message);
-		if (suggestionMatch) {
-			partialChatMessage.message = partialChatMessage.message.replace(SUGGESTION_TAG_REGEX, '');
-			this.specificSuggestions.push({text: `action_suggestions.${suggestionMatch[1]}`, action: suggestionMatch[1]});
-		}
-
-		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
-		if (messageIdTagMatch) {
-			partialChatMessage.message = partialChatMessage.message.replace(MESSAGE_ID_REGEX, '');
-			partialChatMessage.id = messageIdTagMatch[1];
-			partialChatMessage.isCompleted = true;
-			this.enableSearch();
-			if (!this.currentConversation) {
-				this.refreshConversations();
-			}
-		}
-	}
-
-	addMessage(
-		source: ChatMessageSource,
-		message: string,
-		inError = false,
-		isCompleted = true,
-		lang?: Language,
-		faqItemId?: number,
-		url?: string,
-		sources?: MessageSource[]
-	) {
-		// Use activeStreamingConversationId if available (during streaming), otherwise use current conversation
-		const conversationId = this.activeStreamingConversationId || this.currentConversation?.conversationId || this.NEW_CHAT_KEY;
-		if (!this.conversationMessages.has(conversationId)) {
-			this.conversationMessages.set(conversationId, []);
-		}
-		const messages = this.conversationMessages.get(conversationId);
-		messages.push({
-			faqItemId,
-			message,
-			source,
-			isCompleted,
-			timestamp: new Date(),
-			lang,
-			url,
-			inError,
-			beingSpoken: false,
-			sources: sources || []
-		});
+		this.prepareForStreaming(inputText);
+		this.startStreamingRequest(inputText);
+		this.clearSearchAndAttachments();
 	}
 
 	scrollToBottom(): void {
@@ -441,13 +180,9 @@ export class ChatComponent implements OnInit {
 	selectConversation(conversation: ChatTitle) {
 		this.conversationService.getConversation(conversation.conversationId).subscribe(messages => {
 			this.currentConversation = conversation;
-			// Populate the Map with messages from backend
-			const chatMessages = messages.map(this.historyMessageToChatMessage);
-			this.conversationMessages.set(conversation.conversationId, chatMessages);
-			this.specificSuggestions =
-				chatMessages.at(-1)?.suggestions?.map(suggestion => {
-					return {text: `action_suggestions.${suggestion}`, action: suggestion};
-				}) || [];
+			const chatMessages = messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
+			this.conversationManager.setConversationMessages(conversation.conversationId, chatMessages);
+			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
 			this.scrollToBottom();
 		});
 	}
@@ -455,11 +190,10 @@ export class ChatComponent implements OnInit {
 	deleteConversation(conversation: ChatTitle) {
 		if (conversation.conversationId === this.currentConversation?.conversationId) {
 			this.currentConversation = null;
-			this.conversationMessages.set(this.NEW_CHAT_KEY, []);
-			this.specificSuggestions = [];
+			this.conversationManager.initNewChat();
+			this.suggestionService.clearSpecificSuggestions();
 		}
-		// Clean up the Map entry
-		this.conversationMessages.delete(conversation.conversationId);
+		this.conversationManager.deleteConversation(conversation.conversationId);
 	}
 
 	getConversationTitles() {
@@ -474,41 +208,19 @@ export class ChatComponent implements OnInit {
 		});
 	}
 	uploadDoc(): void {
-		const fileInput = document.createElement('input');
-		fileInput.type = 'file';
-		fileInput.accept = '.pdf';
-
-		fileInput.onchange = (e: Event) => {
-			const file = (e.target as HTMLInputElement).files?.[0];
-			if (file) {
-				this.uploadService.uploadPersonalPdf(file, this.currentConversation?.conversationId).subscribe({
-					next: () => {
-						this.notif.success('upload.success');
-						this.settingsEventService.emitSettingsRefresh();
-					},
-					error: err => {
-						if (err.statusText === 'Unknown Error') {
-							this.notif.error('upload.error');
-						} else {
-							this.notif.error(err.error['MESSAGE']);
-						}
-					}
-				});
-			}
-		};
-
-		fileInput.click();
+		this.fileUploadService.uploadDocument(this.currentConversation?.conversationId);
 	}
 
 	handleSuggestionAction(action: string): void {
-		if (action === 'ii-salary') {
-			this.activeForm = this.dfs.buildForm(ActionId.II_CALCUL);
-			const lastAssistant = this.messages.at(-1);
-			const patch = this.dfs.parseAssistantMessage(this.activeForm.def, lastAssistant.message);
-			this.activeForm.group.patchValue(patch, {emitEvent: false});
-		} else {
-			const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
-			this.searchCtrl.setValue(prefix);
+		const result = this.suggestionService.handleSuggestionAction(action, this.messages);
+
+		if (result.shouldShowForm) {
+			this.activeForm = {
+				def: result.formDef,
+				group: result.formGroup
+			};
+		} else if (result.searchValue) {
+			this.searchCtrl.setValue(result.searchValue);
 		}
 	}
 
@@ -533,30 +245,85 @@ export class ChatComponent implements OnInit {
 		this.attachments.splice(index, 1);
 	}
 
-	private getSourceType(url: string) {
-		return url.startsWith('http') ? 'URL' : 'FILE';
+	private prepareForStreaming(inputText: string): void {
+		this.conversationManager.setActiveStreamingConversation(this.currentConversation?.conversationId);
+		this.conversationManager.addMessage(this.currentConversation?.conversationId, ChatMessageSource.USER, inputText);
+		this.conversationManager.addMessage(this.currentConversation?.conversationId, ChatMessageSource.LLM, '', false, false);
+		this.disableSearch();
+		this.suggestionService.clearSpecificSuggestions();
 	}
 
-	private readonly getCommandSuggestions = (text: string): Observable<Command[]> => {
-		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
-	};
+	private startStreamingRequest(inputText: string): void {
+		const currentLang = this.translateService.currentLang;
+		const mappedLanguage = LANGUAGE_MAP[currentLang] || Language.DE;
 
-	private readonly getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
-		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
-	};
-
-	private historyMessageToChatMessage(historyMessage: ChatHistoryMessage): ChatMessage {
-		return {
-			id: historyMessage.messageId,
-			message: historyMessage.message,
-			source: historyMessage.role.toUpperCase() === 'USER' ? ChatMessageSource.USER : ChatMessageSource.LLM,
-			isCompleted: true,
-			timestamp: historyMessage.timestamp,
-			lang: historyMessage.language,
-			faqItemId: historyMessage.faqItemId,
-			sources: historyMessage.sources,
-			suggestions: historyMessage.suggestions
+		const requestConfig = {
+			query: inputText,
+			attachments: this.attachments,
+			conversationId: this.currentConversation?.conversationId,
+			...this.chatConfigCtrl.value,
+			language: mappedLanguage
 		};
+
+		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
+			next: chunk => {
+				this.processStreamChunk(chunk);
+				this.cdr.markForCheck();
+			},
+			error: err => {
+				this.handleStreamError(err);
+			},
+			complete: () => {
+				this.conversationManager.clearActiveStreamingConversation();
+			}
+		});
+	}
+
+	private clearSearchAndAttachments(): void {
+		this.clearSearch();
+		this.attachments = [];
+	}
+
+	private processStreamChunk(chunk: string): void {
+		const streamingMessages = this.conversationManager.getStreamingMessages();
+		if (!streamingMessages || streamingMessages.length === 0) return;
+
+		const partialChatMessage = streamingMessages.at(-1);
+		if (!partialChatMessage) return;
+
+		const result = this.streamProcessor.processChunk(chunk, partialChatMessage);
+
+		if (result.hasNewSuggestion && result.newSuggestion) {
+			this.suggestionService.addSpecificSuggestion(result.newSuggestion);
+		}
+
+		if (result.shouldEnableSearch) {
+			this.enableSearch();
+		}
+
+		if (result.shouldRefreshConversations && !this.currentConversation) {
+			this.refreshConversations();
+		}
+	}
+
+	private handleStreamError(err: any): void {
+		if (err.message !== 'network error') {
+			const streamingMessages = this.conversationManager.getStreamingMessages();
+			if (streamingMessages) {
+				streamingMessages.pop();
+				streamingMessages.push({
+					message: 'Une erreur est survenue. Veuillez réessayer.',
+					source: ChatMessageSource.LLM,
+					timestamp: new Date(),
+					isCompleted: true,
+					inError: true,
+					beingSpoken: false,
+					sources: []
+				});
+			}
+		}
+		this.conversationManager.clearActiveStreamingConversation();
+		this.enableSearch();
 	}
 
 	private updateCurrentConversation() {
@@ -576,6 +343,8 @@ export class ChatComponent implements OnInit {
 				this.setAndSortConversations(conversations);
 				this.currentConversation = this.conversationTitles[0];
 				this.currentConversation.selected = true;
+				// Transfer messages from NEW_CHAT_KEY to the new conversation
+				this.conversationManager.transferNewChatToConversation(this.currentConversation.conversationId);
 			});
 		}, 1_500);
 	}
@@ -586,12 +355,6 @@ export class ChatComponent implements OnInit {
 	}
 
 	private showDialog() {
-		if (this.authService.userStatus() === UserStatus.GUEST) {
-			this.dialog.open(this.userNotRegisteredDialog);
-		} else if (this.authService.userStatus() === UserStatus.JOHN_DOE) {
-			this.dialog.open(this.johnDoeDialog);
-		} else {
-			this.dialog.open(this.userPendingTriesToChatDialog);
-		}
+		this.authDialogService.showAuthDialog(this.userNotRegisteredDialog, this.johnDoeDialog, this.userPendingTriesToChatDialog);
 	}
 }
