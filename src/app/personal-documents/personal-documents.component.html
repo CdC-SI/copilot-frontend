@@ -1,0 +1,86 @@
+<div class="personal-documents-container pd5">
+	<h2>{{ "personal.documents.title" | translate }}</h2>
+	<p class="description">{{ "personal.documents.description" | translate }}</p>
+
+	<div class="upload-section">
+		<ob-file-upload [accept]="['.pdf']" [maxFileSize]="10" (uploadEvent)="uploadPersonalDocument($event)"></ob-file-upload>
+
+		<ul class="documents-list" *ngIf="documentsToUpload.length > 0">
+			<li *ngFor="let doc of documentsToUpload">
+				<div class="doc-to-upload">
+					<span class="doc-info">
+						<mat-icon svgIcon="file"></mat-icon>
+						{{ doc.fileName }} ({{ getFileSizeInKB(doc.fileSize) }} KB)
+					</span>
+					<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)" [attr.aria-label]="'Remove ' + doc.fileName">
+						<mat-icon svgIcon="trash"></mat-icon>
+					</button>
+				</div>
+			</li>
+		</ul>
+
+		<div class="actions">
+			<button
+				mat-button
+				[obButton]="'primary'"
+				(click)="uploadDocuments()"
+				[disabled]="!documentsToUpload.length || isUploading"
+				[attr.aria-label]="'Upload ' + documentsToUpload.length + ' document(s)'"
+			>
+				<mat-icon svgIcon="upload"></mat-icon>
+				{{ "upload" | translate }}
+			</button>
+		</div>
+	</div>
+
+	<div class="user-documents-section">
+		<div class="section-header">
+			<h3>{{ "personal.documents.my.documents" | translate }}</h3>
+			<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadUserDocuments()" [disabled]="isLoadingDocuments">
+				<mat-icon svgIcon="refresh"></mat-icon>
+			</button>
+		</div>
+
+		<div *ngIf="isLoadingDocuments" class="loading-container">
+			<mat-spinner diameter="40"></mat-spinner>
+			<p>{{ "loading" | translate }}</p>
+		</div>
+
+		<div *ngIf="!isLoadingDocuments && userDocuments.length === 0" class="empty-state">
+			<mat-icon svgIcon="file" class="empty-icon"></mat-icon>
+			<p>{{ "personal.documents.no.documents" | translate }}</p>
+		</div>
+
+		<div *ngIf="!isLoadingDocuments && userDocuments.length > 0" class="documents-grid">
+			<mat-card *ngFor="let doc of userDocuments" class="document-card">
+				<mat-card-header>
+					<mat-icon mat-card-avatar svgIcon="file"></mat-icon>
+					<mat-card-title>{{ doc.title }}</mat-card-title>
+					<mat-card-subtitle> {{ "personal.documents.uploaded.at" | translate }} {{ doc.uploadedAt | date: "short" }} </mat-card-subtitle>
+				</mat-card-header>
+				<mat-card-actions align="end">
+					<button
+						mat-icon-button
+						type="button"
+						[obButton]="'secondary'"
+						(click)="downloadDocument(doc)"
+						[attr.aria-label]="'Download ' + doc.title"
+						matTooltip="{{ 'download' | translate }}"
+					>
+						<mat-icon svgIcon="download"></mat-icon>
+					</button>
+					<button
+						mat-icon-button
+						type="button"
+						[obButton]="'secondary'"
+						(click)="deleteDocument(doc)"
+						[attr.aria-label]="'Delete ' + doc.title"
+						matTooltip="{{ 'personal.documents.delete' | translate }}"
+					>
+						<mat-icon svgIcon="trash"></mat-icon>
+					</button>
+				</mat-card-actions>
+			</mat-card>
+		</div>
+	</div>
+</div>

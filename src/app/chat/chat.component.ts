@@ -19,7 +19,6 @@ import {
 	AutocompleteType,
 	ChatAutocompleteService,
 	ChatConversationManagerService,
-	ChatFileUploadService,
 	ChatStreamProcessorService,
 	ChatSuggestionService,
 	LANGUAGE_MAP,
@@ -72,8 +71,7 @@ export class ChatComponent implements OnInit {
 		private readonly conversationManager: ChatConversationManagerService,
 		private readonly suggestionService: ChatSuggestionService,
 		private readonly autocompleteService: ChatAutocompleteService,
-		private readonly authDialogService: UserAuthDialogService,
-		private readonly fileUploadService: ChatFileUploadService
+		private readonly authDialogService: UserAuthDialogService
 	) {}
 
 	ngOnInit() {
@@ -206,9 +204,6 @@ export class ChatComponent implements OnInit {
 		this.feedbackService.sendAnswerFeedback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
 			this.notif.success('feedback.success');
 		});
-	}
-	uploadDoc(): void {
-		this.fileUploadService.uploadDocument(this.currentConversation?.conversationId);
 	}
 
 	handleSuggestionAction(action: string): void {

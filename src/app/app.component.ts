@@ -16,15 +16,18 @@ import {AuthenticationServiceV2} from './shared/services/auth.service';
 export class AppComponent implements OnInit {
 	navigation: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
+		{url: '/personal-documents', label: 'personal.documents'},
 		{url: '/tips', label: 'tips.component'}
 	];
 	navigationTranslator: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
+		{url: '/personal-documents', label: 'personal.documents'},
 		{url: '/tools', label: 'tools'},
 		{url: '/tips', label: 'tips.component'}
 	];
 	navigationAdmin: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
+		{url: '/personal-documents', label: 'personal.documents'},
 		{url: '/admin', label: 'admin'},
 		{url: '/tools', label: 'tools'},
 		{url: '/tips', label: 'tips.component'}
