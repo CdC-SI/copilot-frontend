@@ -408,5 +408,48 @@
     "idNumber": "Numéro d'identité",
     "idType": "Type d'identité",
     "gender": "Genre"
+  },
+  "career-summary": {
+    "title": "Résumé de carrière scolaire",
+    "description": "Créez un résumé détaillé de la carrière scolaire d'un assuré ou de sa famille en saisissant son numéro AVS.",
+    "navs-input": "Numéro AVS",
+    "navs-hint": "Format: 756.1234.5678.90",
+    "navs-required": "Le numéro AVS est requis",
+    "navs-pattern": "Format invalide. Utilisez le format 756.1234.5678.90",
+    "create-button": "Créer un résumé",
+    "task-list-title": "Liste des demandes de résumé",
+    "no-tasks": "Aucune demande de résumé pour le moment",
+    "no-tasks-filtered": "Aucune demande de résumé ne correspond à ce filtre",
+    "filter-by-navs": "Filtrer par numéro AVS",
+    "sort-by-date": "Trier par date",
+    "sort-newest": "Plus récentes d'abord",
+    "sort-oldest": "Plus anciennes d'abord",
+    "navs-label": "NAVS",
+    "created-at": "Créé le",
+    "last-update": "Dernière mise à jour",
+    "view-summary": "Voir le résumé",
+    "detail-title": "Résumé de carrière scolaire",
+    "back-to-list": "Retour à la liste",
+    "retry-button": "Relancer l'analyse",
+    "open-references-button": "Voir les références",
+    "status": {
+      "EN_COURS": "En cours de traitement",
+      "TERMINEE": "Traitement terminé",
+      "ERREUR": "Erreur lors du traitement"
+    },
+    "success": {
+      "create": "Demande de résumé créée avec succès",
+      "retry": "Analyse relancée avec succès",
+      "open-references": "Demande d'affichage envoyée avec succès ({{count}} références)"
+    },
+    "error": {
+      "create": "Erreur lors de la création du résumé",
+      "load-tasks": "Erreur lors du chargement des tâches",
+      "load-detail": "Erreur lors du chargement du résumé",
+      "not-found": "Résumé introuvable",
+      "not-completed": "Le résumé n'est pas encore terminé",
+      "retry": "Erreur lors de la relance de l'analyse",
+      "open-references": "Erreur lors de l'ouverture des références"
+    }
   }
 }

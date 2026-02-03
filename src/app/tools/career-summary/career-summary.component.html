@@ -1,0 +1,122 @@
+<div class="career-summary-container">
+	<!-- Vue détaillée d'un résumé -->
+	<div *ngIf="selectedSummary" class="summary-detail">
+		<mat-card>
+			<mat-card-header>
+				<mat-card-title>{{ "career-summary.detail-title" | translate }}</mat-card-title>
+				<mat-card-subtitle>
+					{{ "career-summary.navs-label" | translate }}: {{ selectedSummary.navs }} - {{ "career-summary.last-update" | translate }}:
+					{{ selectedSummary.updatedAt | date: "short" }}
+				</mat-card-subtitle>
+			</mat-card-header>
+			<mat-card-content>
+				<div class="markdown-content">
+					<markdown [data]="selectedSummary.summaryMarkdown"></markdown>
+				</div>
+			</mat-card-content>
+			<mat-card-actions>
+				<button mat-raised-button color="primary" (click)="closeSummary()">
+					<mat-icon svgIcon="arrow-left"></mat-icon>
+					{{ "career-summary.back-to-list" | translate }}
+				</button>
+				<button mat-raised-button color="accent" (click)="retrySummary(selectedSummary.id, $event)">
+					<mat-icon svgIcon="refresh"></mat-icon>
+					{{ "career-summary.retry-button" | translate }}
+				</button>
+				<button mat-raised-button color="accent" (click)="openReferences(selectedSummary.id)">
+					<mat-icon svgIcon="book"></mat-icon>
+					{{ "career-summary.open-references-button" | translate }}
+				</button>
+			</mat-card-actions>
+		</mat-card>
+	</div>
+
+	<!-- Vue principale avec formulaire et liste -->
+	<div *ngIf="!selectedSummary">
+		<!-- Formulaire de création -->
+		<mat-card class="create-card">
+			<mat-card-header>
+				<mat-card-title>{{ "career-summary.title" | translate }}</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<p>{{ "career-summary.description" | translate }}</p>
+				<form [formGroup]="navsForm" (ngSubmit)="createSummary()">
+					<mat-form-field appearance="outline" style="width: 100%">
+						<mat-label>{{ "career-summary.navs-input" | translate }}</mat-label>
+						<input matInput formControlName="navs" placeholder="756.1234.5678.90" />
+						<mat-hint>{{ "career-summary.navs-hint" | translate }}</mat-hint>
+						<mat-error *ngIf="navsForm.get('navs')?.hasError('required')">
+							{{ "career-summary.navs-required" | translate }}
+						</mat-error>
+						<mat-error *ngIf="navsForm.get('navs')?.hasError('pattern')">
+							{{ "career-summary.navs-pattern" | translate }}
+						</mat-error>
+					</mat-form-field>
+					<button mat-raised-button color="primary" type="submit" [disabled]="navsForm.invalid || isLoading" style="width: 100%; margin-top: 8px">
+						<mat-icon svgIcon="arrow-right"></mat-icon>
+						{{ "career-summary.create-button" | translate }}
+					</button>
+				</form>
+			</mat-card-content>
+		</mat-card>
+
+		<!-- Liste des tâches -->
+		<mat-card class="tasks-card">
+			<mat-card-header>
+				<mat-card-title>{{ "career-summary.task-list-title" | translate }}</mat-card-title>
+				<button mat-icon-button [obButton]="'primary'" (click)="loadTasks()" [disabled]="isLoadingTasks">
+					<mat-icon svgIcon="refresh"></mat-icon>
+				</button>
+			</mat-card-header>
+			<mat-card-content>
+				<!-- Filtres et tri -->
+				<div class="filters-container">
+					<mat-form-field appearance="outline" class="filter-field">
+						<mat-label>{{ "career-summary.filter-by-navs" | translate }}</mat-label>
+						<input matInput [(ngModel)]="navsFilter" (ngModelChange)="applyFilter()" placeholder="756.1234.5678.90" />
+						<button mat-icon-button matSuffix *ngIf="navsFilter" (click)="clearFilter()">
+							<mat-icon svgIcon="cancel"></mat-icon>
+						</button>
+					</mat-form-field>
+					<mat-form-field appearance="outline" class="sort-field">
+						<mat-label>{{ "career-summary.sort-by-date" | translate }}</mat-label>
+						<mat-select [(ngModel)]="sortOrder" (ngModelChange)="applySorting()">
+							<mat-option value="desc">{{ "career-summary.sort-newest" | translate }}</mat-option>
+							<mat-option value="asc">{{ "career-summary.sort-oldest" | translate }}</mat-option>
+						</mat-select>
+					</mat-form-field>
+				</div>
+
+				<div *ngIf="isLoadingTasks" style="text-align: center; padding: 20px">
+					<mat-spinner diameter="40"></mat-spinner>
+				</div>
+
+				<div *ngIf="!isLoadingTasks && filteredTasks.length === 0" class="no-tasks">
+					<mat-icon svgIcon="info-circle"></mat-icon>
+					<p>{{ navsFilter ? ("career-summary.no-tasks-filtered" | translate) : ("career-summary.no-tasks" | translate) }}</p>
+				</div>
+
+				<mat-list *ngIf="!isLoadingTasks && filteredTasks.length > 0">
+					<mat-list-item *ngFor="let task of filteredTasks" class="task-item">
+						<div class="task-content">
+							<div class="task-header">
+								<mat-icon [svgIcon]="getStatusIcon(task.status)" [class]="getStatusClass(task.status)"></mat-icon>
+								<div class="task-info">
+									<span class="task-navs">{{ task.navs }}</span>
+									<span class="task-status">{{ "career-summary.status." + task.status | translate }}</span>
+								</div>
+							</div>
+							<div class="task-meta">
+								<span class="task-date">{{ "career-summary.created-at" | translate }}: {{ task.createdAt | date: "short" }}</span>
+								<button *ngIf="task.status === SummaryTaskStatus.TERMINEE" mat-button color="primary" (click)="viewSummary(task.id)">
+									<mat-icon svgIcon="arrow-right"></mat-icon>
+									{{ "career-summary.view-summary" | translate }}
+								</button>
+							</div>
+						</div>
+					</mat-list-item>
+				</mat-list>
+			</mat-card-content>
+		</mat-card>
+	</div>
+</div>

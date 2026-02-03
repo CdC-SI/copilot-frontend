@@ -408,5 +408,48 @@
     "idNumber": "Numero di identità",
     "idType": "Tipo di identità",
     "gender": "Genere"
+  },
+  "career-summary": {
+    "title": "Riepilogo della carriera scolastica",
+    "description": "Crea un riepilogo dettagliato della carriera scolastica di un assicurato o della sua famiglia inserendo il suo numero AVS.",
+    "navs-input": "Numero AVS",
+    "navs-hint": "Formato: 756.1234.5678.90",
+    "navs-required": "Il numero AVS è obbligatorio",
+    "navs-pattern": "Formato non valido. Utilizzare il formato 756.1234.5678.90",
+    "create-button": "Crea riepilogo",
+    "task-list-title": "Elenco delle richieste di riepilogo",
+    "no-tasks": "Nessuna richiesta di riepilogo al momento",
+    "no-tasks-filtered": "Nessuna richiesta di riepilogo corrisponde a questo filtro",
+    "filter-by-navs": "Filtra per numero AVS",
+    "sort-by-date": "Ordina per data",
+    "sort-newest": "Più recenti prima",
+    "sort-oldest": "Più vecchie prima",
+    "navs-label": "NAVS",
+    "created-at": "Creato il",
+    "last-update": "Ultimo aggiornamento",
+    "view-summary": "Visualizza riepilogo",
+    "detail-title": "Riepilogo della carriera scolastica",
+    "back-to-list": "Torna all'elenco",
+    "retry-button": "Riprova l'analisi",
+    "open-references-button": "Apri riferimenti",
+    "status": {
+      "EN_COURS": "Elaborazione in corso",
+      "TERMINEE": "Elaborazione completata",
+      "ERREUR": "Errore durante l'elaborazione"
+    },
+    "success": {
+      "create": "Richiesta di riepilogo creata con successo",
+      "retry": "Analisi riavviata con successo",
+      "open-references": "Richiesta di visualizzazione inviata con successo ({{count}} riferimenti)"
+    },
+    "error": {
+      "create": "Errore durante la creazione del riepilogo",
+      "load-tasks": "Errore durante il caricamento delle attività",
+      "load-detail": "Errore durante il caricamento del riepilogo",
+      "not-found": "Riepilogo non trovato",
+      "not-completed": "Il riepilogo non è ancora completato",
+      "retry": "Errore durante il riavvio dell'analisi",
+      "open-references": "Errore durante l'apertura dei riferimenti"
+    }
   }
 }

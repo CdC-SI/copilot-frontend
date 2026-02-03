@@ -408,5 +408,48 @@
     "idNumber": "Ausweisnummer",
     "idType": "Ausweisart",
     "gender": "Geschlecht"
+  },
+  "career-summary": {
+    "title": "Zusammenfassung der Schulkarriere",
+    "description": "Erstellen Sie eine detaillierte Zusammenfassung der Schulkarriere eines Versicherten oder seiner Familie, indem Sie seine AHV-Nummer eingeben.",
+    "navs-input": "AHV-Nummer",
+    "navs-hint": "Format: 756.1234.5678.90",
+    "navs-required": "Die AHV-Nummer ist erforderlich",
+    "navs-pattern": "Ungültiges Format. Verwenden Sie das Format 756.1234.5678.90",
+    "create-button": "Zusammenfassung erstellen",
+    "task-list-title": "Liste der Zusammenfassungsanfragen",
+    "no-tasks": "Derzeit keine Zusammenfassungsanfragen",
+    "no-tasks-filtered": "Keine Zusammenfassungsanfragen entsprechen diesem Filter",
+    "filter-by-navs": "Nach AHV-Nummer filtern",
+    "sort-by-date": "Nach Datum sortieren",
+    "sort-newest": "Neueste zuerst",
+    "sort-oldest": "Älteste zuerst",
+    "navs-label": "NAVS",
+    "created-at": "Erstellt am",
+    "last-update": "Letzte Aktualisierung",
+    "view-summary": "Zusammenfassung anzeigen",
+    "detail-title": "Zusammenfassung der Schulkarriere",
+    "back-to-list": "Zurück zur Liste",
+    "retry-button": "Analyse erneut starten",
+    "open-references-button": "Referenzen öffnen",
+    "status": {
+      "EN_COURS": "In Bearbeitung",
+      "TERMINEE": "Verarbeitung abgeschlossen",
+      "ERREUR": "Fehler bei der Verarbeitung"
+    },
+    "success": {
+      "create": "Zusammenfassungsanfrage erfolgreich erstellt",
+      "retry": "Analyse erfolgreich neu gestartet",
+      "open-references": "Anzeigeanforderung erfolgreich gesendet ({{count}} Referenzen)"
+    },
+    "error": {
+      "create": "Fehler beim Erstellen der Zusammenfassung",
+      "load-tasks": "Fehler beim Laden der Aufgaben",
+      "load-detail": "Fehler beim Laden der Zusammenfassung",
+      "not-found": "Zusammenfassung nicht gefunden",
+      "not-completed": "Die Zusammenfassung ist noch nicht abgeschlossen",
+      "retry": "Fehler beim erneuten Starten der Analyse",
+      "open-references": "Fehler beim Öffnen der Referenzen"
+    }
   }
 }
