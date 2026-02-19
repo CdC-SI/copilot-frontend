@@ -5,7 +5,7 @@ import {RagService} from '../shared/services/rag.service';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {ChatTitle} from '../shared/model/chat-history';
+import {Attachment, AttachmentDTO, ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -15,6 +15,7 @@ import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
+import {HttpEventType} from '@angular/common/http';
 import {
 	AutocompleteType,
 	ChatAutocompleteService,
@@ -35,18 +36,18 @@ export class ChatComponent implements OnInit {
 	searchCtrl = new FormControl();
 	chatConfigCtrl = new FormControl();
 	conversationTitles: ChatTitle[] = [];
-	currentConversation: ChatTitle;
+	currentConversationTitle: ChatTitle;
 	isCommandMode = false;
 	displayTextArea = false;
 	activeForm?: {def: FormDef; group: FormGroup};
-	attachments: File[] = [];
+	attachments: Attachment[] = [];
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
 	protected readonly ChatMessageSource = ChatMessageSource;
 
 	get messages(): ChatMessage[] {
-		return this.conversationManager.getMessages(this.currentConversation?.conversationId);
+		return this.conversationManager.getMessages(this.currentConversationTitle?.conversationId);
 	}
 
 	get defaultSuggestions() {
@@ -92,7 +93,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	getOptionService() {
-		return this.autocompleteService.getOptionService(this.isCommandMode, !!this.currentConversation);
+		return this.autocompleteService.getOptionService(this.isCommandMode, !!this.currentConversationTitle);
 	}
 
 	searchOptionLabelFn = (option: AutocompleteType): string => {
@@ -110,7 +111,7 @@ export class ChatComponent implements OnInit {
 	selectFaqOption(question: IQuestion): void {
 		const sourceType = question.url?.startsWith('http') ? 'URL' : 'FILE';
 		this.conversationManager.addMessage(
-			this.currentConversation?.conversationId,
+			this.currentConversationTitle?.conversationId,
 			ChatMessageSource.USER,
 			question.text,
 			false,
@@ -119,7 +120,7 @@ export class ChatComponent implements OnInit {
 			question.id
 		);
 		this.conversationManager.addMessage(
-			this.currentConversation?.conversationId,
+			this.currentConversationTitle?.conversationId,
 			ChatMessageSource.FAQ,
 			question.answer.text,
 			false,
@@ -148,10 +149,14 @@ export class ChatComponent implements OnInit {
 	}
 
 	newChat(): void {
-		if (this.currentConversation) this.currentConversation.selected = false;
-		this.currentConversation = null;
+		if (this.currentConversationTitle) this.currentConversationTitle.selected = false;
+		this.currentConversationTitle = null;
 		this.conversationManager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
+	}
+
+	canAskLLM() {
+		return this.searchCtrl.value && this.attachments.every(att => !att.isUploading);
 	}
 
 	sendToLLM(): void {
@@ -163,7 +168,7 @@ export class ChatComponent implements OnInit {
 		const inputText = this.searchCtrl.value;
 		this.prepareForStreaming(inputText);
 		this.startStreamingRequest(inputText);
-		this.clearSearchAndAttachments();
+		this.clearSearch();
 	}
 
 	scrollToBottom(): void {
@@ -175,19 +180,20 @@ export class ChatComponent implements OnInit {
 		});
 	}
 
-	selectConversation(conversation: ChatTitle) {
-		this.conversationService.getConversation(conversation.conversationId).subscribe(messages => {
-			this.currentConversation = conversation;
-			const chatMessages = messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
-			this.conversationManager.setConversationMessages(conversation.conversationId, chatMessages);
+	selectConversation(chatTitle: ChatTitle) {
+		this.conversationService.getConversation(chatTitle.conversationId).subscribe(conversation => {
+			this.currentConversationTitle = chatTitle;
+			this.updateAttachments(conversation.attachments);
+			const chatMessages = conversation.messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
+			this.conversationManager.setConversationMessages(chatTitle.conversationId, chatMessages);
 			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
 			this.scrollToBottom();
 		});
 	}
 
 	deleteConversation(conversation: ChatTitle) {
-		if (conversation.conversationId === this.currentConversation?.conversationId) {
-			this.currentConversation = null;
+		if (conversation.conversationId === this.currentConversationTitle?.conversationId) {
+			this.currentConversationTitle = null;
 			this.conversationManager.initNewChat();
 			this.suggestionService.clearSpecificSuggestions();
 		}
@@ -201,7 +207,7 @@ export class ChatComponent implements OnInit {
 	}
 
 	sendFeedback(feedback: Feedback) {
-		this.feedbackService.sendAnswerFeedback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
+		this.feedbackService.sendAnswerFeedback({conversationId: this.currentConversationTitle.conversationId, ...feedback}).subscribe(() => {
 			this.notif.success('feedback.success');
 		});
 	}
@@ -233,17 +239,119 @@ export class ChatComponent implements OnInit {
 	}
 
 	onAttachmentsSelected(event: File[]) {
-		this.attachments.push(...event);
+		const pendingAttachments: Attachment[] = this.initializePendingAttachments(event);
+		this.attachments.push(...pendingAttachments);
+
+		this.conversationService.uploadAttachments(this.currentConversationTitle, ...event).subscribe({
+			next: httpEvent => this.handleUploadEvent(httpEvent, pendingAttachments),
+			error: () => this.handleUploadError(pendingAttachments)
+		});
 	}
 
-	removeAttachment(index: number) {
-		this.attachments.splice(index, 1);
+	removeAttachment(id: number) {
+		this.conversationService.deleteAttachment(id).subscribe(() => {
+			this.attachments = this.attachments.filter(att => att.id !== id);
+			this.notif.success('attachment.delete.success');
+		});
+	}
+
+	downloadAttachment(attachment: Attachment) {
+		if (!attachment.id || attachment.isUploading || !this.currentConversationTitle) {
+			return;
+		}
+
+		this.conversationService.downloadAttachment(this.currentConversationTitle.conversationId, attachment.id).subscribe({
+			next: blob => {
+				const url = globalThis.URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = attachment.fileName || 'attachment';
+				link.click();
+				globalThis.URL.revokeObjectURL(url);
+			},
+			error: () => {
+				this.notif.error('attachment.download.error');
+			}
+		});
+	}
+
+	private initializePendingAttachments(files: File[]): Attachment[] {
+		return files.map(file => ({
+			fileName: file.name,
+			fileSize: file.size,
+			file,
+			isUploading: true
+		}));
+	}
+
+	private handleUploadEvent(httpEvent: any, pendingAttachments: Attachment[]): void {
+		if (httpEvent.type === HttpEventType.Response) {
+			this.handleUploadResponse(httpEvent.body, pendingAttachments);
+		}
+	}
+
+	private handleUploadResponse(response: any, pendingAttachments: Attachment[]): void {
+		if (response.success) {
+			this.handleSuccessfulUpload(response, pendingAttachments);
+		} else {
+			this.handleFailedUpload(response, pendingAttachments);
+		}
+	}
+
+	private handleSuccessfulUpload(response: any, pendingAttachments: Attachment[]): void {
+		if (!this.currentConversationTitle) {
+			this.createConversationFromUpload(response);
+		}
+		this.updateAttachmentsWithServerIds(response, pendingAttachments);
+		this.notif.success(response.message);
+		this.cdr.markForCheck();
+	}
+
+	private createConversationFromUpload(response: any): void {
+		this.currentConversationTitle = {
+			conversationId: response.conversationAttachments.conversationId,
+			title: 'Processing attachments...',
+			timestamp: new Date(),
+			selected: true
+		};
+	}
+
+	private updateAttachmentsWithServerIds(response: any, pendingAttachments: Attachment[]): void {
+		response.conversationAttachments.attachments.forEach((serverAtt: {id: number; filename: string}) => {
+			const localAtt = pendingAttachments.find(att => att.file.name === serverAtt.filename);
+			if (localAtt) {
+				localAtt.id = serverAtt.id;
+				localAtt.isUploading = false;
+			}
+		});
+	}
+
+	private updateAttachments(conversationAttachments: AttachmentDTO[]): void {
+		this.attachments = [];
+		for (const convAtt of conversationAttachments) {
+			this.attachments.push({
+				id: convAtt.id,
+				fileName: convAtt.filename,
+				fileSize: convAtt.fileSize,
+				isUploading: false
+			});
+		}
+	}
+
+	private handleFailedUpload(response: any, pendingAttachments: Attachment[]): void {
+		this.attachments = this.attachments.filter(att => !pendingAttachments.includes(att));
+		this.notif.error(response.message);
+	}
+
+	private handleUploadError(pendingAttachments: Attachment[]): void {
+		this.attachments = this.attachments.filter(att => !pendingAttachments.includes(att));
+		this.notif.error('attachment.upload.error');
 	}
 
 	private prepareForStreaming(inputText: string): void {
-		this.conversationManager.setActiveStreamingConversation(this.currentConversation?.conversationId);
-		this.conversationManager.addMessage(this.currentConversation?.conversationId, ChatMessageSource.USER, inputText);
-		this.conversationManager.addMessage(this.currentConversation?.conversationId, ChatMessageSource.LLM, '', false, false);
+		this.conversationManager.setActiveStreamingConversation(this.currentConversationTitle?.conversationId);
+		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.USER, inputText);
+		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
 		this.suggestionService.clearSpecificSuggestions();
 	}
@@ -254,8 +362,7 @@ export class ChatComponent implements OnInit {
 
 		const requestConfig = {
 			query: inputText,
-			attachments: this.attachments,
-			conversationId: this.currentConversation?.conversationId,
+			conversationId: this.currentConversationTitle?.conversationId,
 			...this.chatConfigCtrl.value,
 			language: mappedLanguage
 		};
@@ -272,11 +379,6 @@ export class ChatComponent implements OnInit {
 				this.conversationManager.clearActiveStreamingConversation();
 			}
 		});
-	}
-
-	private clearSearchAndAttachments(): void {
-		this.clearSearch();
-		this.attachments = [];
 	}
 
 	private processStreamChunk(chunk: string): void {
@@ -296,7 +398,7 @@ export class ChatComponent implements OnInit {
 			this.enableSearch();
 		}
 
-		if (result.shouldRefreshConversations && !this.currentConversation) {
+		if (result.shouldRefreshConversations && (!this.currentConversationTitle || this.currentConversationTitle.title === 'Processing attachments...')) {
 			this.refreshConversations();
 		}
 	}
@@ -323,8 +425,8 @@ export class ChatComponent implements OnInit {
 
 	private updateCurrentConversation() {
 		if (!this.isRegistered()) return;
-		if (this.currentConversation) {
-			this.conversationService.update(this.currentConversation.conversationId, [this.messages.at(-2), this.messages.at(-1)]);
+		if (this.currentConversationTitle) {
+			this.conversationService.update(this.currentConversationTitle.conversationId, [this.messages.at(-2), this.messages.at(-1)]);
 		} else {
 			this.conversationService.init(this.messages).subscribe(() => {
 				this.refreshConversations();
@@ -336,10 +438,10 @@ export class ChatComponent implements OnInit {
 		setTimeout(() => {
 			this.conversationService.getConversationTitles().subscribe(conversations => {
 				this.setAndSortConversations(conversations);
-				this.currentConversation = this.conversationTitles[0];
-				this.currentConversation.selected = true;
+				this.currentConversationTitle = this.conversationTitles[0];
+				this.currentConversationTitle.selected = true;
 				// Transfer messages from NEW_CHAT_KEY to the new conversation
-				this.conversationManager.transferNewChatToConversation(this.currentConversation.conversationId);
+				this.conversationManager.transferNewChatToConversation(this.currentConversationTitle.conversationId);
 			});
 		}, 1_500);
 	}
