@@ -31,7 +31,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		apiUrl: '/copilot/api'
 	},
 	{
-		patterns: ['-r.apps.openshift'],
+		patterns: ['-r.zas.admin.ch'],
 		banner: {
 			text: 'REF'
 		},
