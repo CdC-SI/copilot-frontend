@@ -1,9 +1,11 @@
-<div class="flex-row aic">
-	<div class="flex-column flex-1">
-		<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
-		<h4 class="mt16">{{ "create.copilot.account" | translate }}</h4>
-	</div>
-	<div class="flex-column flex-1" ngForm>
+<div class="signup-container">
+	<!-- Left side: Form -->
+	<div class="form-section">
+		<div class="header">
+			<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+			<h4 class="mt16">{{ "create.copilot.account" | translate }}</h4>
+		</div>
+
 		<form [formGroup]="userFrmGrp">
 			<mat-form-field obErrorMessages>
 				<mat-label>{{ "firstName" | translate }}</mat-label>
@@ -13,25 +15,49 @@
 				<mat-label>{{ "lastName" | translate }}</mat-label>
 				<input [formControlName]="FORM_FIELDS.LASTNAME" name="lastName" type="text" matInput placeholder="" />
 			</mat-form-field>
-			<mat-slide-toggle [checked]="true" (change)="onToggleChange()">
-				<span matBadge="?" matBadgeOverlap="false" [matTooltip]="'zas.user.explain' | translate">{{ "zas.user" | translate }}</span>
-			</mat-slide-toggle>
-			<mat-checkbox [formControlName]="FORM_FIELDS.CONFIDENTIALITY" name="accept-gcu">
-				<a href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Datenschutzerklaerung.pdf" target="_blank">
-					{{ "confidentiality.read" | translate }}
-				</a>
-			</mat-checkbox>
-			<mat-checkbox [formControlName]="FORM_FIELDS.GCU" name="accept-gcu" class="mb16">
-				<a href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Nutzungsvereinbarung-Mitarbeitende.pdf" target="_blank">
-					{{ "gcu.read" | translate }}
-				</a>
-			</mat-checkbox>
+
+			<!-- Unified Document Acceptance section -->
+			<div class="document-section">
+				<h5>{{ "documents.legal" | translate }}</h5>
+				<p class="info-text">{{ "documents.visit.both.tabs" | translate }}</p>
+				<mat-checkbox [disabled]="!canCheckHasRead" [(ngModel)]="hasReadDocumentsChecked" [ngModelOptions]="{ standalone: true }" (change)="onHasReadChange()">
+					<span [class.disabled-text]="!canCheckHasRead">{{ "i.have.read.all" | translate }}</span>
+				</mat-checkbox>
+				<mat-checkbox [formControlName]="FORM_FIELDS.CONFIDENTIALITY" name="accept-documents" class="mb16">
+					<span [class.disabled-text]="userFrmGrp.get(FORM_FIELDS.CONFIDENTIALITY)?.disabled">{{ "i.accept.all.documents" | translate }}</span>
+				</mat-checkbox>
+			</div>
 		</form>
+
+		<div class="save-button">
+			<button mat-button [obButton]="'primary'" (click)="onConfirmClick()" [disabled]="!isFormValid">
+				<mat-icon svgIcon="checkmark"></mat-icon>
+				{{ "create" | translate }}
+			</button>
+		</div>
 	</div>
-</div>
-<div class="save-button">
-	<button mat-button [obButton]="'primary'" (click)="onConfirmClick()" [disabled]="this.userFrmGrp.invalid">
-		<mat-icon svgIcon="checkmark"></mat-icon>
-		{{ "create" | translate }}
-	</button>
+
+	<!-- Right side: Document viewer -->
+	<div class="document-viewer">
+		<mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+			<mat-tab [label]="'confidentiality' | translate">
+				<div class="document-content" (scroll)="onScroll($event, 'confidentiality')">
+					<div class="document-text">
+						<h3>{{ "confidentiality.title" | translate }}</h3>
+						<p>{{ confidentialityText }}</p>
+						<!-- Vous pourrez ajouter votre texte complet ici -->
+					</div>
+				</div>
+			</mat-tab>
+			<mat-tab [label]="'gcu' | translate">
+				<div class="document-content" (scroll)="onScroll($event, 'gcu')">
+					<div class="document-text">
+						<h3>{{ "gcu.title" | translate }}</h3>
+						<p>{{ gcuText }}</p>
+						<!-- Vous pourrez ajouter votre texte complet ici -->
+					</div>
+				</div>
+			</mat-tab>
+		</mat-tab-group>
+	</div>
 </div>
