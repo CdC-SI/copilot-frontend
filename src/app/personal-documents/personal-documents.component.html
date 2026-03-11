@@ -35,6 +35,11 @@
 							{{ "upload" | translate }}
 						</button>
 					</div>
+
+					<div *ngIf="showUploadInfo || isUploading" class="upload-info-message">
+						<mat-icon class="info-icon" svgIcon="info"></mat-icon>
+						<span>{{ "personal.documents.upload.processing" | translate }}</span>
+					</div>
 				</div>
 
 				<div class="user-documents-section">
@@ -61,6 +66,11 @@
 								<mat-icon mat-card-avatar svgIcon="file"></mat-icon>
 								<mat-card-title>{{ doc.title }}</mat-card-title>
 								<mat-card-subtitle> {{ "personal.documents.uploaded.at" | translate }} {{ doc.uploadedAt | date: "short" }} </mat-card-subtitle>
+								<div class="status-badge">
+									<mat-chip [class]="getDocumentStatusClass(doc.status)">
+										{{ "personal.documents.status." + (doc.status?.toLowerCase() || "pending") | translate }}
+									</mat-chip>
+								</div>
 							</mat-card-header>
 							<mat-card-actions align="end">
 								<button
@@ -68,6 +78,7 @@
 									type="button"
 									[obButton]="'secondary'"
 									(click)="downloadDocument(doc)"
+									[disabled]="!isDocumentReady(doc)"
 									[attr.aria-label]="'Download ' + doc.title"
 									matTooltip="{{ 'download' | translate }}"
 								>

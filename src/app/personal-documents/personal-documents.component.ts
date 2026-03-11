@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subject, forkJoin} from 'rxjs';
-import {finalize, takeUntil} from 'rxjs/operators';
+import {Observable, Subject, forkJoin, timer} from 'rxjs';
+import {finalize, switchMap, takeUntil, takeWhile} from 'rxjs/operators';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {MatDialog} from '@angular/material/dialog';
 import {IDocument} from '../shared/model/document';
@@ -13,6 +13,7 @@ import {SettingsType} from '../shared/model/settings';
 import {RequestSourceDialogComponent} from './request-source-dialog/request-source-dialog.component';
 
 const BYTES_TO_KB = 1024;
+const AUTO_REFRESH_INTERVAL_MS = 30_000;
 
 @Component({
 	selector: 'zco-personal-documents',
@@ -29,6 +30,7 @@ export class PersonalDocumentsComponent implements OnInit, OnDestroy {
 	isLoadingDocuments = false;
 	isLoadingSources = false;
 	isLoadingRequests = false;
+	showUploadInfo = false;
 
 	readonly SourceRequestStatus = SourceRequestStatus;
 
@@ -183,6 +185,27 @@ export class PersonalDocumentsComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	getDocumentStatusClass(status: string | undefined): string {
+		switch (status) {
+			case 'PENDING':
+				return 'status-pending';
+			case 'PROCESSED':
+				return 'status-processed';
+			case 'FAILED':
+				return 'status-failed';
+			default:
+				return 'status-pending';
+		}
+	}
+
+	isDocumentReady(doc: IPersonalDocument): boolean {
+		return doc.status === 'PROCESSED';
+	}
+
+	hasPendingDocuments(): boolean {
+		return this.userDocuments.some(doc => doc.status === 'PENDING');
+	}
+
 	private isChosenEvent(event: ObIUploadEvent): boolean {
 		return event.type === ObEUploadEventType.CHOSEN;
 	}
@@ -224,7 +247,9 @@ export class PersonalDocumentsComponent implements OnInit, OnDestroy {
 	private handleUploadSuccess(): void {
 		this.notifService.success('personal.documents.upload.success');
 		this.documentsToUpload = [];
+		this.showUploadInfo = true;
 		this.loadUserDocuments();
+		this.startAutoRefresh();
 	}
 
 	private handleUploadError(): void {
@@ -250,6 +275,23 @@ export class PersonalDocumentsComponent implements OnInit, OnDestroy {
 					this.loadMySourceRequests();
 				},
 				error: () => this.notifService.error('sources.request.create.error')
+			});
+	}
+
+	private startAutoRefresh(): void {
+		timer(AUTO_REFRESH_INTERVAL_MS, AUTO_REFRESH_INTERVAL_MS)
+			.pipe(
+				takeUntil(this.destroy$),
+				takeWhile(() => this.hasPendingDocuments()),
+				switchMap(() => this.uploadService.getUserDocuments())
+			)
+			.subscribe({
+				next: (docs: IPersonalDocument[]) => {
+					this.userDocuments = docs;
+					if (!this.hasPendingDocuments()) {
+						this.showUploadInfo = false;
+					}
+				}
 			});
 	}
 }
