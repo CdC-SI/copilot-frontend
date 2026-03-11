@@ -44,7 +44,7 @@
 						alt="copilot-logo"
 					/>
 					<zco-chat-message
-						[conversationId]="currentConversation?.conversationId"
+						[conversationId]="currentConversationTitle?.conversationId"
 						[message]="message"
 						[previousMessage]="i > 0 ? messages[i - 1] : null"
 						(feedback)="sendFeedback($event)"
@@ -83,7 +83,7 @@
 				(attachmentsSelected)="onAttachmentsSelected($event)"
 			/>
 
-			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!searchCtrl.value">
+			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
 				<mat-icon svgIcon="paper-plane"></mat-icon>
 			</button>
 
@@ -92,11 +92,32 @@
 			</button>
 		</form>
 
-		<div *ngIf="attachments.length">
+		<div *ngIf="attachments.length" class="attachments-container">
 			<mat-chip-listbox>
-				<mat-chip *ngFor="let attachment of attachments; index as i" (removed)="removeAttachment(i)">
-					{{ attachment.name }} ({{ attachment.size / 1000 | number: "1.0-0" }} Ko)
-					<button matChipRemove aria-label="Remove attachment">
+				<mat-chip
+					*ngFor="let attachment of attachments"
+					[class.uploading]="attachment.isUploading"
+					[class.downloadable]="!attachment.isUploading"
+					(click)="!attachment.isUploading && downloadAttachment(attachment)"
+					(keydown.enter)="!attachment.isUploading && downloadAttachment(attachment)"
+					(keydown.space)="!attachment.isUploading && downloadAttachment(attachment)"
+				>
+					<div class="loading-stripes" *ngIf="attachment.isUploading"></div>
+					<span class="attachment-content">
+						<span class="attachment-name">
+							{{ attachment.fileName }}
+							<span class="attachment-size" *ngIf="!attachment.isUploading && attachment.fileSize">
+								({{ attachment.fileSize / 1000 | number: "1.0-0" }} Ko)
+							</span>
+						</span>
+						<span class="upload-status" *ngIf="attachment.isUploading">{{ "attachment.uploading" | translate }}</span>
+					</span>
+					<button
+						*ngIf="!attachment.isUploading"
+						matChipRemove
+						(click)="$event.stopPropagation(); removeAttachment(attachment.id)"
+						aria-label="Remove attachment"
+					>
 						<mat-icon svgIcon="cancel"></mat-icon>
 					</button>
 				</mat-chip>

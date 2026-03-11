@@ -14,7 +14,8 @@ import {AuthenticationServiceV2} from './shared/services/auth.service';
 	styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-	navigation: ObINavigationLink[] = [
+	navigationGuest: ObINavigationLink[] = [{url: '/chat', label: 'chat'}];
+	navigationUser: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
 		{url: '/personal-documents', label: 'personal.documents'},
 		{url: '/tips', label: 'tips.component'}
@@ -72,7 +73,8 @@ export class AppComponent implements OnInit {
 	getNavigation() {
 		if (this.authService.hasAdminRole() && this.authService.userStatus() === UserStatus.ACTIVE) return this.navigationAdmin;
 		else if (this.authService.hasTranslatorRole()) return this.navigationTranslator;
-		return this.navigation;
+		else if (this.authService.userStatus() === UserStatus.ACTIVE) return this.navigationUser;
+		return this.navigationGuest;
 	}
 
 	getDisplayName() {
@@ -123,7 +125,7 @@ export class AppComponent implements OnInit {
 
 	private openSignUpDialog() {
 		this.dialog
-			.open(SignUpComponent, {width: '800px'})
+			.open(SignUpComponent, {})
 			.afterClosed()
 			.subscribe(result => result && this.createUser(result));
 	}

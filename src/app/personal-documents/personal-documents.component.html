@@ -2,85 +2,228 @@
 	<h2>{{ "personal.documents.title" | translate }}</h2>
 	<p class="description">{{ "personal.documents.description" | translate }}</p>
 
-	<div class="upload-section">
-		<ob-file-upload [accept]="['.pdf']" [maxFileSize]="10" (uploadEvent)="uploadPersonalDocument($event)"></ob-file-upload>
+	<mat-tab-group animationDuration="300ms" class="documents-tabs">
+		<!-- Tab 1: My Personal Documents -->
+		<mat-tab [label]="'personal.documents.tab.my.documents' | translate">
+			<div class="tab-content">
+				<div class="upload-section">
+					<ob-file-upload [accept]="['.pdf']" [maxFileSize]="10" (uploadEvent)="uploadPersonalDocument($event)"></ob-file-upload>
 
-		<ul class="documents-list" *ngIf="documentsToUpload.length > 0">
-			<li *ngFor="let doc of documentsToUpload">
-				<div class="doc-to-upload">
-					<span class="doc-info">
-						<mat-icon svgIcon="file"></mat-icon>
-						{{ doc.fileName }} ({{ getFileSizeInKB(doc.fileSize) }} KB)
-					</span>
-					<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)" [attr.aria-label]="'Remove ' + doc.fileName">
-						<mat-icon svgIcon="trash"></mat-icon>
-					</button>
+					<ul class="documents-list" *ngIf="documentsToUpload.length > 0">
+						<li *ngFor="let doc of documentsToUpload">
+							<div class="doc-to-upload">
+								<span class="doc-info">
+									<mat-icon svgIcon="file"></mat-icon>
+									{{ doc.fileName }} ({{ getFileSizeInKB(doc.fileSize) }} KB)
+								</span>
+								<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)" [attr.aria-label]="'Remove ' + doc.fileName">
+									<mat-icon svgIcon="trash"></mat-icon>
+								</button>
+							</div>
+						</li>
+					</ul>
+
+					<div class="actions">
+						<button
+							mat-button
+							[obButton]="'primary'"
+							(click)="uploadDocuments()"
+							[disabled]="!documentsToUpload.length || isUploading"
+							[attr.aria-label]="'Upload ' + documentsToUpload.length + ' document(s)'"
+						>
+							<mat-icon svgIcon="upload"></mat-icon>
+							{{ "upload" | translate }}
+						</button>
+					</div>
+
+					<div *ngIf="showUploadInfo || isUploading" class="upload-info-message">
+						<mat-icon class="info-icon" svgIcon="info"></mat-icon>
+						<span>{{ "personal.documents.upload.processing" | translate }}</span>
+					</div>
 				</div>
-			</li>
-		</ul>
 
-		<div class="actions">
-			<button
-				mat-button
-				[obButton]="'primary'"
-				(click)="uploadDocuments()"
-				[disabled]="!documentsToUpload.length || isUploading"
-				[attr.aria-label]="'Upload ' + documentsToUpload.length + ' document(s)'"
-			>
-				<mat-icon svgIcon="upload"></mat-icon>
-				{{ "upload" | translate }}
-			</button>
-		</div>
-	</div>
+				<div class="user-documents-section">
+					<div class="section-header">
+						<h3>{{ "personal.documents.my.documents" | translate }}</h3>
+						<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadUserDocuments()" [disabled]="isLoadingDocuments">
+							<mat-icon svgIcon="refresh"></mat-icon>
+						</button>
+					</div>
 
-	<div class="user-documents-section">
-		<div class="section-header">
-			<h3>{{ "personal.documents.my.documents" | translate }}</h3>
-			<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadUserDocuments()" [disabled]="isLoadingDocuments">
-				<mat-icon svgIcon="refresh"></mat-icon>
-			</button>
-		</div>
+					<div *ngIf="isLoadingDocuments" class="loading-container">
+						<mat-spinner diameter="40"></mat-spinner>
+						<p>{{ "loading" | translate }}</p>
+					</div>
 
-		<div *ngIf="isLoadingDocuments" class="loading-container">
-			<mat-spinner diameter="40"></mat-spinner>
-			<p>{{ "loading" | translate }}</p>
-		</div>
+					<div *ngIf="!isLoadingDocuments && userDocuments.length === 0" class="empty-state">
+						<mat-icon svgIcon="file" class="empty-icon"></mat-icon>
+						<p>{{ "personal.documents.no.documents" | translate }}</p>
+					</div>
 
-		<div *ngIf="!isLoadingDocuments && userDocuments.length === 0" class="empty-state">
-			<mat-icon svgIcon="file" class="empty-icon"></mat-icon>
-			<p>{{ "personal.documents.no.documents" | translate }}</p>
-		</div>
+					<div *ngIf="!isLoadingDocuments && userDocuments.length > 0" class="documents-grid">
+						<mat-card *ngFor="let doc of userDocuments" class="document-card">
+							<mat-card-header>
+								<mat-icon mat-card-avatar svgIcon="file"></mat-icon>
+								<mat-card-title>{{ doc.title }}</mat-card-title>
+								<mat-card-subtitle> {{ "personal.documents.uploaded.at" | translate }} {{ doc.uploadedAt | date: "short" }} </mat-card-subtitle>
+								<div class="status-badge">
+									<mat-chip [class]="getDocumentStatusClass(doc.status)">
+										{{ "personal.documents.status." + (doc.status?.toLowerCase() || "pending") | translate }}
+									</mat-chip>
+								</div>
+							</mat-card-header>
+							<mat-card-actions align="end">
+								<button
+									mat-icon-button
+									type="button"
+									[obButton]="'secondary'"
+									(click)="downloadDocument(doc)"
+									[disabled]="!isDocumentReady(doc)"
+									[attr.aria-label]="'Download ' + doc.title"
+									matTooltip="{{ 'download' | translate }}"
+								>
+									<mat-icon svgIcon="download"></mat-icon>
+								</button>
+								<button
+									mat-icon-button
+									type="button"
+									[obButton]="'secondary'"
+									(click)="deleteDocument(doc)"
+									[attr.aria-label]="'Delete ' + doc.title"
+									matTooltip="{{ 'personal.documents.delete' | translate }}"
+								>
+									<mat-icon svgIcon="trash"></mat-icon>
+								</button>
+							</mat-card-actions>
+						</mat-card>
+					</div>
+				</div>
 
-		<div *ngIf="!isLoadingDocuments && userDocuments.length > 0" class="documents-grid">
-			<mat-card *ngFor="let doc of userDocuments" class="document-card">
-				<mat-card-header>
-					<mat-icon mat-card-avatar svgIcon="file"></mat-icon>
-					<mat-card-title>{{ doc.title }}</mat-card-title>
-					<mat-card-subtitle> {{ "personal.documents.uploaded.at" | translate }} {{ doc.uploadedAt | date: "short" }} </mat-card-subtitle>
-				</mat-card-header>
-				<mat-card-actions align="end">
-					<button
-						mat-icon-button
-						type="button"
-						[obButton]="'secondary'"
-						(click)="downloadDocument(doc)"
-						[attr.aria-label]="'Download ' + doc.title"
-						matTooltip="{{ 'download' | translate }}"
-					>
-						<mat-icon svgIcon="download"></mat-icon>
-					</button>
-					<button
-						mat-icon-button
-						type="button"
-						[obButton]="'secondary'"
-						(click)="deleteDocument(doc)"
-						[attr.aria-label]="'Delete ' + doc.title"
-						matTooltip="{{ 'personal.documents.delete' | translate }}"
-					>
-						<mat-icon svgIcon="trash"></mat-icon>
-					</button>
-				</mat-card-actions>
-			</mat-card>
-		</div>
-	</div>
+				<!-- Info bubble about personal documents -->
+				<div class="info-section">
+					<mat-icon class="info-icon" svgIcon="info"></mat-icon>
+					<div class="info-content">
+						<strong>{{ "sources.info.personal.title" | translate }}</strong>
+						<p>{{ "sources.info.personal.description" | translate }}</p>
+					</div>
+				</div>
+			</div>
+		</mat-tab>
+
+		<!-- Tab 2: Official Sources -->
+		<mat-tab [label]="'sources.official.tab.title' | translate">
+			<div class="tab-content">
+				<div class="sources-section">
+					<div class="section-header">
+						<h3>{{ "sources.official.title" | translate }}</h3>
+						<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadOfficialSources()" [disabled]="isLoadingSources">
+							<mat-icon svgIcon="refresh"></mat-icon>
+						</button>
+					</div>
+
+					<div *ngIf="isLoadingSources" class="loading-container">
+						<mat-spinner diameter="40"></mat-spinner>
+						<p>{{ "loading" | translate }}</p>
+					</div>
+
+					<div *ngIf="!isLoadingSources && officialSources.length === 0" class="empty-state">
+						<mat-icon svgIcon="book" class="empty-icon"></mat-icon>
+						<p>{{ "sources.official.no.sources" | translate }}</p>
+					</div>
+
+					<div *ngIf="!isLoadingSources && officialSources.length > 0" class="sources-grid">
+						<mat-card *ngFor="let source of officialSources" class="source-card">
+							<mat-card-header>
+								<mat-icon mat-card-avatar svgIcon="book"></mat-icon>
+								<mat-card-title>{{ "sources." + source | translate }}</mat-card-title>
+							</mat-card-header>
+							<mat-card-content>
+								<p class="source-badge">
+									<mat-icon class="badge-icon" svgIcon="checkmark-circle"></mat-icon>
+									{{ "sources.official.badge" | translate }}
+								</p>
+							</mat-card-content>
+						</mat-card>
+					</div>
+
+					<!-- Info bubble about official sources -->
+					<div class="info-section">
+						<mat-icon class="info-icon" svgIcon="info"></mat-icon>
+						<div class="info-content">
+							<strong>{{ "sources.info.official.title" | translate }}</strong>
+							<p>{{ "sources.info.official.description" | translate }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</mat-tab>
+
+		<!-- Tab 3: My Source Requests -->
+		<mat-tab [label]="'sources.requests.tab.title' | translate">
+			<div class="tab-content">
+				<div class="requests-section">
+					<div class="section-header">
+						<h3>{{ "sources.requests.title" | translate }}</h3>
+						<div class="header-actions">
+							<button mat-button [obButton]="'primary'" (click)="openRequestSourceDialog()">
+								<mat-icon svgIcon="plus"></mat-icon>
+								{{ "sources.request.new" | translate }}
+							</button>
+							<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadMySourceRequests()" [disabled]="isLoadingRequests">
+								<mat-icon svgIcon="refresh"></mat-icon>
+							</button>
+						</div>
+					</div>
+
+					<div *ngIf="isLoadingRequests" class="loading-container">
+						<mat-spinner diameter="40"></mat-spinner>
+						<p>{{ "loading" | translate }}</p>
+					</div>
+
+					<div *ngIf="!isLoadingRequests && sourceRequests.length === 0" class="empty-state">
+						<mat-icon svgIcon="playlist-add-check" class="empty-icon"></mat-icon>
+						<p>{{ "sources.requests.no.requests" | translate }}</p>
+						<button mat-button [obButton]="'primary'" (click)="openRequestSourceDialog()">
+							<mat-icon svgIcon="plus"></mat-icon>
+							{{ "sources.request.new" | translate }}
+						</button>
+					</div>
+
+					<div *ngIf="!isLoadingRequests && sourceRequests.length > 0" class="requests-list">
+						<mat-card *ngFor="let request of sourceRequests" class="request-card">
+							<mat-card-header>
+								<mat-icon mat-card-avatar svgIcon="file"></mat-icon>
+								<mat-card-title>{{ request.sourceName }}</mat-card-title>
+								<mat-card-subtitle>
+									{{ "sources.request.created.at" | translate }} {{ request.createdAt | date: "short" }}
+									<span *ngIf="request.requesterUsername"> · {{ request.requesterUsername }}</span>
+								</mat-card-subtitle>
+								<div class="status-badge">
+									<mat-chip [class]="'status-' + request.status?.toLowerCase()">
+										{{ "sources.status." + request.status?.toLowerCase() | translate }}
+									</mat-chip>
+								</div>
+							</mat-card-header>
+							<mat-card-content>
+								<p class="request-instructions">{{ request.description }}</p>
+							</mat-card-content>
+							<mat-card-actions align="end">
+								<button
+									mat-icon-button
+									type="button"
+									[obButton]="'secondary'"
+									(click)="deleteSourceRequest(request)"
+									[attr.aria-label]="'Delete ' + request.sourceName"
+									matTooltip="{{ 'sources.request.delete' | translate }}"
+									[disabled]="request.status === SourceRequestStatus.INTEGRATED"
+								>
+									<mat-icon svgIcon="trash"></mat-icon>
+								</button>
+							</mat-card-actions>
+						</mat-card>
+					</div>
+				</div>
+			</div>
+		</mat-tab>
+	</mat-tab-group>
 </div>

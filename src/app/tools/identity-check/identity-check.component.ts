@@ -118,7 +118,7 @@ export class IdentityCheckComponent implements OnInit {
 				nationality: ocrResult.nationality,
 				idNumber: ocrResult.documentNumber,
 				idType: ocrResult.documentType,
-				gender: ocrResult.gender,
+				gender: ocrResult.gender
 			});
 		});
 	}

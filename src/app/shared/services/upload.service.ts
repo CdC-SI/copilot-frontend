@@ -49,7 +49,8 @@ export class UploadService {
 			map(docs =>
 				docs.map(doc => ({
 					title: doc.title,
-					uploadedAt: new Date(doc.uploadedAt)
+					uploadedAt: new Date(doc.uploadedAt),
+					status: doc.status
 				}))
 			)
 		);

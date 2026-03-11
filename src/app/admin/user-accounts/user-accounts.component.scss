@@ -1,0 +1,16 @@
+.roles-edit-container {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+
+	.roles-checkboxes {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.roles-edit-actions {
+		display: flex;
+		gap: 0.25rem;
+	}
+}
