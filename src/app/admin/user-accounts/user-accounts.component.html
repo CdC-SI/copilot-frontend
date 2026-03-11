@@ -18,7 +18,28 @@
 	</ng-container>
 	<ng-container matColumnDef="roles">
 		<th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">{{ "user.roles" | translate }}</th>
-		<td mat-cell *matCellDef="let user">{{ user.roles }}</td>
+		<td mat-cell *matCellDef="let user">
+			<ng-container *ngIf="!isEditingRoles(user.username); else editRoles">
+				{{ user.roles }}
+			</ng-container>
+			<ng-template #editRoles>
+				<div class="roles-edit-container">
+					<div class="roles-checkboxes">
+						<mat-checkbox *ngFor="let role of availableRoles" [checked]="isRoleSelected(role)" (change)="toggleRole(role)">
+							{{ role }}
+						</mat-checkbox>
+					</div>
+					<div class="roles-edit-actions">
+						<button mat-icon-button color="primary" [matTooltip]="'admin.actions.save' | translate" (click)="saveRoles(user.username)">
+							<mat-icon svgIcon="checkmark"></mat-icon>
+						</button>
+						<button mat-icon-button [matTooltip]="'admin.actions.cancel' | translate" (click)="cancelEditingRoles()">
+							<mat-icon svgIcon="cancel"></mat-icon>
+						</button>
+					</div>
+				</div>
+			</ng-template>
+		</td>
 	</ng-container>
 	<ng-container matColumnDef="internalUser">
 		<th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">{{ "user.internal" | translate }}</th>

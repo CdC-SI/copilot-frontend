@@ -1,0 +1,25 @@
+<div class="alert-banner-container" *ngIf="alerts.length > 0">
+	<div
+		*ngFor="let alert of alerts"
+		class="alert-banner"
+		[ngClass]="{
+			'alert-banner-info': alert.level === 'INFO',
+			'alert-banner-warning': alert.level === 'WARNING',
+		}"
+		role="alert"
+	>
+		<div class="alert-banner-content">
+			<mat-icon class="alert-banner-icon" [svgIcon]="alert.level === 'WARNING' ? 'warning-circle' : 'info-circle'"></mat-icon>
+			<span class="alert-banner-text">{{ getAlertText(alert) }}</span>
+		</div>
+		<button
+			mat-icon-button
+			class="alert-banner-close"
+			(click)="dismiss(alert)"
+			[attr.aria-label]="'alert.close' | translate"
+			[matTooltip]="'alert.close' | translate"
+		>
+			<mat-icon svgIcon="cancel"></mat-icon>
+		</button>
+	</div>
+</div>

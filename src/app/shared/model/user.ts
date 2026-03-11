@@ -33,7 +33,7 @@ export enum Role {
 }
 
 export interface IUserAction {
-	id: 'validate' | 'reactivate' | 'deactivate' | 'promote' | 'demote' | 'internalize' | 'externalize';
+	id: 'validate' | 'reactivate' | 'deactivate' | 'grant' | 'internalize' | 'externalize';
 	icon: string;
 	tooltip: string;
 }

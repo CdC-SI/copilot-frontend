@@ -11,9 +11,14 @@ export class AlertsService {
 		private readonly http: HttpClient
 	) {}
 
-	/** GET /api/alerts */
+	/** GET /api/alerts/all - l’ensemble des alertes pour gestion Admin */
 	getAlerts(): Observable<AlertView[]> {
-		return this.http.get<Alert[]>(this.config.backendApi('/alerts')).pipe(map(list => list.map(a => ({...a, active: this.isActive(a.expiresAt)}))));
+		return this.http.get<Alert[]>(this.config.backendApi('/alerts/all')).pipe(map(list => list.map(a => ({...a, active: this.isActive(a.expiresAt)}))));
+	}
+
+	/** GET /api/alerts/active — alertes actives pour affichage public */
+	getActiveAlerts(): Observable<Alert[]> {
+		return this.http.get<Alert[]>(this.config.backendApi('/alerts/active'));
 	}
 
 	/** POST /api/alerts */

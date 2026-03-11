@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>{{ "sources.request.dialog.title" | translate }}</h2>
+
+<mat-dialog-content class="request-source-content">
+	<p class="dialog-description">{{ "sources.request.dialog.description" | translate }}</p>
+
+	<form [formGroup]="form" class="source-form">
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>{{ "sources.request.name.label" | translate }}</mat-label>
+			<input matInput formControlName="sourceName" [placeholder]="'sources.request.name.placeholder' | translate" />
+			<mat-hint>{{ "sources.request.name.hint" | translate }}</mat-hint>
+			<mat-error *ngIf="form.get('sourceName')?.hasError('required')">
+				{{ "sources.request.name.required" | translate }}
+			</mat-error>
+			<mat-error *ngIf="form.get('sourceName')?.hasError('maxlength')">
+				{{ "sources.request.name.maxlength" | translate }}
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>{{ "sources.request.instructions.label" | translate }}</mat-label>
+			<textarea matInput formControlName="description" rows="5" [placeholder]="'sources.request.instructions.placeholder' | translate"></textarea>
+			<mat-hint>{{ "sources.request.instructions.hint" | translate }}</mat-hint>
+			<mat-error *ngIf="form.get('description')?.hasError('required')">
+				{{ "sources.request.instructions.required" | translate }}
+			</mat-error>
+			<mat-error *ngIf="form.get('description')?.hasError('maxlength')">
+				{{ "sources.request.instructions.maxlength" | translate }}
+			</mat-error>
+		</mat-form-field>
+	</form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="actions">
+	<button mat-button [obButton]="'secondary'" (click)="cancel()">
+		{{ "cancel" | translate }}
+	</button>
+	<button mat-button [obButton]="'primary'" [disabled]="form.invalid" (click)="submit()">
+		{{ "sources.request.submit" | translate }}
+	</button>
+</mat-dialog-actions>

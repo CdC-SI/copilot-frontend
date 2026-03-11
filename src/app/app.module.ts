@@ -42,6 +42,9 @@ import {AlertsComponent} from './admin/alerts/alerts.component';
 import {ReactivateDialogComponent} from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
 import {SumexComponent} from './tools/sumex/sumex.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {PersonalDocumentsComponent} from './personal-documents/personal-documents.component';
+import {RequestSourceDialogComponent} from './personal-documents/request-source-dialog/request-source-dialog.component';
+import {CareerSummaryComponent} from './tools/career-summary/career-summary.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -72,7 +75,10 @@ function bannerFactory(configurationService: ConfigurationService) {
 		DocUploadComponent,
 		AlertsComponent,
 		ReactivateDialogComponent,
-		SumexComponent
+		SumexComponent,
+		PersonalDocumentsComponent,
+		RequestSourceDialogComponent,
+		CareerSummaryComponent
 	],
 	imports: [
 		BrowserModule,

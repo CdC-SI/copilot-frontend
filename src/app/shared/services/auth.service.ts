@@ -4,7 +4,6 @@ import {DOCUMENT, LocationStrategy} from '@angular/common';
 import {EnvironmentService, LocalStorageService} from 'zas-design-system';
 import {BehaviorSubject, EMPTY, Observable, catchError, mergeMap, of} from 'rxjs';
 import {HttpClient, HttpErrorResponse, HttpStatusCode} from '@angular/common/http';
-import {map} from 'rxjs/operators';
 import {IUser, Role, UserStatus} from '../model/user';
 
 @Injectable({providedIn: 'root'})
@@ -42,7 +41,7 @@ export class AuthenticationServiceV2 {
 		 * No token on startup, redirect to /v2/authenticate
 		 */
 		if (!match) {
-			const defaultUrl = `${this.environmentService.current?.gatewayUrl}/v2/authenticate-eiam?redirect=${this.window.location.href}`;
+			const defaultUrl = `${this.environmentService.current?.gatewayUrl}/v2/authenticate?redirect=${this.window.location.href}`;
 			this.window.location.replace(defaultUrl);
 		}
 	}
@@ -64,7 +63,7 @@ export class AuthenticationServiceV2 {
 
 	getFullToken(): Observable<string> {
 		return this.http
-			.get<string>(`${this.environmentService.current?.gatewayUrl}/v2/fulltoken-eiam`, {
+			.get<string>(`${this.environmentService.current?.gatewayUrl}/v2/fulltoken`, {
 				withCredentials: true
 			})
 			.pipe(
