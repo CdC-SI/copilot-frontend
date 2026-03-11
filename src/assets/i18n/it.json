@@ -313,7 +313,8 @@
     "oaie": "UAIE",
     "faq_bsv": "FAQ UFAS",
     "knowledge_base": "Base di conoscenza generale",
-    "zasweb": "ZAS Web"
+    "zasweb": "ZAS Web",
+    "bswweb": "BSW Web"
   },
   "tags": {
     "daa": "DAA",
@@ -391,7 +392,32 @@
     "Rente d'invalidité": "Rendita d'invalidità",
     "Rente de vieillesse": "Rendita di vecchiaia",
     "Services": "Servizi",
-    "Travailler à la CdC": "Lavorare alla CdC"
+    "Travailler à la CdC": "Lavorare alla CdC",
+    "Adhésion": "Adesione",
+    "Aides financières": "Aiuti finanziari",
+    "Assurance sociale": "Assicurazione sociale",
+    "AVS": "AVS",
+    "Cas de sortie": "Caso di uscita",
+    "CI": "CI",
+    "Comptabilité": "Contabilità",
+    "Contentieux": "Contenzioso",
+    "Cotisations et prestations": "Contributi e prestazioni",
+    "Exclusion": "Esclusione",
+    "Générations et société": "Generazioni e società",
+    "L'OFAS": "L'OFAS",
+    "Opposition et recours": "Opposizione e ricorsi",
+    "Prévoyance vieillesse": "Previdenza vecchiaia",
+    "Publications": "Pubblicazioni",
+    "Réformes et analyses": "Riforme e analisi",
+    "Registre des allocations familiales": "Registro degli assegni familiari",
+    "Sitax": "Sitax",
+    "Statistiques et données": "Statistiche e dati",
+    "Système des assurances sociales": "Sistema delle assicurazioni sociali",
+    "Taxation": "Tassazione",
+    "Taxation Dispense": "Tassazione Esenzione",
+    "Taxation TE": "Tassazione TE",
+    "Taxation TN": "Tassazione TN",
+    "Taxation TO": "Tassazione TO"
   },
   "legal_basis": {
     "tos": "Termini di servizio",

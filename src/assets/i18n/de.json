@@ -313,7 +313,8 @@
     "oaie": "IVSTA",
     "faq_bsv": "FAQ BSV",
     "knowledge_base": "Wissensdatenbank",
-    "zasweb": "ZAS Website"
+    "zasweb": "ZAS Website",
+    "bswweb": "BSW Website"
   },
   "tags": {
     "daa": "DAA",
@@ -391,7 +392,32 @@
     "Rente d'invalidité": "Invalidenrente",
     "Rente de vieillesse": "Altersrente",
     "Services": "Dienstleistungen",
-    "Travailler à la CdC": "Bei der ZAS arbeiten"
+    "Travailler à la CdC": "Bei der ZAS arbeiten",
+    "Adhésion": "Mitgliedschaft",
+    "Aides financières": "Finanzielle Unterstützung",
+    "Assurance sociale": "Sozialversicherung",
+    "AVS": "AHV",
+    "Cas de sortie": "Austrittsfall",
+    "CI": "CI",
+    "Comptabilité": "Buchhaltung",
+    "Contentieux": "Streitfall",
+    "Cotisations et prestations": "Beiträge und Leistungen",
+    "Exclusion": "Ausschluss",
+    "Générations et société": "Generationen und Gesellschaft",
+    "L'OFAS": "BSW",
+    "Opposition et recours": "Einspruch und Rechtsmittel",
+    "Prévoyance vieillesse": "Altersvorsorge",
+    "Publications": "Publikationen",
+    "Réformes et analyses": "Reformen und Analysen",
+    "Registre des allocations familiales": "Familienzulagenregister",
+    "Sitax": "Sitax",
+    "Statistiques et données": "Statistiken und Daten",
+    "Système des assurances sociales": "Sozialversicherungssystem",
+    "Taxation": "Besteuerung",
+    "Taxation Dispense": "Besteuerungsbefreiung",
+    "Taxation TE": "Besteuerung TE",
+    "Taxation TN": "Besteuerung TN",
+    "Taxation TO": "Besteuerung TO"
   },
   "legal_basis": {
     "tos": "Nutzungsbedingungen",
