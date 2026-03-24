@@ -6,6 +6,7 @@ import {MaterialModule} from './material/material.module';
 import {AutocompleteInputComponent} from './components/autocomplete-input/autocomplete-input.component';
 import {TranslateModule, TranslatePipe} from '@ngx-translate/core';
 import {HighlightTextPipe} from './pipes/highlight-text.pipe';
+import {FormatNavsPipe} from './pipes/format-navs.pipe';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MarkdownModule} from 'ngx-markdown';
 import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
@@ -41,7 +42,8 @@ import {AlertBannerComponent} from './components/alert-banner/alert-banner.compo
 		SourceListComponent,
 		FilePreviewComponent,
 		SourceComponent,
-		AlertBannerComponent
+		AlertBannerComponent,
+		FormatNavsPipe
 	],
 	imports: [
 		CommonModule,
@@ -76,7 +78,8 @@ import {AlertBannerComponent} from './components/alert-banner/alert-banner.compo
 		DynamicFormComponent,
 		FilePreviewComponent,
 		SourceComponent,
-		AlertBannerComponent
+		AlertBannerComponent,
+		FormatNavsPipe
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

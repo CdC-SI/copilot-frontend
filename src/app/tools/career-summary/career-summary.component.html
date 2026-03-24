@@ -5,7 +5,7 @@
 			<mat-card-header>
 				<mat-card-title>{{ "career-summary.detail-title" | translate }}</mat-card-title>
 				<mat-card-subtitle>
-					{{ "career-summary.navs-label" | translate }}: {{ selectedSummary.navs }} - {{ "career-summary.last-update" | translate }}:
+					{{ "career-summary.navs-label" | translate }}: {{ selectedSummary.navs | formatNavs }} - {{ "career-summary.last-update" | translate }}:
 					{{ selectedSummary.updatedAt | date: "short" }}
 				</mat-card-subtitle>
 			</mat-card-header>
@@ -102,7 +102,7 @@
 							<div class="task-header">
 								<mat-icon [svgIcon]="getStatusIcon(task.status)" [class]="getStatusClass(task.status)"></mat-icon>
 								<div class="task-info">
-									<span class="task-navs">{{ task.navs }}</span>
+									<span class="task-navs">{{ task.navs | formatNavs }}</span>
 									<span class="task-status">{{ "career-summary.status." + task.status | translate }}</span>
 								</div>
 							</div>
@@ -111,6 +111,10 @@
 								<button *ngIf="task.status === SummaryTaskStatus.TERMINEE" mat-button color="primary" (click)="viewSummary(task.id)">
 									<mat-icon svgIcon="arrow-right"></mat-icon>
 									{{ "career-summary.view-summary" | translate }}
+								</button>
+								<button *ngIf="task.status === SummaryTaskStatus.ERREUR" mat-button color="warn" (click)="retrySummary(task.id, $event)">
+									<mat-icon svgIcon="refresh"></mat-icon>
+									{{ "career-summary.retry-button" | translate }}
 								</button>
 							</div>
 						</div>

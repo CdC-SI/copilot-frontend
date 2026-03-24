@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {FormBuilder, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
 import {ObNotificationService} from '@oblique/oblique';
 import {SummaryService} from '../../shared/services/summary.service';
 import {SummaryDetailResponse, SummaryTaskResponse, SummaryTaskStatus} from '../../shared/model/summary';
@@ -10,6 +10,8 @@ import {SummaryDetailResponse, SummaryTaskResponse, SummaryTaskStatus} from '../
 	styleUrl: './career-summary.component.scss'
 })
 export class CareerSummaryComponent implements OnInit {
+	@ViewChild(FormGroupDirective) formDirective: FormGroupDirective;
+
 	navsForm: FormGroup;
 	tasks: SummaryTaskResponse[] = [];
 	filteredTasks: SummaryTaskResponse[] = [];
@@ -26,7 +28,7 @@ export class CareerSummaryComponent implements OnInit {
 		private readonly notif: ObNotificationService
 	) {
 		this.navsForm = this.fb.group({
-			navs: ['', [Validators.required]]
+			navs: ['', [Validators.required, Validators.pattern(/^\d{3}\.?\d{4}\.?\d{4}\.?\d{2}$/)]]
 		});
 	}
 
@@ -56,12 +58,12 @@ export class CareerSummaryComponent implements OnInit {
 		}
 
 		this.isLoading = true;
-		const navs = this.navsForm.value.navs;
+		const navs = this.navsForm.value.navs.replaceAll('.', '');
 
 		this.summaryService.createSummary(navs).subscribe({
 			next: response => {
 				this.notif.success('career-summary.success.create');
-				this.navsForm.reset();
+				this.formDirective.resetForm();
 				this.loadTasks();
 				this.isLoading = false;
 
@@ -134,7 +136,8 @@ export class CareerSummaryComponent implements OnInit {
 
 	applyFilter(): void {
 		if (this.navsFilter) {
-			this.filteredTasks = this.tasks.filter(task => task.navs.toLowerCase().includes(this.navsFilter.toLowerCase()));
+			const normalizedFilter = this.navsFilter.replaceAll('.', '').toLowerCase();
+			this.filteredTasks = this.tasks.filter(task => task.navs.replaceAll('.', '').toLowerCase().includes(normalizedFilter));
 		} else {
 			this.filteredTasks = [...this.tasks];
 		}
