@@ -81,6 +81,20 @@ mat-card-header {
 	color: #999;
 }
 
+.task-processing-time {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	color: #999;
+
+	.processing-time-icon {
+		width: 14px;
+		height: 14px;
+		font-size: 14px;
+	}
+}
+
 
 .status-in-progress {
 	color: #ff9800;

@@ -108,6 +108,10 @@
 							</div>
 							<div class="task-meta">
 								<span class="task-date">{{ "career-summary.created-at" | translate }}: {{ task.createdAt | date: "short" }}</span>
+								<span *ngIf="task.status === SummaryTaskStatus.TERMINEE" class="task-processing-time">
+									<mat-icon svgIcon="clock" class="processing-time-icon"></mat-icon>
+									{{ "career-summary.processing-time" | translate }}: {{ getProcessingTime(task) }}
+								</span>
 								<button *ngIf="task.status === SummaryTaskStatus.TERMINEE" mat-button color="primary" (click)="viewSummary(task.id)">
 									<mat-icon svgIcon="arrow-right"></mat-icon>
 									{{ "career-summary.view-summary" | translate }}

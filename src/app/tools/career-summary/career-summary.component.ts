@@ -170,6 +170,29 @@ export class CareerSummaryComponent implements OnInit {
 		}
 	}
 
+	getProcessingTime(task: SummaryTaskResponse): string {
+		const start = new Date(task.createdAt).getTime();
+		const end = new Date(task.updatedAt).getTime();
+		const diffMs = end - start;
+
+		if (diffMs < 0) {
+			return '';
+		}
+
+		const totalSeconds = Math.floor(diffMs / 1000);
+		const hours = Math.floor(totalSeconds / 3600);
+		const minutes = Math.floor((totalSeconds % 3600) / 60);
+		const seconds = totalSeconds % 60;
+
+		if (hours > 0) {
+			return `${hours}h ${minutes}min ${seconds}s`;
+		}
+		if (minutes > 0) {
+			return `${minutes}min ${seconds}s`;
+		}
+		return `${seconds}s`;
+	}
+
 	getStatusIcon(status: SummaryTaskStatus): string {
 		switch (status) {
 			case SummaryTaskStatus.EN_COURS:
