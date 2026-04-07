@@ -1,6 +1,16 @@
 <mat-form-field>
 	<mat-label>{{ i18nLabel | translate }}</mat-label>
-	<input #itemFilterInput [formControl]="formControl" type="text" matInput [matAutocomplete]="autoInput" />
+	<textarea
+		#itemFilterInput
+		[formControl]="formControl"
+		matInput
+		[matAutocomplete]="autoInput"
+		cdkTextareaAutosize
+		[cdkAutosizeMinRows]="1"
+		[cdkAutosizeMaxRows]="6"
+		(keydown)="onKeydown($event)"
+		rows="1"
+	></textarea>
 	<button mat-icon-button matPrefix type="button" aria-label="Add attachments" (click)="file.click()" [matTooltip]="'add.attachment' | translate">
 		<mat-icon svgIcon="file-plus"></mat-icon>
 	</button>

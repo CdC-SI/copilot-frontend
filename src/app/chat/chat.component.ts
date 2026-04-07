@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
@@ -38,12 +38,16 @@ export class ChatComponent implements OnInit {
 	conversationTitles: ChatTitle[] = [];
 	currentConversationTitle: ChatTitle;
 	isCommandMode = false;
+	showScrollToLastMessage = false;
 	displayTextArea = false;
+	scrollVisibilityPending = false;
 	activeForm?: {def: FormDef; group: FormGroup};
 	attachments: Attachment[] = [];
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
+	@ViewChild('messageContainer') messageContainer: ElementRef;
+
 	protected readonly ChatMessageSource = ChatMessageSource;
 
 	get messages(): ChatMessage[] {
@@ -131,7 +135,7 @@ export class ChatComponent implements OnInit {
 			question.url ? [{type: sourceType, link: question.url}] : undefined
 		);
 		this.clearSearch();
-		this.scrollToBottom();
+		this.scrollToLastUserMessage();
 		this.updateCurrentConversation();
 	}
 
@@ -153,6 +157,7 @@ export class ChatComponent implements OnInit {
 		this.currentConversationTitle = null;
 		this.conversationManager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
+		this.resetScrollState();
 	}
 
 	canAskLLM() {
@@ -169,15 +174,36 @@ export class ChatComponent implements OnInit {
 		this.prepareForStreaming(inputText);
 		this.startStreamingRequest(inputText);
 		this.clearSearch();
+		this.scrollToLastUserMessage();
 	}
 
-	scrollToBottom(): void {
-		setTimeout(() => {
-			const mainContainer = document.querySelector('.message-container');
-			if (mainContainer) {
-				mainContainer.scrollTop = mainContainer.scrollHeight;
+	updateScrollButtonVisibility(): void {
+		if (this.scrollVisibilityPending) return;
+		this.scrollVisibilityPending = true;
+		requestAnimationFrame(() => {
+			this.scrollVisibilityPending = false;
+			const el = this.messageContainer?.nativeElement;
+			if (!el) return;
+			const target = this.getTargetScrollTop(el);
+			if (target !== null && el.scrollTop > target) {
+				el.scrollTop = target;
 			}
+			this.showScrollToLastMessage = target !== null && el.scrollTop < target - 10;
 		});
+	}
+
+	getTargetScrollTop(el: HTMLElement): number | null {
+		const WHITE_ZONE = 80;
+		const allMessages = Array.from(el.querySelectorAll<HTMLElement>('.message'));
+		const lastUserMsg = [...allMessages].reverse().find(m => m.classList.contains('user')) ?? null;
+
+		if (!lastUserMsg) return null;
+		const llmMsg = allMessages[allMessages.indexOf(lastUserMsg) + 1] ?? null;
+		if (!llmMsg) return lastUserMsg.offsetTop;
+
+		const llmMsgBottom = llmMsg.offsetTop + llmMsg.offsetHeight;
+		const blockFitsInView = llmMsgBottom - lastUserMsg.offsetTop <= el.clientHeight;
+		return blockFitsInView ? lastUserMsg.offsetTop : llmMsgBottom - el.clientHeight + WHITE_ZONE;
 	}
 
 	selectConversation(chatTitle: ChatTitle) {
@@ -187,7 +213,7 @@ export class ChatComponent implements OnInit {
 			const chatMessages = conversation.messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
 			this.conversationManager.setConversationMessages(chatTitle.conversationId, chatMessages);
 			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
-			this.scrollToBottom();
+			this.scrollToLastUserMessage();
 		});
 	}
 
@@ -196,6 +222,7 @@ export class ChatComponent implements OnInit {
 			this.currentConversationTitle = null;
 			this.conversationManager.initNewChat();
 			this.suggestionService.clearSpecificSuggestions();
+			this.resetScrollState();
 		}
 		this.conversationManager.deleteConversation(conversation.conversationId);
 	}
@@ -275,6 +302,21 @@ export class ChatComponent implements OnInit {
 		});
 	}
 
+	scrollToLastUserMessage(): void {
+		setTimeout(() => {
+			const el = this.messageContainer?.nativeElement;
+			if (!el) return;
+			el.style.paddingBottom = `${el.clientHeight}px`;
+			const target = this.getTargetScrollTop(el);
+			if (target === null) {
+				this.resetScrollState();
+				return;
+			}
+			el.scrollTo({top: target, behavior: 'smooth'});
+			this.showScrollToLastMessage = false;
+		});
+	}
+
 	private initializePendingAttachments(files: File[]): Attachment[] {
 		return files.map(file => ({
 			fileName: file.name,
@@ -348,6 +390,15 @@ export class ChatComponent implements OnInit {
 		this.notif.error('attachment.upload.error');
 	}
 
+
+	private resetScrollState(): void {
+		const el = this.messageContainer?.nativeElement;
+		if (!el) return;
+		el.style.paddingBottom = '';
+		el.scrollTop = 0;
+		this.showScrollToLastMessage = false;
+	}
+
 	private prepareForStreaming(inputText: string): void {
 		this.conversationManager.setActiveStreamingConversation(this.currentConversationTitle?.conversationId);
 		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.USER, inputText);
@@ -401,6 +452,8 @@ export class ChatComponent implements OnInit {
 		if (result.shouldRefreshConversations && (!this.currentConversationTitle || this.currentConversationTitle.title === 'Processing attachments...')) {
 			this.refreshConversations();
 		}
+
+		this.updateScrollButtonVisibility();
 	}
 
 	private handleStreamError(err: any): void {

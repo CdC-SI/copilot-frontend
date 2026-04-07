@@ -23,7 +23,8 @@
 		<div class="logo" *ngIf="messages.length <= 0">
 			<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
 		</div>
-		<div class="message-container">
+		<div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
+			<div class="message-spacer"></div>
 			<div
 				*ngFor="let message of messages; let last = last; let i = index"
 				class="message"
@@ -52,6 +53,9 @@
 				</div>
 			</div>
 		</div>
+		<button *ngIf="showScrollToLastMessage" class="scroll-to-bottom" mat-mini-fab (click)="scrollToLastUserMessage()">
+			<mat-icon svgIcon="arrow-down"></mat-icon>
+		</button>
 		<zco-dynamic-form
 			class="form-container"
 			*ngIf="activeForm"
@@ -81,6 +85,7 @@
 				(optionSelected)="handleOptionSelected($event)"
 				(inputChange)="isCommandMode = $event.startsWith('/')"
 				(attachmentsSelected)="onAttachmentsSelected($event)"
+				(submitMessage)="sendToLLM()"
 			/>
 
 			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
