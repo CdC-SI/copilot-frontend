@@ -54,6 +54,8 @@
 					></zco-chat-message>
 				</div>
 			</div>
+			<div #scrollAnchor class="scroll-anchor"></div>
+			<div class="message-bottom-spacer"></div>
 		</div>
 		<button *ngIf="showScrollToLastMessage" class="scroll-to-bottom" mat-mini-fab (click)="scrollToLastUserMessage()">
 			<mat-icon svgIcon="arrow-down"></mat-icon>

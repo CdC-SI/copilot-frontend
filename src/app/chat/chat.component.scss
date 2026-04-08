@@ -74,7 +74,17 @@
 	}
 
 	.message-spacer {
-		flex: 1 0 auto;
+		flex: 1;
+	}
+
+	.scroll-anchor {
+		height: 0;
+		flex-shrink: 0;
+	}
+
+	.message-bottom-spacer {
+		flex-shrink: 0;
+		height: var(--container-height, 0px);
 	}
 
 	.form-container {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
@@ -33,7 +33,7 @@ import {filter, map, of} from 'rxjs';
 	templateUrl: './chat.component.html',
 	styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	Object = Object;
 	searchCtrl = new FormControl();
 	conversationTitles: ChatTitle[] = [];
@@ -46,12 +46,14 @@ export class ChatComponent implements OnInit {
 	attachments: Attachment[] = [];
 	availableWorkspaces: string[] = [];
 	selectedWorkspace = '';
+	containerResizeObserver: ResizeObserver;
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
 	@ViewChild('workspaceSelectionDialog') workspaceSelectionDialog: TemplateRef<any>;
 	@ViewChild('messageContainer') messageContainer: ElementRef;
+	@ViewChild('scrollAnchor') scrollAnchor: ElementRef;
 	@ViewChildren('messageEl') messageElements!: QueryList<ElementRef>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
@@ -85,6 +87,19 @@ export class ChatComponent implements OnInit {
 		private readonly authDialogService: UserAuthDialogService,
 		private readonly dialog: MatDialog
 	) {}
+
+	ngAfterViewInit() {
+		const el = this.messageContainer?.nativeElement;
+		if (!el) return;
+		this.containerResizeObserver = new ResizeObserver(() => {
+			el.style.setProperty('--container-height', `${el.clientHeight}px`);
+		});
+		this.containerResizeObserver.observe(el);
+	}
+
+	ngOnDestroy() {
+		this.containerResizeObserver?.disconnect();
+	}
 
 	ngOnInit() {
 		this.speechService.speechStartEvent.subscribe(() => {
@@ -198,7 +213,7 @@ export class ChatComponent implements OnInit {
 					.afterClosed()
 					.pipe(map(() => !!this.selectedWorkspace));
 
-		openWorkspaceDialog$.pipe(filter(Boolean)).subscribe(() => this.doSendToLLM());
+		openWorkspaceDialog$.pipe().subscribe(() => this.doSendToLLM());
 	}
 
 	doSendToLLM(): void {
@@ -209,59 +224,39 @@ export class ChatComponent implements OnInit {
 		this.scrollToLastUserMessage();
 	}
 
+	getTargetScrollTop(el: HTMLElement, userEl: HTMLElement): number {
+		return el.scrollTop + userEl.getBoundingClientRect().top - el.getBoundingClientRect().top;
+	}
+
 	updateScrollButtonVisibility(): void {
 		if (this.scrollVisibilityPending) return;
 		this.scrollVisibilityPending = true;
 		requestAnimationFrame(() => {
 			this.scrollVisibilityPending = false;
-			const el = this.messageContainer?.nativeElement;
-			if (!el) return;
-			const target = this.getTargetScrollTop(el);
-			if (target !== null && el.scrollTop > target) {
-				el.scrollTop = target;
+			const el = this.messageContainer.nativeElement;
+			const lastUserEl = this.getLastUserElement();
+			if (lastUserEl) {
+				this.showScrollToLastMessage = el.scrollTop < this.getTargetScrollTop(el, lastUserEl) - 10;
 			}
-			this.showScrollToLastMessage = target !== null && el.scrollTop < target - 10;
 		});
-	}
-
-	getTargetScrollTop(el: HTMLElement): number | null {
-		const WHITE_ZONE = 80;
-		const allMessages = Array.from(el.querySelectorAll<HTMLElement>('.message'));
-		const lastUserMsg = [...allMessages].reverse().find(m => m.classList.contains('user')) ?? null;
-
-		if (!lastUserMsg) return null;
-		const llmMsg = allMessages[allMessages.indexOf(lastUserMsg) + 1] ?? null;
-		if (!llmMsg) return lastUserMsg.offsetTop;
-
-		const llmMsgBottom = llmMsg.offsetTop + llmMsg.offsetHeight;
-		const blockFitsInView = llmMsgBottom - lastUserMsg.offsetTop <= el.clientHeight;
-		return blockFitsInView ? lastUserMsg.offsetTop : llmMsgBottom - el.clientHeight + WHITE_ZONE;
 	}
 
 	scrollToLastUserMessage(): void {
 		setTimeout(() => {
-			const el = this.messageContainer?.nativeElement;
-			if (!el) return;
-			el.style.paddingBottom = `${el.clientHeight}px`;
-			const target = this.getTargetScrollTop(el);
-			if (target === null) {
-				this.resetScrollState();
-				return;
-			}
-			el.scrollTo({top: target, behavior: 'smooth'});
+			const el = this.messageContainer.nativeElement;
+			const lastUserEl = this.getLastUserElement();
+			if (!lastUserEl) return this.resetScrollState();
+			el.scrollTo({top: this.getTargetScrollTop(el, lastUserEl), behavior: 'smooth'});
 			this.showScrollToLastMessage = false;
 		});
 	}
 
 	getLastUserElement(): HTMLElement | null {
-		const elements = this.messageElements.toArray();
-
-		for (let i = elements.length - 1; i >= 0; i--) {
-			if (this.messages[i].source === ChatMessageSource.USER) {
-				return elements[i].nativeElement;
-			}
-		}
-		return null;
+		return (
+			[...this.messageElements].reverse().find((_, i, arr) => {
+				return this.messages[this.messages.length - 1 - i]?.source === ChatMessageSource.USER;
+			})?.nativeElement ?? null
+		);
 	}
 
 	selectConversation(chatTitle: ChatTitle) {
@@ -437,7 +432,6 @@ export class ChatComponent implements OnInit {
 	private resetScrollState(): void {
 		const el = this.messageContainer?.nativeElement;
 		if (!el) return;
-		el.style.paddingBottom = '';
 		el.scrollTop = 0;
 		this.showScrollToLastMessage = false;
 	}
