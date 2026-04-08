@@ -535,5 +535,7 @@
       "retry": "Erreur lors de la relance de l'analyse",
       "open-references": "Erreur lors de l'ouverture des références"
     }
-  }
+  },
+  "workspace.select.title": "Sélectionner un espace de travail",
+  "workspace.select.description": "Choisissez l'espace de travail pour cette nouvelle conversation."
 }

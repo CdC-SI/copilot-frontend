@@ -17,6 +17,11 @@ export class ConversationService {
 	getConversationTitles(): Observable<ChatTitle[]> {
 		return this.http.get<ChatTitle[]>(this.config.backendApi('/conversations/titles'));
 	}
+
+	getAvailableWorkspaces(): Observable<string[]> {
+		return this.http.get<string[]>(this.config.backendApi('/conversations/workspaces'));
+	}
+
 	getConversation(id: string): Observable<Conversation> {
 		return this.http.get<Conversation>(this.config.backendApi(`/conversations/${id}`));
 	}

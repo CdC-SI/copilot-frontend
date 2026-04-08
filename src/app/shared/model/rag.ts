@@ -4,6 +4,7 @@ export interface ChatRequest {
 	query: string;
 	attachments?: File[];
 	language?: Language;
+	workspace?: string;
 	tags?: string[];
 	sources?: string[];
 	llmModel?: string;
