@@ -29,6 +29,37 @@
 		align-items: center;
 		position: relative;
 		overflow: hidden;
+
+		&.drag-over {
+			outline: 2px dashed palette.$ob-blue-900;
+			outline-offset: -4px;
+		}
+	}
+
+	.drag-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 100;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		background: rgba(255, 255, 255, 0.85);
+		pointer-events: none;
+
+		mat-icon {
+			font-size: 48px;
+			width: 48px;
+			height: 48px;
+			color: palette.$ob-blue-900;
+		}
+
+		span {
+			font-size: 1.2rem;
+			font-weight: 500;
+			color: palette.$ob-blue-900;
+		}
 	}
 
 	.scroll-to-bottom {

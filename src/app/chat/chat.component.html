@@ -19,7 +19,19 @@
 		</mat-card>
 	</div>
 
-	<div column-main-content class="chat-container">
+	<div
+		column-main-content
+		class="chat-container"
+		[class.drag-over]="isDragOver"
+		(paste)="onPaste($event)"
+		(dragover)="onDragOver($event)"
+		(dragleave)="onDragLeave($event)"
+		(drop)="onDrop($event)"
+	>
+		<div class="drag-overlay" *ngIf="isDragOver">
+			<mat-icon svgIcon="upload"></mat-icon>
+			<span>{{ "attachment.drop.here" | translate }}</span>
+		</div>
 		<zco-chat-header [selectedWorkspace]="selectedWorkspace"></zco-chat-header>
 		<div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
 			<div class="logo" *ngIf="messages.length <= 0">

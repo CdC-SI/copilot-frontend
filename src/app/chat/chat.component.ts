@@ -44,6 +44,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	scrollVisibilityPending = false;
 	activeForm?: {def: FormDef; group: FormGroup};
 	attachments: Attachment[] = [];
+	isDragOver = false;
 	availableWorkspaces: string[] = [];
 	selectedWorkspace = '';
 	containerResizeObserver: ResizeObserver;
@@ -317,6 +318,33 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	onCloseForm() {
 		this.activeForm = undefined;
+	}
+
+	onPaste(event: ClipboardEvent): void {
+		const files = Array.from(event.clipboardData?.files ?? []);
+		if (files.length > 0) {
+			event.preventDefault();
+			this.onAttachmentsSelected(files);
+		}
+	}
+
+	onDragOver(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = true;
+	}
+
+	onDragLeave(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = false;
+	}
+
+	onDrop(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = false;
+		const files = Array.from(event.dataTransfer?.files ?? []);
+		if (files.length > 0) {
+			this.onAttachmentsSelected(files);
+		}
 	}
 
 	onAttachmentsSelected(event: File[]) {
