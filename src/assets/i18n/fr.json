@@ -468,6 +468,7 @@
   "document-analysis.cancel": "Annuler l'analyse",
   "document-analysis.extract": "Extraire des données",
   "document-analysis.translate": "Traduire",
+  "document-analysis.drop-here": "Déposez votre fichier ici",
   "document-analysis.results": "Résultats",
   "document-analysis.no-request": "Veuillez lancer une demande",
   "document-analysis.document-type": "Type du document",

@@ -365,6 +365,7 @@
   "document-analysis.cancel": "Analyse abbrechen",
   "document-analysis.extract": "Daten extrahieren",
   "document-analysis.translate": "Übersetzen",
+  "document-analysis.drop-here": "Datei hier ablegen",
   "document-analysis.results": "Ergebnisse",
   "document-analysis.no-request": "Bitte eine Anfrage starten",
   "document-analysis.document-type": "Dokumenttyp",

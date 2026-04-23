@@ -1,4 +1,10 @@
 <div class="card-container">
+	<div class="drop-overlay" *ngIf="dragging">
+		<div class="drop-overlay-content">
+			<mat-icon svgIcon="upload"></mat-icon>
+			<span>{{ "document-analysis.drop-here" | translate }}</span>
+		</div>
+	</div>
 	<div style="display: flex; flex-direction: row; min-width: 100%">
 		<mat-card style="flex: 1; margin-right: 4px; height: fit-content">
 			<mat-card-header style="display: flex; flex-direction: row; justify-content: space-between">
@@ -8,33 +14,23 @@
 				<ob-file-upload
 					class="d-flex mb16"
 					(uploadEvent)="uploadDocumentEvent($event)"
-					[accept]="['.jpeg', '.jpg', '.png']"
+					[accept]="['.jpeg', '.jpg', '.png', '.pdf']"
 					[maxFileSize]="10"
 					[multiple]="true"
 					[singleRequest]="false"
 				></ob-file-upload>
 				<app-file-preview style="margin-top: 8px" *ngIf="documentCtrl.value" [file]="documentCtrl.value.file"></app-file-preview>
 			</mat-card-content>
-			<mat-card-actions *ngIf="!!documentCtrl.value" style="display: flex; flex-direction: column; align-items: flex-start; margin-top: 32px">
+			<mat-card-actions *ngIf="!!documentCtrl.value" style="display: flex; flex-direction: column; align-items: stretch; margin-top: 32px">
 				<button *ngIf="requestSubscription" mat-button [obButton]="'secondary'" (click)="cancelRequest()">
 					<mat-icon svgIcon="cancel"></mat-icon>
 					{{ "document-analysis.cancel" | translate }}
 				</button>
 				<button
-					*ngIf="!requestSubscription && hasAdminRole()"
-					style="margin-bottom: 16px; width: 100%; justify-content: flex-start"
-					mat-button
-					[obButton]="'primary'"
-					(click)="openExtractDataDialog()"
-				>
-					<mat-icon svgIcon="arrow-right"></mat-icon>
-					{{ "document-analysis.extract" | translate }}
-				</button>
-				<button
 					*ngIf="!requestSubscription && hasTranslatorRole()"
-					style="width: 100%; justify-content: flex-start"
-					mat-button
-					[obButton]="'primary'"
+					class="translate-btn"
+					mat-flat-button
+					color="primary"
 					(click)="openTranslateDialog()"
 				>
 					<mat-icon svgIcon="arrow-right"></mat-icon>
@@ -43,7 +39,7 @@
 			</mat-card-actions>
 		</mat-card>
 
-		<mat-card style="flex: 1; margin-left: 4px; justify-content: flex-start" [formGroup]="visionFrmGrp">
+		<mat-card style="flex: 1; margin-left: 4px; justify-content: flex-start; min-width: 0; overflow: hidden" [formGroup]="visionFrmGrp">
 			<mat-card-header style="display: flex; flex-direction: row; justify-content: space-between">
 				<mat-card-title>{{ "document-analysis.results" | translate }}</mat-card-title>
 			</mat-card-header>
@@ -54,7 +50,7 @@
 					</div>
 				</ng-container>
 
-				<ob-alert *ngIf="allVisionCtrlName.length <= 0 && !translation && !loading" style="margin-left: 0 !important">
+				<ob-alert *ngIf="allVisionCtrlName.length <= 0 && translations.length === 0 && !loading" style="margin-left: 0 !important">
 					{{ "document-analysis.no-request" | translate }}
 				</ob-alert>
 
@@ -73,10 +69,14 @@
 					</div>
 				</ng-container>
 
-				<ng-container *ngIf="!!translation && !loading">
-					<div style="margin-top: 16px">
-						<markdown [data]="translation"></markdown>
-					</div>
+				<ng-container *ngIf="translations.length > 0 && !loading">
+					<mat-tab-group [(selectedIndex)]="selectedPageIndex" animationDuration="300ms">
+						<mat-tab *ngFor="let page of translations; let i = index" [label]="'Page ' + (i + 1)">
+							<div class="translation-content">
+								<markdown [data]="page.translatedText"></markdown>
+							</div>
+						</mat-tab>
+					</mat-tab-group>
 				</ng-container>
 			</mat-card-content>
 		</mat-card>

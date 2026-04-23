@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatChipEditedEvent, MatChipInputEvent} from '@angular/material/chips';
@@ -27,8 +27,12 @@ export class DocumentAnalysisComponent implements OnInit {
 
 	// RESULTS
 	documentType: any;
-	translation: string = '';
+	translations: {translatedText: string}[] = [];
+	selectedPageIndex = 0;
 	visionFrmGrp: FormGroup = new FormGroup<any>({});
+	dragging = false;
+
+	private readonly acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
 
 	constructor(
 		private readonly fb: FormBuilder,
@@ -40,6 +44,46 @@ export class DocumentAnalysisComponent implements OnInit {
 
 	ngOnInit() {
 		this.buildForm();
+	}
+
+	@HostListener('window:paste', ['$event'])
+	onPaste(event: ClipboardEvent): void {
+		const files = event.clipboardData?.files;
+		if (files && files.length > 0) {
+			const file = files[0];
+			if (this.isAcceptedFile(file)) {
+				event.preventDefault();
+				this.loadFile(file);
+			}
+		}
+	}
+
+	@HostListener('window:dragover', ['$event'])
+	onDragOver(event: DragEvent): void {
+		event.preventDefault();
+		event.stopPropagation();
+		this.dragging = true;
+	}
+
+	@HostListener('window:dragleave', ['$event'])
+	onDragLeave(event: DragEvent): void {
+		if (!(event.relatedTarget as Node)?.ownerDocument) {
+			this.dragging = false;
+		}
+	}
+
+	@HostListener('window:drop', ['$event'])
+	onDrop(event: DragEvent): void {
+		event.preventDefault();
+		event.stopPropagation();
+		this.dragging = false;
+		const files = event.dataTransfer?.files;
+		if (files && files.length > 0) {
+			const file = files[0];
+			if (this.isAcceptedFile(file)) {
+				this.loadFile(file);
+			}
+		}
 	}
 
 	buildForm() {
@@ -143,7 +187,8 @@ export class DocumentAnalysisComponent implements OnInit {
 	resetVisionForm() {
 		this.visionFrmGrp = new FormGroup<any>({});
 		this.documentType = null;
-		this.translation = '';
+		this.translations = [];
+		this.selectedPageIndex = 0;
 	}
 
 	addCtrlToVisionForm(key: string, value: string) {
@@ -170,13 +215,23 @@ export class DocumentAnalysisComponent implements OnInit {
 		return this.documentFrmGrp.get('document') as FormControl;
 	}
 
+	loadFile(file: File): void {
+		this.resetVisionForm();
+		this.documentCtrl.setValue({file});
+	}
+
+	private isAcceptedFile(file: File): boolean {
+		return this.acceptedTypes.includes(file.type);
+	}
+
 	translate() {
 		this.resetVisionForm();
 		this.loading = true;
 
 		this.requestSubscription = this.visionService.translateFile(this.documentCtrl.value.file, this.languageCtrl.value).subscribe({
 			next: result => {
-				this.translation = result.translatedText;
+				this.translations = result;
+				this.selectedPageIndex = 0;
 				this.cancelRequest();
 			},
 			error: () => {
