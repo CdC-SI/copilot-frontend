@@ -7,6 +7,7 @@ import {Subscription} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {VisionService} from '../../shared/services/vision.service';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
+import {jsPDF} from 'jspdf';
 
 @Component({
 	selector: 'zco-document-analysis',
@@ -27,10 +28,11 @@ export class DocumentAnalysisComponent implements OnInit {
 
 	// RESULTS
 	documentType: any;
-	translations: {translatedText: string}[] = [];
+	translations: {translatedText: string; detectedLanguage?: string}[] = [];
 	selectedPageIndex = 0;
 	visionFrmGrp: FormGroup = new FormGroup<any>({});
 	dragging = false;
+	detectedLanguage: string | null = null;
 
 	private readonly acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
 
@@ -224,6 +226,41 @@ export class DocumentAnalysisComponent implements OnInit {
 		return this.acceptedTypes.includes(file.type);
 	}
 
+	downloadTranslationPdf(): void {
+		const doc = new jsPDF({orientation: 'portrait', unit: 'mm', format: 'a4'});
+		const pageWidth = doc.internal.pageSize.getWidth();
+		const pageHeight = doc.internal.pageSize.getHeight();
+		const margin = 15;
+		const maxWidth = pageWidth - margin * 2;
+		const fontSize = 9;
+		const lineHeight = fontSize * 0.45;
+
+		doc.setFontSize(fontSize);
+
+		this.translations.forEach((page, index) => {
+			if (index > 0) {
+				doc.addPage();
+				doc.setFontSize(fontSize);
+			}
+			const text = page.translatedText
+				.replace(/[#*_`~>-]/g, '')
+				.replace(/\n{3,}/g, '\n\n');
+			const lines = doc.splitTextToSize(text, maxWidth);
+			let y = margin;
+			for (const line of lines) {
+				if (y + lineHeight > pageHeight - margin) {
+					doc.addPage();
+					doc.setFontSize(fontSize);
+					y = margin;
+				}
+				doc.text(line, margin, y);
+				y += lineHeight;
+			}
+		});
+
+		doc.save('translation.pdf');
+	}
+
 	translate() {
 		this.resetVisionForm();
 		this.loading = true;
@@ -231,6 +268,7 @@ export class DocumentAnalysisComponent implements OnInit {
 		this.requestSubscription = this.visionService.translateFile(this.documentCtrl.value.file, this.languageCtrl.value).subscribe({
 			next: result => {
 				this.translations = result;
+				this.detectedLanguage = result.length > 0 ? (result[0].detectedLanguage ?? null) : null;
 				this.selectedPageIndex = 0;
 				this.cancelRequest();
 			},

@@ -118,7 +118,7 @@ main#content {
 	background-color: palette.$ob-secondary-50;
 	padding: 0;
 	height: calc(100vh - 56px);
-	overflow: hidden;
+	overflow-y: auto;
 }
 
 .ob-column-content {

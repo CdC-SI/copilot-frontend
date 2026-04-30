@@ -1,7 +1,17 @@
 :host {
 	display: block;
-	height: 100%;
-	overflow-y: auto;
+}
+
+.btn-icon {
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+	margin-right: 6px;
+	filter: brightness(0) invert(1); // white by default (button enabled)
+}
+
+.translate-btn:disabled .btn-icon {
+	filter: brightness(0); // black when button is disabled
 }
 
 .skeleton {
@@ -10,9 +20,10 @@
 	animation: loadingAnimation 1.5s infinite;
 }
 
-.card-container {
+.page-container {
+	display: flex;
+	flex-direction: column;
 	padding: 16px;
-	position: relative;
 }
 
 .drop-overlay {
@@ -47,19 +58,179 @@
 	}
 }
 
-.skeleton-text {
-	display: inline-block;
-	width: 60%;
-	height: 16px;
-	border-radius: 4px;
+// --- Language banner ---
+.language-banner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex-shrink: 0;
+	margin-bottom: 16px;
+	gap: 8px;
 }
 
+.language-row {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.detected-language {
+	font-size: 1rem;
+	font-weight: 500;
+	padding: 8px 16px;
+	background: #f0f0f0;
+	border-radius: 8px;
+	min-width: 120px;
+	text-align: center;
+}
+
+.arrow-icon {
+	color: #888;
+}
+
+.target-language-field {
+	width: 200px;
+	margin-bottom: -17px;
+}
+
+.translate-row {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 12px;
+}
+
+.translate-btn {
+	padding: 0 24px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	border-radius: 8px;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	white-space: nowrap;
+	height: 40px;
+}
+
+// Aligner tous les boutons de la translate-row sur la même hauteur
+.translate-row button {
+	height: 40px;
+	line-height: 40px;
+}
+
+.download-btn {
+	height: 40px;
+	padding: 0 20px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	border-radius: 8px;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	white-space: nowrap;
+}
+
+.btn-divider {
+	display: inline-block;
+	width: 1px;
+	height: 28px;
+	background-color: #d0d0d0;
+	border-radius: 1px;
+}
+
+.upload-zone {
+	margin-bottom: 12px;
+}
+
+// --- Split view: document left, translation right ---
+.split-view {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+}
+
+.split-left,
+.split-right {
+	flex: 1;
+	min-width: 0;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	background: #fafafa;
+	padding: 16px;
+}
+
+.split-left {
+	display: flex;
+	flex-direction: column;
+
+	app-file-preview {
+		flex: 1;
+	}
+}
+
+.split-right {
+	display: flex;
+	flex-direction: column;
+}
+
+// --- Empty state ---
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	text-align: center;
+	color: #bbb;
+
+	.empty-state-icon {
+		width: 48px;
+		height: 48px;
+		font-size: 48px;
+		margin-bottom: 12px;
+		opacity: 0.3;
+	}
+
+	.empty-state-text {
+		font-size: 0.9rem;
+		line-height: 1.5;
+		max-width: 260px;
+		margin: 0;
+	}
+}
+
+// --- Results ---
+.document-type-badge {
+	margin-bottom: 12px;
+}
+
+.field-row {
+	margin-top: 12px;
+}
+
+.translation-content {
+	padding: 12px 0;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+}
+
+mat-tab-group {
+	max-width: 100%;
+	min-width: 0;
+}
+
+// --- Skeletons ---
 .skeleton-input {
 	display: block;
-	height: 32px;
+	height: 28px;
 	width: 80%;
 	border-radius: 4px;
-	margin-top: 32px
+	margin-top: 20px;
+}
+
+.skeleton-field + .skeleton-field .skeleton-input {
+	width: 65%;
 }
 
 @keyframes loadingAnimation {
@@ -71,29 +242,6 @@
 	}
 }
 
-
-.translation-content {
-	margin-top: 16px;
-	white-space: pre-wrap;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-}
-
-mat-tab-group {
-	max-width: 100%;
-	min-width: 0;
-}
-
-.translate-btn {
+.full-width {
 	width: 100%;
-	padding: 12px 24px;
-	font-size: 1rem;
-	font-weight: 500;
-	letter-spacing: 0.025em;
-	border-radius: 8px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
 }
-

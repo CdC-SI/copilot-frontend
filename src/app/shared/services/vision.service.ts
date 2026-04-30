@@ -29,7 +29,7 @@ export class VisionService {
 		return this.http.post<any>(this.config.backendApi(this.CLASSIFY_URL), formData);
 	}
 
-	translateFile(file: File, language: string): Observable<{translatedText: string}[]> {
+	translateFile(file: File, language: string): Observable<{translatedText: string; detectedLanguage?: string}[]> {
 		const formData: FormData = new FormData();
 		formData.append('file', file, file.name);
 		formData.append('language', language);
