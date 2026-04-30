@@ -451,7 +451,7 @@
     "COMPLETE": "Complet"
   },
   "careerSummary": "Résumé de carrière scolaire",
-  "documentAnalysis": "Analyse intelligente de document",
+  "documentAnalysis": "Traduction de documents",
   "identityCheck": "Vérification d'identité",
   "back": "Retour",
   "validate": "Valider",
@@ -477,10 +477,6 @@
   "document-analysis.no-request-icon": "translate",
   "document-analysis.document-type": "Type du document",
   "document-analysis.target-language": "Traduire vers",
-  "document-analysis.lang-fr": "Français",
-  "document-analysis.lang-de": "Allemand",
-  "document-analysis.lang-en": "Anglais",
-  "document-analysis.lang-it": "Italien",
   "document-analysis.fields-to-extract": "Données à extraire",
   "user-info": {
     "title": "Informations personnelles",
