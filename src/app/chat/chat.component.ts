@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
@@ -16,6 +16,7 @@ import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
 import {HttpEventType} from '@angular/common/http';
+import {MatDialog} from '@angular/material/dialog';
 import {
 	AutocompleteType,
 	ChatAutocompleteService,
@@ -25,25 +26,37 @@ import {
 	LANGUAGE_MAP,
 	UserAuthDialogService
 } from './services';
+import {filter, map, of} from 'rxjs';
 
 @Component({
 	selector: 'zco-chat',
 	templateUrl: './chat.component.html',
 	styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	Object = Object;
 	searchCtrl = new FormControl();
-	chatConfigCtrl = new FormControl();
 	conversationTitles: ChatTitle[] = [];
 	currentConversationTitle: ChatTitle;
 	isCommandMode = false;
+	showScrollToLastMessage = false;
 	displayTextArea = false;
+	scrollVisibilityPending = false;
 	activeForm?: {def: FormDef; group: FormGroup};
 	attachments: Attachment[] = [];
+	isDragOver = false;
+	availableWorkspaces: string[] = [];
+	selectedWorkspace = '';
+	containerResizeObserver: ResizeObserver;
+
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
+	@ViewChild('workspaceSelectionDialog') workspaceSelectionDialog: TemplateRef<any>;
+	@ViewChild('messageContainer') messageContainer: ElementRef;
+	@ViewChild('scrollAnchor') scrollAnchor: ElementRef;
+	@ViewChildren('messageEl') messageElements!: QueryList<ElementRef>;
+
 	protected readonly ChatMessageSource = ChatMessageSource;
 
 	get messages(): ChatMessage[] {
@@ -72,8 +85,22 @@ export class ChatComponent implements OnInit {
 		private readonly conversationManager: ChatConversationManagerService,
 		private readonly suggestionService: ChatSuggestionService,
 		private readonly autocompleteService: ChatAutocompleteService,
-		private readonly authDialogService: UserAuthDialogService
+		private readonly authDialogService: UserAuthDialogService,
+		private readonly dialog: MatDialog
 	) {}
+
+	ngAfterViewInit() {
+		const el = this.messageContainer?.nativeElement;
+		if (!el) return;
+		this.containerResizeObserver = new ResizeObserver(() => {
+			el.style.setProperty('--container-height', `${el.clientHeight}px`);
+		});
+		this.containerResizeObserver.observe(el);
+	}
+
+	ngOnDestroy() {
+		this.containerResizeObserver?.disconnect();
+	}
 
 	ngOnInit() {
 		this.speechService.speechStartEvent.subscribe(() => {
@@ -85,6 +112,9 @@ export class ChatComponent implements OnInit {
 			if (user && user.status === UserStatus.ACTIVE) {
 				this.getConversationTitles();
 			}
+		});
+		this.conversationService.getAvailableWorkspaces().subscribe(workspaces => {
+			this.availableWorkspaces = workspaces;
 		});
 	}
 
@@ -131,7 +161,7 @@ export class ChatComponent implements OnInit {
 			question.url ? [{type: sourceType, link: question.url}] : undefined
 		);
 		this.clearSearch();
-		this.scrollToBottom();
+		this.scrollToLastUserMessage();
 		this.updateCurrentConversation();
 	}
 
@@ -153,6 +183,18 @@ export class ChatComponent implements OnInit {
 		this.currentConversationTitle = null;
 		this.conversationManager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
+		this.resetScrollState();
+		this.openWorkspaceSelectionDialog();
+	}
+
+	openWorkspaceSelectionDialog(): void {
+		if (!this.workspaceSelectionDialog || !this.availableWorkspaces?.length) return;
+		this.dialog.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false});
+	}
+
+	selectWorkspaceAndClose(workspace: string): void {
+		this.selectedWorkspace = workspace;
+		this.dialog.closeAll();
 	}
 
 	canAskLLM() {
@@ -165,19 +207,57 @@ export class ChatComponent implements OnInit {
 			return;
 		}
 
+		const openWorkspaceDialog$ = this.selectedWorkspace
+			? of(true)
+			: this.dialog
+					.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false})
+					.afterClosed()
+					.pipe(map(() => !!this.selectedWorkspace));
+
+		openWorkspaceDialog$.pipe().subscribe(() => this.doSendToLLM());
+	}
+
+	doSendToLLM(): void {
 		const inputText = this.searchCtrl.value;
 		this.prepareForStreaming(inputText);
 		this.startStreamingRequest(inputText);
 		this.clearSearch();
+		this.scrollToLastUserMessage();
 	}
 
-	scrollToBottom(): void {
-		setTimeout(() => {
-			const mainContainer = document.querySelector('.message-container');
-			if (mainContainer) {
-				mainContainer.scrollTop = mainContainer.scrollHeight;
+	getTargetScrollTop(el: HTMLElement, userEl: HTMLElement): number {
+		return el.scrollTop + userEl.getBoundingClientRect().top - el.getBoundingClientRect().top;
+	}
+
+	updateScrollButtonVisibility(): void {
+		if (this.scrollVisibilityPending) return;
+		this.scrollVisibilityPending = true;
+		requestAnimationFrame(() => {
+			this.scrollVisibilityPending = false;
+			const el = this.messageContainer.nativeElement;
+			const lastUserEl = this.getLastUserElement();
+			if (lastUserEl) {
+				this.showScrollToLastMessage = el.scrollTop < this.getTargetScrollTop(el, lastUserEl) - 10;
 			}
 		});
+	}
+
+	scrollToLastUserMessage(): void {
+		setTimeout(() => {
+			const el = this.messageContainer.nativeElement;
+			const lastUserEl = this.getLastUserElement();
+			if (!lastUserEl) return this.resetScrollState();
+			el.scrollTo({top: this.getTargetScrollTop(el, lastUserEl), behavior: 'smooth'});
+			this.showScrollToLastMessage = false;
+		});
+	}
+
+	getLastUserElement(): HTMLElement | null {
+		return (
+			[...this.messageElements].reverse().find((_, i, arr) => {
+				return this.messages[this.messages.length - 1 - i]?.source === ChatMessageSource.USER;
+			})?.nativeElement ?? null
+		);
 	}
 
 	selectConversation(chatTitle: ChatTitle) {
@@ -186,8 +266,9 @@ export class ChatComponent implements OnInit {
 			this.updateAttachments(conversation.attachments);
 			const chatMessages = conversation.messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
 			this.conversationManager.setConversationMessages(chatTitle.conversationId, chatMessages);
+			this.selectedWorkspace = chatTitle.workspace;
 			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
-			this.scrollToBottom();
+			this.scrollToLastUserMessage();
 		});
 	}
 
@@ -196,6 +277,7 @@ export class ChatComponent implements OnInit {
 			this.currentConversationTitle = null;
 			this.conversationManager.initNewChat();
 			this.suggestionService.clearSpecificSuggestions();
+			this.resetScrollState();
 		}
 		this.conversationManager.deleteConversation(conversation.conversationId);
 	}
@@ -236,6 +318,33 @@ export class ChatComponent implements OnInit {
 
 	onCloseForm() {
 		this.activeForm = undefined;
+	}
+
+	onPaste(event: ClipboardEvent): void {
+		const files = Array.from(event.clipboardData?.files ?? []);
+		if (files.length > 0) {
+			event.preventDefault();
+			this.onAttachmentsSelected(files);
+		}
+	}
+
+	onDragOver(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = true;
+	}
+
+	onDragLeave(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = false;
+	}
+
+	onDrop(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = false;
+		const files = Array.from(event.dataTransfer?.files ?? []);
+		if (files.length > 0) {
+			this.onAttachmentsSelected(files);
+		}
 	}
 
 	onAttachmentsSelected(event: File[]) {
@@ -348,6 +457,13 @@ export class ChatComponent implements OnInit {
 		this.notif.error('attachment.upload.error');
 	}
 
+	private resetScrollState(): void {
+		const el = this.messageContainer?.nativeElement;
+		if (!el) return;
+		el.scrollTop = 0;
+		this.showScrollToLastMessage = false;
+	}
+
 	private prepareForStreaming(inputText: string): void {
 		this.conversationManager.setActiveStreamingConversation(this.currentConversationTitle?.conversationId);
 		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.USER, inputText);
@@ -363,7 +479,7 @@ export class ChatComponent implements OnInit {
 		const requestConfig = {
 			query: inputText,
 			conversationId: this.currentConversationTitle?.conversationId,
-			...this.chatConfigCtrl.value,
+			workspace: this.selectedWorkspace || undefined,
 			language: mappedLanguage
 		};
 
@@ -401,6 +517,8 @@ export class ChatComponent implements OnInit {
 		if (result.shouldRefreshConversations && (!this.currentConversationTitle || this.currentConversationTitle.title === 'Processing attachments...')) {
 			this.refreshConversations();
 		}
+
+		this.updateScrollButtonVisibility();
 	}
 
 	private handleStreamError(err: any): void {

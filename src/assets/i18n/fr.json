@@ -451,7 +451,7 @@
     "COMPLETE": "Complet"
   },
   "careerSummary": "Résumé de carrière scolaire",
-  "documentAnalysis": "Analyse intelligente de document",
+  "documentAnalysis": "Traduction de documents",
   "identityCheck": "Vérification d'identité",
   "back": "Retour",
   "validate": "Valider",
@@ -464,14 +464,19 @@
   "identity-check.error": "Erreur lors de la vérification",
   "identity-check.last-update": "Dernière mise à jour :",
   "identity-check.start-new": "Lancer une nouvelle vérification",
-  "document-analysis.title": "Document à analyser",
-  "document-analysis.cancel": "Annuler l'analyse",
+  "document-analysis.title": "Importer un document",
+  "document-analysis.subtitle": "Formats acceptés : PDF, JPEG, PNG (max. 10 Mo)",
+  "document-analysis.cancel": "Annuler",
   "document-analysis.extract": "Extraire des données",
-  "document-analysis.translate": "Traduire",
-  "document-analysis.results": "Résultats",
-  "document-analysis.no-request": "Veuillez lancer une demande",
+  "document-analysis.translate": "Traduire ce document",
+  "document-analysis.drop-here": "Déposez votre fichier ici",
+  "document-analysis.results": "Traduction",
+  "document-analysis.results-placeholder": "La traduction apparaîtra ici.",
+  "document-analysis.download-pdf": "Télécharger PDF",
+  "document-analysis.no-request": "Importez un document puis cliquez sur « Traduire » pour obtenir la traduction.",
+  "document-analysis.no-request-icon": "translate",
   "document-analysis.document-type": "Type du document",
-  "document-analysis.target-language": "Langue cible",
+  "document-analysis.target-language": "Traduire vers",
   "document-analysis.fields-to-extract": "Données à extraire",
   "user-info": {
     "title": "Informations personnelles",
@@ -535,5 +540,7 @@
       "retry": "Erreur lors de la relance de l'analyse",
       "open-references": "Erreur lors de l'ouverture des références"
     }
-  }
+  },
+  "workspace.select.title": "Sélectionner un espace de travail",
+  "workspace.select.description": "Choisissez l'espace de travail pour cette nouvelle conversation."
 }

@@ -45,6 +45,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {PersonalDocumentsComponent} from './personal-documents/personal-documents.component';
 import {RequestSourceDialogComponent} from './personal-documents/request-source-dialog/request-source-dialog.component';
 import {CareerSummaryComponent} from './tools/career-summary/career-summary.component';
+import {ChatHeaderComponent} from './chat/chat-header/chat-header.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -78,7 +79,8 @@ function bannerFactory(configurationService: ConfigurationService) {
 		SumexComponent,
 		PersonalDocumentsComponent,
 		RequestSourceDialogComponent,
-		CareerSummaryComponent
+		CareerSummaryComponent,
+		ChatHeaderComponent
 	],
 	imports: [
 		BrowserModule,

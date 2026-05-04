@@ -1,5 +1,5 @@
 <zco-alert-banner></zco-alert-banner>
-<ob-column-layout class="h100" [left]="isRegistered()" [right]="isRegistered()">
+<ob-column-layout class="h100" [left]="isRegistered()" [right]="false">
 	<div column-left-content class="h100">
 		<mat-card class="history-card">
 			<mat-card-header class="flex-row aic jcsb">
@@ -19,14 +19,29 @@
 		</mat-card>
 	</div>
 
-	<div column-main-content class="chat-container">
-		<div class="logo" *ngIf="messages.length <= 0">
-			<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+	<div
+		column-main-content
+		class="chat-container"
+		[class.drag-over]="isDragOver"
+		(paste)="onPaste($event)"
+		(dragover)="onDragOver($event)"
+		(dragleave)="onDragLeave($event)"
+		(drop)="onDrop($event)"
+	>
+		<div class="drag-overlay" *ngIf="isDragOver">
+			<mat-icon svgIcon="upload"></mat-icon>
+			<span>{{ "attachment.drop.here" | translate }}</span>
 		</div>
-		<div class="message-container">
+		<zco-chat-header [selectedWorkspace]="selectedWorkspace"></zco-chat-header>
+		<div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
+			<div class="logo" *ngIf="messages.length <= 0">
+				<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+			</div>
+			<div class="message-spacer"></div>
 			<div
 				*ngFor="let message of messages; let last = last; let i = index"
 				class="message"
+				#messageEl
 				[class.retrieving]="message.isRetrieving"
 				[class.validating]="message.isValidating"
 				[class.routing]="message.isRouting"
@@ -51,7 +66,12 @@
 					></zco-chat-message>
 				</div>
 			</div>
+			<div #scrollAnchor class="scroll-anchor"></div>
+			<div class="message-bottom-spacer"></div>
 		</div>
+		<button *ngIf="showScrollToLastMessage" class="scroll-to-bottom" mat-mini-fab (click)="scrollToLastUserMessage()">
+			<mat-icon svgIcon="arrow-down"></mat-icon>
+		</button>
 		<zco-dynamic-form
 			class="form-container"
 			*ngIf="activeForm"
@@ -81,6 +101,7 @@
 				(optionSelected)="handleOptionSelected($event)"
 				(inputChange)="isCommandMode = $event.startsWith('/')"
 				(attachmentsSelected)="onAttachmentsSelected($event)"
+				(submitMessage)="sendToLLM()"
 			/>
 
 			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
@@ -124,18 +145,22 @@
 			</mat-chip-listbox>
 		</div>
 	</div>
-
-	<div column-right-content class="h100">
-		<mat-card class="configuration-card">
-			<mat-card-header>
-				<mat-card-title class="mt16">{{ "parameters.title" | translate }}</mat-card-title>
-			</mat-card-header>
-			<mat-card-content>
-				<zco-chat-configuration-edit [formControl]="chatConfigCtrl"></zco-chat-configuration-edit>
-			</mat-card-content>
-		</mat-card>
-	</div>
 </ob-column-layout>
+
+<ng-template #workspaceSelectionDialog>
+	<h2 mat-dialog-title>{{ "workspace.select.title" | translate }}</h2>
+	<div mat-dialog-content>
+		<mat-action-list>
+			<button mat-list-item *ngFor="let workspace of availableWorkspaces" (click)="selectWorkspaceAndClose(workspace)">
+				<mat-icon matListItemIcon [svgIcon]="'folder'"></mat-icon>
+				<span matListItemTitle>{{ workspace | translate }}</span>
+			</button>
+		</mat-action-list>
+	</div>
+	<div mat-dialog-actions align="end">
+		<button mat-button [obButton]="'secondary'" matDialogClose>{{ "cancel" | translate }}</button>
+	</div>
+</ng-template>
 
 <ng-template #userNotRegisteredTriesToChatDialog>
 	<h2 mat-dialog-title>{{ "copilot.register.info.title" | translate }}</h2>

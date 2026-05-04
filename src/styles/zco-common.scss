@@ -117,10 +117,26 @@
 main#content {
 	background-color: palette.$ob-secondary-50;
 	padding: 0;
+	height: calc(100vh - 56px);
+	overflow-y: auto;
 }
 
 .ob-column-content {
 	padding: 0 !important;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.ob-column-layout {
+	height: 100%;
+}
+
+.ob-column-main {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
 }
 
 .mdc-dialog__title {

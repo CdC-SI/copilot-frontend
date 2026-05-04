@@ -14,7 +14,6 @@ import {ChatMessageComponent} from './components/chat-message/chat-message.compo
 import {MessageActionComponent} from './components/message-action/message-action.component';
 import {FaqItemEditComponent} from './components/faq-item-edit/faq-item-edit.component';
 import {SignUpComponent} from './components/sign-up/sign-up.component';
-import {ChatConfigurationEditComponent} from './components/chat-configuration-edit/chat-configuration-edit.component';
 import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
 import {MatLine, MatNativeDateModule} from '@angular/material/core';
@@ -34,7 +33,6 @@ import {AlertBannerComponent} from './components/alert-banner/alert-banner.compo
 		MessageActionComponent,
 		FaqItemEditComponent,
 		SignUpComponent,
-		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
@@ -71,7 +69,6 @@ import {AlertBannerComponent} from './components/alert-banner/alert-banner.compo
 		ConfirmDialogComponent,
 		ChatMessageComponent,
 		FaqItemEditComponent,
-		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,

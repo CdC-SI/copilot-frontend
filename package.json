@@ -28,14 +28,15 @@
     "@popperjs/core": "^2.0.0",
     "angular-oauth2-oidc": "^17.0.0",
     "chart.js": "4.5.0",
+    "jspdf": "4.2.1",
     "jwt-decode": "^4.0.0",
     "ng2-charts": "6.0.1",
     "ngx-markdown": "17.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "uuid": "^9.0.0",
-    "zone.js": "~0.14.3",
-    "zas-design-system": "^17.0.0"
+    "zas-design-system": "^17.0.0",
+    "zone.js": "~0.14.3"
   },
   "devDependencies": {
     "@angular-builders/jest": "^17.0.0",

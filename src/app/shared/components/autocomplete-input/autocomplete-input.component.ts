@@ -11,9 +11,10 @@ import {
 	Output,
 	ViewChild
 } from '@angular/core';
-import {Observable, Subject, debounceTime, fromEvent, map, of} from 'rxjs';
+import {Observable, Subject, debounceTime, of} from 'rxjs';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators} from '@angular/forms';
 import {HighlightTextPipe} from '../../pipes/highlight-text.pipe';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 
 @Component({
 	selector: 'ut-autocomplete-input',
@@ -40,8 +41,10 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 	@Output() readonly optionSelected = new EventEmitter<T>();
 	@Output() readonly inputChange = new EventEmitter<string>();
 	@Output() readonly attachmentsSelected = new EventEmitter<File[]>();
+	@Output() readonly submitMessage = new EventEmitter<void>();
 
 	@ViewChild('itemFilterInput', {static: true}) itemFilterInput: ElementRef;
+	@ViewChild('autosize') autosize: CdkTextareaAutosize;
 
 	destroyed$ = new Subject<any>();
 	formControl: FormControl;
@@ -60,17 +63,15 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 	}
 
 	ngAfterViewInit(): void {
-		fromEvent<KeyboardEvent>(this.itemFilterInput.nativeElement, 'keyup')
-			.pipe(
-				map(event => (event.target as HTMLInputElement).value),
-				debounceTime(200)
-			)
-			.subscribe(value => {
-				this.options = this.formControl.value?.length > this.minLength ? this.optionService(this.formControl.value) : of([]);
-				this.inputChange.emit(value);
-				this.cdr.markForCheck();
-				this._onChange(value);
-			});
+		this.formControl.valueChanges.subscribe(value => {
+			this._onChange(value);
+			this.inputChange.emit(value);
+		});
+
+		this.formControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {
+			this.options = value?.length > this.minLength ? this.optionService(value) : of([]);
+			this.cdr.markForCheck();
+		});
 	}
 
 	ngOnDestroy(): void {
@@ -119,6 +120,13 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 		return value => {
 			return this.optionLabelFn(value) || (value as string);
 		};
+	}
+
+	onKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter' && !event.shiftKey) {
+			event.preventDefault();
+			this.submitMessage.emit();
+		}
 	}
 
 	onFilesChange(event: Event) {
