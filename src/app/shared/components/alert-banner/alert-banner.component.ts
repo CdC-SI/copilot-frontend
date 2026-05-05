@@ -3,6 +3,8 @@ import {AlertsService} from '../../services/alert.service';
 import {Alert} from '../../model/alerts';
 import {Subject, takeUntil} from 'rxjs';
 import {TranslateService} from '@ngx-translate/core';
+import {UserStatus} from '../../model/user';
+import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
 	selector: 'zco-alert-banner',
@@ -15,12 +17,17 @@ export class AlertBannerComponent implements OnInit, OnDestroy {
 	private readonly DISMISSED_ALERTS_KEY = 'dismissedAlerts';
 
 	constructor(
+		private readonly authService: AuthenticationServiceV2,
 		private readonly alertService: AlertsService,
 		private readonly translate: TranslateService
 	) {}
 
 	ngOnInit(): void {
-		this.loadActiveAlerts();
+		this.authService.$authenticatedUser.subscribe(user => {
+			if (user?.status === UserStatus.ACTIVE) {
+				this.loadActiveAlerts();
+			}
+		});
 	}
 
 	ngOnDestroy(): void {

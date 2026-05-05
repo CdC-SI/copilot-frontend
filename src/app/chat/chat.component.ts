@@ -109,12 +109,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			});
 		});
 		this.authService.$authenticatedUser.subscribe(user => {
-			if (user && user.status === UserStatus.ACTIVE) {
+			if (user?.status === UserStatus.ACTIVE) {
+				this.getAvailableWorkspaces();
 				this.getConversationTitles();
 			}
-		});
-		this.conversationService.getAvailableWorkspaces().subscribe(workspaces => {
-			this.availableWorkspaces = workspaces;
 		});
 	}
 
@@ -285,6 +283,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
 			this.setAndSortConversations(conversations);
+		});
+	}
+
+	getAvailableWorkspaces() {
+		this.conversationService.getAvailableWorkspaces().subscribe(workspaces => {
+			this.availableWorkspaces = workspaces;
 		});
 	}
 
