@@ -19,7 +19,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		},
 		production: false,
 		local: true,
-		apiUrl: '/copilot/api'
+		apiUrl: '/zia/api'
 	},
 	{
 		patterns: ['-d.zas.admin.ch'],
@@ -28,7 +28,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		},
 		production: false,
 		local: false,
-		apiUrl: '/copilot/api'
+		apiUrl: '/zia/api'
 	},
 	{
 		patterns: ['-r.zas.admin.ch'],
@@ -37,7 +37,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		},
 		production: false,
 		local: false,
-		apiUrl: '/copilot/api'
+		apiUrl: '/zia/api'
 	},
 	{
 		patterns: ['-a.zas.admin.ch'],
@@ -46,6 +46,6 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		},
 		production: false,
 		local: false,
-		apiUrl: '/copilot/api'
+		apiUrl: '/zia/api'
 	}
 ];
