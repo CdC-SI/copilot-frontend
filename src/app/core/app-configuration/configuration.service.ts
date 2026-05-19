@@ -77,10 +77,10 @@ export class ConfigurationService {
 	private setupEnvironmentConfigs() {
 		this.environmentService.setEnvironmentConfigs([
 			{matchUrlRegex: '^http[s]?://localhost.*', gatewayUrl: 'http://localhost:9998'},
-			{matchUrlRegex: '^https://.*copilot-d\\..*', gatewayUrl: 'https://gateway-d.zas.admin.ch'},
-			{matchUrlRegex: '^https://.*copilot-r\\..*', gatewayUrl: 'https://gateway-r.zas.admin.ch'},
-			{matchUrlRegex: '^https://.*copilot-a\\..*', gatewayUrl: 'https://gateway-a.zas.admin.ch'},
-			{matchUrlRegex: '^https://.*copilot\\..*', gatewayUrl: 'https://gateway.zas.admin.ch'}
+			{matchUrlRegex: String.raw`^https://.*zia-d\..*`, gatewayUrl: 'https://gateway-d.zas.admin.ch'},
+			{matchUrlRegex: String.raw`^https://.*zia-r\..*`, gatewayUrl: 'https://gateway-r.zas.admin.ch'},
+			{matchUrlRegex: String.raw`^https://.*zia-a\..*`, gatewayUrl: 'https://gateway-a.zas.admin.ch'},
+			{matchUrlRegex: String.raw`^https://.*zia\..*`, gatewayUrl: 'https://gateway.zas.admin.ch'}
 		]);
 	}
 
