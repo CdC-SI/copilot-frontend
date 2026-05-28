@@ -26,3 +26,13 @@
 	color: black !important;
 	cursor: pointer;
 }
+
+.footer-link {
+	cursor: pointer;
+	text-decoration: underline;
+	color: inherit;
+}
+
+.footer-link:hover {
+	opacity: 0.7;
+}

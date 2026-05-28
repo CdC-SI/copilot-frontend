@@ -3,8 +3,10 @@ import {ObNotificationService, WINDOW} from '@oblique/oblique';
 import {DOCUMENT, LocationStrategy} from '@angular/common';
 import {EnvironmentService, LocalStorageService} from 'zas-design-system';
 import {BehaviorSubject, EMPTY, Observable, catchError, mergeMap, of} from 'rxjs';
-import {HttpClient, HttpErrorResponse, HttpStatusCode} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams, HttpStatusCode} from '@angular/common/http';
 import {IUser, Role, UserStatus} from '../model/user';
+
+export const FULLTOKEN_FILTERING_ROLES: Role[] = [Role.ADMIN, Role.EXPERT, Role.TRANSLATOR];
 
 @Injectable({providedIn: 'root'})
 export class AuthenticationServiceV2 {
@@ -62,9 +64,15 @@ export class AuthenticationServiceV2 {
 	}
 
 	getFullToken(): Observable<string> {
+		let params = new HttpParams();
+		FULLTOKEN_FILTERING_ROLES.forEach(role => {
+			params = params.append('filtering', role);
+		});
+
 		return this.http
-			.get<string>(`${this.environmentService.current?.gatewayUrl}/v2/fulltoken-eiam`, {
-				withCredentials: true
+			.get<string>(`${this.environmentService.current?.gatewayUrl}/v2/fulltoken`, {
+				withCredentials: true,
+				params
 			})
 			.pipe(
 				mergeMap(token => {

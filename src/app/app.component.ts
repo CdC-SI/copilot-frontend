@@ -7,6 +7,7 @@ import {SettingsType} from './shared/model/settings';
 import {IUser, UserStatus} from './shared/model/user';
 import {SignUpComponent} from './shared/components/sign-up/sign-up.component';
 import {AuthenticationServiceV2} from './shared/services/auth.service';
+import {LegalDocumentDialogComponent} from './shared/components/legal-document-dialog/legal-document-dialog.component';
 
 @Component({
 	selector: 'zco-root',
@@ -121,6 +122,12 @@ export class AppComponent implements OnInit {
 
 	openJohnDoeInfoDialog() {
 		this.dialog.open(this.johnDoeInfoDialog);
+	}
+
+	openLegalDocumentDialog(tab: 'confidentiality' | 'gcu'): void {
+		this.dialog.open(LegalDocumentDialogComponent, {
+			data: {selectedTab: tab}
+		});
 	}
 
 	private openSignUpDialog() {

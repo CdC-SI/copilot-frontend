@@ -24,6 +24,7 @@ import {SourceListComponent} from './components/source-list/source-list.componen
 import {FilePreviewComponent} from './components/file-preview/file-preview.component';
 import {SourceComponent} from './components/source-list/source/source.component';
 import {AlertBannerComponent} from './components/alert-banner/alert-banner.component';
+import {LegalDocumentDialogComponent} from './components/legal-document-dialog/legal-document-dialog.component';
 
 @NgModule({
 	declarations: [
@@ -41,6 +42,7 @@ import {AlertBannerComponent} from './components/alert-banner/alert-banner.compo
 		FilePreviewComponent,
 		SourceComponent,
 		AlertBannerComponent,
+		LegalDocumentDialogComponent,
 		FormatNavsPipe
 	],
 	imports: [

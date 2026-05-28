@@ -1,5 +1,5 @@
 <ob-master-layout [navigation]="getNavigation()">
-	<ng-container obHeaderTitle>ZAS/EAK CopilotGPT</ng-container>
+	<ng-container obHeaderTitle>ZIA - Zas IA</ng-container>
 	<ng-template #obHeaderControl>
 		<div>
 			{{ getDisplayName() }}
@@ -14,17 +14,14 @@
 	</ng-template>
 	<ng-container obFooterInfo>
 		<p>
-			<span>ZAS / EAK CopilotGPT {{ projectVersion ? "| " : "" }}</span>
-			<a class="footer-link" href="https://github.com/CdC-SI/ZAS-EAK-CopilotGPT" target="_blank">{{ projectVersion }}</a>
+			<span>ZIA {{ projectVersion ? "| " : "" }}</span>
+			<a class="footer-link" href="https://github.com/CdC-SI/copilot-frontend" target="_blank">{{ projectVersion }}</a>
 		</p>
 		<p>
-			&copy; 2025 <span> ZAS | </span>
-			<a class="footer-link" href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Nutzungsvereinbarung-Mitarbeitende.pdf" target="_blank">
-				{{ "gcu" | translate }} | 
-			</a>
-			<a class="footer-link" href="https://portal.collab.admin.ch/sites/602-eak-copilot/PublicDocuments/Datenschutzerklaerung.pdf" target="_blank">
-				{{ "confidentiality" | translate }}
-			</a>
+			&copy; 2026 <span> ZAS | </span>
+			<span class="footer-link" (click)="openLegalDocumentDialog('gcu')">{{ "gcu" | translate }}</span>
+			<span> | </span>
+			<span class="footer-link" (click)="openLegalDocumentDialog('confidentiality')">{{ "confidentiality" | translate }}</span>
 		</p>
 	</ng-container>
 </ob-master-layout>

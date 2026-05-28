@@ -42,20 +42,12 @@
 		<mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
 			<mat-tab [label]="'confidentiality' | translate">
 				<div class="document-content" (scroll)="onScroll($event, 'confidentiality')">
-					<div class="document-text">
-						<h3>{{ "confidentiality.title" | translate }}</h3>
-						<p>{{ confidentialityText }}</p>
-						<!-- Vous pourrez ajouter votre texte complet ici -->
-					</div>
+					<div class="document-text" [innerHTML]="confidentialityText"></div>
 				</div>
 			</mat-tab>
 			<mat-tab [label]="'gcu' | translate">
 				<div class="document-content" (scroll)="onScroll($event, 'gcu')">
-					<div class="document-text">
-						<h3>{{ "gcu.title" | translate }}</h3>
-						<p>{{ gcuText }}</p>
-						<!-- Vous pourrez ajouter votre texte complet ici -->
-					</div>
+					<div class="document-text" [innerHTML]="gcuText"></div>
 				</div>
 			</mat-tab>
 		</mat-tab-group>
