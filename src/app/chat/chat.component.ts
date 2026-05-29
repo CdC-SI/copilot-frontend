@@ -200,10 +200,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	sendToLLM(): void {
-		if (!this.isRegistered()) {
-			this.showDialog();
-			return;
-		}
+		// if (!this.isRegistered()) {
+		// 	this.showDialog();
+		// 	return;
+		// }
 
 		const openWorkspaceDialog$ = this.selectedWorkspace
 			? of(true)
