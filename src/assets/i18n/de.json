@@ -288,6 +288,7 @@
   "login.copilot.account": "Mit einem ZAS/EAK CopilotGPT-Konto anmelden",
   "login.fail": "Falscher Benutzername oder falsches Passwort",
   "chat_history": "Chat-Verlauf",
+  "chat.ai-disclaimer": "ZIA kann Fehler machen. Es wird empfohlen, wichtige Informationen zu überprüfen.",
   "parameters.title": "Parameter",
   "parameters.tags": "Tags",
   "parameters.sources": "Quellen",

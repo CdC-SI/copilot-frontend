@@ -288,6 +288,7 @@
   "login.copilot.account": "Se connecter à un compte ZAS/EAK CopilotGPT",
   "login.fail": "Utilisateur ou mot de passe incorrect",
   "chat_history": "Historique",
+  "chat.ai-disclaimer": "ZIA peut commettre des erreurs. Il est recommandé de vérifier les informations importantes.",
   "parameters.title": "Paramètres",
   "parameters.tags": "Tags",
   "parameters.sources": "Sources",
@@ -484,6 +485,10 @@
   "document-analysis.document-type": "Type du document",
   "document-analysis.target-language": "Traduire vers",
   "document-analysis.fields-to-extract": "Données à extraire",
+  "document-analysis.lang-fr": "Français",
+  "document-analysis.lang-de": "Allemand",
+  "document-analysis.lang-en": "Anglais",
+  "document-analysis.lang-it": "Italien",
   "user-info": {
     "title": "Informations personnelles",
     "capture": "Capturer",

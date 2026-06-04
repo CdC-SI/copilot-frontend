@@ -146,7 +146,15 @@
 .split-view {
 	display: flex;
 	gap: 16px;
-	align-items: flex-start;
+	align-items: stretch;
+}
+
+.ai-disclaimer {
+	text-align: center;
+	font-size: 0.8rem;
+	color: #666;
+	margin: 6px 0 12px;
+	letter-spacing: 0.2px;
 }
 
 .split-left,
