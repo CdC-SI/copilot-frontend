@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {
 	AGENT_TAG_REGEX,
 	ANCHOR_TAG_REGEX,
+	ATTACHMENT_TAG_REGEX,
 	II_TARIFFS_ANSWER_TAG_REGEX,
 	II_TARIFFS_TAG_REGEX,
 	INTENT_TAG_REGEX,
@@ -51,6 +52,9 @@ export class ChatStreamProcessorService {
 		if (!chunk) return result;
 
 		// Process status tags
+		if (this.processStatusTag(chunk, message, RETRIEVING_TAG_REGEX, {isRetrieving: true})) return result;
+		if (this.processStatusTag(chunk, message, OCR_TAG_REGEX, {isRetrieving: true})) return result;
+		if (this.processStatusTag(chunk, message, ATTACHMENT_TAG_REGEX, {isRetrieving: true})) return result;
 		if (this.processStatusTag(chunk, message, TOOL_TAG_REGEX, {isToolUse: true})) return result;
 		if (this.processStatusTag(chunk, message, INTENT_TAG_REGEX, {isProcessingIntent: true})) return result;
 		if (this.processStatusTag(chunk, message, SOURCE_TAG_REGEX, {isProcessingSources: true})) return result;
@@ -58,8 +62,6 @@ export class ChatStreamProcessorService {
 		if (this.processStatusTag(chunk, message, AGENT_TAG_REGEX, {isAgent: true})) return result;
 		if (this.processStatusTag(chunk, message, ROUTING_TAG_REGEX, {isRouting: true})) return result;
 		if (this.processStatusTag(chunk, message, TOPIC_CHECK_REGEX, {isValidating: true})) return result;
-		if (this.processStatusTag(chunk, message, RETRIEVING_TAG_REGEX, {isRetrieving: true})) return result;
-		if (this.processStatusTag(chunk, message, OCR_TAG_REGEX, {isRetrieving: true})) return result;
 		if (this.processStatusTag(chunk, message, II_TARIFFS_TAG_REGEX, {isRetrieving: true})) return result;
 		if (this.processStatusTag(chunk, message, II_TARIFFS_ANSWER_TAG_REGEX, {isRetrieving: true})) return result;
 

@@ -179,6 +179,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	newChat(): void {
 		if (this.currentConversationTitle) this.currentConversationTitle.selected = false;
 		this.currentConversationTitle = null;
+		this.attachments = [];
 		this.conversationManager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
 		this.resetScrollState();
