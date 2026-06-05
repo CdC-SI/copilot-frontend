@@ -1,0 +1,47 @@
+@mixin markdown-content {
+	.markdown-content {
+		background-color: #f5f5f5;
+		padding: 20px;
+		border-radius: 4px;
+		overflow-x: auto;
+
+		::ng-deep table {
+			width: 100%;
+			border-collapse: collapse;
+			border-spacing: 0;
+			font-size: 14px;
+			margin: 16px 0;
+
+			thead tr {
+				background-color: #37474f;
+				color: #ffffff;
+			}
+
+			th {
+				padding: 10px 14px;
+				text-align: left;
+				font-weight: 600;
+				border: 1px solid #546e7a;
+			}
+
+			td {
+				padding: 9px 14px;
+				border: 1px solid #cfd8dc;
+			}
+
+			tbody tr:nth-child(odd) {
+				background-color: #ffffff;
+			}
+
+			tbody tr:nth-child(even) {
+				background-color: #eceff1;
+			}
+
+			tbody tr:hover {
+				background-color: #b0bec5;
+				transition: background-color 0.15s ease;
+			}
+		}
+	}
+}
+

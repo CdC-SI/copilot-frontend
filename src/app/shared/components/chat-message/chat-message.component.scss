@@ -1,5 +1,7 @@
 @use '@oblique/oblique/styles/scss/core/variables' as *;
 @use '@oblique/oblique/styles/scss/core/mixins/layout';
+@use 'styles/markdown-content' as markdown;
+@include markdown.markdown-content;
 
 .message {
     width: 100%;
