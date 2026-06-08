@@ -36,18 +36,22 @@ export interface MessageSource {
 	answerId?: string;
 }
 
+export type AttachmentStatus = 'PENDING' | 'PROCESSED' | 'FAILED';
+
 export interface Attachment {
 	id?: number;
 	fileName?: string;
 	fileSize?: number;
 	file?: File;
 	isUploading?: boolean;
+	status?: AttachmentStatus;
 }
 
 export interface AttachmentDTO {
 	id: number;
 	filename: string;
 	fileSize: number;
+	status: AttachmentStatus;
 }
 
 export interface ConversationAttachments {
@@ -56,7 +60,7 @@ export interface ConversationAttachments {
 }
 
 export interface AttachmentUploadResponse {
-	success: boolean;
+	status: AttachmentStatus;
 	message: string;
 	conversationAttachments: ConversationAttachments;
 }

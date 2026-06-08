@@ -61,6 +61,10 @@ export class ConversationService {
 		return this.http.delete<void>(this.config.backendApi(`/conversations/attachments/${attachmentId}`));
 	}
 
+	getConversationAttachmentsStatus(conversationId: string): Observable<AttachmentUploadResponse> {
+		return this.http.get<AttachmentUploadResponse>(this.config.backendApi(`/conversations/${conversationId}/attachments`));
+	}
+
 	downloadAttachment(conversationId: string, attachmentId: number): Observable<Blob> {
 		return this.http.get(this.config.backendApi(`/conversations/${conversationId}/attachments/${attachmentId}`), {
 			responseType: 'blob'

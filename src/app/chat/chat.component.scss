@@ -241,6 +241,17 @@
 				}
 			}
 
+			&.failed {
+				background-color: rgba(220, 53, 69, 0.05);
+				border: 1px solid rgba(220, 53, 69, 0.35);
+				cursor: default;
+
+				.attachment-content {
+					position: relative;
+					z-index: 2;
+				}
+			}
+
 			.loading-stripes {
 				position: absolute;
 				inset: 0;
@@ -284,7 +295,22 @@
 					color: rgba(0, 123, 255, 0.9);
 					font-weight: 500;
 					font-style: italic;
+
+					&.failed-status {
+						color: rgba(220, 53, 69, 0.9);
+					}
 				}
+			}
+
+			.retry-button {
+				font-size: 11px;
+				min-width: unset;
+				height: 24px;
+				line-height: 24px;
+				padding: 0 8px;
+				position: relative;
+				z-index: 2;
+				color: rgba(220, 53, 69, 0.9);
 			}
 
 			button[matChipRemove] {
@@ -292,6 +318,27 @@
 				z-index: 2;
 			}
 		}
+	}
+
+	.polling-timeout-banner {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 4px 12px;
+			margin-top: 8px;
+			background-color: rgba(255, 193, 7, 0.1);
+			border: 1px solid rgba(255, 193, 7, 0.4);
+			border-radius: 4px;
+			font-size: 12px;
+			color: #856404;
+
+			button {
+				font-size: 12px;
+				min-width: unset;
+				height: 24px;
+				line-height: 24px;
+				padding: 0 8px;
+			}
 	}
 }
 

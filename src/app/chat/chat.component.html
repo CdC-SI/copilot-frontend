@@ -118,21 +118,32 @@
 				<mat-chip
 					*ngFor="let attachment of attachments"
 					[class.uploading]="attachment.isUploading"
-					[class.downloadable]="!attachment.isUploading"
-					(click)="!attachment.isUploading && downloadAttachment(attachment)"
-					(keydown.enter)="!attachment.isUploading && downloadAttachment(attachment)"
-					(keydown.space)="!attachment.isUploading && downloadAttachment(attachment)"
+					[class.failed]="attachment.status === 'FAILED'"
+					[class.downloadable]="attachment.status === 'PROCESSED'"
+					(click)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
+					(keydown.enter)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
+					(keydown.space)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
 				>
 					<div class="loading-stripes" *ngIf="attachment.isUploading"></div>
 					<span class="attachment-content">
 						<span class="attachment-name">
 							{{ attachment.fileName }}
-							<span class="attachment-size" *ngIf="!attachment.isUploading && attachment.fileSize">
+							<span class="attachment-size" *ngIf="attachment.status === 'PROCESSED' && attachment.fileSize">
 								({{ attachment.fileSize / 1000 | number: "1.0-0" }} Ko)
 							</span>
 						</span>
 						<span class="upload-status" *ngIf="attachment.isUploading">{{ "attachment.uploading" | translate }}</span>
+						<span class="upload-status failed-status" *ngIf="attachment.status === 'FAILED'">{{ "attachment.failed" | translate }}</span>
 					</span>
+					<button
+						*ngIf="attachment.status === 'FAILED' && attachment.file"
+						mat-button
+						(click)="$event.stopPropagation(); retryAttachment(attachment)"
+						[attr.aria-label]="'attachment.retry' | translate"
+						class="retry-button"
+					>
+						{{ "attachment.retry" | translate }}
+					</button>
 					<button
 						*ngIf="!attachment.isUploading"
 						matChipRemove
@@ -143,6 +154,10 @@
 					</button>
 				</mat-chip>
 			</mat-chip-listbox>
+			<div *ngIf="attachmentsPollingTimedOut" class="polling-timeout-banner">
+				<span>{{ "attachment.process.timeout" | translate }}</span>
+				<button mat-button (click)="refreshAttachmentsStatus()">{{ "attachment.refresh" | translate }}</button>
+			</div>
 		</div>
 	</div>
 </ob-column-layout>

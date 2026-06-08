@@ -5,7 +5,7 @@ import {RagService} from '../shared/services/rag.service';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {Attachment, AttachmentDTO, ChatTitle} from '../shared/model/chat-history';
+import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -26,7 +26,10 @@ import {
 	LANGUAGE_MAP,
 	UserAuthDialogService
 } from './services';
-import {filter, map, of} from 'rxjs';
+import {Subject, filter, map, merge, of, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
+
+const ATTACHMENT_POLL_INTERVAL_MS = 10_000;
+const ATTACHMENT_POLL_MAX_ATTEMPTS = 15;
 
 @Component({
 	selector: 'zco-chat',
@@ -48,6 +51,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	availableWorkspaces: string[] = [];
 	selectedWorkspace = '';
 	containerResizeObserver: ResizeObserver;
+	attachmentsPollingTimedOut = false;
+
+	private readonly destroy$ = new Subject<void>();
+	private pollingStop$ = new Subject<void>();
+	private pollingCancelled = false;
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
@@ -99,7 +107,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngOnDestroy() {
+		this.pollingCancelled = true;
 		this.containerResizeObserver?.disconnect();
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	ngOnInit() {
@@ -180,6 +191,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (this.currentConversationTitle) this.currentConversationTitle.selected = false;
 		this.currentConversationTitle = null;
 		this.attachments = [];
+		this.attachmentsPollingTimedOut = false;
+		this.stopAttachmentsPolling();
 		this.conversationManager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
 		this.resetScrollState();
@@ -260,6 +273,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	selectConversation(chatTitle: ChatTitle) {
+		this.stopAttachmentsPolling();
+		this.attachmentsPollingTimedOut = false;
 		this.conversationService.getConversation(chatTitle.conversationId).subscribe(conversation => {
 			this.currentConversationTitle = chatTitle;
 			this.updateAttachments(conversation.attachments);
@@ -268,6 +283,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.selectedWorkspace = chatTitle.workspace;
 			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
 			this.scrollToLastUserMessage();
+			if (this.hasPendingAttachments()) {
+				this.startAttachmentsPolling();
+			}
 		});
 	}
 
@@ -389,39 +407,74 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		});
 	}
 
+	retryAttachment(attachment: Attachment): void {
+		if (!attachment.file || !this.currentConversationTitle) return;
+		attachment.status = 'PENDING';
+		attachment.isUploading = true;
+		this.cdr.markForCheck();
+		this.conversationService.uploadAttachments(this.currentConversationTitle, attachment.file).subscribe({
+			next: httpEvent => {
+				if (httpEvent.type === HttpEventType.Response) {
+					const response = httpEvent.body as AttachmentUploadResponse;
+					const serverAtt = response.conversationAttachments.attachments.find(s => s.filename === attachment.file!.name);
+					if (serverAtt) {
+						attachment.id = serverAtt.id;
+						attachment.status = serverAtt.status;
+						attachment.isUploading = serverAtt.status === 'PENDING';
+					}
+					this.cdr.markForCheck();
+					if (this.hasPendingAttachments()) {
+						this.startAttachmentsPolling();
+					} else {
+						this.notifyPollingComplete(response.status);
+					}
+				}
+			},
+			error: () => {
+				attachment.status = 'FAILED';
+				attachment.isUploading = false;
+				this.notif.error('attachment.upload.error');
+				this.cdr.markForCheck();
+			}
+		});
+	}
+
+	refreshAttachmentsStatus(): void {
+		if (!this.currentConversationTitle) return;
+		this.attachmentsPollingTimedOut = false;
+		this.startAttachmentsPolling();
+	}
+
 	private initializePendingAttachments(files: File[]): Attachment[] {
 		return files.map(file => ({
 			fileName: file.name,
 			fileSize: file.size,
 			file,
+			status: 'PENDING' as AttachmentStatus,
 			isUploading: true
 		}));
 	}
 
 	private handleUploadEvent(httpEvent: any, pendingAttachments: Attachment[]): void {
 		if (httpEvent.type === HttpEventType.Response) {
-			this.handleUploadResponse(httpEvent.body, pendingAttachments);
+			this.handleUploadResponse(httpEvent.body as AttachmentUploadResponse, pendingAttachments);
 		}
 	}
 
-	private handleUploadResponse(response: any, pendingAttachments: Attachment[]): void {
-		if (response.success) {
-			this.handleSuccessfulUpload(response, pendingAttachments);
-		} else {
-			this.handleFailedUpload(response, pendingAttachments);
-		}
-	}
-
-	private handleSuccessfulUpload(response: any, pendingAttachments: Attachment[]): void {
+	private handleUploadResponse(response: AttachmentUploadResponse, pendingAttachments: Attachment[]): void {
 		if (!this.currentConversationTitle) {
 			this.createConversationFromUpload(response);
 		}
-		this.updateAttachmentsWithServerIds(response, pendingAttachments);
-		this.notif.success(response.message);
+		this.syncAttachmentsFromResponse(response, pendingAttachments);
 		this.cdr.markForCheck();
+		if (this.hasPendingAttachments()) {
+			this.startAttachmentsPolling();
+		} else {
+			this.notifyPollingComplete(response.status);
+		}
 	}
 
-	private createConversationFromUpload(response: any): void {
+	private createConversationFromUpload(response: AttachmentUploadResponse): void {
 		this.currentConversationTitle = {
 			conversationId: response.conversationAttachments.conversationId,
 			title: 'Processing attachments...',
@@ -430,36 +483,90 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		};
 	}
 
-	private updateAttachmentsWithServerIds(response: any, pendingAttachments: Attachment[]): void {
-		response.conversationAttachments.attachments.forEach((serverAtt: {id: number; filename: string}) => {
-			const localAtt = pendingAttachments.find(att => att.file.name === serverAtt.filename);
+	private syncAttachmentsFromResponse(response: AttachmentUploadResponse, pendingAttachments: Attachment[]): void {
+		response.conversationAttachments.attachments.forEach(serverAtt => {
+			const localAtt = pendingAttachments.find(att => att.file?.name === serverAtt.filename);
 			if (localAtt) {
 				localAtt.id = serverAtt.id;
-				localAtt.isUploading = false;
+				localAtt.status = serverAtt.status;
+				localAtt.isUploading = serverAtt.status === 'PENDING';
 			}
 		});
 	}
 
 	private updateAttachments(conversationAttachments: AttachmentDTO[]): void {
-		this.attachments = [];
-		for (const convAtt of conversationAttachments) {
-			this.attachments.push({
-				id: convAtt.id,
-				fileName: convAtt.filename,
-				fileSize: convAtt.fileSize,
-				isUploading: false
-			});
-		}
-	}
-
-	private handleFailedUpload(response: any, pendingAttachments: Attachment[]): void {
-		this.attachments = this.attachments.filter(att => !pendingAttachments.includes(att));
-		this.notif.error(response.message);
+		this.attachments = conversationAttachments.map(convAtt => ({
+			id: convAtt.id,
+			fileName: convAtt.filename,
+			fileSize: convAtt.fileSize,
+			status: convAtt.status,
+			isUploading: convAtt.status === 'PENDING'
+		}));
 	}
 
 	private handleUploadError(pendingAttachments: Attachment[]): void {
 		this.attachments = this.attachments.filter(att => !pendingAttachments.includes(att));
 		this.notif.error('attachment.upload.error');
+	}
+
+	private hasPendingAttachments(): boolean {
+		return this.attachments.some(att => att.status === 'PENDING');
+	}
+
+	private startAttachmentsPolling(): void {
+		if (!this.currentConversationTitle) return;
+		this.stopAttachmentsPolling();
+		this.pollingCancelled = false;
+		this.attachmentsPollingTimedOut = false;
+
+		timer(0, ATTACHMENT_POLL_INTERVAL_MS)
+			.pipe(
+				takeUntil(merge(this.destroy$, this.pollingStop$)),
+				take(ATTACHMENT_POLL_MAX_ATTEMPTS),
+				takeWhile(() => this.hasPendingAttachments()),
+				switchMap(() => this.conversationService.getConversationAttachmentsStatus(this.currentConversationTitle!.conversationId))
+			)
+			.subscribe({
+				next: (response: AttachmentUploadResponse) => {
+					this.updateAttachmentsFromPoll(response);
+					this.cdr.markForCheck();
+					if (!this.hasPendingAttachments()) {
+						this.notifyPollingComplete(response.status);
+						this.stopAttachmentsPolling();
+					}
+				},
+				complete: () => {
+					if (!this.pollingCancelled && this.hasPendingAttachments()) {
+						this.attachmentsPollingTimedOut = true;
+						this.notif.warning('attachment.process.timeout');
+						this.cdr.markForCheck();
+					}
+				}
+			});
+	}
+
+	private stopAttachmentsPolling(): void {
+		this.pollingCancelled = true;
+		this.pollingStop$.next();
+		this.pollingStop$ = new Subject<void>();
+	}
+
+	private updateAttachmentsFromPoll(response: AttachmentUploadResponse): void {
+		response.conversationAttachments.attachments.forEach(serverAtt => {
+			const localAtt = this.attachments.find(att => att.id === serverAtt.id);
+			if (localAtt) {
+				localAtt.status = serverAtt.status;
+				localAtt.isUploading = serverAtt.status === 'PENDING';
+			}
+		});
+	}
+
+	private notifyPollingComplete(aggregatedStatus: AttachmentStatus): void {
+		if (aggregatedStatus === 'PROCESSED') {
+			this.notif.success('attachment.process.success');
+		} else if (aggregatedStatus === 'FAILED') {
+			this.notif.error('attachment.process.error');
+		}
 	}
 
 	private resetScrollState(): void {
