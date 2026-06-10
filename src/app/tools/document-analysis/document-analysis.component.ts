@@ -33,6 +33,7 @@ export class DocumentAnalysisComponent implements OnInit {
 	visionFrmGrp: FormGroup = new FormGroup<any>({});
 	dragging = false;
 	detectedLanguage: string | null = null;
+	translationTargetLang: string | null = null;
 
 	private readonly acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
 
@@ -122,6 +123,7 @@ export class DocumentAnalysisComponent implements OnInit {
 	}
 
 	uploadDocumentEvent(event: ObIUploadEvent): void {
+		this.dragging = false;
 		if (event.type === ObEUploadEventType.CHOSEN) {
 			this.resetVisionForm();
 			event.files.forEach(file => {
@@ -234,6 +236,29 @@ export class DocumentAnalysisComponent implements OnInit {
 		const maxWidth = pageWidth - margin * 2;
 		const fontSize = 9;
 		const lineHeight = fontSize * 0.45;
+		const footerFontSize = 7;
+		const footerY = pageHeight - 8;
+		const contentMaxY = footerY - 5;
+
+		const footerTexts: Record<string, (lang: string) => string> = {
+			FRENCH: (lang: string) => `Traduction automatique réalisée par IA sur infrastructure sécurisée interne. Langue source détectée : ${lang}`,
+			GERMAN: (lang: string) => `Automatische Übersetzung durch KI auf interner gesicherter Infrastruktur. Erkannte Quellsprache: ${lang}`,
+			ITALIAN: (lang: string) => `Traduzione automatica effettuata dall'IA su infrastruttura interna sicura. Lingua di origine rilevata: ${lang}`,
+			ENGLISH: (lang: string) => `Automatic translation performed by AI on secure internal infrastructure. Detected source language: ${lang}`
+		};
+
+		const targetLang = this.translationTargetLang ?? this.languageCtrl.value ?? 'FRENCH';
+		const detectedLang = this.detectedLanguage ?? 'inconnue';
+		const footerFn = footerTexts[targetLang] ?? footerTexts['FRENCH'];
+		const footerText = footerFn(detectedLang);
+
+		const addFooter = () => {
+			doc.setFontSize(footerFontSize);
+			doc.setTextColor(120);
+			doc.text(footerText, margin, footerY);
+			doc.setTextColor(0);
+			doc.setFontSize(fontSize);
+		};
 
 		doc.setFontSize(fontSize);
 
@@ -248,7 +273,8 @@ export class DocumentAnalysisComponent implements OnInit {
 			const lines = doc.splitTextToSize(text, maxWidth);
 			let y = margin;
 			for (const line of lines) {
-				if (y + lineHeight > pageHeight - margin) {
+				if (y + lineHeight > contentMaxY) {
+					addFooter();
 					doc.addPage();
 					doc.setFontSize(fontSize);
 					y = margin;
@@ -256,6 +282,7 @@ export class DocumentAnalysisComponent implements OnInit {
 				doc.text(line, margin, y);
 				y += lineHeight;
 			}
+			addFooter();
 		});
 
 		doc.save('translation.pdf');
@@ -264,6 +291,7 @@ export class DocumentAnalysisComponent implements OnInit {
 	translate() {
 		this.resetVisionForm();
 		this.loading = true;
+		this.translationTargetLang = this.languageCtrl.value;
 
 		this.requestSubscription = this.visionService.translateFile(this.documentCtrl.value.file, this.languageCtrl.value).subscribe({
 			next: result => {
