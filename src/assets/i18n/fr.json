@@ -566,5 +566,12 @@
     }
   },
   "workspace.select.title": "Sélectionner un espace de travail",
-  "workspace.select.description": "Choisissez l'espace de travail pour cette nouvelle conversation."
+  "workspace.select.description": "Choisissez l'espace de travail pour cette nouvelle conversation.",
+  "RH": "Ressources Humaines",
+  "AFAC": "Assurance facultative",
+  "GENERAL": "Général",
+  "OAIE": "OAIE",
+  "EAK": "CFC",
+  "LOIS_AVS": "Lois de l’AVS",
+  "LOIS_AI": "Lois de l’AI"
 }

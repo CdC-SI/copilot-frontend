@@ -462,5 +462,12 @@
     }
   },
   "workspace.select.title": "Arbeitsbereich auswählen",
-  "workspace.select.description": "Wählen Sie den Arbeitsbereich für dieses neue Gespräch."
+  "workspace.select.description": "Wählen Sie den Arbeitsbereich für dieses neue Gespräch.",
+  "RH": "Personalwesen",
+  "AFAC": "Freiwillige Versicherung",
+  "GENERAL": "Allgemein",
+  "OAIE": "IVST",
+  "EAK": "EAK",
+  "LOIS_AVS": "AHV‑Gesetze",
+  "LOIS_AI": "IV‑Gesetze"
 }
