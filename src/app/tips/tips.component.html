@@ -1,16 +1,109 @@
-<div class="tips-container">
-	<h2 class="mb16">{{ "tips.component" | translate }}</h2>
+<div class="help-container">
+	<header class="help-header">
+		<h2>{{ "tips.component" | translate }}</h2>
+		<p class="help-intro">{{ "tips.intro" | translate }}</p>
+	</header>
 
-	<div class="tips-sections">
-		<mat-card class="tip-card mat-elevation-z2" *ngFor="let section of tipSections">
-			<mat-card-header>
-				<mat-card-title>{{ section.titleKey | translate }}</mat-card-title>
-			</mat-card-header>
-			<mat-card-content>
-				<ul>
-					<li *ngFor="let tipKey of section.tipsKeys">{{ tipKey | translate }}</li>
-				</ul>
-			</mat-card-content>
-		</mat-card>
-	</div>
+	<section class="help-section" *ngIf="images.length">
+		<h3 class="help-section-title">
+			<mat-icon svgIcon="image"></mat-icon>
+			<span>{{ "tips.examples.title" | translate }}</span>
+		</h3>
+		<div class="resource-grid">
+			<mat-card
+				class="resource-card mat-elevation-z2"
+				*ngFor="let image of images"
+				(click)="openImage(image)"
+				tabindex="0"
+				role="button"
+				[attr.aria-label]="image.titleKey | translate"
+				(keyup.enter)="openImage(image)"
+			>
+				<div class="card-preview">
+					<img [src]="image.src" [alt]="image.titleKey | translate" />
+					<div class="card-overlay">
+						<mat-icon svgIcon="plus-circle"></mat-icon>
+					</div>
+						<div class="card-tooltip" *ngIf="image.descriptionKey">
+							{{ image.descriptionKey | translate }}
+						</div>
+					</div>
+				<mat-card-content>
+					<h4>{{ image.titleKey | translate }}</h4>
+				</mat-card-content>
+			</mat-card>
+		</div>
+	</section>
+
+	<section class="help-section" *ngIf="documents.length">
+		<h3 class="help-section-title">
+			<mat-icon svgIcon="file"></mat-icon>
+			<span>{{ "tips.documents.title" | translate }}</span>
+		</h3>
+		<div class="resource-grid">
+			<mat-card
+				class="resource-card mat-elevation-z2"
+				*ngFor="let document of documents"
+				(click)="downloadDocument(document)"
+				tabindex="0"
+				role="button"
+				[attr.aria-label]="document.titleKey | translate"
+				(keyup.enter)="downloadDocument(document)"
+			>
+				<div class="card-preview doc-preview">
+					<mat-icon svgIcon="file-pdf"></mat-icon>
+					<div class="card-overlay">
+						<mat-icon svgIcon="download"></mat-icon>
+					</div>
+						<div class="card-tooltip" *ngIf="document.descriptionKey">
+							{{ document.descriptionKey | translate }}
+						</div>
+					</div>
+				<mat-card-content>
+					<h4>{{ document.titleKey | translate }}</h4>
+				</mat-card-content>
+			</mat-card>
+		</div>
+	</section>
+
+	<section class="help-section" *ngIf="videos.length">
+		<h3 class="help-section-title">
+			<mat-icon svgIcon="play"></mat-icon>
+			<span>{{ "tips.tutorials.title" | translate }}</span>
+		</h3>
+		<div class="resource-grid">
+			<mat-card
+				class="resource-card mat-elevation-z2"
+				*ngFor="let video of videos"
+				(click)="playVideoFullscreen($event)"
+				tabindex="0"
+				role="button"
+				[attr.aria-label]="video.titleKey | translate"
+				(keyup.enter)="playVideoFullscreen($event)"
+			>
+				<div class="card-preview video-preview">
+					<video [src]="video.src" [poster]="video.thumbnail" preload="metadata"></video>
+					<div class="card-overlay">
+						<mat-icon svgIcon="play"></mat-icon>
+					</div>
+						<div class="card-tooltip" *ngIf="video.descriptionKey">
+							{{ video.descriptionKey | translate }}
+						</div>
+					</div>
+				<mat-card-content>
+					<h4>{{ video.titleKey | translate }}</h4>
+				</mat-card-content>
+			</mat-card>
+		</div>
+	</section>
+</div>
+
+<div class="lightbox-overlay" *ngIf="selectedImage" (click)="closeImage()">
+	<button type="button" class="lightbox-close" [attr.aria-label]="'tips.actions.close' | translate" (click)="closeImage()">
+		<mat-icon svgIcon="cancel"></mat-icon>
+	</button>
+	<figure class="lightbox-content" (click)="$event.stopPropagation()">
+		<img [src]="selectedImage.src" [alt]="selectedImage.titleKey | translate" />
+		<figcaption>{{ selectedImage.titleKey | translate }}</figcaption>
+	</figure>
 </div>

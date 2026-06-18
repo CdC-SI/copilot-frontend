@@ -220,33 +220,30 @@
   "loading": "Chargement...",
   "tips": {
     "component": "Aide",
-    "sections": {
-      "getting_started": {
-        "title": "Pour commencer",
-        "tips": [
-          "Commencez votre conversation en tapant une question ou en sélectionnant une question suggérée",
-          "Essayez d'inclure des mots-clefs pertinents dans la formulation de votre question",
-          "Appuyez sur Enter ou cliquez sur le bouton envoyer pour traiter votre question",
-          "Effacez la conversation en cliquant sur le bouton effacer"
-        ]
+    "intro": "Retrouvez ici des ressources pour vous aider à utiliser l'assistant : fiches pratiques, tutoriels et documents à télécharger.",
+    "examples": {
+      "title": "Fiches pratiques"
+    },
+    "tutorials": {
+      "title": "Tutoriels"
+    },
+    "documents": {
+      "title": "Documents"
+    },
+    "items": {
+      "read_answer": {
+        "title": "Comment lire une réponse",
+        "description": "Cette illustration explique comment interpréter les différents éléments d'une réponse de l'assistant."
       },
-      "retrieval": {
-        "title": "Recherche de documents",
-        "tips": [
-          "Posez vos questions sur un sujet particulier",
-          "Si le copilote peine à répondre, filtrez la source et les tags manuellement",
-          "Note: ce filtrage sera bientôt automatisé"
-        ]
-      },
-      "document_management": {
-        "title": "Gestion des documents",
-        "tips": [
-          "Téléchargez des PDF en utilisant le bouton de téléchargement",
-          "Posez ensuite vos questions sur les documents téléchargés",
-          "Traduisez ou résumez les documents téléchargés",
-          "Les documents restent disponibles durant 24 heures"
-        ]
+      "formation_initiale": {
+        "title": "Formation initiale ZIA",
+        "description": "Document de formation initiale présentant les principales fonctionnalités de l'assistant."
       }
+    },
+    "actions": {
+      "download": "Télécharger",
+      "enlarge": "Cliquer pour agrandir",
+      "close": "Fermer"
     }
   },
   "add.question.answer.ask": "Ajouter une question/réponse ?",
