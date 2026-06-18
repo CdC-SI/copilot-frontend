@@ -305,6 +305,8 @@
     "eak_lernbaustein_2024": "Guide d'apprentissage CFC",
     "eak_praxisleitfaden_fz_2024": "Guide Pratique AFam CFC",
     "afac": "Assurance Facultative",
+    "csc_afac": "Assurance Facultative",
+    "rh": "Ressources Humaines",
     "rh_procedures": "Procédures RH",
     "rh_lpers": "Loi sur le personnel de la Confédération",
     "rh_oopers": "Ordonnance du DFAE concernant l’ordonnance sur le personnel de la Confédération",
@@ -331,7 +333,8 @@
     "faq_bsv": "FAQ OFAS",
     "knowledge_base": "Base de Connaissance Interne",
     "user_pdf_upload": "PDF Utilisateur:",
-    "user_edit": "SurveyPipeline - Saisie utilisateur"
+    "user_edit": "SurveyPipeline - Saisie utilisateur",
+    "oaie": "OAIE"
   },
   "tags": {
     "daa": "DAA",
