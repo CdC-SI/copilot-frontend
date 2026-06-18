@@ -21,7 +21,8 @@ import {MatListModule} from '@angular/material/list';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
-import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {TextFieldModule} from '@angular/cdk/text-field';
 
 @NgModule({
 	imports: [
@@ -46,7 +47,8 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 		MatChipsModule,
 		MatDialogModule,
 		MatSidenavModule,
-		MatSlideToggleModule
+		MatSlideToggleModule,
+		TextFieldModule
 	],
 	exports: [
 		MatButtonModule,
@@ -73,7 +75,8 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 		MatDialogModule,
 		MatSidenavModule,
 		MatSlideToggleModule,
-		MatTooltipModule
+		MatTooltipModule,
+		TextFieldModule
 	],
 	providers: [
 		{

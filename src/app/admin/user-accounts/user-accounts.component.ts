@@ -20,23 +20,31 @@ export class UserAccountsComponent implements AfterViewInit {
 	pageSize = 10;
 	defaultSort = {active: 'status', direction: 'asc' as const};
 
+	editingRolesForUser: string | null = null;
+	selectedRoles: Set<Role> = new Set();
+	availableRoles = [Role.USER, Role.EXPERT, Role.TRANSLATOR, Role.ADMIN];
+
 	@ViewChild(MatSort) sort: MatSort;
 	@ViewChild(MatPaginator) paginator: MatPaginator;
 
 	ACTION_MATRIX: Record<UserStatus, Record<Role, string[]>> = {
-		ACTIVE: {USER: ['deactivate', 'promote'], EXPERT: ['deactivate', 'demote', 'promote'], ADMIN: ['deactivate', 'demote']},
-		PENDING_ACTIVATION: {USER: ['validate'], EXPERT: [], ADMIN: []},
-		INACTIVE: {USER: ['reactivate'], EXPERT: ['reactivate'], ADMIN: ['reactivate']},
-		GUEST: {USER: [], EXPERT: [], ADMIN: []},
-		JOHN_DOE: {USER: [], EXPERT: [], ADMIN: []}
+		ACTIVE: {
+			USER: ['deactivate', 'grant'],
+			EXPERT: ['deactivate', 'grant'],
+			TRANSLATOR: ['deactivate', 'grant'],
+			ADMIN: ['deactivate', 'grant']
+		},
+		PENDING_ACTIVATION: {USER: ['validate'], EXPERT: [], TRANSLATOR: [], ADMIN: []},
+		INACTIVE: {USER: ['reactivate'], EXPERT: ['reactivate'], TRANSLATOR: ['reactivate'], ADMIN: ['reactivate']},
+		GUEST: {USER: [], EXPERT: [], TRANSLATOR: [], ADMIN: []},
+		JOHN_DOE: {USER: [], EXPERT: [], TRANSLATOR: [], ADMIN: []}
 	};
 
 	ACTION_CATALOG: Record<string, IUserAction> = {
 		validate: {id: 'validate', icon: 'checkmark', tooltip: 'admin.actions.validate'},
 		deactivate: {id: 'deactivate', icon: 'lock', tooltip: 'admin.actions.deactivate'},
 		reactivate: {id: 'reactivate', icon: 'unlock', tooltip: 'admin.actions.reactivate'},
-		promote: {id: 'promote', icon: 'increase', tooltip: 'admin.actions.promote'},
-		demote: {id: 'demote', icon: 'decrease', tooltip: 'admin.actions.demote'},
+		grant: {id: 'grant', icon: 'user', tooltip: 'admin.actions.grant'},
 		internalize: {id: 'internalize', icon: 'eye', tooltip: 'admin.actions.internalize'},
 		externalize: {id: 'externalize', icon: 'eye-slash', tooltip: 'admin.actions.externalize'}
 	};
@@ -80,6 +88,11 @@ export class UserAccountsComponent implements AfterViewInit {
 	}
 
 	onAction(action: string, user: IUser): void {
+		if (action === 'grant') {
+			this.startEditingRoles(user);
+			return;
+		}
+
 		let call$: Observable<void>;
 		switch (action) {
 			case 'validate':
@@ -91,12 +104,6 @@ export class UserAccountsComponent implements AfterViewInit {
 			case 'deactivate':
 				call$ = this.userService.deactivateUser(user);
 				break;
-			case 'promote':
-				call$ = this.userService.promoteUser(user);
-				break;
-			case 'demote':
-				call$ = this.userService.demoteUser(user);
-				break;
 			case 'internalize':
 				call$ = this.userService.internalizeUser(user);
 				break;
@@ -105,6 +112,46 @@ export class UserAccountsComponent implements AfterViewInit {
 				break;
 		}
 		call$.pipe(finalize(() => this.refresh$.next())).subscribe();
+	}
+
+	startEditingRoles(user: IUser): void {
+		this.editingRolesForUser = user.username;
+		this.selectedRoles = new Set(user.roles);
+	}
+
+	toggleRole(role: Role): void {
+		if (this.selectedRoles.has(role)) {
+			this.selectedRoles.delete(role);
+		} else {
+			this.selectedRoles.add(role);
+		}
+	}
+
+	isRoleSelected(role: Role): boolean {
+		return this.selectedRoles.has(role);
+	}
+
+	cancelEditingRoles(): void {
+		this.editingRolesForUser = null;
+		this.selectedRoles.clear();
+	}
+
+	saveRoles(username: string): void {
+		const roles = Array.from(this.selectedRoles);
+		this.userService
+			.updateUserRoles(username, roles)
+			.pipe(
+				finalize(() => {
+					this.editingRolesForUser = null;
+					this.selectedRoles.clear();
+					this.refresh$.next();
+				})
+			)
+			.subscribe();
+	}
+
+	isEditingRoles(username: string): boolean {
+		return this.editingRolesForUser === username;
 	}
 
 	private getActions(user: IUser): IUserAction[] {

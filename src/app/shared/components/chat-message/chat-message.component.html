@@ -3,7 +3,7 @@
 </div>
 <div *ngIf="message.source !== ChatMessageSource.USER">
 	<div class="flex-column">
-		<markdown [data]="message.message"></markdown>
+		<markdown class="markdown-content" [data]="message.message"></markdown>
 
 		<mat-expansion-panel *ngIf="hasMultipleSources" class="sources-panel" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">
 			<mat-expansion-panel-header>

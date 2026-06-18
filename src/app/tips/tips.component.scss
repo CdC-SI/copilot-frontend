@@ -1,36 +1,217 @@
 :host {
-  display: block;
-  padding: 16px;
+	display: block;
+	padding: 16px;
 
-  .tips-container {
-    max-width: 1200px;
-    margin: 0 auto;
+	.help-container {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
 
-    h2 {
-      margin-bottom: 24px;
-    }
-  }
+	.help-header {
+		margin-bottom: 32px;
 
-  .tips-sections {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-  }
+		h2 {
+			margin-bottom: 8px;
+		}
 
-  .tip-card {
-    height: 100%;
+		.help-intro {
+			margin: 0;
+			color: rgba(0, 0, 0, 0.6);
+			font-size: 1rem;
+			line-height: 1.5;
+		}
+	}
 
-    mat-card-header {
-      margin-bottom: 16px;
-    }
+	.help-section {
+		margin-bottom: 40px;
 
-    ul {
-      padding-left: 20px;
-      margin: 0;
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 
-      li {
-        margin-bottom: 8px;
-      }
-    }
-  }
+	.help-section-title {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 16px;
+		font-size: 1.1rem;
+		font-weight: 500;
+
+		mat-icon {
+			color: var(--ob-primary, #006699);
+		}
+	}
+
+	h4 {
+		margin: 0;
+		font-size: 0.95rem;
+		font-weight: 500;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	// ----- Uniform resource grid (shared by all sections) -----
+	.resource-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 16px;
+	}
+
+	.resource-card {
+		display: flex;
+		flex-direction: column;
+		cursor: pointer;
+		overflow: hidden;
+		transition: box-shadow 0.2s ease, transform 0.15s ease;
+
+		&:hover,
+		&:focus-visible {
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+			transform: translateY(-2px);
+			outline: none;
+
+			.card-overlay {
+				opacity: 1;
+			}
+
+			.card-tooltip {
+				transform: translateY(0);
+			}
+		}
+
+		mat-card-content {
+			padding: 12px 16px;
+			flex: 1;
+		}
+	}
+
+	// ----- Shared preview area (same aspect ratio for all types) -----
+	.card-preview {
+		position: relative;
+		aspect-ratio: 4 / 3;
+		background: #f0f0f0;
+		overflow: hidden;
+
+		img,
+		video {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+
+	// ----- Action overlay (shown on hover) -----
+	.card-overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, 0.35);
+		opacity: 0;
+		transition: opacity 0.2s ease;
+
+		mat-icon {
+			font-size: 48px;
+			width: 48px;
+			height: 48px;
+			color: #fff;
+			filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+		}
+	}
+
+	// ----- Description tooltip (slides up from bottom on hover) -----
+	.card-tooltip {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: 10px 14px;
+		background: rgba(0, 0, 0, 0.72);
+		color: #fff;
+		font-size: 0.82rem;
+		line-height: 1.4;
+		backdrop-filter: blur(4px);
+		transform: translateY(100%);
+		transition: transform 0.22s ease;
+		pointer-events: none;
+	}
+
+	// ----- Document preview (icon-based instead of image) -----
+	.doc-preview {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #fce8e8;
+
+		> mat-icon {
+			font-size: 72px;
+			width: 72px;
+			height: 72px;
+			color: #c62828;
+		}
+	}
+
+	// ----- Video preview (no controls in card) -----
+	.video-preview video {
+		pointer-events: none;
+	}
+
+	// ----- Lightbox overlay -----
+	.lightbox-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 1000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 32px;
+		background: rgba(0, 0, 0, 0.85);
+		cursor: zoom-out;
+
+		.lightbox-close {
+			position: absolute;
+			top: 16px;
+			right: 16px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 44px;
+			height: 44px;
+			border: none;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.15);
+			color: #fff;
+			cursor: pointer;
+
+			&:hover {
+				background: rgba(255, 255, 255, 0.3);
+			}
+		}
+
+		.lightbox-content {
+			margin: 0;
+			max-width: 90vw;
+			max-height: 90vh;
+			cursor: default;
+			text-align: center;
+
+			img {
+				max-width: 90vw;
+				max-height: 82vh;
+				object-fit: contain;
+				border-radius: 4px;
+				box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+			}
+
+			figcaption {
+				margin-top: 12px;
+				color: #fff;
+				font-size: 0.95rem;
+			}
+		}
+	}
 }

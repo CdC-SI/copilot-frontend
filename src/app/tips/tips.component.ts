@@ -1,8 +1,26 @@
 import {Component} from '@angular/core';
 
-interface TipSection {
+/** A help illustration (example image). */
+interface HelpImage {
 	titleKey: string;
-	tipsKeys: string[];
+	descriptionKey?: string;
+	src: string;
+}
+
+/** A help tutorial video. Reserved for future use. */
+interface HelpVideo {
+	titleKey: string;
+	descriptionKey?: string;
+	src: string;
+	thumbnail?: string;
+}
+
+/** A downloadable explanatory document. */
+interface HelpDocument {
+	titleKey: string;
+	descriptionKey?: string;
+	src: string;
+	fileName: string;
 }
 
 @Component({
@@ -11,28 +29,50 @@ interface TipSection {
 	styleUrls: ['./tips.component.scss']
 })
 export class TipsComponent {
-	tipSections: TipSection[] = [
+	images: HelpImage[] = [
 		{
-			titleKey: 'tips.sections.getting_started.title',
-			tipsKeys: [
-				'tips.sections.getting_started.tips.0',
-				'tips.sections.getting_started.tips.1',
-				'tips.sections.getting_started.tips.2',
-				'tips.sections.getting_started.tips.3'
-			]
-		},
-		{
-			titleKey: 'tips.sections.retrieval.title',
-			tipsKeys: ['tips.sections.retrieval.tips.0', 'tips.sections.retrieval.tips.1', 'tips.sections.retrieval.tips.2']
-		},
-		{
-			titleKey: 'tips.sections.document_management.title',
-			tipsKeys: [
-				'tips.sections.document_management.tips.0',
-				'tips.sections.document_management.tips.1',
-				'tips.sections.document_management.tips.2',
-				'tips.sections.document_management.tips.3'
-			]
+			titleKey: 'tips.items.read_answer.title',
+			descriptionKey: 'tips.items.read_answer.description',
+			src: 'assets/images/ZIA-CommentLireReponse.png'
 		}
 	];
+
+	videos: HelpVideo[] = [];
+
+	documents: HelpDocument[] = [
+		{
+			titleKey: 'tips.items.formation_initiale.title',
+			descriptionKey: 'tips.items.formation_initiale.description',
+			src: 'assets/docs/P-ZIA-FormationInitiale-v2.pdf',
+			fileName: 'P-ZIA-FormationInitiale-v2.pdf'
+		}
+	];
+
+	selectedImage: HelpImage | null = null;
+
+	openImage(image: HelpImage): void {
+		this.selectedImage = image;
+	}
+
+	closeImage(): void {
+		this.selectedImage = null;
+	}
+
+	downloadDocument(doc: HelpDocument): void {
+		const a = document.createElement('a');
+		a.href = doc.src;
+		a.download = doc.fileName;
+		a.target = '_blank';
+		a.rel = 'noopener';
+		a.click();
+	}
+
+	playVideoFullscreen(event: Event): void {
+		const card = event.currentTarget as HTMLElement;
+		const video = card.querySelector('video') as HTMLVideoElement | null;
+		if (video) {
+			video.play().catch(() => {});
+			video.requestFullscreen?.();
+		}
+	}
 }

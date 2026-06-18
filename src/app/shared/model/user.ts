@@ -28,11 +28,12 @@ export enum UserFormFields {
 export enum Role {
 	ADMIN = 'ADMIN',
 	USER = 'USER',
-	EXPERT = 'EXPERT'
+	EXPERT = 'EXPERT',
+	TRANSLATOR = 'TRANSLATOR'
 }
 
 export interface IUserAction {
-	id: 'validate' | 'reactivate' | 'deactivate' | 'promote' | 'demote' | 'internalize' | 'externalize';
+	id: 'validate' | 'reactivate' | 'deactivate' | 'grant' | 'internalize' | 'externalize';
 	icon: string;
 	tooltip: string;
 }

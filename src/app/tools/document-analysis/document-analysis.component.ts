@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatChipEditedEvent, MatChipInputEvent} from '@angular/material/chips';
@@ -6,6 +6,8 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Subscription} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {VisionService} from '../../shared/services/vision.service';
+import {AuthenticationServiceV2} from '../../shared/services/auth.service';
+import {jsPDF} from 'jspdf';
 
 @Component({
 	selector: 'zco-document-analysis',
@@ -26,18 +28,65 @@ export class DocumentAnalysisComponent implements OnInit {
 
 	// RESULTS
 	documentType: any;
-	translation: string = '';
+	translations: {translatedText: string; detectedLanguage?: string}[] = [];
+	selectedPageIndex = 0;
 	visionFrmGrp: FormGroup = new FormGroup<any>({});
+	dragging = false;
+	detectedLanguage: string | null = null;
+	translationTargetLang: string | null = null;
+
+	private readonly acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
 
 	constructor(
 		private readonly fb: FormBuilder,
 		private readonly visionService: VisionService,
 		private readonly notif: ObNotificationService,
-		private readonly dialogService: MatDialog
+		private readonly dialogService: MatDialog,
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	ngOnInit() {
 		this.buildForm();
+	}
+
+	@HostListener('window:paste', ['$event'])
+	onPaste(event: ClipboardEvent): void {
+		const files = event.clipboardData?.files;
+		if (files && files.length > 0) {
+			const file = files[0];
+			if (this.isAcceptedFile(file)) {
+				event.preventDefault();
+				this.loadFile(file);
+			}
+		}
+	}
+
+	@HostListener('window:dragover', ['$event'])
+	onDragOver(event: DragEvent): void {
+		event.preventDefault();
+		event.stopPropagation();
+		this.dragging = true;
+	}
+
+	@HostListener('window:dragleave', ['$event'])
+	onDragLeave(event: DragEvent): void {
+		if (!(event.relatedTarget as Node)?.ownerDocument) {
+			this.dragging = false;
+		}
+	}
+
+	@HostListener('window:drop', ['$event'])
+	onDrop(event: DragEvent): void {
+		event.preventDefault();
+		event.stopPropagation();
+		this.dragging = false;
+		const files = event.dataTransfer?.files;
+		if (files && files.length > 0) {
+			const file = files[0];
+			if (this.isAcceptedFile(file)) {
+				this.loadFile(file);
+			}
+		}
 	}
 
 	buildForm() {
@@ -74,6 +123,7 @@ export class DocumentAnalysisComponent implements OnInit {
 	}
 
 	uploadDocumentEvent(event: ObIUploadEvent): void {
+		this.dragging = false;
 		if (event.type === ObEUploadEventType.CHOSEN) {
 			this.resetVisionForm();
 			event.files.forEach(file => {
@@ -141,11 +191,20 @@ export class DocumentAnalysisComponent implements OnInit {
 	resetVisionForm() {
 		this.visionFrmGrp = new FormGroup<any>({});
 		this.documentType = null;
-		this.translation = '';
+		this.translations = [];
+		this.selectedPageIndex = 0;
 	}
 
 	addCtrlToVisionForm(key: string, value: string) {
 		this.visionFrmGrp.addControl(key, new FormControl(value));
+	}
+
+	hasTranslatorRole(): boolean {
+		return this.authService.hasTranslatorRole();
+	}
+
+	hasAdminRole(): boolean {
+		return this.authService.hasAdminRole();
 	}
 
 	get allVisionCtrlName(): string[] {
@@ -160,13 +219,85 @@ export class DocumentAnalysisComponent implements OnInit {
 		return this.documentFrmGrp.get('document') as FormControl;
 	}
 
+	loadFile(file: File): void {
+		this.resetVisionForm();
+		this.documentCtrl.setValue({file});
+	}
+
+	private isAcceptedFile(file: File): boolean {
+		return this.acceptedTypes.includes(file.type);
+	}
+
+	downloadTranslationPdf(): void {
+		const doc = new jsPDF({orientation: 'portrait', unit: 'mm', format: 'a4'});
+		const pageWidth = doc.internal.pageSize.getWidth();
+		const pageHeight = doc.internal.pageSize.getHeight();
+		const margin = 15;
+		const maxWidth = pageWidth - margin * 2;
+		const fontSize = 9;
+		const lineHeight = fontSize * 0.45;
+		const footerFontSize = 7;
+		const footerY = pageHeight - 8;
+		const contentMaxY = footerY - 5;
+
+		const footerTexts: Record<string, (lang: string) => string> = {
+			FRENCH: (lang: string) => `Traduction automatique réalisée par IA sur infrastructure sécurisée interne. Langue source détectée : ${lang}`,
+			GERMAN: (lang: string) => `Automatische Übersetzung durch KI auf interner gesicherter Infrastruktur. Erkannte Quellsprache: ${lang}`,
+			ITALIAN: (lang: string) => `Traduzione automatica effettuata dall'IA su infrastruttura interna sicura. Lingua di origine rilevata: ${lang}`,
+			ENGLISH: (lang: string) => `Automatic translation performed by AI on secure internal infrastructure. Detected source language: ${lang}`
+		};
+
+		const targetLang = this.translationTargetLang ?? this.languageCtrl.value ?? 'FRENCH';
+		const detectedLang = this.detectedLanguage ?? 'inconnue';
+		const footerFn = footerTexts[targetLang] ?? footerTexts['FRENCH'];
+		const footerText = footerFn(detectedLang);
+
+		const addFooter = () => {
+			doc.setFontSize(footerFontSize);
+			doc.setTextColor(120);
+			doc.text(footerText, margin, footerY);
+			doc.setTextColor(0);
+			doc.setFontSize(fontSize);
+		};
+
+		doc.setFontSize(fontSize);
+
+		this.translations.forEach((page, index) => {
+			if (index > 0) {
+				doc.addPage();
+				doc.setFontSize(fontSize);
+			}
+			const text = page.translatedText
+				.replace(/[#*_`~>-]/g, '')
+				.replace(/\n{3,}/g, '\n\n');
+			const lines = doc.splitTextToSize(text, maxWidth);
+			let y = margin;
+			for (const line of lines) {
+				if (y + lineHeight > contentMaxY) {
+					addFooter();
+					doc.addPage();
+					doc.setFontSize(fontSize);
+					y = margin;
+				}
+				doc.text(line, margin, y);
+				y += lineHeight;
+			}
+			addFooter();
+		});
+
+		doc.save('translation.pdf');
+	}
+
 	translate() {
 		this.resetVisionForm();
 		this.loading = true;
+		this.translationTargetLang = this.languageCtrl.value;
 
 		this.requestSubscription = this.visionService.translateFile(this.documentCtrl.value.file, this.languageCtrl.value).subscribe({
 			next: result => {
-				this.translation = result.translatedText;
+				this.translations = result;
+				this.detectedLanguage = result.length > 0 ? (result[0].detectedLanguage ?? null) : null;
+				this.selectedPageIndex = 0;
 				this.cancelRequest();
 			},
 			error: () => {

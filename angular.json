@@ -46,7 +46,10 @@
             ],
             "scripts": [
               "node_modules/@oblique/oblique/ob-features.js"
-            ]
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src"]
+            }
           },
           "configurations": {
             "production": {

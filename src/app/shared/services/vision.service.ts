@@ -29,10 +29,20 @@ export class VisionService {
 		return this.http.post<any>(this.config.backendApi(this.CLASSIFY_URL), formData);
 	}
 
-	translateFile(file: File, language: string): Observable<any> {
+	translateFile(file: File, language: string): Observable<{translatedText: string; detectedLanguage?: string}[]> {
 		const formData: FormData = new FormData();
 		formData.append('file', file, file.name);
 		formData.append('language', language);
-		return this.http.post<any>(this.config.backendApi(this.TRANSLATE_URL), formData);
+		return this.http.post<{translatedText: string}[]>(this.config.backendApi(this.TRANSLATE_URL), formData);
+	}
+
+	sumex(file: File): Observable<any> {
+		const formData: FormData = new FormData();
+		formData.append('file', file, file.name);
+		return this.http.post<any>(this.config.backendApi('/visualize/sumex'), formData);
+	}
+
+	submitInvoice(invoice: any) {
+		return this.http.post(this.config.backendApi('/sumex-invoices/convert'), invoice, {observe: 'response', responseType: 'blob'});
 	}
 }

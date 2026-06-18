@@ -1,0 +1,127 @@
+@use 'styles/markdown-content' as markdown;
+@include markdown.markdown-content;
+
+.career-summary-container {
+	padding: 20px;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.create-card,
+.tasks-card,
+.summary-detail {
+	margin-bottom: 20px;
+}
+
+mat-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.filters-container {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 16px;
+	flex-wrap: wrap;
+
+	.filter-field,
+	.sort-field {
+		flex: 1;
+		min-width: 200px;
+	}
+}
+
+.task-item {
+	border-bottom: 1px solid #e0e0e0;
+	padding: 16px 0;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.task-content {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.task-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.task-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+}
+
+.task-navs {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.task-status {
+	font-size: 14px;
+	color: #666;
+}
+
+.task-meta {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-left: 40px;
+}
+
+.task-date {
+	font-size: 12px;
+	color: #999;
+}
+
+.task-processing-time {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	color: #999;
+
+	.processing-time-icon {
+		width: 14px;
+		height: 14px;
+		font-size: 14px;
+	}
+}
+
+
+.status-in-progress {
+	color: #ff9800;
+}
+
+.status-completed {
+	color: #4caf50;
+}
+
+.status-error {
+	color: #f44336;
+}
+
+.no-tasks {
+	text-align: center;
+	padding: 40px 20px;
+	color: #999;
+
+	mat-icon {
+		font-size: 48px;
+		width: 48px;
+		height: 48px;
+		margin-bottom: 16px;
+	}
+}
+
+

@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>{{ "documents.legal" | translate }}</h2>
+<div mat-dialog-content class="legal-document-dialog-content">
+	<mat-tab-group [(selectedIndex)]="selectedTabIndex">
+		<mat-tab [label]="'confidentiality' | translate">
+			<div class="document-content">
+				<div class="document-text" [innerHTML]="confidentialityText"></div>
+			</div>
+		</mat-tab>
+		<mat-tab [label]="'gcu' | translate">
+			<div class="document-content">
+				<div class="document-text" [innerHTML]="gcuText"></div>
+			</div>
+		</mat-tab>
+	</mat-tab-group>
+</div>
+<div mat-dialog-actions align="end">
+	<button mat-button [obButton]="'primary'" (click)="close()">
+		{{ "close" | translate }}
+	</button>
+</div>

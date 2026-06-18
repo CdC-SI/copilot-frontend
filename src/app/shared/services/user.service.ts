@@ -55,12 +55,8 @@ export class UserService {
 		return this.http.put<void>(this.config.backendApi(`/users/${user.username}/deactivate`), user);
 	}
 
-	promoteUser(user: IUser) {
-		return this.http.put<void>(this.config.backendApi(`/users/${user.username}/promote`), user);
-	}
-
-	demoteUser(user: IUser) {
-		return this.http.put<void>(this.config.backendApi(`/users/${user.username}/demote`), user);
+	updateUserRoles(username: string, roles: string[]) {
+		return this.http.put<void>(this.config.backendApi(`/users/${username}/roles`), {roles});
 	}
 
 	internalizeUser(user: IUser) {

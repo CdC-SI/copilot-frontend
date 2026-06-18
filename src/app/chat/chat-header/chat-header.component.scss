@@ -1,0 +1,42 @@
+:host {
+	display: block;
+	width: 100%;
+	flex-shrink: 0;
+}
+
+.workspace-bar {
+	width: calc(100% + 60px);
+	margin-left: -30px;
+	display: flex;
+	justify-content: flex-start;
+	padding: 8px 16px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+	background: white;
+
+	.workspace-badge {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		border-radius: 20px;
+		padding: 4px 12px 4px 10px;
+		height: 36px;
+		background: rgba(0, 0, 0, 0.04);
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		font-size: 13px;
+		margin-left: 16px;
+		color: rgba(0, 0, 0, 0.4);
+		cursor: default;
+		user-select: none;
+
+		mat-icon {
+			font-size: 16px;
+			width: 16px;
+			height: 16px;
+			color: rgba(0, 0, 0, 0.35);
+		}
+
+		.workspace-label {
+			color: rgba(0, 0, 0, 0.4);
+		}
+	}
+}

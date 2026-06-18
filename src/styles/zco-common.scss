@@ -7,6 +7,10 @@
 	color: white !important;
 }
 
+.mat-mdc-card-header-text {
+	flex: 1 !important;
+}
+
 .h100 {
 	height: 100%;
 }
@@ -17,6 +21,10 @@
 
 .mr8 {
 	margin-right: 8px;
+}
+
+.ml8 {
+	margin-left: 8px;
 }
 
 .mr16 {
@@ -76,6 +84,14 @@
 	align-items: center;
 }
 
+.aie {
+	align-items: end;
+}
+
+.jce {
+	justify-content: end;
+}
+
 .jcsb {
 	justify-content: space-between;
 }
@@ -101,10 +117,26 @@
 main#content {
 	background-color: palette.$ob-secondary-50;
 	padding: 0;
+	height: calc(100vh - 56px);
+	overflow-y: auto;
 }
 
 .ob-column-content {
 	padding: 0 !important;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.ob-column-layout {
+	height: 100%;
+}
+
+.ob-column-main {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
 }
 
 .mdc-dialog__title {
@@ -138,4 +170,25 @@ main#content {
 			}
 		}
 	}
+
+	zco-sumex {
+		.ob-column-layout {
+			.ob-column-left,
+			.ob-column-right {
+				flex-basis: 50vw;
+				max-width: 50vw;
+				margin-right: 16px;
+				padding-right: 16px;
+			}
+
+			.ob-column-left.ob-collapsed {
+				margin-left: -50vw;
+			}
+
+			.ob-column-right.ob-collapsed {
+				margin-right: -50vw;
+			}
+		}
+	}
+
 }

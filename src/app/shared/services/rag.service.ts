@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable} from 'rxjs';
-import {TokenService} from './token.service';
+import {AuthenticationServiceV2} from './auth.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -10,13 +10,13 @@ import {TokenService} from './token.service';
 export class RagService {
 	constructor(
 		private readonly config: ConfigurationService,
-		private readonly tokenService: TokenService
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	process(ragRequest: ChatRequest): Observable<string> {
 		const headers = new Headers({Accept: 'text/event-stream'});
-		const token = this.tokenService.blueToken;
-		if (token) headers.append('Blue', token.value);
+		const token = this.authService.jwtToken;
+		if (token) headers.append('Blue', `Bearer ${token}`);
 
 		const form = this.buildFormDataFromChatRequest(ragRequest);
 
@@ -50,9 +50,8 @@ export class RagService {
 
 		// optional
 		this.append(fd, 'language', ragRequest.language);
+		this.append(fd, 'workspace', ragRequest.workspace);
 		this.append(fd, 'conversationId', ragRequest.conversationId);
-		this.appendList(fd, 'tags', ragRequest.tags);
-		this.appendList(fd, 'sources', ragRequest.sources);
 
 		return fd;
 	}

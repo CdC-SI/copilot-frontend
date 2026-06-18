@@ -6,6 +6,7 @@ import {MaterialModule} from './material/material.module';
 import {AutocompleteInputComponent} from './components/autocomplete-input/autocomplete-input.component';
 import {TranslateModule, TranslatePipe} from '@ngx-translate/core';
 import {HighlightTextPipe} from './pipes/highlight-text.pipe';
+import {FormatNavsPipe} from './pipes/format-navs.pipe';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MarkdownModule} from 'ngx-markdown';
 import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
@@ -13,7 +14,6 @@ import {ChatMessageComponent} from './components/chat-message/chat-message.compo
 import {MessageActionComponent} from './components/message-action/message-action.component';
 import {FaqItemEditComponent} from './components/faq-item-edit/faq-item-edit.component';
 import {SignUpComponent} from './components/sign-up/sign-up.component';
-import {ChatConfigurationEditComponent} from './components/chat-configuration-edit/chat-configuration-edit.component';
 import {QuestionSuggestionComponent} from './components/question-suggestion/question-suggestion.component';
 import {ChatHistoryComponent} from './components/chat-history/chat-history.component';
 import {MatLine, MatNativeDateModule} from '@angular/material/core';
@@ -23,6 +23,8 @@ import {DynamicFormComponent} from './components/dynamic-form/dynamic-form.compo
 import {SourceListComponent} from './components/source-list/source-list.component';
 import {FilePreviewComponent} from './components/file-preview/file-preview.component';
 import {SourceComponent} from './components/source-list/source/source.component';
+import {AlertBannerComponent} from './components/alert-banner/alert-banner.component';
+import {LegalDocumentDialogComponent} from './components/legal-document-dialog/legal-document-dialog.component';
 
 @NgModule({
 	declarations: [
@@ -32,14 +34,16 @@ import {SourceComponent} from './components/source-list/source/source.component'
 		MessageActionComponent,
 		FaqItemEditComponent,
 		SignUpComponent,
-		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
 		SourceListComponent,
 		FilePreviewComponent,
-		SourceComponent
+		SourceComponent,
+		AlertBannerComponent,
+		LegalDocumentDialogComponent,
+		FormatNavsPipe
 	],
 	imports: [
 		CommonModule,
@@ -67,13 +71,14 @@ import {SourceComponent} from './components/source-list/source/source.component'
 		ConfirmDialogComponent,
 		ChatMessageComponent,
 		FaqItemEditComponent,
-		ChatConfigurationEditComponent,
 		QuestionSuggestionComponent,
 		ChatHistoryComponent,
 		ActionSuggestionsComponent,
 		DynamicFormComponent,
 		FilePreviewComponent,
-		SourceComponent
+		SourceComponent,
+		AlertBannerComponent,
+		FormatNavsPipe
 	],
 	providers: [TranslatePipe, HighlightTextPipe]
 })

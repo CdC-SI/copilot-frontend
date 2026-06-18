@@ -1,9 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 
 export enum ToolsComponentType {
 	DocumentAnalysis = 'document-analysis',
-	IdentityCheck = 'identity-check'
+	IdentityCheck = 'identity-check',
+	Sumex = 'sumex',
+	CareerSummary = 'career-summary'
 }
 
 @Component({
@@ -16,7 +19,10 @@ export class ToolsHomeComponent implements OnInit {
 	TOOLS_COMPONENT_TYPE = ToolsComponentType;
 	selectedComponent: ToolsComponentType | null = null;
 
-	constructor(private readonly route: ActivatedRoute) {}
+	constructor(
+		private readonly route: ActivatedRoute,
+		private readonly authService: AuthenticationServiceV2
+	) {}
 
 	ngOnInit() {
 		this.route.queryParams.subscribe(params => {
@@ -31,5 +37,13 @@ export class ToolsHomeComponent implements OnInit {
 
 	closeComponent() {
 		this.selectedComponent = null;
+	}
+
+	hasTranslatorRole() {
+		return this.authService.hasTranslatorRole();
+	}
+
+	hasAdminRole() {
+		return this.authService.hasAdminRole();
 	}
 }

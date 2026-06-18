@@ -1,79 +1,85 @@
-import {ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {Observable, of} from 'rxjs';
-import {FaqItemsService} from '../shared/services/faq-items.service';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
-import {
-	AGENT_TAG_REGEX,
-	ANCHOR_TAG_REGEX,
-	II_TARIFFS_ANSWER_TAG_REGEX,
-	II_TARIFFS_TAG_REGEX,
-	INTENT_TAG_REGEX,
-	MESSAGE_ID_REGEX,
-	OCR_TAG_REGEX,
-	OFF_TOPIC_REGEX,
-	RETRIEVING_TAG_REGEX,
-	ROUTING_TAG_REGEX,
-	SOURCE_TAG_REGEX,
-	SUGGESTION_TAG_REGEX,
-	TAGS_TAG_REGEX,
-	TOOL_TAG_REGEX,
-	TOPIC_CHECK_REGEX,
-	clearNullAndEmpty
-} from '../shared/utils/zco-utils';
+import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {ChatHistoryMessage, ChatTitle, MessageSource} from '../shared/model/chat-history';
+import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
 import {FeedbackService} from '../shared/services/feedback.service';
 import {ObNotificationService} from '@oblique/oblique';
-import {Command, CommandService} from '../shared/services/command.service';
-import {UploadService} from '../shared/services/upload.service';
-import {SettingsEventService} from '../shared/services/settings-event.service';
 import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
-import {ActionId, FormDef} from '../shared/model/form-definition';
+import {FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
+import {HttpEventType} from '@angular/common/http';
 import {MatDialog} from '@angular/material/dialog';
+import {
+	AutocompleteType,
+	ChatAutocompleteService,
+	ChatConversationManagerService,
+	ChatStreamProcessorService,
+	ChatSuggestionService,
+	LANGUAGE_MAP,
+	UserAuthDialogService
+} from './services';
+import {Subject, filter, map, merge, of, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
 
-type AutocompleteType = IQuestion | Command;
+const ATTACHMENT_POLL_INTERVAL_MS = 10_000;
+const ATTACHMENT_POLL_MAX_ATTEMPTS = 15;
 
 @Component({
 	selector: 'zco-chat',
 	templateUrl: './chat.component.html',
 	styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	Object = Object;
 	searchCtrl = new FormControl();
-	chatConfigCtrl = new FormControl();
-	messages: ChatMessage[] = [];
 	conversationTitles: ChatTitle[] = [];
-	currentConversation: ChatTitle;
+	currentConversationTitle: ChatTitle;
 	isCommandMode = false;
+	showScrollToLastMessage = false;
 	displayTextArea = false;
-	defaultSuggestions = [
-		{text: 'action_suggestions.translate', action: 'translate'},
-		{text: 'action_suggestions.summarize', action: 'summarize'},
-		{text: 'action_suggestions.explain', action: 'explain'},
-		{text: 'action_suggestions.reformulate', action: 'reformulate'},
-		{text: 'action_suggestions.draft', action: 'draft'}
-	];
-	specificSuggestions: {text: string; action: string}[] = [];
+	scrollVisibilityPending = false;
 	activeForm?: {def: FormDef; group: FormGroup};
-	attachments: File[] = [];
+	attachments: Attachment[] = [];
+	isDragOver = false;
+	availableWorkspaces: string[] = [];
+	selectedWorkspace = '';
+	containerResizeObserver: ResizeObserver;
+	attachmentsPollingTimedOut = false;
+
+	private readonly destroy$ = new Subject<void>();
+	private pollingStop$ = new Subject<void>();
+	private pollingCancelled = false;
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
+	@ViewChild('workspaceSelectionDialog') workspaceSelectionDialog: TemplateRef<any>;
+	@ViewChild('messageContainer') messageContainer: ElementRef;
+	@ViewChild('scrollAnchor') scrollAnchor: ElementRef;
+	@ViewChildren('messageEl') messageElements!: QueryList<ElementRef>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
 
+	get messages(): ChatMessage[] {
+		return this.conversationManager.getMessages(this.currentConversationTitle?.conversationId);
+	}
+
+	get defaultSuggestions() {
+		return this.suggestionService.getDefaultSuggestions();
+	}
+
+	get specificSuggestions() {
+		return this.suggestionService.getSpecificSuggestions();
+	}
+
 	constructor(
-		private readonly autocompleteService: FaqItemsService,
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
 		private readonly speechService: SpeechService,
@@ -82,12 +88,30 @@ export class ChatComponent implements OnInit {
 		private readonly translateService: TranslateService,
 		private readonly feedbackService: FeedbackService,
 		private readonly notif: ObNotificationService,
-		private readonly commandService: CommandService,
-		private readonly uploadService: UploadService,
-		private readonly settingsEventService: SettingsEventService,
 		private readonly dfs: DynamicFormService,
+		private readonly streamProcessor: ChatStreamProcessorService,
+		private readonly conversationManager: ChatConversationManagerService,
+		private readonly suggestionService: ChatSuggestionService,
+		private readonly autocompleteService: ChatAutocompleteService,
+		private readonly authDialogService: UserAuthDialogService,
 		private readonly dialog: MatDialog
 	) {}
+
+	ngAfterViewInit() {
+		const el = this.messageContainer?.nativeElement;
+		if (!el) return;
+		this.containerResizeObserver = new ResizeObserver(() => {
+			el.style.setProperty('--container-height', `${el.clientHeight}px`);
+		});
+		this.containerResizeObserver.observe(el);
+	}
+
+	ngOnDestroy() {
+		this.pollingCancelled = true;
+		this.containerResizeObserver?.disconnect();
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
 
 	ngOnInit() {
 		this.speechService.speechStartEvent.subscribe(() => {
@@ -96,38 +120,46 @@ export class ChatComponent implements OnInit {
 			});
 		});
 		this.authService.$authenticatedUser.subscribe(user => {
-			if (user && user.status === UserStatus.ACTIVE) {
+			if (user?.status === UserStatus.ACTIVE) {
+				this.getAvailableWorkspaces();
 				this.getConversationTitles();
 			}
 		});
 	}
 
 	isRegistered(): boolean {
-		return this.authService.isRegistered();
+		return this.authDialogService.isRegistered();
 	}
 
 	getOptionService() {
-		return this.isCommandMode ? this.getCommandSuggestions : this.currentConversation ? () => of([]) : this.getSearchProposalFunction;
+		return this.autocompleteService.getOptionService(this.isCommandMode, !!this.currentConversationTitle);
 	}
 
 	searchOptionLabelFn = (option: AutocompleteType): string => {
-		if (this.isCommandMode && 'name' in option) {
-			return option.name;
-		}
-		return (option as IQuestion)?.text ?? '';
+		return this.autocompleteService.getOptionLabel(option, this.isCommandMode);
 	};
 
 	handleOptionSelected(value: AutocompleteType): void {
-		if (this.isCommandMode && 'name' in value) {
+		if (this.autocompleteService.isCommand(value)) {
 			this.searchCtrl.setValue(value.name);
 		} else {
-			this.selectFaqOption(value as IQuestion);
+			this.selectFaqOption(value);
 		}
 	}
 
 	selectFaqOption(question: IQuestion): void {
-		this.addMessage(ChatMessageSource.USER, question.text, false, true, question.language, question.id);
-		this.addMessage(
+		const sourceType = question.url?.startsWith('http') ? 'URL' : 'FILE';
+		this.conversationManager.addMessage(
+			this.currentConversationTitle?.conversationId,
+			ChatMessageSource.USER,
+			question.text,
+			false,
+			true,
+			question.language,
+			question.id
+		);
+		this.conversationManager.addMessage(
+			this.currentConversationTitle?.conversationId,
 			ChatMessageSource.FAQ,
 			question.answer.text,
 			false,
@@ -135,10 +167,10 @@ export class ChatComponent implements OnInit {
 			question.language,
 			question.id,
 			question.url,
-			question.url ? [{type: this.getSourceType(question.url), link: question.url}] : undefined
+			question.url ? [{type: sourceType, link: question.url}] : undefined
 		);
 		this.clearSearch();
-		this.scrollToBottom();
+		this.scrollToLastUserMessage();
 		this.updateCurrentConversation();
 	}
 
@@ -156,314 +188,145 @@ export class ChatComponent implements OnInit {
 	}
 
 	newChat(): void {
-		if (this.currentConversation) this.currentConversation.selected = false;
-		this.currentConversation = null;
-		this.messages = [];
-		this.specificSuggestions = [];
+		if (this.currentConversationTitle) this.currentConversationTitle.selected = false;
+		this.currentConversationTitle = null;
+		this.attachments = [];
+		this.attachmentsPollingTimedOut = false;
+		this.stopAttachmentsPolling();
+		this.conversationManager.initNewChat();
+		this.suggestionService.clearSpecificSuggestions();
+		this.resetScrollState();
+		this.openWorkspaceSelectionDialog();
+	}
+
+	openWorkspaceSelectionDialog(): void {
+		if (!this.workspaceSelectionDialog || !this.availableWorkspaces?.length) return;
+		this.dialog.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false});
+	}
+
+	selectWorkspaceAndClose(workspace: string): void {
+		this.selectedWorkspace = workspace;
+		this.dialog.closeAll();
+	}
+
+	canAskLLM() {
+		return this.searchCtrl.value && this.attachments.every(att => !att.isUploading);
 	}
 
 	sendToLLM(): void {
-		if (!this.isRegistered()) {
-			this.showDialog();
-			return;
-		}
+		// if (!this.isRegistered()) {
+		// 	this.showDialog();
+		// 	return;
+		// }
 
+		const openWorkspaceDialog$ = this.selectedWorkspace
+			? of(true)
+			: this.dialog
+					.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false})
+					.afterClosed()
+					.pipe(map(() => !!this.selectedWorkspace));
+
+		openWorkspaceDialog$.pipe().subscribe(() => this.doSendToLLM());
+	}
+
+	doSendToLLM(): void {
 		const inputText = this.searchCtrl.value;
-
-		this.addMessage(ChatMessageSource.USER, inputText);
-		this.addMessage(ChatMessageSource.LLM, '', false, false);
-		this.disableSearch();
-		this.specificSuggestions = [];
-
-		const languageMap: Record<string, Language> = {
-			de: Language.DE,
-			fr: Language.FR,
-			it: Language.IT
-		};
-		const currentLang = this.translateService.currentLang;
-		const mappedLanguage = languageMap[currentLang] || Language.DE;
-
-		// Handle the three mutually exclusive modes
-		const requestConfig = {
-			query: inputText,
-			attachments: this.attachments,
-			conversationId: this.currentConversation?.conversationId,
-			...this.chatConfigCtrl.value,
-			language: mappedLanguage
-		};
-
-		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
-			next: chunk => {
-				this.buildResponseWithLLMChunk(this.messages[this.messages.length - 1], chunk);
-				this.cdr.markForCheck();
-			},
-			error: err => {
-				if (err.message !== 'network error') {
-					// TODO dirty fix to handle the 'error net::ERR_INCOMPLETE_CHUNKED_ENCODING' issue
-					this.messages.pop();
-					this.addMessage(ChatMessageSource.LLM, 'Une erreur est survenue. Veuillez réessayer.', true);
-				}
-				this.enableSearch();
-			}
-		});
-
+		this.prepareForStreaming(inputText);
+		this.startStreamingRequest(inputText);
 		this.clearSearch();
-		this.attachments = [];
+		this.scrollToLastUserMessage();
 	}
 
-	buildResponseWithLLMChunk(partialChatMessage: ChatMessage, chunk: string): void {
-		if (!chunk) return;
+	getTargetScrollTop(el: HTMLElement, userEl: HTMLElement): number {
+		return el.scrollTop + userEl.getBoundingClientRect().top - el.getBoundingClientRect().top;
+	}
 
-		const toolTagMatch = TOOL_TAG_REGEX.exec(chunk);
-		if (toolTagMatch) {
-			partialChatMessage.message = toolTagMatch[1];
-			partialChatMessage.isToolUse = true;
-			return;
-		}
-
-		const intentTagMatch = INTENT_TAG_REGEX.exec(chunk);
-		if (intentTagMatch) {
-			partialChatMessage.message = intentTagMatch[1];
-			partialChatMessage.isProcessingIntent = true;
-			return;
-		}
-
-		const sourceTagMatch = SOURCE_TAG_REGEX.exec(chunk);
-		if (sourceTagMatch) {
-			partialChatMessage.message = sourceTagMatch[1];
-			partialChatMessage.isProcessingSources = true;
-			return;
-		}
-
-		const tagsTagMatch = TAGS_TAG_REGEX.exec(chunk);
-		if (tagsTagMatch) {
-			partialChatMessage.message = tagsTagMatch[1];
-			partialChatMessage.isProcessingTags = true;
-			return;
-		}
-
-		const agentTagMatch = AGENT_TAG_REGEX.exec(chunk);
-		if (agentTagMatch) {
-			partialChatMessage.message = agentTagMatch[1];
-			partialChatMessage.isAgent = true;
-			return;
-		}
-
-		const routingTagMatch = ROUTING_TAG_REGEX.exec(chunk);
-		if (routingTagMatch) {
-			partialChatMessage.message = routingTagMatch[1];
-			partialChatMessage.isRouting = true;
-			return;
-		}
-
-		const topicCheckMatch = TOPIC_CHECK_REGEX.exec(chunk);
-		if (topicCheckMatch) {
-			partialChatMessage.message = topicCheckMatch[1];
-			partialChatMessage.isValidating = true;
-			return;
-		}
-
-		const offTopicMatch = OFF_TOPIC_REGEX.exec(chunk);
-		if (offTopicMatch) {
-			// Remove validation message and handle off-topic response
-			partialChatMessage.isValidating = false;
-			return;
-		}
-
-		const retrievingTagMatch = RETRIEVING_TAG_REGEX.exec(chunk);
-		if (retrievingTagMatch) {
-			partialChatMessage.message = retrievingTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		const ocrTagMatch = OCR_TAG_REGEX.exec(chunk);
-		if (ocrTagMatch) {
-			partialChatMessage.message = ocrTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		const iiTariffsTagMatch = II_TARIFFS_TAG_REGEX.exec(chunk);
-		if (iiTariffsTagMatch) {
-			partialChatMessage.message = iiTariffsTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		const iiTariffsAnswerTagMatch = II_TARIFFS_ANSWER_TAG_REGEX.exec(chunk);
-		if (iiTariffsAnswerTagMatch) {
-			partialChatMessage.message = iiTariffsAnswerTagMatch[1];
-			partialChatMessage.isRetrieving = true;
-			return;
-		}
-
-		// If we were in retrieving/validating/routing/agent state, clear the message before adding new content
-		if (
-			partialChatMessage.isRetrieving ||
-			partialChatMessage.isValidating ||
-			partialChatMessage.isRouting ||
-			partialChatMessage.isAgent ||
-			partialChatMessage.isToolUse ||
-			partialChatMessage.isProcessingIntent ||
-			partialChatMessage.isProcessingSources ||
-			partialChatMessage.isProcessingTags
-		) {
-			partialChatMessage.message = '';
-			partialChatMessage.isRetrieving = false;
-			partialChatMessage.isValidating = false;
-			partialChatMessage.isRouting = false;
-			partialChatMessage.isAgent = false;
-			partialChatMessage.isToolUse = false;
-			partialChatMessage.isProcessingIntent = false;
-			partialChatMessage.isProcessingSources = false;
-			partialChatMessage.isProcessingTags = false;
-		}
-
-		partialChatMessage.message += chunk;
-
-		// Initialize sources array if needed
-		if (!partialChatMessage.sources) {
-			partialChatMessage.sources = [];
-		}
-
-		// Collect all sources from current message content
-		let sourceMatch;
-		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(partialChatMessage.message)) !== null) {
-			// Only store the URL
-			const docId = sourceMatch[1];
-			const sourceUrl = sourceMatch[2];
-			const sourceFile = sourceMatch[3];
-			const pageNumber = sourceMatch[4];
-			const subSection = sourceMatch[5];
-			const version = sourceMatch[6];
-
-			const source: MessageSource = sourceUrl
-				? {documentId: docId, type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version}
-				: {documentId: docId, type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
-			partialChatMessage.sources.push(source);
-
-			// Remove entire source tag from message
-			partialChatMessage.message = partialChatMessage.message.replace(sourceMatch[0], '');
-		}
-
-		const suggestionMatch = SUGGESTION_TAG_REGEX.exec(partialChatMessage.message);
-		if (suggestionMatch) {
-			partialChatMessage.message = partialChatMessage.message.replace(SUGGESTION_TAG_REGEX, '');
-			this.specificSuggestions.push({text: `action_suggestions.${suggestionMatch[1]}`, action: suggestionMatch[1]});
-		}
-
-		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(partialChatMessage.message);
-		if (messageIdTagMatch) {
-			partialChatMessage.message = partialChatMessage.message.replace(MESSAGE_ID_REGEX, '');
-			partialChatMessage.id = messageIdTagMatch[1];
-			partialChatMessage.isCompleted = true;
-			this.enableSearch();
-			if (!this.currentConversation) {
-				this.refreshConversations();
+	updateScrollButtonVisibility(): void {
+		if (this.scrollVisibilityPending) return;
+		this.scrollVisibilityPending = true;
+		requestAnimationFrame(() => {
+			this.scrollVisibilityPending = false;
+			const el = this.messageContainer.nativeElement;
+			const lastUserEl = this.getLastUserElement();
+			if (lastUserEl) {
+				this.showScrollToLastMessage = el.scrollTop < this.getTargetScrollTop(el, lastUserEl) - 10;
 			}
-		}
-	}
-
-	addMessage(
-		source: ChatMessageSource,
-		message: string,
-		inError = false,
-		isCompleted = true,
-		lang?: Language,
-		faqItemId?: number,
-		url?: string,
-		sources?: MessageSource[]
-	) {
-		this.messages.push({
-			faqItemId,
-			message,
-			source,
-			isCompleted,
-			timestamp: new Date(),
-			lang,
-			url,
-			inError,
-			beingSpoken: false,
-			sources: sources || []
 		});
 	}
 
-	scrollToBottom(): void {
+	scrollToLastUserMessage(): void {
 		setTimeout(() => {
-			const mainContainer = document.querySelector('.message-container');
-			if (mainContainer) {
-				mainContainer.scrollTop = mainContainer.scrollHeight;
-			}
+			const el = this.messageContainer.nativeElement;
+			const lastUserEl = this.getLastUserElement();
+			if (!lastUserEl) return this.resetScrollState();
+			el.scrollTo({top: this.getTargetScrollTop(el, lastUserEl), behavior: 'smooth'});
+			this.showScrollToLastMessage = false;
 		});
 	}
 
-	selectConversation(conversation: ChatTitle) {
-		this.conversationService.getConversation(conversation.conversationId).subscribe(messages => {
-			this.currentConversation = conversation;
-			this.messages = messages.map(this.historyMessageToChatMessage);
-			this.specificSuggestions = this.messages[this.messages.length - 1].suggestions?.map(suggestion => {
-				return {text: `action_suggestions.${suggestion}`, action: suggestion};
-			});
-			this.scrollToBottom();
+	getLastUserElement(): HTMLElement | null {
+		return (
+			[...this.messageElements].reverse().find((_, i, arr) => {
+				return this.messages[this.messages.length - 1 - i]?.source === ChatMessageSource.USER;
+			})?.nativeElement ?? null
+		);
+	}
+
+	selectConversation(chatTitle: ChatTitle) {
+		this.stopAttachmentsPolling();
+		this.attachmentsPollingTimedOut = false;
+		this.conversationService.getConversation(chatTitle.conversationId).subscribe(conversation => {
+			this.currentConversationTitle = chatTitle;
+			this.updateAttachments(conversation.attachments);
+			const chatMessages = conversation.messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
+			this.conversationManager.setConversationMessages(chatTitle.conversationId, chatMessages);
+			this.selectedWorkspace = chatTitle.workspace;
+			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
+			this.scrollToLastUserMessage();
+			if (this.hasPendingAttachments()) {
+				this.startAttachmentsPolling();
+			}
 		});
 	}
 
 	deleteConversation(conversation: ChatTitle) {
-		if (conversation.conversationId === this.currentConversation?.conversationId) {
-			this.currentConversation = null;
-			this.messages = [];
-			this.specificSuggestions = [];
+		if (conversation.conversationId === this.currentConversationTitle?.conversationId) {
+			this.currentConversationTitle = null;
+			this.conversationManager.initNewChat();
+			this.suggestionService.clearSpecificSuggestions();
+			this.resetScrollState();
 		}
+		this.conversationManager.deleteConversation(conversation.conversationId);
 	}
 
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
-			this.conversationTitles = conversations;
+			this.setAndSortConversations(conversations);
+		});
+	}
+
+	getAvailableWorkspaces() {
+		this.conversationService.getAvailableWorkspaces().subscribe(workspaces => {
+			this.availableWorkspaces = workspaces;
 		});
 	}
 
 	sendFeedback(feedback: Feedback) {
-		this.feedbackService.sendAnswerFeedback({conversationId: this.currentConversation.conversationId, ...feedback}).subscribe(() => {
+		this.feedbackService.sendAnswerFeedback({conversationId: this.currentConversationTitle.conversationId, ...feedback}).subscribe(() => {
 			this.notif.success('feedback.success');
 		});
 	}
-	uploadDoc(): void {
-		const fileInput = document.createElement('input');
-		fileInput.type = 'file';
-		fileInput.accept = '.pdf';
-
-		fileInput.onchange = (e: Event) => {
-			const file = (e.target as HTMLInputElement).files?.[0];
-			if (file) {
-				this.uploadService.uploadPersonalPdf(file, this.currentConversation?.conversationId).subscribe({
-					next: () => {
-						this.notif.success('upload.success');
-						this.settingsEventService.emitSettingsRefresh();
-					},
-					error: err => {
-						if (err.statusText === 'Unknown Error') {
-							this.notif.error('upload.error');
-						} else {
-							this.notif.error(err.error['MESSAGE']);
-						}
-					}
-				});
-			}
-		};
-
-		fileInput.click();
-	}
 
 	handleSuggestionAction(action: string): void {
-		if (action === 'ii-salary') {
-			this.activeForm = this.dfs.buildForm(ActionId.II_CALCUL);
-			const lastAssistant = this.messages[this.messages.length - 1];
-			const patch = this.dfs.parseAssistantMessage(this.activeForm.def, lastAssistant.message);
-			this.activeForm.group.patchValue(patch, {emitEvent: false});
-		} else {
-			const prefix = this.translateService.instant(`action_suggestions.prefixes.${action}`);
-			this.searchCtrl.setValue(prefix);
+		const result = this.suggestionService.handleSuggestionAction(action, this.messages);
+
+		if (result.shouldShowForm) {
+			this.activeForm = {
+				def: result.formDef,
+				group: result.formGroup
+			};
+		} else if (result.searchValue) {
+			this.searchCtrl.setValue(result.searchValue);
 		}
 	}
 
@@ -480,71 +343,345 @@ export class ChatComponent implements OnInit {
 		this.activeForm = undefined;
 	}
 
+	onPaste(event: ClipboardEvent): void {
+		const files = Array.from(event.clipboardData?.files ?? []);
+		if (files.length > 0) {
+			event.preventDefault();
+			this.onAttachmentsSelected(files);
+		}
+	}
+
+	onDragOver(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = true;
+	}
+
+	onDragLeave(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = false;
+	}
+
+	onDrop(event: DragEvent): void {
+		event.preventDefault();
+		this.isDragOver = false;
+		const files = Array.from(event.dataTransfer?.files ?? []);
+		if (files.length > 0) {
+			this.onAttachmentsSelected(files);
+		}
+	}
+
 	onAttachmentsSelected(event: File[]) {
-		this.attachments.push(...event);
+		const pendingAttachments: Attachment[] = this.initializePendingAttachments(event);
+		this.attachments.push(...pendingAttachments);
+
+		this.conversationService.uploadAttachments(this.currentConversationTitle, ...event).subscribe({
+			next: httpEvent => this.handleUploadEvent(httpEvent, pendingAttachments),
+			error: () => this.handleUploadError(pendingAttachments)
+		});
 	}
 
-	removeAttachment(index: number) {
-		this.attachments.splice(index, 1);
+	removeAttachment(id: number) {
+		this.conversationService.deleteAttachment(id).subscribe(() => {
+			this.attachments = this.attachments.filter(att => att.id !== id);
+			this.notif.success('attachment.delete.success');
+		});
 	}
 
-	private getSourceType(url: string) {
-		return url.startsWith('http') ? 'URL' : 'FILE';
+	downloadAttachment(attachment: Attachment) {
+		if (!attachment.id || attachment.isUploading || !this.currentConversationTitle) {
+			return;
+		}
+
+		this.conversationService.downloadAttachment(this.currentConversationTitle.conversationId, attachment.id).subscribe({
+			next: blob => {
+				const url = globalThis.URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = attachment.fileName || 'attachment';
+				link.click();
+				globalThis.URL.revokeObjectURL(url);
+			},
+			error: () => {
+				this.notif.error('attachment.download.error');
+			}
+		});
 	}
 
-	private readonly getCommandSuggestions = (text: string): Observable<Command[]> => {
-		return this.isCommandMode ? this.commandService.searchCommands(text) : of([]);
-	};
+	retryAttachment(attachment: Attachment): void {
+		if (!attachment.file || !this.currentConversationTitle) return;
+		attachment.status = 'PENDING';
+		attachment.isUploading = true;
+		this.cdr.markForCheck();
+		this.conversationService.uploadAttachments(this.currentConversationTitle, attachment.file).subscribe({
+			next: httpEvent => {
+				if (httpEvent.type === HttpEventType.Response) {
+					const response = httpEvent.body as AttachmentUploadResponse;
+					const serverAtt = response.conversationAttachments.attachments.find(s => s.filename === attachment.file!.name);
+					if (serverAtt) {
+						attachment.id = serverAtt.id;
+						attachment.status = serverAtt.status;
+						attachment.isUploading = serverAtt.status === 'PENDING';
+					}
+					this.cdr.markForCheck();
+					if (this.hasPendingAttachments()) {
+						this.startAttachmentsPolling();
+					} else {
+						this.notifyPollingComplete(response.status);
+					}
+				}
+			},
+			error: () => {
+				attachment.status = 'FAILED';
+				attachment.isUploading = false;
+				this.notif.error('attachment.upload.error');
+				this.cdr.markForCheck();
+			}
+		});
+	}
 
-	private readonly getSearchProposalFunction = (text: string): Observable<IQuestion[]> => {
-		return this.isCommandMode ? of([]) : this.autocompleteService.search(text);
-	};
+	refreshAttachmentsStatus(): void {
+		if (!this.currentConversationTitle) return;
+		this.attachmentsPollingTimedOut = false;
+		this.startAttachmentsPolling();
+	}
 
-	private historyMessageToChatMessage(historyMessage: ChatHistoryMessage): ChatMessage {
-		return {
-			id: historyMessage.messageId,
-			message: historyMessage.message,
-			source: historyMessage.role.toUpperCase() === 'USER' ? ChatMessageSource.USER : ChatMessageSource.LLM,
-			isCompleted: true,
-			timestamp: historyMessage.timestamp,
-			lang: historyMessage.language,
-			faqItemId: historyMessage.faqItemId,
-			sources: historyMessage.sources,
-			suggestions: historyMessage.suggestions
+	private initializePendingAttachments(files: File[]): Attachment[] {
+		return files.map(file => ({
+			fileName: file.name,
+			fileSize: file.size,
+			file,
+			status: 'PENDING' as AttachmentStatus,
+			isUploading: true
+		}));
+	}
+
+	private handleUploadEvent(httpEvent: any, pendingAttachments: Attachment[]): void {
+		if (httpEvent.type === HttpEventType.Response) {
+			this.handleUploadResponse(httpEvent.body as AttachmentUploadResponse, pendingAttachments);
+		}
+	}
+
+	private handleUploadResponse(response: AttachmentUploadResponse, pendingAttachments: Attachment[]): void {
+		if (!this.currentConversationTitle) {
+			this.createConversationFromUpload(response);
+		}
+		this.syncAttachmentsFromResponse(response, pendingAttachments);
+		this.cdr.markForCheck();
+		if (this.hasPendingAttachments()) {
+			this.startAttachmentsPolling();
+		} else {
+			this.notifyPollingComplete(response.status);
+		}
+	}
+
+	private createConversationFromUpload(response: AttachmentUploadResponse): void {
+		this.currentConversationTitle = {
+			conversationId: response.conversationAttachments.conversationId,
+			title: 'Processing attachments...',
+			timestamp: new Date(),
+			selected: true
 		};
+	}
+
+	private syncAttachmentsFromResponse(response: AttachmentUploadResponse, pendingAttachments: Attachment[]): void {
+		response.conversationAttachments.attachments.forEach(serverAtt => {
+			const localAtt = pendingAttachments.find(att => att.file?.name === serverAtt.filename);
+			if (localAtt) {
+				localAtt.id = serverAtt.id;
+				localAtt.status = serverAtt.status;
+				localAtt.isUploading = serverAtt.status === 'PENDING';
+			}
+		});
+	}
+
+	private updateAttachments(conversationAttachments: AttachmentDTO[]): void {
+		this.attachments = conversationAttachments.map(convAtt => ({
+			id: convAtt.id,
+			fileName: convAtt.filename,
+			fileSize: convAtt.fileSize,
+			status: convAtt.status,
+			isUploading: convAtt.status === 'PENDING'
+		}));
+	}
+
+	private handleUploadError(pendingAttachments: Attachment[]): void {
+		this.attachments = this.attachments.filter(att => !pendingAttachments.includes(att));
+		this.notif.error('attachment.upload.error');
+	}
+
+	private hasPendingAttachments(): boolean {
+		return this.attachments.some(att => att.status === 'PENDING');
+	}
+
+	private startAttachmentsPolling(): void {
+		if (!this.currentConversationTitle) return;
+		this.stopAttachmentsPolling();
+		this.pollingCancelled = false;
+		this.attachmentsPollingTimedOut = false;
+
+		timer(0, ATTACHMENT_POLL_INTERVAL_MS)
+			.pipe(
+				takeUntil(merge(this.destroy$, this.pollingStop$)),
+				take(ATTACHMENT_POLL_MAX_ATTEMPTS),
+				takeWhile(() => this.hasPendingAttachments()),
+				switchMap(() => this.conversationService.getConversationAttachmentsStatus(this.currentConversationTitle!.conversationId))
+			)
+			.subscribe({
+				next: (response: AttachmentUploadResponse) => {
+					this.updateAttachmentsFromPoll(response);
+					this.cdr.markForCheck();
+					if (!this.hasPendingAttachments()) {
+						this.notifyPollingComplete(response.status);
+						this.stopAttachmentsPolling();
+					}
+				},
+				complete: () => {
+					if (!this.pollingCancelled && this.hasPendingAttachments()) {
+						this.attachmentsPollingTimedOut = true;
+						this.notif.warning('attachment.process.timeout');
+						this.cdr.markForCheck();
+					}
+				}
+			});
+	}
+
+	private stopAttachmentsPolling(): void {
+		this.pollingCancelled = true;
+		this.pollingStop$.next();
+		this.pollingStop$ = new Subject<void>();
+	}
+
+	private updateAttachmentsFromPoll(response: AttachmentUploadResponse): void {
+		response.conversationAttachments.attachments.forEach(serverAtt => {
+			const localAtt = this.attachments.find(att => att.id === serverAtt.id);
+			if (localAtt) {
+				localAtt.status = serverAtt.status;
+				localAtt.isUploading = serverAtt.status === 'PENDING';
+			}
+		});
+	}
+
+	private notifyPollingComplete(aggregatedStatus: AttachmentStatus): void {
+		if (aggregatedStatus === 'PROCESSED') {
+			this.notif.success('attachment.process.success');
+		} else if (aggregatedStatus === 'FAILED') {
+			this.notif.error('attachment.process.error');
+		}
+	}
+
+	private resetScrollState(): void {
+		const el = this.messageContainer?.nativeElement;
+		if (!el) return;
+		el.scrollTop = 0;
+		this.showScrollToLastMessage = false;
+	}
+
+	private prepareForStreaming(inputText: string): void {
+		this.conversationManager.setActiveStreamingConversation(this.currentConversationTitle?.conversationId);
+		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.USER, inputText);
+		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.LLM, '', false, false);
+		this.disableSearch();
+		this.suggestionService.clearSpecificSuggestions();
+	}
+
+	private startStreamingRequest(inputText: string): void {
+		const currentLang = this.translateService.currentLang;
+		const mappedLanguage = LANGUAGE_MAP[currentLang] || Language.DE;
+
+		const requestConfig = {
+			query: inputText,
+			conversationId: this.currentConversationTitle?.conversationId,
+			workspace: this.selectedWorkspace || undefined,
+			language: mappedLanguage
+		};
+
+		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
+			next: chunk => {
+				this.processStreamChunk(chunk);
+				this.cdr.markForCheck();
+			},
+			error: err => {
+				this.handleStreamError(err);
+			},
+			complete: () => {
+				this.conversationManager.clearActiveStreamingConversation();
+			}
+		});
+	}
+
+	private processStreamChunk(chunk: string): void {
+		const streamingMessages = this.conversationManager.getStreamingMessages();
+		if (!streamingMessages || streamingMessages.length === 0) return;
+
+		const partialChatMessage = streamingMessages.at(-1);
+		if (!partialChatMessage) return;
+
+		const result = this.streamProcessor.processChunk(chunk, partialChatMessage);
+
+		if (result.hasNewSuggestion && result.newSuggestion) {
+			this.suggestionService.addSpecificSuggestion(result.newSuggestion);
+		}
+
+		if (result.shouldEnableSearch) {
+			this.enableSearch();
+		}
+
+		if (result.shouldRefreshConversations && (!this.currentConversationTitle || this.currentConversationTitle.title === 'Processing attachments...')) {
+			this.refreshConversations();
+		}
+
+		this.updateScrollButtonVisibility();
+	}
+
+	private handleStreamError(err: any): void {
+		if (err.message !== 'network error') {
+			const streamingMessages = this.conversationManager.getStreamingMessages();
+			if (streamingMessages) {
+				streamingMessages.pop();
+				streamingMessages.push({
+					message: 'Une erreur est survenue. Veuillez réessayer.',
+					source: ChatMessageSource.LLM,
+					timestamp: new Date(),
+					isCompleted: true,
+					inError: true,
+					beingSpoken: false,
+					sources: []
+				});
+			}
+		}
+		this.conversationManager.clearActiveStreamingConversation();
+		this.enableSearch();
 	}
 
 	private updateCurrentConversation() {
 		if (!this.isRegistered()) return;
-		if (!this.currentConversation) {
+		if (this.currentConversationTitle) {
+			this.conversationService.update(this.currentConversationTitle.conversationId, [this.messages.at(-2), this.messages.at(-1)]);
+		} else {
 			this.conversationService.init(this.messages).subscribe(() => {
 				this.refreshConversations();
 			});
-		} else {
-			this.conversationService.update(this.currentConversation.conversationId, [
-				this.messages[this.messages.length - 2],
-				this.messages[this.messages.length - 1]
-			]);
 		}
 	}
 
 	private refreshConversations() {
 		setTimeout(() => {
 			this.conversationService.getConversationTitles().subscribe(conversations => {
-				this.conversationTitles = conversations;
-				this.currentConversation = conversations[conversations.length - 1];
-				this.currentConversation.selected = true;
+				this.setAndSortConversations(conversations);
+				this.currentConversationTitle = this.conversationTitles[0];
+				this.currentConversationTitle.selected = true;
+				// Transfer messages from NEW_CHAT_KEY to the new conversation
+				this.conversationManager.transferNewChatToConversation(this.currentConversationTitle.conversationId);
 			});
 		}, 1_500);
 	}
 
+	private setAndSortConversations(conversations: ChatTitle[]) {
+		conversations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+		this.conversationTitles = conversations;
+	}
+
 	private showDialog() {
-		if (this.authService.userStatus() === UserStatus.GUEST) {
-			this.dialog.open(this.userNotRegisteredDialog);
-		} else if (this.authService.userStatus() === UserStatus.JOHN_DOE) {
-			this.dialog.open(this.johnDoeDialog);
-		} else {
-			this.dialog.open(this.userPendingTriesToChatDialog);
-		}
+		this.authDialogService.showAuthDialog(this.userNotRegisteredDialog, this.johnDoeDialog, this.userPendingTriesToChatDialog);
 	}
 }

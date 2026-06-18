@@ -1,0 +1,6 @@
+<div class="workspace-bar" *ngIf="selectedWorkspace">
+	<span class="workspace-badge">
+		<mat-icon [svgIcon]="'folder'"></mat-icon>
+		<span class="workspace-label">{{ selectedWorkspace | translate }}</span>
+	</span>
+</div>
