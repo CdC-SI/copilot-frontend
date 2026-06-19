@@ -20,11 +20,14 @@
 			<div class="document-section">
 				<h5>{{ "documents.legal" | translate }}</h5>
 				<p class="info-text">{{ "documents.visit.both.tabs" | translate }}</p>
-				<mat-checkbox [disabled]="!canCheckHasRead" [(ngModel)]="hasReadDocumentsChecked" [ngModelOptions]="{ standalone: true }" (change)="onHasReadChange()">
-					<span [class.disabled-text]="!canCheckHasRead">{{ "i.have.read.all" | translate }}</span>
-				</mat-checkbox>
-				<mat-checkbox [formControlName]="FORM_FIELDS.CONFIDENTIALITY" name="accept-documents" class="mb16">
+				<mat-checkbox [formControlName]="FORM_FIELDS.CONFIDENTIALITY" name="accept-documents" (change)="onAcceptDocumentsChange()">
 					<span [class.disabled-text]="userFrmGrp.get(FORM_FIELDS.CONFIDENTIALITY)?.disabled">{{ "i.accept.all.documents" | translate }}</span>
+				</mat-checkbox>
+				<mat-checkbox [formControlName]="FORM_FIELDS.AI_AWARENESS" name="ai-awareness">
+					<span [class.disabled-text]="userFrmGrp.get(FORM_FIELDS.AI_AWARENESS)?.disabled">{{ "i.followed.ai.awareness.session" | translate }}</span>
+				</mat-checkbox>
+				<mat-checkbox [formControlName]="FORM_FIELDS.AI_TRAINING" name="ai-training" class="mb16">
+					<span [class.disabled-text]="userFrmGrp.get(FORM_FIELDS.AI_TRAINING)?.disabled">{{ "i.followed.ai.training" | translate }}</span>
 				</mat-checkbox>
 			</div>
 		</form>

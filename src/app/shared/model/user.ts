@@ -22,7 +22,9 @@ export enum UserFormFields {
 	LASTNAME = 'lastName',
 	ORGANIZATION = 'organization',
 	CONFIDENTIALITY = 'confidentiality',
-	GCU = 'gcu'
+	GCU = 'gcu',
+	AI_AWARENESS = 'aiAwareness',
+	AI_TRAINING = 'aiTraining'
 }
 
 export enum Role {
