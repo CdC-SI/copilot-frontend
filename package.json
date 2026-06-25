@@ -1,6 +1,6 @@
 {
   "name": "zas-eak-copilot-frontend",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "scripts": {
     "start:dev": "ng serve --configuration development",
     "start": "ng serve",
