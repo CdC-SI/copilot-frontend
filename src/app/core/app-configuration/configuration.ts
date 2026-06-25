@@ -51,7 +51,7 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 	{
 		patterns: ['zia.zas.admin.ch'],
 		banner: {
-			text: 'PROD'
+			text: ''
 		},
 		production: true,
 		local: false,
