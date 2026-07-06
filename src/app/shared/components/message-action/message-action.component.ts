@@ -90,6 +90,12 @@ export class MessageActionComponent {
 		return this.authService.hasExpertRole();
 	}
 
+	copyAnswer() {
+		void navigator.clipboard.writeText(this.message.message).then(() => {
+			this.notif.success('copilot.answer.copied');
+		});
+	}
+
 	private giveFeedback(comment: string, isPositive: boolean) {
 		this.feedback.emit({
 			messageId: this.message.id,

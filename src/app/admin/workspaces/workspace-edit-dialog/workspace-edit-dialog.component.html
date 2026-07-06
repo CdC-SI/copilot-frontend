@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>{{ (isEdit ? "admin.workspaces.edit.title" : "admin.workspaces.create.title") | translate }}</h2>
+
+<mat-dialog-content class="workspace-edit-content">
+	<form [formGroup]="form" class="grid">
+		<mat-form-field appearance="outline">
+			<mat-label>{{ "admin.workspaces.name" | translate }}</mat-label>
+			<input matInput formControlName="name" maxlength="255" />
+			<mat-error *ngIf="form.get('name')?.hasError('required')">
+				{{ "admin.workspaces.name.required" | translate }}
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>{{ "admin.workspaces.description" | translate }}</mat-label>
+			<textarea matInput formControlName="description" rows="4" maxlength="10000"></textarea>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>{{ "admin.workspaces.sources" | translate }}</mat-label>
+			<mat-select formControlName="sources" multiple>
+				<mat-option *ngFor="let source of availableSources" [value]="source.name">{{ "sources." + source.name | translate }}</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>{{ "admin.workspaces.hypotheticalQuestions" | translate }}</mat-label>
+			<mat-chip-grid #chipGrid>
+				<mat-chip-row *ngFor="let question of hypotheticalQuestions" (removed)="removeQuestion(question)">
+					{{ question }}
+					<button matChipRemove [attr.aria-label]="'admin.actions.remove' | translate">
+						<mat-icon svgIcon="cancel"></mat-icon>
+					</button>
+				</mat-chip-row>
+				<input
+					[placeholder]="'admin.workspaces.hypotheticalQuestions.placeholder' | translate"
+					[matChipInputFor]="chipGrid"
+					[matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+					(matChipInputTokenEnd)="addQuestion($event)"
+				/>
+			</mat-chip-grid>
+		</mat-form-field>
+	</form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="actions">
+	<button mat-button [obButton]="'secondary'" (click)="cancel()">
+		{{ "cancel" | translate }}
+	</button>
+	<button mat-button [obButton]="'primary'" [disabled]="form.invalid" (click)="submit()">
+		{{ (isEdit ? "admin.actions.save" : "admin.actions.create") | translate }}
+	</button>
+</mat-dialog-actions>

@@ -7,28 +7,24 @@ import {IDocument} from '../shared/model/document';
 import {IPersonalDocument} from '../shared/model/personal-document';
 import {ISourceRequest, SourceRequestStatus} from '../shared/model/source-request';
 import {UploadService} from '../shared/services/upload.service';
-import {SettingsService} from '../shared/services/settings.service';
 import {SourceRequestService} from '../shared/services/source-request.service';
-import {SettingsType} from '../shared/model/settings';
 import {RequestSourceDialogComponent} from './request-source-dialog/request-source-dialog.component';
 
 const BYTES_TO_KB = 1024;
 const AUTO_REFRESH_INTERVAL_MS = 30_000;
 
 @Component({
-	selector: 'zco-personal-documents',
-	templateUrl: './personal-documents.component.html',
-	styleUrl: './personal-documents.component.scss'
+	selector: 'zco-corpus',
+	templateUrl: './corpus.component.html',
+	styleUrl: './corpus.component.scss'
 })
-export class PersonalDocumentsComponent implements OnInit, OnDestroy {
+export class CorpusComponent implements OnInit, OnDestroy {
 	documentsToUpload: IDocument[] = [];
 	userDocuments: IPersonalDocument[] = [];
-	officialSources: string[] = [];
 	sourceRequests: ISourceRequest[] = [];
 
 	isUploading = false;
 	isLoadingDocuments = false;
-	isLoadingSources = false;
 	isLoadingRequests = false;
 	showUploadInfo = false;
 
@@ -39,14 +35,12 @@ export class PersonalDocumentsComponent implements OnInit, OnDestroy {
 	constructor(
 		private readonly uploadService: UploadService,
 		private readonly notifService: ObNotificationService,
-		private readonly settingsService: SettingsService,
 		private readonly sourceRequestService: SourceRequestService,
 		private readonly dialog: MatDialog
 	) {}
 
 	ngOnInit(): void {
 		this.loadUserDocuments();
-		this.loadOfficialSources();
 		this.loadMySourceRequests();
 	}
 
@@ -115,20 +109,6 @@ export class PersonalDocumentsComponent implements OnInit, OnDestroy {
 					this.loadUserDocuments();
 				},
 				error: () => this.notifService.error('personal.documents.delete.error')
-			});
-	}
-
-	loadOfficialSources(): void {
-		this.isLoadingSources = true;
-		this.settingsService
-			.getSettings(SettingsType.SOURCE)
-			.pipe(
-				takeUntil(this.destroy$),
-				finalize(() => (this.isLoadingSources = false))
-			)
-			.subscribe({
-				next: (sources: string[]) => (this.officialSources = sources),
-				error: () => this.notifService.error('sources.load.error')
 			});
 	}
 

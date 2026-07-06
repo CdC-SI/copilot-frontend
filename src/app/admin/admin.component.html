@@ -57,5 +57,31 @@
 
 			<zco-doc-upload #docUploadComponent></zco-doc-upload>
 		</mat-expansion-panel>
+
+		<!-- Sources Administration -->
+		<mat-expansion-panel #sourcesPanel (opened)="onSourcesPanelOpened()">
+			<mat-expansion-panel-header>
+				<mat-panel-title>{{ "admin.manage.sources" | translate }}</mat-panel-title>
+				<mat-panel-description>{{ "admin.manage.sources.description" | translate }}</mat-panel-description>
+			</mat-expansion-panel-header>
+
+			<!-- lazy instantiation of sources component -->
+			<ng-template matExpansionPanelContent>
+				<zco-sources #sourcesComponent></zco-sources>
+			</ng-template>
+		</mat-expansion-panel>
+
+		<!-- Workspaces Administration -->
+		<mat-expansion-panel (opened)="onWorkspacesPanelOpened()">
+			<mat-expansion-panel-header>
+				<mat-panel-title>{{ "admin.manage.workspaces" | translate }}</mat-panel-title>
+				<mat-panel-description>{{ "admin.manage.workspaces.description" | translate }}</mat-panel-description>
+			</mat-expansion-panel-header>
+
+			<!-- lazy instantiation of workspaces component -->
+			<ng-template matExpansionPanelContent>
+				<zco-workspaces #workspacesComponent (sourceSelected)="onWorkspaceSourceSelected($event)"></zco-workspaces>
+			</ng-template>
+		</mat-expansion-panel>
 	</mat-accordion>
 </div>

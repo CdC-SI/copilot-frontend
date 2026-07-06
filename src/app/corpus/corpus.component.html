@@ -1,6 +1,6 @@
-<div class="personal-documents-container pd5">
-	<h2>{{ "personal.documents.title" | translate }}</h2>
-	<p class="description">{{ "personal.documents.description" | translate }}</p>
+<div class="corpus-container pd5">
+	<h2>{{ "corpus.title" | translate }}</h2>
+	<p class="description">{{ "corpus.description" | translate }}</p>
 
 	<mat-tab-group animationDuration="300ms" class="documents-tabs">
 		<!-- Tab 1: My Personal Documents -->
@@ -110,51 +110,10 @@
 			</div>
 		</mat-tab>
 
-		<!-- Tab 2: Official Sources -->
+		<!-- Tab 2: Official Sources, browsed via Workspaces -->
 		<mat-tab [label]="'sources.official.tab.title' | translate">
 			<div class="tab-content">
-				<div class="sources-section">
-					<div class="section-header">
-						<h3>{{ "sources.official.title" | translate }}</h3>
-						<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadOfficialSources()" [disabled]="isLoadingSources">
-							<mat-icon svgIcon="refresh"></mat-icon>
-						</button>
-					</div>
-
-					<div *ngIf="isLoadingSources" class="loading-container">
-						<mat-spinner diameter="40"></mat-spinner>
-						<p>{{ "loading" | translate }}</p>
-					</div>
-
-					<div *ngIf="!isLoadingSources && officialSources.length === 0" class="empty-state">
-						<mat-icon svgIcon="book" class="empty-icon"></mat-icon>
-						<p>{{ "sources.official.no.sources" | translate }}</p>
-					</div>
-
-					<div *ngIf="!isLoadingSources && officialSources.length > 0" class="sources-grid">
-						<mat-card *ngFor="let source of officialSources" class="source-card">
-							<mat-card-header>
-								<mat-icon mat-card-avatar svgIcon="book"></mat-icon>
-								<mat-card-title>{{ "sources." + source | translate }}</mat-card-title>
-							</mat-card-header>
-							<mat-card-content>
-								<p class="source-badge">
-									<mat-icon class="badge-icon" svgIcon="checkmark-circle"></mat-icon>
-									{{ "sources.official.badge" | translate }}
-								</p>
-							</mat-card-content>
-						</mat-card>
-					</div>
-
-					<!-- Info bubble about official sources -->
-					<div class="info-section">
-						<mat-icon class="info-icon" svgIcon="info"></mat-icon>
-						<div class="info-content">
-							<strong>{{ "sources.info.official.title" | translate }}</strong>
-							<p>{{ "sources.info.official.description" | translate }}</p>
-						</div>
-					</div>
-				</div>
+				<zco-official-sources-browser></zco-official-sources-browser>
 			</div>
 		</mat-tab>
 

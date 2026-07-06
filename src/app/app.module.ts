@@ -42,10 +42,15 @@ import {AlertsComponent} from './admin/alerts/alerts.component';
 import {ReactivateDialogComponent} from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
 import {SumexComponent} from './tools/sumex/sumex.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {PersonalDocumentsComponent} from './personal-documents/personal-documents.component';
-import {RequestSourceDialogComponent} from './personal-documents/request-source-dialog/request-source-dialog.component';
+import {CorpusComponent} from './corpus/corpus.component';
+import {RequestSourceDialogComponent} from './corpus/request-source-dialog/request-source-dialog.component';
+import {OfficialSourcesBrowserComponent} from './corpus/official-sources-browser/official-sources-browser.component';
 import {CareerSummaryComponent} from './tools/career-summary/career-summary.component';
 import {ChatHeaderComponent} from './chat/chat-header/chat-header.component';
+import {SourcesComponent} from './admin/sources/sources.component';
+import {SourceEditDialogComponent} from './admin/sources/source-edit-dialog/source-edit-dialog.component';
+import {WorkspacesComponent} from './admin/workspaces/workspaces.component';
+import {WorkspaceEditDialogComponent} from './admin/workspaces/workspace-edit-dialog/workspace-edit-dialog.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -77,10 +82,15 @@ function bannerFactory(configurationService: ConfigurationService) {
 		AlertsComponent,
 		ReactivateDialogComponent,
 		SumexComponent,
-		PersonalDocumentsComponent,
+		CorpusComponent,
 		RequestSourceDialogComponent,
+		OfficialSourcesBrowserComponent,
 		CareerSummaryComponent,
-		ChatHeaderComponent
+		ChatHeaderComponent,
+		SourcesComponent,
+		SourceEditDialogComponent,
+		WorkspacesComponent,
+		WorkspaceEditDialogComponent
 	],
 	imports: [
 		BrowserModule,

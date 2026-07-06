@@ -5,13 +5,13 @@ import {AdminComponent} from './admin/admin.component';
 import {TipsComponent} from './tips/tips.component';
 import {AdminGuard} from './shared/services/admin.guard';
 import {ToolsHomeComponent} from './tools/tools-home/tools-home.component';
-import {PersonalDocumentsComponent} from './personal-documents/personal-documents.component';
+import {CorpusComponent} from './corpus/corpus.component';
 import {UserGuard} from './shared/services/user.guard';
 
 const routes: Routes = [
 	{path: '', redirectTo: 'chat', pathMatch: 'full'},
 	{path: 'chat', component: ChatComponent},
-	{path: 'personal-documents', component: PersonalDocumentsComponent, canActivate: [UserGuard]},
+	{path: 'corpus', component: CorpusComponent, canActivate: [UserGuard]},
 	{path: 'admin', component: AdminComponent, canActivate: [AdminGuard]},
 	{path: 'tips', component: TipsComponent},
 	{path: 'tools', component: ToolsHomeComponent}
