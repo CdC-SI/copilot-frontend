@@ -16,7 +16,6 @@ import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
 import {HttpEventType} from '@angular/common/http';
-import {MatDialog} from '@angular/material/dialog';
 import {
 	AutocompleteType,
 	ChatAutocompleteService,
@@ -26,7 +25,7 @@ import {
 	LANGUAGE_MAP,
 	UserAuthDialogService
 } from './services';
-import {Subject, filter, map, merge, of, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
+import {Subject, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 10_000;
 const ATTACHMENT_POLL_MAX_ATTEMPTS = 15;
@@ -48,24 +47,21 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	activeForm?: {def: FormDef; group: FormGroup};
 	attachments: Attachment[] = [];
 	isDragOver = false;
-	availableWorkspaces: string[] = [];
-	selectedWorkspace = '';
 	containerResizeObserver: ResizeObserver;
 	attachmentsPollingTimedOut = false;
-
-	private readonly destroy$ = new Subject<void>();
-	private pollingStop$ = new Subject<void>();
-	private pollingCancelled = false;
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
-	@ViewChild('workspaceSelectionDialog') workspaceSelectionDialog: TemplateRef<any>;
 	@ViewChild('messageContainer') messageContainer: ElementRef;
 	@ViewChild('scrollAnchor') scrollAnchor: ElementRef;
 	@ViewChildren('messageEl') messageElements!: QueryList<ElementRef>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
+
+	private readonly destroy$ = new Subject<void>();
+	private pollingStop$ = new Subject<void>();
+	private pollingCancelled = false;
 
 	get messages(): ChatMessage[] {
 		return this.conversationManager.getMessages(this.currentConversationTitle?.conversationId);
@@ -93,8 +89,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		private readonly conversationManager: ChatConversationManagerService,
 		private readonly suggestionService: ChatSuggestionService,
 		private readonly autocompleteService: ChatAutocompleteService,
-		private readonly authDialogService: UserAuthDialogService,
-		private readonly dialog: MatDialog
+		private readonly authDialogService: UserAuthDialogService
 	) {}
 
 	ngAfterViewInit() {
@@ -121,7 +116,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		});
 		this.authService.$authenticatedUser.subscribe(user => {
 			if (user?.status === UserStatus.ACTIVE) {
-				this.getAvailableWorkspaces();
 				this.getConversationTitles();
 			}
 		});
@@ -196,17 +190,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.conversationManager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
 		this.resetScrollState();
-		this.openWorkspaceSelectionDialog();
-	}
-
-	openWorkspaceSelectionDialog(): void {
-		if (!this.workspaceSelectionDialog || !this.availableWorkspaces?.length) return;
-		this.dialog.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false});
-	}
-
-	selectWorkspaceAndClose(workspace: string): void {
-		this.selectedWorkspace = workspace;
-		this.dialog.closeAll();
 	}
 
 	canAskLLM() {
@@ -219,14 +202,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		// 	return;
 		// }
 
-		const openWorkspaceDialog$ = this.selectedWorkspace
-			? of(true)
-			: this.dialog
-					.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false})
-					.afterClosed()
-					.pipe(map(() => !!this.selectedWorkspace));
-
-		openWorkspaceDialog$.pipe().subscribe(() => this.doSendToLLM());
+		this.doSendToLLM();
 	}
 
 	doSendToLLM(): void {
@@ -280,7 +256,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.updateAttachments(conversation.attachments);
 			const chatMessages = conversation.messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
 			this.conversationManager.setConversationMessages(chatTitle.conversationId, chatMessages);
-			this.selectedWorkspace = chatTitle.workspace;
 			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
 			this.scrollToLastUserMessage();
 			if (this.hasPendingAttachments()) {
@@ -302,12 +277,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
 			this.setAndSortConversations(conversations);
-		});
-	}
-
-	getAvailableWorkspaces() {
-		this.conversationService.getAvailableWorkspaces().subscribe(workspaces => {
-			this.availableWorkspaces = workspaces;
 		});
 	}
 
@@ -415,8 +384,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.conversationService.uploadAttachments(this.currentConversationTitle, attachment.file).subscribe({
 			next: httpEvent => {
 				if (httpEvent.type === HttpEventType.Response) {
-					const response = httpEvent.body as AttachmentUploadResponse;
-					const serverAtt = response.conversationAttachments.attachments.find(s => s.filename === attachment.file!.name);
+					const response = httpEvent.body;
+					const serverAtt = response.conversationAttachments.attachments.find(s => s.filename === attachment.file.name);
 					if (serverAtt) {
 						attachment.id = serverAtt.id;
 						attachment.status = serverAtt.status;
@@ -524,7 +493,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 				takeUntil(merge(this.destroy$, this.pollingStop$)),
 				take(ATTACHMENT_POLL_MAX_ATTEMPTS),
 				takeWhile(() => this.hasPendingAttachments()),
-				switchMap(() => this.conversationService.getConversationAttachmentsStatus(this.currentConversationTitle!.conversationId))
+				switchMap(() => this.conversationService.getConversationAttachmentsStatus(this.currentConversationTitle.conversationId))
 			)
 			.subscribe({
 				next: (response: AttachmentUploadResponse) => {
@@ -591,7 +560,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		const requestConfig = {
 			query: inputText,
 			conversationId: this.currentConversationTitle?.conversationId,
-			workspace: this.selectedWorkspace || undefined,
 			language: mappedLanguage
 		};
 

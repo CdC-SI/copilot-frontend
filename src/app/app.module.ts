@@ -46,7 +46,6 @@ import {CorpusComponent} from './corpus/corpus.component';
 import {RequestSourceDialogComponent} from './corpus/request-source-dialog/request-source-dialog.component';
 import {OfficialSourcesBrowserComponent} from './corpus/official-sources-browser/official-sources-browser.component';
 import {CareerSummaryComponent} from './tools/career-summary/career-summary.component';
-import {ChatHeaderComponent} from './chat/chat-header/chat-header.component';
 import {SourcesComponent} from './admin/sources/sources.component';
 import {SourceEditDialogComponent} from './admin/sources/source-edit-dialog/source-edit-dialog.component';
 import {WorkspacesComponent} from './admin/workspaces/workspaces.component';
@@ -86,7 +85,6 @@ function bannerFactory(configurationService: ConfigurationService) {
 		RequestSourceDialogComponent,
 		OfficialSourcesBrowserComponent,
 		CareerSummaryComponent,
-		ChatHeaderComponent,
 		SourcesComponent,
 		SourceEditDialogComponent,
 		WorkspacesComponent,

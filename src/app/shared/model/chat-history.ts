@@ -3,7 +3,6 @@ export interface ChatTitle {
 	conversationId: string;
 	timestamp: Date;
 	selected?: boolean;
-	workspace?: string;
 }
 
 export interface Conversation {

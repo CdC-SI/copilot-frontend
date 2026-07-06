@@ -532,8 +532,6 @@
       "open-references": "Fehler beim Öffnen der Referenzen"
     }
   },
-  "workspace.select.title": "Arbeitsbereich auswählen",
-  "workspace.select.description": "Wählen Sie den Arbeitsbereich für dieses neue Gespräch.",
   "RH": "Personalwesen",
   "AFAC": "Freiwillige Versicherung",
   "CSC": "SAK",

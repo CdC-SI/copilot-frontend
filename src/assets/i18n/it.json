@@ -532,8 +532,6 @@
       "open-references": "Errore durante l'apertura dei riferimenti"
     }
   },
-  "workspace.select.title": "Seleziona uno spazio di lavoro",
-  "workspace.select.description": "Scegli lo spazio di lavoro per questa nuova conversazione.",
   "RH": "Risorse umane",
   "AFAC": "Assicurazione facoltativa",
   "CSC": "CSC",
