@@ -101,7 +101,8 @@ export class ChatConversationManagerService {
 			lang: historyMessage.language,
 			faqItemId: historyMessage.faqItemId,
 			sources: historyMessage.sources,
-			suggestions: historyMessage.suggestions
+			suggestions: historyMessage.suggestions,
+			workspace: historyMessage.workspace
 		};
 	}
 }

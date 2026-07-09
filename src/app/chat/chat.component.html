@@ -62,6 +62,7 @@
 						[message]="message"
 						[previousMessage]="i > 0 ? messages[i - 1] : null"
 						(feedback)="sendFeedback($event)"
+						(workspaceChange)="onWorkspaceChange($event)"
 					></zco-chat-message>
 				</div>
 			</div>

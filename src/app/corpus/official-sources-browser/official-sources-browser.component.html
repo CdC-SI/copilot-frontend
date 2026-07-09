@@ -18,64 +18,53 @@
 		<p>{{ "corpus.workspaces.empty" | translate }}</p>
 	</div>
 
-	<!-- Niveau 1 : Workspaces -->
+	<!-- Niveau 1 : Workspaces (le workspace "Général" est mis en avant et regroupe aussi les sources sans workspace) -->
 	<mat-accordion multi class="workspaces-accordion" *ngIf="!isLoading && workspaces.length">
-		<mat-expansion-panel *ngFor="let workspace of workspaces">
+		<mat-expansion-panel *ngFor="let workspace of workspaces" [class.general-panel]="isGeneralWorkspace(workspace)">
 			<mat-expansion-panel-header>
 				<mat-panel-title>
-					<mat-icon svgIcon="folder" class="panel-icon"></mat-icon>
+					<mat-icon [svgIcon]="isGeneralWorkspace(workspace) ? 'globe' : 'folder'" class="panel-icon"></mat-icon>
 					{{ workspace.name | translate }}
 				</mat-panel-title>
-				<mat-panel-description>
-					<span class="workspace-description">{{ workspace.description }}</span>
-					<span class="sources-count">{{ "corpus.workspaces.sources.count" | translate: { count: workspace.sources.length } }}</span>
+				<mat-panel-description class="workspace-panel-description">
+					<span class="sources-count" [class.general-badge]="isGeneralWorkspace(workspace)">
+						{{
+							isGeneralWorkspace(workspace)
+								? ("corpus.workspaces.general.badge" | translate)
+								: ("corpus.workspaces.sources.count" | translate: { count: workspace.sources.length })
+						}}
+					</span>
 				</mat-panel-description>
 			</mat-expansion-panel-header>
 
+			<!-- La description complète n'est affichée qu'une fois le panneau ouvert, pour garder l'en-tête compact. -->
+			<p class="workspace-description-full" *ngIf="isGeneralWorkspace(workspace); else standardDescription">
+				{{ "corpus.workspaces.general.description" | translate }}
+			</p>
+			<ng-template #standardDescription>
+				<p class="workspace-description-full" *ngIf="workspace.description">{{ workspace.description }}</p>
+			</ng-template>
+
 			<!-- Niveau 2 : Sources du workspace -->
-			<div *ngIf="!workspace.sources.length" class="no-sources">
+			<div *ngIf="!getWorkspaceSourceNames(workspace).length" class="no-sources">
 				{{ "corpus.workspaces.sources.empty" | translate }}
 			</div>
 
-			<mat-accordion multi class="sources-accordion" *ngIf="workspace.sources.length">
-				<mat-expansion-panel *ngFor="let sourceName of workspace.sources" (opened)="loadSourceContents(sourceName)">
+			<mat-accordion multi class="sources-accordion" *ngIf="getWorkspaceSourceNames(workspace).length">
+				<mat-expansion-panel *ngFor="let sourceName of getWorkspaceSourceNames(workspace)" (opened)="loadSourceContents(sourceName)">
 					<mat-expansion-panel-header>
 						<mat-panel-title>
 							<mat-icon svgIcon="book" class="panel-icon"></mat-icon>
-							{{ "sources." + sourceName | translate }}
+							<span class="source-name">{{ "sources." + sourceName | translate }}</span>
 						</mat-panel-title>
-						<mat-panel-description>{{ resolveSource(sourceName)?.description }}</mat-panel-description>
 					</mat-expansion-panel-header>
+
+					<p class="source-description-full" *ngIf="resolveSource(sourceName)?.description">
+						{{ resolveSource(sourceName)?.description }}
+					</p>
 
 					<!-- Niveau 3 : Contenus de la source -->
 					<ng-container *ngTemplateOutlet="contentsTpl; context: { name: sourceName }"></ng-container>
-				</mat-expansion-panel>
-			</mat-accordion>
-		</mat-expansion-panel>
-	</mat-accordion>
-
-	<!-- Sources hors workspace -->
-	<mat-accordion multi class="others-accordion" *ngIf="otherSources.length">
-		<mat-expansion-panel class="others-panel">
-			<mat-expansion-panel-header>
-				<mat-panel-title>
-					<mat-icon svgIcon="book" class="panel-icon"></mat-icon>
-					{{ "corpus.workspaces.others.title" | translate }}
-				</mat-panel-title>
-				<mat-panel-description>{{ "corpus.workspaces.others.description" | translate }}</mat-panel-description>
-			</mat-expansion-panel-header>
-
-			<mat-accordion multi class="sources-accordion">
-				<mat-expansion-panel *ngFor="let source of otherSources" (opened)="loadSourceContents(source.name)">
-					<mat-expansion-panel-header>
-						<mat-panel-title>
-							<mat-icon svgIcon="book" class="panel-icon"></mat-icon>
-							{{ "sources." + source.name | translate }}
-						</mat-panel-title>
-						<mat-panel-description>{{ source.description }}</mat-panel-description>
-					</mat-expansion-panel-header>
-
-					<ng-container *ngTemplateOutlet="contentsTpl; context: { name: source.name }"></ng-container>
 				</mat-expansion-panel>
 			</mat-accordion>
 		</mat-expansion-panel>

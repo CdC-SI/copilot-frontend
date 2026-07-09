@@ -22,6 +22,7 @@ export interface ChatHistoryMessage {
 	faqItemId?: number;
 	sources?: MessageSource[];
 	suggestions?: string[];
+	workspace?: string;
 }
 
 export interface MessageSource {

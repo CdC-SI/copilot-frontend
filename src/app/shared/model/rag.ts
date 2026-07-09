@@ -24,6 +24,8 @@ export interface ChatRequest {
 	topicCheck?: boolean;
 	isFollowUpQ?: boolean;
 	conversationId?: string;
+	/** Nom du workspace explicitement choisi par l'utilisateur (override du routing automatique). */
+	workspace?: string;
 }
 
 export enum ChatRequestConfigFields {

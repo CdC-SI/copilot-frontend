@@ -213,6 +213,18 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.scrollToLastUserMessage();
 	}
 
+	/**
+	 * Renvoie une question déjà posée en imposant explicitement le workspace à utiliser
+	 * (choisi par l'utilisateur via le badge affiché sous la question). Ajoute une nouvelle
+	 * paire question/réponse à la conversation, sans toucher à l'historique existant.
+	 */
+	onWorkspaceChange(event: {question: string; workspace: string}): void {
+		if (!event?.question || !event.workspace) return;
+		this.prepareForStreaming(event.question);
+		this.startStreamingRequest(event.question, event.workspace);
+		this.scrollToLastUserMessage();
+	}
+
 	getTargetScrollTop(el: HTMLElement, userEl: HTMLElement): number {
 		return el.scrollTop + userEl.getBoundingClientRect().top - el.getBoundingClientRect().top;
 	}
@@ -553,14 +565,15 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.suggestionService.clearSpecificSuggestions();
 	}
 
-	private startStreamingRequest(inputText: string): void {
+	private startStreamingRequest(inputText: string, workspace?: string): void {
 		const currentLang = this.translateService.currentLang;
 		const mappedLanguage = LANGUAGE_MAP[currentLang] || Language.DE;
 
 		const requestConfig = {
 			query: inputText,
 			conversationId: this.currentConversationTitle?.conversationId,
-			language: mappedLanguage
+			language: mappedLanguage,
+			workspace
 		};
 
 		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
@@ -585,6 +598,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (!partialChatMessage) return;
 
 		const result = this.streamProcessor.processChunk(chunk, partialChatMessage);
+
+		// The workspace used to answer is surfaced on the question rather than the answer bubble.
+		if (partialChatMessage.workspace) {
+			const questionMessage = streamingMessages.at(-2);
+			if (questionMessage && questionMessage.source === ChatMessageSource.USER) {
+				questionMessage.workspace = partialChatMessage.workspace;
+			}
+		}
 
 		if (result.hasNewSuggestion && result.newSuggestion) {
 			this.suggestionService.addSpecificSuggestion(result.newSuggestion);

@@ -18,6 +18,9 @@ export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 
 	isLoading = false;
 
+	/** Nom technique (non traduit) du workspace spécial qui représente "toutes les sources". */
+	private static readonly GENERAL_WORKSPACE_NAME = 'GENERAL';
+
 	private sourcesByName = new Map<string, SourceDto>();
 	private readonly contentsCache = new Map<string, SourceDto>();
 	private readonly loadingContentFor = new Set<string>();
@@ -50,7 +53,7 @@ export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 			)
 			.subscribe({
 				next: ({workspaces, sources}) => {
-					this.workspaces = workspaces;
+					this.workspaces = this.sortWithGeneralFirst(workspaces);
 					this.sourcesByName = new Map(sources.map(source => [source.name, source]));
 					this.otherSources = this.computeOrphanSources(workspaces, sources);
 				},
@@ -61,6 +64,22 @@ export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 	/** Résout le nom d'une source d'un workspace vers son DTO complet (description, questions). */
 	resolveSource(name: string): SourceDto | undefined {
 		return this.sourcesByName.get(name);
+	}
+
+	/**
+	 * Le workspace "Général" ne référence aucune source explicitement : c'est le workspace implicite
+	 * utilisé quand aucun thème particulier ne correspond, il contient donc de facto toutes les sources.
+	 */
+	isGeneralWorkspace(workspace: WorkspaceDto): boolean {
+		return workspace.name === OfficialSourcesBrowserComponent.GENERAL_WORKSPACE_NAME;
+	}
+
+	/** Sources affichées pour un workspace : pour "Général", ce sont toutes les sources non rattachées à un autre workspace. */
+	getWorkspaceSourceNames(workspace: WorkspaceDto): string[] {
+		if (!this.isGeneralWorkspace(workspace)) {
+			return workspace.sources;
+		}
+		return Array.from(new Set([...workspace.sources, ...this.otherSources.map(source => source.name)]));
 	}
 
 	/** Charge le détail (contenus) d'une source à la volée, une seule fois, en la mémorisant dans un cache. */
@@ -92,5 +111,10 @@ export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 	private computeOrphanSources(workspaces: WorkspaceDto[], sources: SourceDto[]): SourceDto[] {
 		const namesInWorkspaces = new Set(workspaces.flatMap(workspace => workspace.sources));
 		return sources.filter(source => !namesInWorkspaces.has(source.name));
+	}
+
+	/** Le workspace "Général" est mis en avant en tête de liste, car il agit comme fourre-tout par défaut. */
+	private sortWithGeneralFirst(workspaces: WorkspaceDto[]): WorkspaceDto[] {
+		return [...workspaces].sort((a, b) => Number(this.isGeneralWorkspace(b)) - Number(this.isGeneralWorkspace(a)));
 	}
 }

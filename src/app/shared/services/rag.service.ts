@@ -51,6 +51,7 @@ export class RagService {
 		// optional
 		this.append(fd, 'language', ragRequest.language);
 		this.append(fd, 'conversationId', ragRequest.conversationId);
+		this.append(fd, 'workspace', ragRequest.workspace);
 
 		return fd;
 	}

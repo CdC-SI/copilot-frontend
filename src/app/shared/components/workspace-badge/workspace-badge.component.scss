@@ -1,0 +1,52 @@
+.workspace-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.1rem;
+	margin-top: 0.35rem;
+	border: 1px solid var(--ob-color-border, #d4d4d4);
+	border-radius: 999px;
+	background-color: var(--ob-color-background-secondary, #f4f4f4);
+	font-size: 0.78rem;
+	line-height: 1;
+}
+
+.workspace-badge-label,
+.workspace-badge-chevron {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0.3rem 0.5rem;
+	color: var(--ob-color-text-secondary, #5a5a5a);
+
+	&:hover {
+		color: var(--ob-color-primary, #d8232a);
+	}
+
+	.mat-icon {
+		width: 14px;
+		height: 14px;
+		font-size: 14px;
+	}
+}
+
+.workspace-badge-chevron {
+	padding-left: 0.1rem;
+	padding-right: 0.4rem;
+	border-left: 1px solid var(--ob-color-border, #d4d4d4);
+}
+
+.badge-name {
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.workspace-menu-loading {
+	display: flex;
+	justify-content: center;
+	padding: 0.5rem 1rem;
+}

@@ -80,22 +80,75 @@
 	.panel-icon {
 		margin-right: var(--browser-spacing-xs);
 		vertical-align: middle;
+		flex-shrink: 0;
 	}
 
-	mat-panel-description {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		flex: 1;
+	.source-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+	}
 
-		.workspace-description {
-			color: var(--browser-text-muted);
-		}
+	// Le titre (icône + nom) ne doit jamais être écrasé par la description ou le compteur de
+	// sources : on lui laisse toute la place nécessaire et on tronque plutôt la description sur
+	// une seule ligne (avec tooltip pour lire le texte complet).
+	::ng-deep .mat-expansion-panel-header .mat-content {
+		overflow: hidden;
+	}
+
+	::ng-deep .mat-expansion-panel-header-title {
+		flex: 0 1 auto;
+		min-width: 0;
+	}
+
+	// Description du workspace : l'en-tête ne montre plus qu'un badge compact (compteur de sources),
+	// le texte complet de la description est affiché dans le corps du panneau une fois ouvert.
+	mat-panel-description.workspace-panel-description {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		white-space: normal;
+		flex: 0 0 auto;
 
 		.sources-count {
 			font-size: 12px;
 			color: #1976d2;
 			font-weight: 500;
+			flex-shrink: 0;
+			white-space: nowrap;
+			background-color: #e3f2fd;
+			padding: 2px 10px;
+			border-radius: 12px;
+
+			&.general-badge {
+				color: #e65100;
+				background-color: #fff3e0;
+			}
+		}
+	}
+
+	// Description complète affichée dans le corps du panneau (workspace ou source), une fois déplié :
+	// évite la troncature et l'encombrement visuel de l'en-tête tout en restant lisible.
+	.workspace-description-full,
+	.source-description-full {
+		margin: 0 0 var(--browser-spacing-md);
+		color: var(--browser-text-muted);
+		font-size: 13px;
+		line-height: 1.5;
+	}
+
+	// Mise en avant visuelle du workspace "Général" : il ne référence aucune source propre puisqu'il
+	// les contient toutes implicitement (fourre-tout par défaut).
+	mat-expansion-panel.general-panel {
+		border-left: 3px solid #fb8c00;
+
+		::ng-deep > .mat-expansion-panel-header {
+			background-color: #fff8e1;
+
+			.panel-icon {
+				color: #fb8c00;
+			}
 		}
 	}
 
@@ -149,10 +202,6 @@
 				height: 18px;
 			}
 		}
-	}
-
-	.others-accordion {
-		margin-top: var(--browser-spacing-lg);
 	}
 
 	.info-section {
