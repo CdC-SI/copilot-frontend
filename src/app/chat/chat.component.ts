@@ -5,7 +5,7 @@ import {RagService} from '../shared/services/rag.service';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle} from '../shared/model/chat-history';
+import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle, ConversationType} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -49,6 +49,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	isDragOver = false;
 	containerResizeObserver: ResizeObserver;
 	attachmentsPollingTimedOut = false;
+	/**
+	 * Mode "LLM seul" choisi pour une conversation qui n'existe pas encore côté backend (avant le premier
+	 * échange). Une fois la conversation créée, c'est `currentConversationTitle.type` qui fait foi (cf.
+	 * `isLlmOnlyMode()`) : le mode est alors figé pour toute la conversation, comme la navigation privée.
+	 */
+	ragEnabled = true;
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
@@ -73,6 +79,18 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	get specificSuggestions() {
 		return this.suggestionService.getSpecificSuggestions();
+	}
+
+	/**
+	 * Indique si la conversation courante est en mode "sans Corpus" (LLM seul). Une fois la conversation
+	 * persistée côté backend, le type qu'elle a reçu à sa création fait foi ; sinon (nouvelle conversation
+	 * pas encore envoyée) on se base sur le choix fait via le bouton "Nouvelle conversation sans Corpus".
+	 */
+	isLlmOnlyMode(): boolean {
+		if (this.currentConversationTitle?.type) {
+			return this.currentConversationTitle.type === ConversationType.NO_RAG;
+		}
+		return !this.ragEnabled;
 	}
 
 	constructor(
@@ -181,9 +199,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.searchCtrl.enable();
 	}
 
-	newChat(): void {
+	newChat(ragEnabled = true): void {
 		if (this.currentConversationTitle) this.currentConversationTitle.selected = false;
 		this.currentConversationTitle = null;
+		this.ragEnabled = ragEnabled;
 		this.attachments = [];
 		this.attachmentsPollingTimedOut = false;
 		this.stopAttachmentsPolling();
@@ -265,6 +284,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.attachmentsPollingTimedOut = false;
 		this.conversationService.getConversation(chatTitle.conversationId).subscribe(conversation => {
 			this.currentConversationTitle = chatTitle;
+			// Le type ("COMPLETE"/"NO_RAG") est désormais fourni par le backend avec le titre de la conversation.
+			this.ragEnabled = chatTitle.type !== ConversationType.NO_RAG;
 			this.updateAttachments(conversation.attachments);
 			const chatMessages = conversation.messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
 			this.conversationManager.setConversationMessages(chatTitle.conversationId, chatMessages);
@@ -279,6 +300,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	deleteConversation(conversation: ChatTitle) {
 		if (conversation.conversationId === this.currentConversationTitle?.conversationId) {
 			this.currentConversationTitle = null;
+			this.ragEnabled = true;
 			this.conversationManager.initNewChat();
 			this.suggestionService.clearSpecificSuggestions();
 			this.resetScrollState();
@@ -460,7 +482,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			conversationId: response.conversationAttachments.conversationId,
 			title: 'Processing attachments...',
 			timestamp: new Date(),
-			selected: true
+			selected: true,
+			type: this.ragEnabled ? ConversationType.COMPLETE : ConversationType.NO_RAG
 		};
 	}
 
@@ -573,7 +596,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			query: inputText,
 			conversationId: this.currentConversationTitle?.conversationId,
 			language: mappedLanguage,
-			workspace
+			workspace,
+			ragEnabled: !this.isLlmOnlyMode()
 		};
 
 		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
@@ -659,6 +683,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 				this.setAndSortConversations(conversations);
 				this.currentConversationTitle = this.conversationTitles[0];
 				this.currentConversationTitle.selected = true;
+				// Le type de conversation fait désormais foi une fois renvoyé par le backend.
+				if (this.currentConversationTitle.type) {
+					this.ragEnabled = this.currentConversationTitle.type !== ConversationType.NO_RAG;
+				}
 				// Transfer messages from NEW_CHAT_KEY to the new conversation
 				this.conversationManager.transferNewChatToConversation(this.currentConversationTitle.conversationId);
 			});

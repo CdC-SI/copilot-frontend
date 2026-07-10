@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ConversationService} from '../../services/conversation.service';
-import {ChatTitle} from '../../model/chat-history';
+import {ChatTitle, ConversationType} from '../../model/chat-history';
 
 @Component({
 	selector: 'zco-chat-history',
@@ -16,6 +16,16 @@ export class ChatHistoryComponent {
 	@Output() readonly conversationDeleted = new EventEmitter<ChatTitle>();
 	@Input() titles!: ChatTitle[] | null;
 	constructor(private readonly conversationService: ConversationService) {}
+
+	/** Icône représentant le type de conversation : Corpus documentaire (book) ou LLM seul (bolt). */
+	getTypeIcon(title: ChatTitle): string {
+		return title.type === ConversationType.NO_RAG ? 'bolt' : 'book';
+	}
+
+	/** Libellé accessible/tooltip associé à l'icône de type de conversation. */
+	getTypeLabel(title: ChatTitle): string {
+		return title.type === ConversationType.NO_RAG ? 'chat.new-conversation-llm-only.short-tooltip' : 'chat.new-conversation.short-tooltip';
+	}
 
 	titleSelected(title: ChatTitle): void {
 		this.titles.forEach(t => (t.selected = false));

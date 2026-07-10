@@ -18,7 +18,6 @@ export interface ChatRequest {
 	command?: string;
 	commandArgs?: string;
 	autocomplete?: boolean;
-	rag?: boolean;
 	agenticRag?: boolean;
 	sourceValidation?: boolean;
 	topicCheck?: boolean;
@@ -26,6 +25,8 @@ export interface ChatRequest {
 	conversationId?: string;
 	/** Nom du workspace explicitement choisi par l'utilisateur (override du routing automatique). */
 	workspace?: string;
+	/** Si false, la question est traitée en mode "LLM seul" : aucune recherche n'est faite dans le Corpus documentaire. */
+	ragEnabled?: boolean;
 }
 
 export enum ChatRequestConfigFields {
