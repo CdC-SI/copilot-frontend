@@ -112,6 +112,27 @@ export class CorpusComponent implements OnInit, OnDestroy {
 			});
 	}
 
+	reactivateDocument(doc: IPersonalDocument): void {
+		this.uploadService
+			.reactivateUserDocument(doc.title)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: () => {
+					this.notifService.success('personal.documents.reactivate.success');
+					this.loadUserDocuments();
+				},
+				error: () => this.notifService.error('personal.documents.reactivate.error')
+			});
+	}
+
+	isArchived(doc: IPersonalDocument): boolean {
+		return doc.availabilityStatus === 'ARCHIVED';
+	}
+
+	getAvailabilityStatusClass(doc: IPersonalDocument): string {
+		return this.isArchived(doc) ? 'availability-archived' : 'availability-active';
+	}
+
 	loadMySourceRequests(): void {
 		this.isLoadingRequests = true;
 		this.sourceRequestService

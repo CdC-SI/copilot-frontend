@@ -72,7 +72,34 @@
 									</mat-chip>
 								</div>
 							</mat-card-header>
+							<mat-card-content *ngIf="doc.availabilityStatus || (doc.timeToLiveInDays !== undefined && doc.timeToLiveInDays !== null)">
+								<div class="availability-info">
+									<mat-chip *ngIf="doc.availabilityStatus" [class]="getAvailabilityStatusClass(doc)">
+										<mat-icon svgIcon="{{ isArchived(doc) ? 'archive' : 'checkmark-circle' }}"></mat-icon>
+										{{ "personal.documents.availability." + doc.availabilityStatus.toLowerCase() | translate }}
+									</mat-chip>
+									<span *ngIf="doc.timeToLiveInDays !== undefined && doc.timeToLiveInDays !== null" class="ttl-info" [class.ttl-warning]="isArchived(doc)">
+										<mat-icon svgIcon="clock"></mat-icon>
+										{{ (isArchived(doc) ? "personal.documents.ttl.deletion" : "personal.documents.ttl.archival") | translate: { days: doc.timeToLiveInDays } }}
+									</span>
+								</div>
+								<div *ngIf="isArchived(doc)" class="archived-warning">
+									<mat-icon svgIcon="info"></mat-icon>
+									<span>{{ "personal.documents.archived.warning" | translate }}</span>
+								</div>
+							</mat-card-content>
 							<mat-card-actions align="end">
+								<button
+									mat-icon-button
+									type="button"
+									[obButton]="'secondary'"
+									*ngIf="isArchived(doc)"
+									(click)="reactivateDocument(doc)"
+									[attr.aria-label]="'Reactivate ' + doc.title"
+									matTooltip="{{ 'personal.documents.reactivate' | translate }}"
+								>
+									<mat-icon svgIcon="refresh"></mat-icon>
+								</button>
 								<button
 									mat-icon-button
 									type="button"
@@ -106,6 +133,42 @@
 						<strong>{{ "sources.info.personal.title" | translate }}</strong>
 						<p>{{ "sources.info.personal.description" | translate }}</p>
 					</div>
+				</div>
+
+				<!-- Lifecycle legend: explains the ACTIVE -> ARCHIVED -> DELETED flow -->
+				<div class="lifecycle-section">
+					<div class="lifecycle-header">
+						<mat-icon svgIcon="clock"></mat-icon>
+						<strong>{{ "personal.documents.lifecycle.title" | translate }}</strong>
+					</div>
+					<p class="lifecycle-intro">{{ "personal.documents.lifecycle.intro" | translate }}</p>
+					<ul class="lifecycle-steps">
+						<li>
+							<mat-chip class="availability-active">
+								<mat-icon svgIcon="checkmark-circle"></mat-icon>
+								{{ "personal.documents.availability.active" | translate }}
+							</mat-chip>
+							<span>{{ "personal.documents.lifecycle.active" | translate }}</span>
+						</li>
+						<li>
+							<mat-chip class="availability-archived">
+								<mat-icon svgIcon="archive"></mat-icon>
+								{{ "personal.documents.availability.archived" | translate }}
+							</mat-chip>
+							<span>{{ "personal.documents.lifecycle.archived" | translate }}</span>
+						</li>
+						<li>
+							<mat-chip class="availability-deleted">
+								<mat-icon svgIcon="trash"></mat-icon>
+								{{ "personal.documents.lifecycle.deleted.label" | translate }}
+							</mat-chip>
+							<span>{{ "personal.documents.lifecycle.deleted" | translate }}</span>
+						</li>
+					</ul>
+					<p class="lifecycle-hint">
+						<mat-icon svgIcon="refresh"></mat-icon>
+						{{ "personal.documents.lifecycle.reactivate.hint" | translate }}
+					</p>
 				</div>
 			</div>
 		</mat-tab>

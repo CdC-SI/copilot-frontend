@@ -5,6 +5,7 @@ import {UserAccountsComponent} from './user-accounts/user-accounts.component';
 import {AlertsComponent} from './alerts/alerts.component';
 import {SourcesComponent} from './sources/sources.component';
 import {WorkspacesComponent} from './workspaces/workspaces.component';
+import {RetentionConfigComponent} from './retention-config/retention-config.component';
 
 @Component({
 	selector: 'zco-admin',
@@ -17,6 +18,7 @@ export class AdminComponent {
 	@ViewChild('alertsComponent') alertComponent?: AlertsComponent;
 	@ViewChild('sourcesComponent') sourcesComponent?: SourcesComponent;
 	@ViewChild('workspacesComponent') workspacesComponent?: WorkspacesComponent;
+	@ViewChild('retentionConfigComponent') retentionConfigComponent?: RetentionConfigComponent;
 	@ViewChild('sourcesPanel') sourcesPanel?: MatExpansionPanel;
 
 	onFeedbackPanelOpened() {
@@ -37,6 +39,10 @@ export class AdminComponent {
 
 	onWorkspacesPanelOpened() {
 		queueMicrotask(() => this.workspacesComponent?.reload());
+	}
+
+	onRetentionPanelOpened() {
+		queueMicrotask(() => this.retentionConfigComponent?.reload());
 	}
 
 	/** Ouvre le panneau Sources et met en évidence la source sélectionnée depuis le détail d'un workspace. */

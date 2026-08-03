@@ -38,6 +38,7 @@ import {DocumentFeedbackDetailDialogComponent} from './admin/feedback-kpi/docume
 import {FaqEditComponent} from './admin/faq-edit/faq-edit.component';
 import {UserAccountsComponent} from './admin/user-accounts/user-accounts.component';
 import {DocUploadComponent} from './admin/doc-upload/doc-upload.component';
+import {RetentionConfigComponent} from './admin/retention-config/retention-config.component';
 import {AlertsComponent} from './admin/alerts/alerts.component';
 import {ReactivateDialogComponent} from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
 import {SumexComponent} from './tools/sumex/sumex.component';
@@ -78,6 +79,7 @@ function bannerFactory(configurationService: ConfigurationService) {
 		FaqEditComponent,
 		UserAccountsComponent,
 		DocUploadComponent,
+		RetentionConfigComponent,
 		AlertsComponent,
 		ReactivateDialogComponent,
 		SumexComponent,
