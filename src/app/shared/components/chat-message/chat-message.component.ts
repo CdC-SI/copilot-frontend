@@ -12,6 +12,7 @@ export class ChatMessageComponent {
 	@Input() message: ChatMessage;
 	@Input() conversationId: string;
 	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
+	@Output() readonly workspaceChange = new EventEmitter<{question: string; workspace: string}>();
 	sourcePanelOpen: boolean;
 	protected readonly ChatMessageSource = ChatMessageSource;
 

@@ -15,7 +15,8 @@ import {
 	SUGGESTION_TAG_REGEX,
 	TAGS_TAG_REGEX,
 	TOOL_TAG_REGEX,
-	TOPIC_CHECK_REGEX
+	TOPIC_CHECK_REGEX,
+	WORKSPACE_TAG_REGEX
 } from '../../shared/utils/zco-utils';
 import {ChatMessage} from '../../shared/model/chat-message';
 import {MessageSource} from '../../shared/model/chat-history';
@@ -89,6 +90,9 @@ export class ChatStreamProcessorService {
 		// Extract and remove source tags
 		this.extractSources(message);
 
+		// Extract and remove workspace tag
+		this.extractWorkspace(message);
+
 		// Extract and remove suggestion tags
 		const suggestionMatch = SUGGESTION_TAG_REGEX.exec(message.message);
 		if (suggestionMatch) {
@@ -160,6 +164,14 @@ export class ChatStreamProcessorService {
 
 			message.sources.push(source);
 			message.message = message.message.replace(sourceMatch[0], '');
+		}
+	}
+
+	private extractWorkspace(message: ChatMessage): void {
+		const workspaceMatch = WORKSPACE_TAG_REGEX.exec(message.message);
+		if (workspaceMatch) {
+			message.workspace = workspaceMatch[1];
+			message.message = message.message.replace(WORKSPACE_TAG_REGEX, '');
 		}
 	}
 }

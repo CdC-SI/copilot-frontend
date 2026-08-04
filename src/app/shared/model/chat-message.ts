@@ -21,6 +21,8 @@ export interface ChatMessage {
 	isProcessingIntent?: boolean;
 	isProcessingSources?: boolean;
 	isProcessingTags?: boolean;
+	/** Nom du workspace utilisé par le backend pour répondre à cette question (affiché au niveau de la question). */
+	workspace?: string;
 }
 
 export enum ChatMessageSource {

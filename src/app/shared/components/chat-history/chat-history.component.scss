@@ -1,15 +1,25 @@
 @use "@oblique/oblique/styles/scss/core/palette";
 
 :host {
+	.history-list {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding-top: 4px;
+	}
+
 	.title-selected {
 		background-color: palette.$ob-secondary-50 !important;
+		border-left: 3px solid palette.$ob-blue-900;
 	}
 
 	mat-list-item {
-		padding: 0 4px !important;
-		border-radius: 8px;
-		margin-top: -12px;
-		margin-bottom: -12px;
+		--mdc-list-list-item-container-height: auto;
+		height: auto !important;
+		padding: 6px 8px !important;
+		border-radius: 10px;
+		border-left: 3px solid transparent;
+		transition: background-color 0.15s ease, box-shadow 0.15s ease;
 	}
 
 	.title {
@@ -18,28 +28,85 @@
 
 	.title:hover {
 		background-color: palette.$ob-secondary-50;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+	}
+
+	// Léger accent ambré pour repérer les conversations "sans Corpus" dans la liste.
+	mat-list-item.llm-only {
+		border-left-color: rgba(217, 119, 6, 0.35);
+	}
+
+	mat-list-item.llm-only.title-selected {
+		border-left-color: #d97706;
 	}
 
 	.history-item {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		gap: 8px;
 		width: 100%;
 		min-width: 0;
+		padding: 4px 0;
 
-		span {
-			cursor: pointer;
-			flex: 1;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			margin-right: 4px
+		.type-icon {
+			flex: none;
+			width: 16px;
+			height: 16px;
+			font-size: 16px;
+			color: palette.$ob-blue-900;
+			opacity: 0.7;
 		}
+	}
+
+	mat-list-item.llm-only .type-icon {
+		color: #d97706;
+	}
+
+	.history-item-body {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-width: 0;
+		cursor: pointer;
+		gap: 1px;
+	}
+
+	.history-item-title {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: 0.88rem;
+		line-height: 1.3;
+	}
+
+	.history-item-date {
+		font-size: 0.7rem;
+		color: var(--theme-text-light, #888);
+		white-space: nowrap;
+	}
+
+	button {
+		opacity: 0;
+		transition: opacity 0.2s;
+		flex-shrink: 0;
+		width: 24px;
+		padding: 0;
+		line-height: 24px;
+
+		.mat-icon {
+			font-size: 16px;
+			width: 16px;
+			height: 16px;
+		}
+	}
+
+	.actions {
+		display: flex;
+		flex: none;
+		opacity: 0;
+		transition: opacity 0.2s;
 
 		button {
-			opacity: 0;
-			transition: opacity 0.2s;
-			flex-shrink: 0;
 			width: 24px;
 			padding: 0;
 			line-height: 24px;
@@ -49,64 +116,48 @@
 				width: 16px;
 				height: 16px;
 			}
-		}
 
-		.actions {
-			display: flex;
-			opacity: 0;
-			transition: opacity 0.2s;
+			border-radius: 4px;
+			margin-left: 2px;
 
-			button {
-				width: 24px;
-				padding: 0;
-				line-height: 24px;
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.04);
+			}
 
-				.mat-icon {
-					font-size: 16px;
-					width: 16px;
-					height: 16px;
-				}
+			&:first-child:hover {  // edit button
+				background-color: #908e8e;
+				color: #000000;
+			}
 
-				border-radius: 4px;
-				margin-left: 2px;
-
-				&:hover {
-					background-color: rgba(0, 0, 0, 0.04);
-				}
-
-				&:first-child:hover {  // edit button
-					background-color: #908e8e;
-					color: #000000;
-				}
-
-				&:last-child:hover {   // delete button
-					background-color: #ffebee;
-					color: #d32f2f;
-				}
+			&:last-child:hover {   // delete button
+				background-color: #ffebee;
+				color: #d32f2f;
 			}
 		}
+	}
 
-		input {
-			position: static;       // Changed from relative to avoid event blocking
-			z-index: 1000;
-			width: 100%;
-			border: none;
-			background-color: white;
-			padding: 8px 0;
-			margin: 0;
-			font-size: inherit;
-			font-family: inherit;
-			border-bottom: 1px solid palette.$ob-secondary-500;
-			outline: none;
-			height: auto;           // Changed from fixed height
-			min-height: 24px;      // Added min-height
-			line-height: 24px;
-			box-sizing: border-box;
-			pointer-events: all;    // Added to ensure events are captured
+	input {
+		position: static;       // Changed from relative to avoid event blocking
+		z-index: 1000;
+		width: 100%;
+		flex: 1;
+		min-width: 0;
+		border: none;
+		background-color: white;
+		padding: 8px 0;
+		margin: 0;
+		font-size: inherit;
+		font-family: inherit;
+		border-bottom: 1px solid palette.$ob-secondary-500;
+		outline: none;
+		height: auto;           // Changed from fixed height
+		min-height: 24px;      // Added min-height
+		line-height: 24px;
+		box-sizing: border-box;
+		pointer-events: all;    // Added to ensure events are captured
 
-			&:focus {
-				border-bottom: 2px solid palette.$ob-secondary-500;
-			}
+		&:focus {
+			border-bottom: 2px solid palette.$ob-secondary-500;
 		}
 	}
 }

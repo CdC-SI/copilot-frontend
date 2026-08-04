@@ -16,7 +16,7 @@ export class SourceRequestService {
 	) {}
 
 	getMyRequests(): Observable<ISourceRequest[]> {
-		return this.http.get<ISourceRequest[]>(this.config.backendApi(this.SOURCE_REQUESTS_URL));
+		return this.http.get<ISourceRequest[]>(this.config.backendApi(`${this.SOURCE_REQUESTS_URL}/my`));
 	}
 
 	createRequest(request: ISourceRequest): Observable<ISourceRequest> {

@@ -1,0 +1,58 @@
+.workspaces-root {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.actions-bar {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.description-cell {
+	max-width: 320px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.detail-row {
+	height: 0;
+}
+
+.expanded-detail {
+	overflow: hidden;
+	max-height: 0;
+	transition: max-height 0.2s ease-in-out;
+	padding: 0;
+}
+
+.expanded-detail.expanded {
+	max-height: 500px;
+	padding: 12px 0;
+}
+
+.sources-list {
+	margin-bottom: 8px;
+}
+
+.no-sources {
+	font-style: italic;
+	opacity: 0.7;
+}
+
+.hypothetical-questions {
+	margin-bottom: 8px;
+}
+
+.workspace-row {
+	cursor: pointer;
+}
+
+.clickable-source-chip {
+	cursor: pointer;
+}
+
+.clickable-source-chip:hover {
+	text-decoration: underline;
+}

@@ -1,0 +1,32 @@
+<span class="workspace-badge">
+	<button
+		type="button"
+		class="workspace-badge-label"
+		(click)="openContent()"
+		[matTooltip]="'workspace.badge.tooltip' | translate: { name: (workspaceName | translate) }"
+	>
+		<mat-icon svgIcon="folder" class="badge-icon"></mat-icon>
+		<span class="badge-name">{{ workspaceName | translate }}</span>
+	</button>
+
+	<button
+		type="button"
+		class="workspace-badge-chevron"
+		[matMenuTriggerFor]="workspaceMenu"
+		(menuOpened)="loadAvailableWorkspaces()"
+		[attr.aria-label]="'workspace.badge.change' | translate"
+		[matTooltip]="'workspace.badge.change' | translate"
+	>
+		<mat-icon svgIcon="arrow-down"></mat-icon>
+	</button>
+</span>
+
+<mat-menu #workspaceMenu="matMenu">
+	<div *ngIf="isLoadingWorkspaces" class="workspace-menu-loading">
+		<mat-spinner diameter="20"></mat-spinner>
+	</div>
+	<button mat-menu-item *ngFor="let workspace of availableWorkspaces" (click)="selectWorkspace(workspace)" [disabled]="isCurrent(workspace)">
+		<mat-icon svgIcon="checkmark" *ngIf="isCurrent(workspace)"></mat-icon>
+		<span>{{ workspace.name | translate }}</span>
+	</button>
+</mat-menu>

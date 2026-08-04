@@ -1,0 +1,21 @@
+.workspace-edit-content .grid {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 420px;
+}
+
+.actions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+mat-chip-grid {
+	width: 100%;
+}
+
+@media (max-width: 640px) {
+	.workspace-edit-content .grid {
+		min-width: 0;
+	}
+}

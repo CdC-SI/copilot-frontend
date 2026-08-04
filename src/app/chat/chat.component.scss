@@ -20,6 +20,35 @@
 		@include thin-scrollbar;
 	}
 
+	.history-actions {
+		gap: 4px;
+	}
+
+	.llm-only-banner {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		width: 100%;
+		max-width: 50vw;
+		margin: 8px auto 0;
+		padding: 10px 16px;
+		border-radius: 8px;
+		background: #fef3e2;
+		color: #92400e;
+
+		mat-icon {
+			flex: none;
+			color: #d97706;
+		}
+
+		.llm-only-banner-text {
+			display: flex;
+			flex-direction: column;
+			font-size: 0.85rem;
+			line-height: 1.3;
+		}
+	}
+
 	.chat-container {
 		padding: 0 16px;
 		flex: 1 1 0;
@@ -200,6 +229,24 @@
 		width: 100%;
 		justify-self: start;
 		margin: 16px 0;
+	}
+
+	// Mode "sans Corpus" (LLM seul) : accent ambré sur les bulles pour bien distinguer visuellement
+	// cette conversation d'une conversation standard qui interroge le Corpus documentaire.
+	.chat-container.llm-only-mode {
+		.my-message {
+			background: #fef7ed;
+			border: 1px solid #fcd9a6;
+		}
+
+		.ia-message {
+			border-left: 3px solid #d97706;
+			padding-left: 12px;
+		}
+
+		.ia-avatar {
+			filter: sepia(0.6) saturate(3) hue-rotate(-10deg);
+		}
 	}
 
 	.attachments-container {

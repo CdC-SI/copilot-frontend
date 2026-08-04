@@ -18,18 +18,18 @@ export class AppComponent implements OnInit {
 	navigationGuest: ObINavigationLink[] = [{url: '/chat', label: 'chat'}];
 	navigationUser: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
-		{url: '/personal-documents', label: 'personal.documents'},
+		{url: '/corpus', label: 'corpus'},
 		{url: '/tips', label: 'tips.component'}
 	];
 	navigationTranslator: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
-		{url: '/personal-documents', label: 'personal.documents'},
+		{url: '/corpus', label: 'corpus'},
 		{url: '/tools', label: 'tools'},
 		{url: '/tips', label: 'tips.component'}
 	];
 	navigationAdmin: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
-		{url: '/personal-documents', label: 'personal.documents'},
+		{url: '/corpus', label: 'corpus'},
 		{url: '/admin', label: 'admin'},
 		{url: '/tools', label: 'tools'},
 		{url: '/tips', label: 'tips.component'}

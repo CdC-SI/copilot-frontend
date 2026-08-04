@@ -1,0 +1,92 @@
+.workspace-content-dialog {
+	min-width: 320px;
+	width: 100%;
+
+	.workspace-description {
+		color: var(--ob-color-text-secondary, #5a5a5a);
+		margin-bottom: 1rem;
+	}
+
+	.loading-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 1.5rem 0;
+	}
+
+	.no-sources,
+	.no-contents {
+		font-style: italic;
+		color: var(--ob-color-text-secondary, #5a5a5a);
+	}
+
+	.source-description {
+		margin: 0 0 0.5rem;
+		font-size: 0.9rem;
+	}
+
+	.contents-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			display: flex;
+			align-items: center;
+			gap: 0.4rem;
+			padding: 0.2rem 0;
+		}
+	}
+
+	.contents-loading {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+
+		.spin {
+			animation: zco-workspace-spin 1.2s linear infinite;
+		}
+	}
+
+	// Assure que le titre d'une source dispose de toute la largeur disponible et n'est
+	// pas écrasé par l'icône d'expansion : l'icône ne doit jamais rétrécir, le texte peut
+	// s'étendre et se tronquer proprement avec un tooltip pour lire le nom complet.
+	::ng-deep .sources-accordion .mat-expansion-panel-header {
+		.mat-content {
+			overflow: hidden;
+		}
+
+		.mat-expansion-panel-header-title {
+			min-width: 0;
+			flex: 1;
+		}
+	}
+
+	.panel-icon {
+		flex-shrink: 0;
+		margin-right: 0.4rem;
+		vertical-align: middle;
+	}
+
+	.source-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+	}
+}
+
+.title-icon {
+	vertical-align: middle;
+	margin-right: 0.3rem;
+}
+
+@keyframes zco-workspace-spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
