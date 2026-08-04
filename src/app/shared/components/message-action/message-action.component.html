@@ -7,6 +7,7 @@
 	[svgIcon]="message.beingSpoken ? 'audio-mute' : 'audio'"
 	(click)="speak()"
 ></mat-icon>
+<mat-icon [matTooltip]="'copy.answer' | translate" [svgIcon]="'duplicate'" (click)="copyAnswer()"></mat-icon>
 
 <ng-template #addFaqItemDialog>
 	<h4 mat-dialog-title>{{ "edit.question.answer" | translate }}</h4>

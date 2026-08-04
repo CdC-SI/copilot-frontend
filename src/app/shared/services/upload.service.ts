@@ -50,7 +50,9 @@ export class UploadService {
 				docs.map(doc => ({
 					title: doc.title,
 					uploadedAt: new Date(doc.uploadedAt),
-					status: doc.status
+					status: doc.status,
+					availabilityStatus: doc.availabilityStatus,
+					timeToLiveInDays: doc.timeToLiveInDays
 				}))
 			)
 		);
@@ -59,5 +61,10 @@ export class UploadService {
 	deleteUserDocument(title: string): Observable<void> {
 		const url = this.config.backendApi('/documents/user-docs');
 		return this.http.delete<void>(url, {params: {filename: title}});
+	}
+
+	reactivateUserDocument(title: string): Observable<void> {
+		const url = this.config.backendApi('/documents/user-docs/reactivate');
+		return this.http.put<void>(url, null, {params: {filename: title}});
 	}
 }

@@ -1,0 +1,88 @@
+<div class="workspaces-root">
+	<div class="actions-bar">
+		<button mat-button [obButton]="'primary'" (click)="openCreateDialog()">
+			<mat-icon svgIcon="plus"></mat-icon>
+			{{ "admin.workspaces.create.cta" | translate }}
+		</button>
+	</div>
+
+	<table mat-table class="ob-table" [dataSource]="workspacesDataSource" multiTemplateDataRows>
+		<caption>
+			{{
+				"admin.workspaces.list" | translate
+			}}
+		</caption>
+
+		<ng-container matColumnDef="name">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.workspaces.name" | translate }}</th>
+			<td mat-cell *matCellDef="let workspace">{{ workspace.name }}</td>
+		</ng-container>
+
+		<ng-container matColumnDef="description">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.workspaces.description" | translate }}</th>
+			<td mat-cell *matCellDef="let workspace" class="description-cell">{{ workspace.description }}</td>
+		</ng-container>
+
+		<ng-container matColumnDef="sources">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.workspaces.sources" | translate }}</th>
+			<td mat-cell *matCellDef="let workspace">
+				<button mat-button [obButton]="'tertiary'" (click)="$event.stopPropagation(); toggleExpand(workspace)">
+					{{ "admin.workspaces.sources.count" | translate: { count: workspace.sources.length } }}
+					<mat-icon [svgIcon]="isExpanded(workspace) ? 'chevron-up' : 'chevron-down'"></mat-icon>
+				</button>
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="updatedAt">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.workspaces.updatedAt" | translate }}</th>
+			<td mat-cell *matCellDef="let workspace">{{ workspace.updatedAt | date: "yyyy-MM-dd HH:mm" }}</td>
+		</ng-container>
+
+		<ng-container matColumnDef="actions">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.actions" | translate }}</th>
+			<td mat-cell *matCellDef="let workspace">
+				<button mat-icon-button [matTooltip]="'admin.actions.edit' | translate" (click)="$event.stopPropagation(); openEditDialog(workspace)">
+					<mat-icon svgIcon="pen"></mat-icon>
+				</button>
+				<button mat-icon-button [matTooltip]="'admin.actions.delete' | translate" (click)="$event.stopPropagation(); delete(workspace)">
+					<mat-icon svgIcon="trash"></mat-icon>
+				</button>
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="expandedDetail">
+			<td mat-cell *matCellDef="let workspace" [attr.colspan]="displayedColumns.length">
+				<div class="expanded-detail" [class.expanded]="isExpanded(workspace)">
+					<ng-container *ngIf="isExpanded(workspace)">
+						<div class="hypothetical-questions" *ngIf="workspace.hypotheticalQuestions?.length">
+							<strong>{{ "admin.workspaces.hypotheticalQuestions" | translate }}:</strong>
+							<mat-chip-set>
+								<mat-chip *ngFor="let question of workspace.hypotheticalQuestions">{{ question }}</mat-chip>
+							</mat-chip-set>
+						</div>
+						<div class="sources-list" *ngIf="workspace.sources?.length; else noSources">
+							<strong>{{ "admin.workspaces.sources" | translate }}:</strong>
+							<mat-chip-set>
+								<mat-chip
+									*ngFor="let source of workspace.sources"
+									class="clickable-source-chip"
+									[matTooltip]="'admin.workspaces.sources.viewInSources' | translate"
+									(click)="$event.stopPropagation(); selectSource(source)"
+								>
+									{{ "sources." + source | translate }}
+								</mat-chip>
+							</mat-chip-set>
+						</div>
+						<ng-template #noSources>
+							<span class="no-sources">{{ "admin.workspaces.sources.empty" | translate }}</span>
+						</ng-template>
+					</ng-container>
+				</div>
+			</td>
+		</ng-container>
+
+		<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+		<tr mat-row *matRowDef="let row; columns: displayedColumns" class="workspace-row" (click)="toggleExpand(row)"></tr>
+		<tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+	</table>
+</div>

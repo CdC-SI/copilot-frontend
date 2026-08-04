@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>
+	<mat-icon svgIcon="folder" class="title-icon"></mat-icon>
+	{{ data.workspaceName | translate }}
+</h2>
+
+<mat-dialog-content class="workspace-content-dialog">
+	<div *ngIf="isLoading" class="loading-container">
+		<mat-spinner diameter="32"></mat-spinner>
+		<p>{{ "corpus.workspaces.loading" | translate }}</p>
+	</div>
+
+	<ng-container *ngIf="!isLoading && workspace as ws">
+		<p class="workspace-description" *ngIf="ws.description">{{ ws.description }}</p>
+
+		<div *ngIf="!ws.sources.length" class="no-sources">
+			{{ "corpus.workspaces.sources.empty" | translate }}
+		</div>
+
+		<mat-accordion multi class="sources-accordion" *ngIf="ws.sources.length">
+			<mat-expansion-panel *ngFor="let sourceName of ws.sources" (opened)="loadSourceContents(sourceName)">
+				<mat-expansion-panel-header>
+					<mat-panel-title [matTooltip]="'sources.' + sourceName | translate">
+						<mat-icon svgIcon="book" class="panel-icon"></mat-icon>
+						<span class="source-name">{{ "sources." + sourceName | translate }}</span>
+					</mat-panel-title>
+				</mat-expansion-panel-header>
+
+				<div *ngIf="isLoadingContents(sourceName)" class="contents-loading">
+					<mat-icon svgIcon="refresh" class="spin"></mat-icon>
+					{{ "corpus.workspaces.contents.loading" | translate }}
+				</div>
+
+				<ng-container *ngIf="!isLoadingContents(sourceName) && getContents(sourceName) as detail">
+					<p class="source-description" *ngIf="detail.description">{{ detail.description }}</p>
+					<ul class="contents-list" *ngIf="detail.contents?.length; else noContents">
+						<li *ngFor="let content of detail.contents">
+							<mat-icon svgIcon="file" class="content-icon"></mat-icon>
+							{{ content.title || content.url }}
+						</li>
+					</ul>
+					<ng-template #noContents>
+						<span class="no-contents">{{ "corpus.workspaces.contents.empty" | translate }}</span>
+					</ng-template>
+				</ng-container>
+			</mat-expansion-panel>
+		</mat-accordion>
+	</ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+	<button mat-button [obButton]="'primary'" mat-dialog-close>
+		{{ "close" | translate }}
+	</button>
+</mat-dialog-actions>

@@ -22,6 +22,7 @@ import {MatChipsModule} from '@angular/material/chips';
 import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {TextFieldModule} from '@angular/cdk/text-field';
 
 @NgModule({
@@ -48,6 +49,7 @@ import {TextFieldModule} from '@angular/cdk/text-field';
 		MatDialogModule,
 		MatSidenavModule,
 		MatSlideToggleModule,
+		MatProgressSpinnerModule,
 		TextFieldModule
 	],
 	exports: [
@@ -76,6 +78,7 @@ import {TextFieldModule} from '@angular/cdk/text-field';
 		MatSidenavModule,
 		MatSlideToggleModule,
 		MatTooltipModule,
+		MatProgressSpinnerModule,
 		TextFieldModule
 	],
 	providers: [

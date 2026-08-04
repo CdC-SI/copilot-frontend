@@ -5,7 +5,7 @@ import {RagService} from '../shared/services/rag.service';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
-import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle} from '../shared/model/chat-history';
+import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle, ConversationType} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -16,7 +16,6 @@ import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
 import {HttpEventType} from '@angular/common/http';
-import {MatDialog} from '@angular/material/dialog';
 import {
 	AutocompleteType,
 	ChatAutocompleteService,
@@ -26,7 +25,7 @@ import {
 	LANGUAGE_MAP,
 	UserAuthDialogService
 } from './services';
-import {Subject, filter, map, merge, of, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
+import {Subject, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 10_000;
 const ATTACHMENT_POLL_MAX_ATTEMPTS = 15;
@@ -48,24 +47,27 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	activeForm?: {def: FormDef; group: FormGroup};
 	attachments: Attachment[] = [];
 	isDragOver = false;
-	availableWorkspaces: string[] = [];
-	selectedWorkspace = '';
 	containerResizeObserver: ResizeObserver;
 	attachmentsPollingTimedOut = false;
-
-	private readonly destroy$ = new Subject<void>();
-	private pollingStop$ = new Subject<void>();
-	private pollingCancelled = false;
+	/**
+	 * Mode "LLM seul" choisi pour une conversation qui n'existe pas encore côté backend (avant le premier
+	 * échange). Une fois la conversation créée, c'est `currentConversationTitle.type` qui fait foi (cf.
+	 * `isLlmOnlyMode()`) : le mode est alors figé pour toute la conversation, comme la navigation privée.
+	 */
+	ragEnabled = true;
 
 	@ViewChild('userNotRegisteredTriesToChatDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('userPendingTriesToChatDialog') userPendingTriesToChatDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeDialog: TemplateRef<any>;
-	@ViewChild('workspaceSelectionDialog') workspaceSelectionDialog: TemplateRef<any>;
 	@ViewChild('messageContainer') messageContainer: ElementRef;
 	@ViewChild('scrollAnchor') scrollAnchor: ElementRef;
 	@ViewChildren('messageEl') messageElements!: QueryList<ElementRef>;
 
 	protected readonly ChatMessageSource = ChatMessageSource;
+
+	private readonly destroy$ = new Subject<void>();
+	private pollingStop$ = new Subject<void>();
+	private pollingCancelled = false;
 
 	get messages(): ChatMessage[] {
 		return this.conversationManager.getMessages(this.currentConversationTitle?.conversationId);
@@ -77,6 +79,18 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	get specificSuggestions() {
 		return this.suggestionService.getSpecificSuggestions();
+	}
+
+	/**
+	 * Indique si la conversation courante est en mode "sans Corpus" (LLM seul). Une fois la conversation
+	 * persistée côté backend, le type qu'elle a reçu à sa création fait foi ; sinon (nouvelle conversation
+	 * pas encore envoyée) on se base sur le choix fait via le bouton "Nouvelle conversation sans Corpus".
+	 */
+	isLlmOnlyMode(): boolean {
+		if (this.currentConversationTitle?.type) {
+			return this.currentConversationTitle.type === ConversationType.NO_RAG;
+		}
+		return !this.ragEnabled;
 	}
 
 	constructor(
@@ -93,8 +107,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		private readonly conversationManager: ChatConversationManagerService,
 		private readonly suggestionService: ChatSuggestionService,
 		private readonly autocompleteService: ChatAutocompleteService,
-		private readonly authDialogService: UserAuthDialogService,
-		private readonly dialog: MatDialog
+		private readonly authDialogService: UserAuthDialogService
 	) {}
 
 	ngAfterViewInit() {
@@ -121,7 +134,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		});
 		this.authService.$authenticatedUser.subscribe(user => {
 			if (user?.status === UserStatus.ACTIVE) {
-				this.getAvailableWorkspaces();
 				this.getConversationTitles();
 			}
 		});
@@ -187,26 +199,16 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.searchCtrl.enable();
 	}
 
-	newChat(): void {
+	newChat(ragEnabled = true): void {
 		if (this.currentConversationTitle) this.currentConversationTitle.selected = false;
 		this.currentConversationTitle = null;
+		this.ragEnabled = ragEnabled;
 		this.attachments = [];
 		this.attachmentsPollingTimedOut = false;
 		this.stopAttachmentsPolling();
 		this.conversationManager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
 		this.resetScrollState();
-		this.openWorkspaceSelectionDialog();
-	}
-
-	openWorkspaceSelectionDialog(): void {
-		if (!this.workspaceSelectionDialog || !this.availableWorkspaces?.length) return;
-		this.dialog.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false});
-	}
-
-	selectWorkspaceAndClose(workspace: string): void {
-		this.selectedWorkspace = workspace;
-		this.dialog.closeAll();
 	}
 
 	canAskLLM() {
@@ -219,14 +221,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		// 	return;
 		// }
 
-		const openWorkspaceDialog$ = this.selectedWorkspace
-			? of(true)
-			: this.dialog
-					.open(this.workspaceSelectionDialog, {width: '400px', disableClose: false})
-					.afterClosed()
-					.pipe(map(() => !!this.selectedWorkspace));
-
-		openWorkspaceDialog$.pipe().subscribe(() => this.doSendToLLM());
+		this.doSendToLLM();
 	}
 
 	doSendToLLM(): void {
@@ -234,6 +229,18 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.prepareForStreaming(inputText);
 		this.startStreamingRequest(inputText);
 		this.clearSearch();
+		this.scrollToLastUserMessage();
+	}
+
+	/**
+	 * Renvoie une question déjà posée en imposant explicitement le workspace à utiliser
+	 * (choisi par l'utilisateur via le badge affiché sous la question). Ajoute une nouvelle
+	 * paire question/réponse à la conversation, sans toucher à l'historique existant.
+	 */
+	onWorkspaceChange(event: {question: string; workspace: string}): void {
+		if (!event?.question || !event.workspace) return;
+		this.prepareForStreaming(event.question);
+		this.startStreamingRequest(event.question, event.workspace);
 		this.scrollToLastUserMessage();
 	}
 
@@ -277,10 +284,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.attachmentsPollingTimedOut = false;
 		this.conversationService.getConversation(chatTitle.conversationId).subscribe(conversation => {
 			this.currentConversationTitle = chatTitle;
+			// Le type ("COMPLETE"/"NO_RAG") est désormais fourni par le backend avec le titre de la conversation.
+			this.ragEnabled = chatTitle.type !== ConversationType.NO_RAG;
 			this.updateAttachments(conversation.attachments);
 			const chatMessages = conversation.messages.map(msg => this.conversationManager.historyMessageToChatMessage(msg));
 			this.conversationManager.setConversationMessages(chatTitle.conversationId, chatMessages);
-			this.selectedWorkspace = chatTitle.workspace;
 			this.suggestionService.setSpecificSuggestionsFromMessages(chatMessages);
 			this.scrollToLastUserMessage();
 			if (this.hasPendingAttachments()) {
@@ -292,6 +300,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	deleteConversation(conversation: ChatTitle) {
 		if (conversation.conversationId === this.currentConversationTitle?.conversationId) {
 			this.currentConversationTitle = null;
+			this.ragEnabled = true;
 			this.conversationManager.initNewChat();
 			this.suggestionService.clearSpecificSuggestions();
 			this.resetScrollState();
@@ -302,12 +311,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	getConversationTitles() {
 		this.conversationService.getConversationTitles().subscribe(conversations => {
 			this.setAndSortConversations(conversations);
-		});
-	}
-
-	getAvailableWorkspaces() {
-		this.conversationService.getAvailableWorkspaces().subscribe(workspaces => {
-			this.availableWorkspaces = workspaces;
 		});
 	}
 
@@ -415,8 +418,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.conversationService.uploadAttachments(this.currentConversationTitle, attachment.file).subscribe({
 			next: httpEvent => {
 				if (httpEvent.type === HttpEventType.Response) {
-					const response = httpEvent.body as AttachmentUploadResponse;
-					const serverAtt = response.conversationAttachments.attachments.find(s => s.filename === attachment.file!.name);
+					const response = httpEvent.body;
+					const serverAtt = response.conversationAttachments.attachments.find(s => s.filename === attachment.file.name);
 					if (serverAtt) {
 						attachment.id = serverAtt.id;
 						attachment.status = serverAtt.status;
@@ -479,7 +482,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			conversationId: response.conversationAttachments.conversationId,
 			title: 'Processing attachments...',
 			timestamp: new Date(),
-			selected: true
+			selected: true,
+			type: this.ragEnabled ? ConversationType.COMPLETE : ConversationType.NO_RAG
 		};
 	}
 
@@ -524,7 +528,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 				takeUntil(merge(this.destroy$, this.pollingStop$)),
 				take(ATTACHMENT_POLL_MAX_ATTEMPTS),
 				takeWhile(() => this.hasPendingAttachments()),
-				switchMap(() => this.conversationService.getConversationAttachmentsStatus(this.currentConversationTitle!.conversationId))
+				switchMap(() => this.conversationService.getConversationAttachmentsStatus(this.currentConversationTitle.conversationId))
 			)
 			.subscribe({
 				next: (response: AttachmentUploadResponse) => {
@@ -584,15 +588,16 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.suggestionService.clearSpecificSuggestions();
 	}
 
-	private startStreamingRequest(inputText: string): void {
+	private startStreamingRequest(inputText: string, workspace?: string): void {
 		const currentLang = this.translateService.currentLang;
 		const mappedLanguage = LANGUAGE_MAP[currentLang] || Language.DE;
 
 		const requestConfig = {
 			query: inputText,
 			conversationId: this.currentConversationTitle?.conversationId,
-			workspace: this.selectedWorkspace || undefined,
-			language: mappedLanguage
+			language: mappedLanguage,
+			workspace,
+			ragEnabled: !this.isLlmOnlyMode()
 		};
 
 		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
@@ -617,6 +622,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (!partialChatMessage) return;
 
 		const result = this.streamProcessor.processChunk(chunk, partialChatMessage);
+
+		// The workspace used to answer is surfaced on the question rather than the answer bubble.
+		if (partialChatMessage.workspace) {
+			const questionMessage = streamingMessages.at(-2);
+			if (questionMessage && questionMessage.source === ChatMessageSource.USER) {
+				questionMessage.workspace = partialChatMessage.workspace;
+			}
+		}
 
 		if (result.hasNewSuggestion && result.newSuggestion) {
 			this.suggestionService.addSpecificSuggestion(result.newSuggestion);
@@ -670,6 +683,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 				this.setAndSortConversations(conversations);
 				this.currentConversationTitle = this.conversationTitles[0];
 				this.currentConversationTitle.selected = true;
+				// Le type de conversation fait désormais foi une fois renvoyé par le backend.
+				if (this.currentConversationTitle.type) {
+					this.ragEnabled = this.currentConversationTitle.type !== ConversationType.NO_RAG;
+				}
 				// Transfer messages from NEW_CHAT_KEY to the new conversation
 				this.conversationManager.transferNewChatToConversation(this.currentConversationTitle.conversationId);
 			});

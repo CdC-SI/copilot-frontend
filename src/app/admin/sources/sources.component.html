@@ -1,0 +1,88 @@
+<div class="sources-root">
+	<div class="actions-bar">
+		<button mat-button [obButton]="'primary'" (click)="openCreateDialog()">
+			<mat-icon svgIcon="plus"></mat-icon>
+			{{ "admin.sources.create.cta" | translate }}
+		</button>
+	</div>
+
+	<table mat-table class="ob-table" [dataSource]="sourcesDataSource" multiTemplateDataRows>
+		<caption>
+			{{
+				"admin.sources.list" | translate
+			}}
+		</caption>
+
+		<ng-container matColumnDef="name">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.sources.name" | translate }}</th>
+			<td mat-cell *matCellDef="let source">{{ "sources." + source.name | translate }}</td>
+		</ng-container>
+
+		<ng-container matColumnDef="description">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.sources.description" | translate }}</th>
+			<td mat-cell *matCellDef="let source" class="description-cell">{{ source.description }}</td>
+		</ng-container>
+
+		<ng-container matColumnDef="contents">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.sources.contents" | translate }}</th>
+			<td mat-cell *matCellDef="let source">
+				<button mat-button [obButton]="'tertiary'" (click)="$event.stopPropagation(); toggleExpand(source)">
+					{{ "admin.sources.contents.label" | translate }}
+					<mat-icon [svgIcon]="isExpanded(source) ? 'chevron-up' : 'chevron-down'"></mat-icon>
+				</button>
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="updatedAt">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.sources.updatedAt" | translate }}</th>
+			<td mat-cell *matCellDef="let source">{{ source.updatedAt | date: "yyyy-MM-dd HH:mm" }}</td>
+		</ng-container>
+
+		<ng-container matColumnDef="actions">
+			<th mat-header-cell *matHeaderCellDef scope="col">{{ "admin.actions" | translate }}</th>
+			<td mat-cell *matCellDef="let source">
+				<button mat-icon-button [matTooltip]="'admin.actions.edit' | translate" (click)="$event.stopPropagation(); openEditDialog(source)">
+					<mat-icon svgIcon="pen"></mat-icon>
+				</button>
+				<button mat-icon-button [matTooltip]="'admin.actions.delete' | translate" (click)="$event.stopPropagation(); delete(source)">
+					<mat-icon svgIcon="trash"></mat-icon>
+				</button>
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="expandedDetail">
+			<td mat-cell *matCellDef="let source" [attr.colspan]="displayedColumns.length">
+				<div class="expanded-detail" [class.expanded]="isExpanded(source)">
+					<ng-container *ngIf="isExpanded(source)">
+						<div class="hypothetical-questions" *ngIf="source.hypotheticalQuestions?.length">
+							<strong>{{ "admin.sources.hypotheticalQuestions" | translate }}:</strong>
+							<mat-chip-set>
+								<mat-chip *ngFor="let question of source.hypotheticalQuestions">{{ question }}</mat-chip>
+							</mat-chip-set>
+						</div>
+
+						<div class="contents-loading" *ngIf="loadingDetail">
+							<mat-icon svgIcon="refresh" class="spin"></mat-icon>
+							{{ "admin.sources.contents.loading" | translate }}
+						</div>
+
+						<ng-container *ngIf="!loadingDetail && expandedSourceDetail?.name === source.name">
+							<ul class="contents-list" *ngIf="expandedSourceDetail?.contents?.length; else noContents">
+								<li *ngFor="let content of expandedSourceDetail?.contents">
+									{{ content.title || content.url }}
+								</li>
+							</ul>
+							<ng-template #noContents>
+								<span class="no-contents">{{ "admin.sources.contents.empty" | translate }}</span>
+							</ng-template>
+						</ng-container>
+					</ng-container>
+				</div>
+			</td>
+		</ng-container>
+
+		<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+		<tr mat-row *matRowDef="let row; columns: displayedColumns" class="source-row" [attr.id]="'source-row-' + row.name" (click)="toggleExpand(row)"></tr>
+		<tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+	</table>
+</div>

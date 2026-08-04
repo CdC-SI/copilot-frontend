@@ -1,6 +1,6 @@
-<div class="personal-documents-container pd5">
-	<h2>{{ "personal.documents.title" | translate }}</h2>
-	<p class="description">{{ "personal.documents.description" | translate }}</p>
+<div class="corpus-container pd5">
+	<h2>{{ "corpus.title" | translate }}</h2>
+	<p class="description">{{ "corpus.description" | translate }}</p>
 
 	<mat-tab-group animationDuration="300ms" class="documents-tabs">
 		<!-- Tab 1: My Personal Documents -->
@@ -72,7 +72,34 @@
 									</mat-chip>
 								</div>
 							</mat-card-header>
+							<mat-card-content *ngIf="doc.availabilityStatus || (doc.timeToLiveInDays !== undefined && doc.timeToLiveInDays !== null)">
+								<div class="availability-info">
+									<mat-chip *ngIf="doc.availabilityStatus" [class]="getAvailabilityStatusClass(doc)">
+										<mat-icon svgIcon="{{ isArchived(doc) ? 'archive' : 'checkmark-circle' }}"></mat-icon>
+										{{ "personal.documents.availability." + doc.availabilityStatus.toLowerCase() | translate }}
+									</mat-chip>
+									<span *ngIf="doc.timeToLiveInDays !== undefined && doc.timeToLiveInDays !== null" class="ttl-info" [class.ttl-warning]="isArchived(doc)">
+										<mat-icon svgIcon="clock"></mat-icon>
+										{{ (isArchived(doc) ? "personal.documents.ttl.deletion" : "personal.documents.ttl.archival") | translate: { days: doc.timeToLiveInDays } }}
+									</span>
+								</div>
+								<div *ngIf="isArchived(doc)" class="archived-warning">
+									<mat-icon svgIcon="info"></mat-icon>
+									<span>{{ "personal.documents.archived.warning" | translate }}</span>
+								</div>
+							</mat-card-content>
 							<mat-card-actions align="end">
+								<button
+									mat-icon-button
+									type="button"
+									[obButton]="'secondary'"
+									*ngIf="isArchived(doc)"
+									(click)="reactivateDocument(doc)"
+									[attr.aria-label]="'Reactivate ' + doc.title"
+									matTooltip="{{ 'personal.documents.reactivate' | translate }}"
+								>
+									<mat-icon svgIcon="refresh"></mat-icon>
+								</button>
 								<button
 									mat-icon-button
 									type="button"
@@ -107,54 +134,49 @@
 						<p>{{ "sources.info.personal.description" | translate }}</p>
 					</div>
 				</div>
+
+				<!-- Lifecycle legend: explains the ACTIVE -> ARCHIVED -> DELETED flow -->
+				<div class="lifecycle-section">
+					<div class="lifecycle-header">
+						<mat-icon svgIcon="clock"></mat-icon>
+						<strong>{{ "personal.documents.lifecycle.title" | translate }}</strong>
+					</div>
+					<p class="lifecycle-intro">{{ "personal.documents.lifecycle.intro" | translate }}</p>
+					<ul class="lifecycle-steps">
+						<li>
+							<mat-chip class="availability-active">
+								<mat-icon svgIcon="checkmark-circle"></mat-icon>
+								{{ "personal.documents.availability.active" | translate }}
+							</mat-chip>
+							<span>{{ "personal.documents.lifecycle.active" | translate }}</span>
+						</li>
+						<li>
+							<mat-chip class="availability-archived">
+								<mat-icon svgIcon="archive"></mat-icon>
+								{{ "personal.documents.availability.archived" | translate }}
+							</mat-chip>
+							<span>{{ "personal.documents.lifecycle.archived" | translate }}</span>
+						</li>
+						<li>
+							<mat-chip class="availability-deleted">
+								<mat-icon svgIcon="trash"></mat-icon>
+								{{ "personal.documents.lifecycle.deleted.label" | translate }}
+							</mat-chip>
+							<span>{{ "personal.documents.lifecycle.deleted" | translate }}</span>
+						</li>
+					</ul>
+					<p class="lifecycle-hint">
+						<mat-icon svgIcon="refresh"></mat-icon>
+						{{ "personal.documents.lifecycle.reactivate.hint" | translate }}
+					</p>
+				</div>
 			</div>
 		</mat-tab>
 
-		<!-- Tab 2: Official Sources -->
+		<!-- Tab 2: Official Sources, browsed via Workspaces -->
 		<mat-tab [label]="'sources.official.tab.title' | translate">
 			<div class="tab-content">
-				<div class="sources-section">
-					<div class="section-header">
-						<h3>{{ "sources.official.title" | translate }}</h3>
-						<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadOfficialSources()" [disabled]="isLoadingSources">
-							<mat-icon svgIcon="refresh"></mat-icon>
-						</button>
-					</div>
-
-					<div *ngIf="isLoadingSources" class="loading-container">
-						<mat-spinner diameter="40"></mat-spinner>
-						<p>{{ "loading" | translate }}</p>
-					</div>
-
-					<div *ngIf="!isLoadingSources && officialSources.length === 0" class="empty-state">
-						<mat-icon svgIcon="book" class="empty-icon"></mat-icon>
-						<p>{{ "sources.official.no.sources" | translate }}</p>
-					</div>
-
-					<div *ngIf="!isLoadingSources && officialSources.length > 0" class="sources-grid">
-						<mat-card *ngFor="let source of officialSources" class="source-card">
-							<mat-card-header>
-								<mat-icon mat-card-avatar svgIcon="book"></mat-icon>
-								<mat-card-title>{{ "sources." + source | translate }}</mat-card-title>
-							</mat-card-header>
-							<mat-card-content>
-								<p class="source-badge">
-									<mat-icon class="badge-icon" svgIcon="checkmark-circle"></mat-icon>
-									{{ "sources.official.badge" | translate }}
-								</p>
-							</mat-card-content>
-						</mat-card>
-					</div>
-
-					<!-- Info bubble about official sources -->
-					<div class="info-section">
-						<mat-icon class="info-icon" svgIcon="info"></mat-icon>
-						<div class="info-content">
-							<strong>{{ "sources.info.official.title" | translate }}</strong>
-							<p>{{ "sources.info.official.description" | translate }}</p>
-						</div>
-					</div>
-				</div>
+				<zco-official-sources-browser></zco-official-sources-browser>
 			</div>
 		</mat-tab>
 

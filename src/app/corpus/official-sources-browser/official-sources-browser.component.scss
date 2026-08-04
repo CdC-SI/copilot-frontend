@@ -1,0 +1,247 @@
+:host {
+	--browser-spacing-xs: 8px;
+	--browser-spacing-sm: 12px;
+	--browser-spacing-md: 16px;
+	--browser-spacing-lg: 24px;
+	--browser-border-radius: 4px;
+	--browser-bg-light: #f5f5f5;
+	--browser-text-muted: #666;
+}
+
+.official-sources-browser {
+	.intro-section {
+		margin-bottom: var(--browser-spacing-lg);
+		display: flex;
+		gap: var(--browser-spacing-md);
+		padding: var(--browser-spacing-md);
+		background-color: #e8f5e9;
+		border-left: 4px solid #4caf50;
+		border-radius: var(--browser-border-radius);
+
+		.intro-icon {
+			color: #4caf50;
+			flex-shrink: 0;
+		}
+
+		.intro-content {
+			flex: 1;
+
+			strong {
+				display: block;
+				margin-bottom: var(--browser-spacing-xs);
+				color: #2e7d32;
+			}
+
+			p {
+				margin: 0;
+				color: #424242;
+				font-size: 14px;
+				line-height: 1.5;
+			}
+		}
+	}
+
+	.loading-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: var(--browser-spacing-lg);
+		gap: var(--browser-spacing-md);
+
+		p {
+			color: var(--browser-text-muted);
+		}
+	}
+
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 48px;
+		background: var(--browser-bg-light);
+		border-radius: var(--browser-border-radius);
+
+		.empty-icon {
+			font-size: 48px;
+			width: 48px;
+			height: 48px;
+			color: var(--browser-text-muted);
+			margin-bottom: var(--browser-spacing-md);
+		}
+
+		p {
+			color: var(--browser-text-muted);
+			margin: 0;
+		}
+	}
+
+	.panel-icon {
+		margin-right: var(--browser-spacing-xs);
+		vertical-align: middle;
+		flex-shrink: 0;
+	}
+
+	.source-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+	}
+
+	// Le titre (icône + nom) ne doit jamais être écrasé par la description ou le compteur de
+	// sources : on lui laisse toute la place nécessaire et on tronque plutôt la description sur
+	// une seule ligne (avec tooltip pour lire le texte complet).
+	::ng-deep .mat-expansion-panel-header .mat-content {
+		overflow: hidden;
+	}
+
+	::ng-deep .mat-expansion-panel-header-title {
+		flex: 0 1 auto;
+		min-width: 0;
+	}
+
+	// Description du workspace : l'en-tête ne montre plus qu'un badge compact (compteur de sources),
+	// le texte complet de la description est affiché dans le corps du panneau une fois ouvert.
+	mat-panel-description.workspace-panel-description {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		white-space: normal;
+		flex: 0 0 auto;
+
+		.sources-count {
+			font-size: 12px;
+			color: #1976d2;
+			font-weight: 500;
+			flex-shrink: 0;
+			white-space: nowrap;
+			background-color: #e3f2fd;
+			padding: 2px 10px;
+			border-radius: 12px;
+
+			&.general-badge {
+				color: #e65100;
+				background-color: #fff3e0;
+			}
+		}
+	}
+
+	// Description complète affichée dans le corps du panneau (workspace ou source), une fois déplié :
+	// évite la troncature et l'encombrement visuel de l'en-tête tout en restant lisible.
+	.workspace-description-full,
+	.source-description-full {
+		margin: 0 0 var(--browser-spacing-md);
+		color: var(--browser-text-muted);
+		font-size: 13px;
+		line-height: 1.5;
+	}
+
+	// Mise en avant visuelle du workspace "Général" : il ne référence aucune source propre puisqu'il
+	// les contient toutes implicitement (fourre-tout par défaut).
+	mat-expansion-panel.general-panel {
+		border-left: 3px solid #fb8c00;
+
+		::ng-deep > .mat-expansion-panel-header {
+			background-color: #fff8e1;
+
+			.panel-icon {
+				color: #fb8c00;
+			}
+		}
+	}
+
+	.sources-accordion {
+		margin-top: var(--browser-spacing-sm);
+		box-shadow: none;
+	}
+
+	.no-sources,
+	.no-contents {
+		color: var(--browser-text-muted);
+		font-size: 13px;
+		padding: var(--browser-spacing-sm) 0;
+		display: block;
+	}
+
+	.contents-loading {
+		display: flex;
+		align-items: center;
+		gap: var(--browser-spacing-xs);
+		color: var(--browser-text-muted);
+		font-size: 13px;
+		padding: var(--browser-spacing-sm) 0;
+
+		.spin {
+			animation: browser-spin 1s linear infinite;
+		}
+	}
+
+	.contents-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			display: flex;
+			align-items: center;
+			gap: var(--browser-spacing-xs);
+			padding: var(--browser-spacing-xs) 0;
+			font-size: 14px;
+			border-bottom: 1px solid #eee;
+
+			&:last-child {
+				border-bottom: none;
+			}
+
+			.content-icon {
+				color: var(--browser-text-muted);
+				font-size: 18px;
+				width: 18px;
+				height: 18px;
+			}
+		}
+	}
+
+	.info-section {
+		margin-top: var(--browser-spacing-lg);
+		display: flex;
+		gap: var(--browser-spacing-md);
+		padding: var(--browser-spacing-md);
+		background-color: #e3f2fd;
+		border-left: 4px solid #2196f3;
+		border-radius: var(--browser-border-radius);
+
+		.info-icon {
+			color: #2196f3;
+			flex-shrink: 0;
+		}
+
+		.info-content {
+			flex: 1;
+
+			strong {
+				display: block;
+				margin-bottom: var(--browser-spacing-xs);
+				color: #1976d2;
+			}
+
+			p {
+				margin: 0;
+				color: #424242;
+				font-size: 14px;
+				line-height: 1.5;
+			}
+		}
+	}
+}
+
+@keyframes browser-spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}

@@ -34,3 +34,108 @@
 	background: var(--mat-dialog-container-background, #fff);
 	padding-top: 8px;
 }
+
+/* Popover d'aide comparant les modes de conversation "Standard" / "Sans Corpus" (zco-chat) */
+.modes-help-menu.mat-mdc-menu-panel {
+	max-width: 420px;
+}
+
+.modes-help-menu .mat-mdc-menu-content {
+	padding: 0;
+}
+
+.modes-help-menu .modes-help-panel {
+	padding: 16px 18px 14px;
+	cursor: default;
+}
+
+.modes-help-menu .modes-help-title {
+	margin: 0 0 12px;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #1e3a8a;
+}
+
+.modes-help-menu .modes-help-section {
+	margin-bottom: 14px;
+	padding: 10px 12px;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.03);
+	border-left: 3px solid transparent;
+}
+
+.modes-help-menu .modes-help-section.standard {
+	border-left-color: #1e3a8a;
+}
+
+.modes-help-menu .modes-help-section.llm-only {
+	border-left-color: #d97706;
+}
+
+.modes-help-menu .modes-help-section-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 4px;
+}
+
+.modes-help-menu .modes-help-section-header mat-icon {
+	flex: none;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	color: inherit;
+}
+
+.modes-help-menu .modes-help-section-title {
+	font-size: 0.9rem;
+	font-weight: 600;
+	white-space: normal;
+}
+
+.modes-help-menu .modes-help-section-text {
+	margin: 0 0 6px;
+	font-size: 0.82rem;
+	line-height: 1.4;
+	color: #333;
+	white-space: normal;
+}
+
+.modes-help-menu .modes-help-list {
+	margin: 0 0 6px;
+	padding-left: 18px;
+	font-size: 0.8rem;
+	line-height: 1.4;
+	color: #333;
+}
+
+.modes-help-menu .modes-help-list li {
+	white-space: normal;
+}
+
+.modes-help-menu .modes-help-caveat {
+	margin: 4px 0 0;
+	font-size: 0.78rem;
+	font-style: italic;
+	color: #856404;
+	white-space: normal;
+}
+
+.modes-help-menu .modes-help-footer {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 4px 0 0;
+	padding-top: 10px;
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+	font-size: 0.78rem;
+	color: #666;
+	white-space: normal;
+}
+
+.modes-help-menu .modes-help-footer mat-icon {
+	flex: none;
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+}

@@ -38,14 +38,19 @@ import {DocumentFeedbackDetailDialogComponent} from './admin/feedback-kpi/docume
 import {FaqEditComponent} from './admin/faq-edit/faq-edit.component';
 import {UserAccountsComponent} from './admin/user-accounts/user-accounts.component';
 import {DocUploadComponent} from './admin/doc-upload/doc-upload.component';
+import {RetentionConfigComponent} from './admin/retention-config/retention-config.component';
 import {AlertsComponent} from './admin/alerts/alerts.component';
 import {ReactivateDialogComponent} from './admin/alerts/reactivate-dialog/reactivate-dialog.component';
 import {SumexComponent} from './tools/sumex/sumex.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import {PersonalDocumentsComponent} from './personal-documents/personal-documents.component';
-import {RequestSourceDialogComponent} from './personal-documents/request-source-dialog/request-source-dialog.component';
+import {CorpusComponent} from './corpus/corpus.component';
+import {RequestSourceDialogComponent} from './corpus/request-source-dialog/request-source-dialog.component';
+import {OfficialSourcesBrowserComponent} from './corpus/official-sources-browser/official-sources-browser.component';
 import {CareerSummaryComponent} from './tools/career-summary/career-summary.component';
-import {ChatHeaderComponent} from './chat/chat-header/chat-header.component';
+import {SourcesComponent} from './admin/sources/sources.component';
+import {SourceEditDialogComponent} from './admin/sources/source-edit-dialog/source-edit-dialog.component';
+import {WorkspacesComponent} from './admin/workspaces/workspaces.component';
+import {WorkspaceEditDialogComponent} from './admin/workspaces/workspace-edit-dialog/workspace-edit-dialog.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -74,13 +79,18 @@ function bannerFactory(configurationService: ConfigurationService) {
 		FaqEditComponent,
 		UserAccountsComponent,
 		DocUploadComponent,
+		RetentionConfigComponent,
 		AlertsComponent,
 		ReactivateDialogComponent,
 		SumexComponent,
-		PersonalDocumentsComponent,
+		CorpusComponent,
 		RequestSourceDialogComponent,
+		OfficialSourcesBrowserComponent,
 		CareerSummaryComponent,
-		ChatHeaderComponent
+		SourcesComponent,
+		SourceEditDialogComponent,
+		WorkspacesComponent,
+		WorkspaceEditDialogComponent
 	],
 	imports: [
 		BrowserModule,

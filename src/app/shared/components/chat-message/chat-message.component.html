@@ -1,5 +1,11 @@
 <div *ngIf="message.source === ChatMessageSource.USER">
 	<markdown class="no-margin" [data]="message.message"></markdown>
+	<zco-workspace-badge
+		*ngIf="message.workspace"
+		[workspaceName]="message.workspace"
+		[question]="message.message"
+		(workspaceChange)="workspaceChange.emit($event)"
+	></zco-workspace-badge>
 </div>
 <div *ngIf="message.source !== ChatMessageSource.USER">
 	<div class="flex-column">

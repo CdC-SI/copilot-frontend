@@ -25,6 +25,8 @@ import {FilePreviewComponent} from './components/file-preview/file-preview.compo
 import {SourceComponent} from './components/source-list/source/source.component';
 import {AlertBannerComponent} from './components/alert-banner/alert-banner.component';
 import {LegalDocumentDialogComponent} from './components/legal-document-dialog/legal-document-dialog.component';
+import {WorkspaceBadgeComponent} from './components/workspace-badge/workspace-badge.component';
+import {WorkspaceContentDialogComponent} from './components/workspace-content-dialog/workspace-content-dialog.component';
 
 @NgModule({
 	declarations: [
@@ -43,6 +45,8 @@ import {LegalDocumentDialogComponent} from './components/legal-document-dialog/l
 		SourceComponent,
 		AlertBannerComponent,
 		LegalDocumentDialogComponent,
+		WorkspaceBadgeComponent,
+		WorkspaceContentDialogComponent,
 		FormatNavsPipe
 	],
 	imports: [
@@ -78,6 +82,7 @@ import {LegalDocumentDialogComponent} from './components/legal-document-dialog/l
 		FilePreviewComponent,
 		SourceComponent,
 		AlertBannerComponent,
+		WorkspaceBadgeComponent,
 		FormatNavsPipe
 	],
 	providers: [TranslatePipe, HighlightTextPipe]

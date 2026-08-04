@@ -1,0 +1,61 @@
+<div class="retention-root">
+	<mat-card class="ob-card form-card">
+		<div class="card-heading">
+			<div class="heading-icon">
+				<mat-icon svgIcon="clock"></mat-icon>
+			</div>
+			<div class="heading-text">
+				<h3 class="card-title">{{ "admin.retention.title" | translate }}</h3>
+				<p class="card-subtitle">{{ "admin.retention.subtitle" | translate }}</p>
+			</div>
+		</div>
+
+		<div *ngIf="isLoading" class="loading-container">
+			<mat-spinner diameter="32"></mat-spinner>
+		</div>
+
+		<form *ngIf="!isLoading" [formGroup]="form" class="retention-form">
+			<div class="fields-row">
+				<mat-form-field appearance="outline">
+					<mat-label>{{ "admin.retention.daysBeforeArchival" | translate }}</mat-label>
+					<input matInput type="number" min="1" formControlName="daysBeforeArchival" />
+					<mat-icon matSuffix svgIcon="archive"></mat-icon>
+					<mat-hint>{{ "admin.retention.daysBeforeArchival.hint" | translate }}</mat-hint>
+					<mat-error *ngIf="form.get('daysBeforeArchival')?.hasError('required')">
+						{{ "admin.retention.required" | translate }}
+					</mat-error>
+					<mat-error *ngIf="form.get('daysBeforeArchival')?.hasError('min')">
+						{{ "admin.retention.min" | translate }}
+					</mat-error>
+				</mat-form-field>
+
+				<mat-icon class="flow-arrow" svgIcon="arrow-right"></mat-icon>
+
+				<mat-form-field appearance="outline">
+					<mat-label>{{ "admin.retention.daysBeforeDeletion" | translate }}</mat-label>
+					<input matInput type="number" min="1" formControlName="daysBeforeDeletion" />
+					<mat-icon matSuffix svgIcon="trash"></mat-icon>
+					<mat-hint>{{ "admin.retention.daysBeforeDeletion.hint" | translate }}</mat-hint>
+					<mat-error *ngIf="form.get('daysBeforeDeletion')?.hasError('required')">
+						{{ "admin.retention.required" | translate }}
+					</mat-error>
+					<mat-error *ngIf="form.get('daysBeforeDeletion')?.hasError('min')">
+						{{ "admin.retention.min" | translate }}
+					</mat-error>
+				</mat-form-field>
+			</div>
+
+			<div class="order-error" *ngIf="form.hasError('archivalNotBeforeDeletion') && form.touched">
+				<mat-icon svgIcon="info"></mat-icon>
+				<span>{{ "admin.retention.order.error" | translate }}</span>
+			</div>
+
+			<div class="actions">
+				<button mat-button [obButton]="'primary'" (click)="save()" [disabled]="form.invalid || isSaving">
+					<mat-icon svgIcon="checkmark"></mat-icon>
+					{{ "admin.retention.save" | translate }}
+				</button>
+			</div>
+		</form>
+	</mat-card>
+</div>

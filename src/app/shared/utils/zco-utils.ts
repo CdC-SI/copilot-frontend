@@ -14,6 +14,7 @@ export const OCR_TAG_REGEX = /<ocr>(.*?)<\/ocr>/gi;
 export const ATTACHMENT_TAG_REGEX = /<attachments>(.*?)<\/attachments>/gi;
 export const II_TARIFFS_TAG_REGEX = /<ii_tariffs>(.*?)<\/ii_tariffs>/gi;
 export const II_TARIFFS_ANSWER_TAG_REGEX = /<ii_tariffs_answer>(.*?)<\/ii_tariffs_answer>/gi;
+export const WORKSPACE_TAG_REGEX = /<workspace><name>(.*?)<\/name><\/workspace>/gi;
 
 // Remove null, undefined and empty string value from object
 export const clearNullAndEmpty = (obj: any): any => {
