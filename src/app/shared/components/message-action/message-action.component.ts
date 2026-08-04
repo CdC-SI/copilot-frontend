@@ -90,10 +90,15 @@ export class MessageActionComponent {
 		return this.authService.hasExpertRole();
 	}
 
-	copyAnswer() {
-		void navigator.clipboard.writeText(this.message.message).then(() => {
-			this.notif.success('copilot.answer.copied');
-		});
+	copyAnswer(): void {
+		if (!navigator.clipboard?.writeText) {
+			this.notif.error('i18n.oblique.http.error.general');
+			return;
+		}
+		void navigator.clipboard
+			.writeText(this.message.message)
+			.then(() => this.notif.success('copilot.answer.copied'))
+			.catch(() => this.notif.error('i18n.oblique.http.error.general'));
 	}
 
 	private giveFeedback(comment: string, isPositive: boolean) {
