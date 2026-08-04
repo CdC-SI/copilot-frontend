@@ -47,5 +47,14 @@ export const ZCO_CONFIGURATIONS: Configuration[] = [
 		production: false,
 		local: false,
 		apiUrl: '/zia/api'
+	},
+	{
+		patterns: ['zia.zas.admin.ch'],
+		banner: {
+			text: ''
+		},
+		production: true,
+		local: false,
+		apiUrl: '/zia/api'
 	}
 ];
