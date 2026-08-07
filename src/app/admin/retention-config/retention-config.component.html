@@ -45,11 +45,6 @@
 				</mat-form-field>
 			</div>
 
-			<div class="order-error" *ngIf="form.hasError('archivalNotBeforeDeletion') && form.touched">
-				<mat-icon svgIcon="info"></mat-icon>
-				<span>{{ "admin.retention.order.error" | translate }}</span>
-			</div>
-
 			<div class="actions">
 				<button mat-button [obButton]="'primary'" (click)="save()" [disabled]="form.invalid || isSaving">
 					<mat-icon svgIcon="checkmark"></mat-icon>

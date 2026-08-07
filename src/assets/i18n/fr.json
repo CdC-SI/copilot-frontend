@@ -175,7 +175,7 @@
   "admin.retention.daysBeforeArchival": "Jours avant archivage",
   "admin.retention.daysBeforeArchival.hint": "Nombre de jours après l'upload avant l'archivage",
   "admin.retention.daysBeforeDeletion": "Jours avant suppression",
-  "admin.retention.daysBeforeDeletion.hint": "Nombre de jours après l'upload avant la suppression définitive",
+  "admin.retention.daysBeforeDeletion.hint": "Nombre de jours après l'archivage avant la suppression définitive",
   "admin.retention.required": "Ce champ est obligatoire",
   "admin.retention.min": "La valeur doit être supérieure ou égale à 1",
   "admin.retention.order.error": "Le délai d'archivage doit être inférieur au délai de suppression.",

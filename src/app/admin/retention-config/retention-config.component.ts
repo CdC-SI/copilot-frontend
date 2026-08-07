@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
 import {ObNotificationService} from '@oblique/oblique';
 import {RetentionConfigService} from '../../shared/services/retention-config.service';
@@ -24,13 +24,10 @@ export class RetentionConfigComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
-		this.form = this.fb.group(
-			{
-				daysBeforeArchival: [null, [Validators.required, Validators.min(1)]],
-				daysBeforeDeletion: [null, [Validators.required, Validators.min(1)]]
-			},
-			{validators: archivalBeforeDeletionValidator}
-		);
+		this.form = this.fb.group({
+			daysBeforeArchival: [null, [Validators.required, Validators.min(1)]],
+			daysBeforeDeletion: [null, [Validators.required, Validators.min(1)]]
+		});
 		this.reload();
 	}
 
@@ -78,13 +75,4 @@ export class RetentionConfigComponent implements OnInit, OnDestroy {
 				}
 			});
 	}
-}
-
-function archivalBeforeDeletionValidator(group: AbstractControl): ValidationErrors | null {
-	const archival = group.get('daysBeforeArchival')?.value;
-	const deletion = group.get('daysBeforeDeletion')?.value;
-	if (archival == null || deletion == null) {
-		return null;
-	}
-	return archival < deletion ? null : {archivalNotBeforeDeletion: true};
 }
