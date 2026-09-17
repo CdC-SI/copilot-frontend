@@ -9,6 +9,8 @@ import {ISourceRequest, SourceRequestStatus} from '../shared/model/source-reques
 import {UploadService} from '../shared/services/upload.service';
 import {SourceRequestService} from '../shared/services/source-request.service';
 import {RequestSourceDialogComponent} from './request-source-dialog/request-source-dialog.component';
+import {AuthenticationServiceV2} from '../shared/services/auth.service';
+import {UserStatus} from '../shared/model/user';
 
 const BYTES_TO_KB = 1024;
 const AUTO_REFRESH_INTERVAL_MS = 30_000;
@@ -36,12 +38,22 @@ export class CorpusComponent implements OnInit, OnDestroy {
 		private readonly uploadService: UploadService,
 		private readonly notifService: ObNotificationService,
 		private readonly sourceRequestService: SourceRequestService,
-		private readonly dialog: MatDialog
+		private readonly dialog: MatDialog,
+		private readonly authService: AuthenticationServiceV2
 	) {}
 
 	ngOnInit(): void {
-		this.loadUserDocuments();
-		this.loadMySourceRequests();
+		/*
+		 * Wait for the JWT/authenticated user to be ready before firing authenticated requests,
+		 * consistent with ChatComponent. Protects against requests racing ahead of the token
+		 * (e.g. on page refresh before APP_INITIALIZER auth flow resolves).
+		 */
+		this.authService.$authenticatedUser.pipe(takeUntil(this.destroy$)).subscribe(user => {
+			if (user?.status === UserStatus.ACTIVE) {
+				this.loadUserDocuments();
+				this.loadMySourceRequests();
+			}
+		});
 	}
 
 	ngOnDestroy(): void {
