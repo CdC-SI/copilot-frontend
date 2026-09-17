@@ -125,6 +125,7 @@ export const LEGAL_GCU_TEXT = `<h2>Conditions d'utilisation</h2>
 <li>En cliquant sur « Accepter », vous confirmez :</li>
 <ul>
 <li>Avoir lu et compris toutes les conditions susmentionnées.</li>
+<li>Dans le cadre de l'utilisation de la traduction assistée par IA dans "GAIME", avoir lu et compris le document "Instruction de travail – IA traductions".</li>
 <li>Accepter de manière volontaire et explicite lesdites conditions</li>
 <li>Vérifier les réponses générées par l’application ZIA, et les sources indiquées avant toute utilisation de celles-ci.</li>
 </ul>`;

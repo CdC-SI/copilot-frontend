@@ -35,7 +35,7 @@ export class ConfigurationService {
 	configureAuthentication() {
 		this.setupEnvironmentConfigs();
 		this.setupAuthenticationTokens();
-		firstValueFrom(this.environmentService.load().pipe(mergeMap(env => this.handleAuthenticationFlow(env)))).catch(error => {
+		return firstValueFrom(this.environmentService.load().pipe(mergeMap(env => this.handleAuthenticationFlow(env)))).catch(error => {
 			console.error("Erreur lors de l'initialisation de l'authentification", error);
 		});
 	}
