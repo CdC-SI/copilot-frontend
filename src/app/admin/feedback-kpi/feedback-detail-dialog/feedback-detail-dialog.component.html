@@ -8,6 +8,13 @@
 			<strong>{{ "score" | translate }}: </strong
 			><span [class.pos]="data.score === 1" [class.neg]="data.score === -1">{{ data.score === 1 ? "👍" : "👎" }}</span>
 		</div>
+		<div *ngIf="data.category">
+			<strong>{{ "category" | translate }}: </strong>{{ "feedback.category." + data.category | translate }}
+		</div>
+		<div>
+			<strong>{{ "status" | translate }}: </strong>
+			<zco-feedback-status-select [status]="data.status" (statusChange)="onStatusChange($event)"></zco-feedback-status-select>
+		</div>
 		<div *ngIf="data.comment">
 			<strong>{{ "comment" | translate }}: </strong>{{ data.comment }}
 		</div>
