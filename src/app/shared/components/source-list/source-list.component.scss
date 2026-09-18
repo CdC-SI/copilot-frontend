@@ -181,3 +181,15 @@
 		}
 	}
 }
+
+.feedback-dialog .dialog-header .category-badge {
+	display: inline-block;
+	margin-top: .4rem;
+	padding: .08rem .5rem;
+	border-radius: 999px;
+	border: 1px solid #f3c8c8;
+	background: #fde3e3;
+	color: #b03131;
+	font-size: .78rem;
+	font-weight: 600;
+}

@@ -1,5 +1,17 @@
 import {MessageSource} from './chat-history';
 
+export type FeedbackStatus = 'NEW' | 'TREATED' | 'OBSOLETE';
+
+export type FeedbackCategory = 'WRONG_SOURCE' | 'WRONG_ANSWER' | 'INCOMPLETE_ANSWER';
+
+export const FEEDBACK_STATUSES: FeedbackStatus[] = ['NEW', 'TREATED', 'OBSOLETE'];
+
+/** Categories selectable by the user when giving negative feedback on an LLM answer. */
+export const ANSWER_FEEDBACK_CATEGORIES: FeedbackCategory[] = ['WRONG_ANSWER', 'INCOMPLETE_ANSWER'];
+
+/** Categories selectable by the user when giving negative feedback on a source. */
+export const SOURCE_FEEDBACK_CATEGORIES: FeedbackCategory[] = ['WRONG_SOURCE'];
+
 export interface Feedback {
 	messageId: string;
 	isPositive: boolean;
@@ -7,6 +19,7 @@ export interface Feedback {
 	conversationId?: string;
 	question?: string;
 	answer?: string;
+	category?: FeedbackCategory;
 }
 
 export interface SourceFeedback {
@@ -17,6 +30,7 @@ export interface SourceFeedback {
 	comment?: string;
 	question?: string;
 	answer?: string;
+	category?: FeedbackCategory;
 }
 
 export interface IMessageFeedback {
@@ -27,6 +41,8 @@ export interface IMessageFeedback {
 	score: 1 | -1; // 1 POSITIVE, -1 NEGATIVE
 	comment?: string;
 	timestamp: string; // ISO date
+	status: FeedbackStatus;
+	category?: FeedbackCategory;
 	// Denormalized for the detail dialog (mocked for now)
 	question?: string;
 	answer?: string;
@@ -42,6 +58,8 @@ export interface ISourceFeedback {
 	feedbackType: 'POSITIVE' | 'NEGATIVE';
 	comment?: string;
 	timestamp: string; // ISO date
+	status: FeedbackStatus;
+	category?: FeedbackCategory;
 	// Optional denormalized
 	documentTitle?: string;
 	documentUrl?: string;
@@ -55,7 +73,17 @@ export interface IDocumentFeedbackDetail {
 	documentUrl?: string;
 	pos: number;
 	neg: number;
+	statusCounts: Record<FeedbackStatus, number>;
 	feedbacks: ISourceFeedback[];
+}
+
+/** Réglages de planification du rapport hebdomadaire des feedbacks. */
+export interface FeedbackReportConfig {
+	enabled: boolean;
+	cronExpression: string;
+	zoneId: string;
+	recipients: string[];
+	lookbackDays: number;
 }
 
 export interface IFeedbackStats {

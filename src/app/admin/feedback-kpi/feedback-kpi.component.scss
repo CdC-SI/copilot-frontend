@@ -24,3 +24,32 @@
 
 .pos { color: #2e7d32; }
 .neg { color: #c62828; }
+
+.filters-bar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.filters-bar .category-filter { width: 220px; margin-bottom: -1.25rem; }
+.status-tabs .tab-count {
+	margin-left: .35rem;
+	font-weight: 700;
+	opacity: .75;
+}
+
+.status-chip, .category-chip {
+	display: inline-block;
+	padding: .1rem .5rem;
+	border-radius: 9999px;
+	font-size: .75rem;
+	font-weight: 600;
+	margin-right: .25rem;
+	margin-bottom: .15rem;
+}
+.category-chip { background: rgba(0,0,0,.06); }
+.status-chip.status-new { background: rgba(33,150,243,.15); color: #1565c0; }
+.status-chip.status-treated { background: rgba(76,175,80,.15); color: #2e7d32; }
+.status-chip.status-obsolete { background: rgba(158,158,158,.2); color: #616161; }
+
+.empty-state {
+	padding: 1.5rem;
+	text-align: center;
+	opacity: .6;
+	font-style: italic;
+}
