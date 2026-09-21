@@ -4,6 +4,7 @@ import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../services/feedback.service';
 import {AuthenticationServiceV2} from '../../services/auth.service';
 import {ChatMessage} from '../../model/chat-message';
+import {FeedbackCategory} from '../../model/feedback';
 
 type FeedbackVote = 'upvote' | 'downvote';
 
@@ -29,6 +30,10 @@ export class SourceListComponent implements OnChanges {
 	// vote + optional comment caches
 	feedbackById = new Map<string, FeedbackVote>();
 	feedbackComments = new Map<string, string>();
+	feedbackCategories = new Map<string, FeedbackCategory>();
+
+	// category auto-assigned when voting negatively (only one possible value for sources)
+	selectedCategory: FeedbackCategory | null = null;
 
 	@ViewChild('feedbackDialog') feedbackDialog?: ElementRef<HTMLDialogElement>;
 	@ViewChild('commentInput') commentInput?: ElementRef<HTMLTextAreaElement>;
@@ -86,6 +91,9 @@ export class SourceListComponent implements OnChanges {
 		// Prefill the comment with the previous one (user can edit)
 		this.comment = existingComment;
 
+		// A source can only be flagged as a wrong source, no selection needed
+		this.selectedCategory = vote === 'downvote' ? 'WRONG_SOURCE' : null;
+
 		const dlg = this.feedbackDialog?.nativeElement;
 		if (dlg && !dlg.open) {
 			dlg.showModal();
@@ -102,6 +110,7 @@ export class SourceListComponent implements OnChanges {
 		this.selectedSource = null;
 		this.selectedVote = null;
 		this.comment = '';
+		this.selectedCategory = null;
 		this.isSubmitting = false;
 	}
 
@@ -120,13 +129,16 @@ export class SourceListComponent implements OnChanges {
 				isPositive: this.selectedVote === 'upvote',
 				comment: this.comment?.trim() || undefined,
 				question: this.question,
-				answer: this.message.message
+				answer: this.message.message,
+				category: this.selectedCategory ?? undefined
 			})
 			.subscribe({
 				next: () => {
 					// Update local state immediately
 					this.feedbackById.set(documentId, this.selectedVote);
 					if (this.comment) this.feedbackComments.set(documentId, this.comment);
+					if (this.selectedCategory) this.feedbackCategories.set(documentId, this.selectedCategory);
+					else this.feedbackCategories.delete(documentId);
 					this.applyFeedbackToSources();
 					this.notifService.success('feedback.success');
 					this.closeFeedback();
@@ -155,6 +167,7 @@ export class SourceListComponent implements OnChanges {
 					const vote: FeedbackVote = r.isPositive ? 'upvote' : 'downvote';
 					this.feedbackById.set(r.documentId, vote);
 					if (r.comment) this.feedbackComments.set(r.documentId, r.comment);
+					if (r.category) this.feedbackCategories.set(r.documentId, r.category);
 				}
 				this.applyFeedbackToSources();
 				this.feedbackLoaded = true;

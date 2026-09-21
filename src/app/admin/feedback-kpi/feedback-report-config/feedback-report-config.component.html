@@ -1,0 +1,83 @@
+<div class="feedback-report-root">
+	<mat-card class="ob-card form-card">
+		<div class="card-heading">
+			<div class="heading-icon">
+				<mat-icon svgIcon="clock"></mat-icon>
+			</div>
+			<div class="heading-text">
+				<h3 class="card-title">{{ "admin.feedbackReport.title" | translate }}</h3>
+				<p class="card-subtitle">{{ "admin.feedbackReport.subtitle" | translate }}</p>
+			</div>
+		</div>
+
+		<div *ngIf="isLoading" class="loading-container">
+			<mat-spinner diameter="32"></mat-spinner>
+		</div>
+
+		<form *ngIf="!isLoading" [formGroup]="form" class="feedback-report-form">
+			<mat-slide-toggle formControlName="enabled" class="enabled-toggle">
+				{{ "admin.feedbackReport.enabled" | translate }}
+			</mat-slide-toggle>
+
+			<div class="fields-row">
+				<mat-form-field appearance="outline">
+					<mat-label>{{ "admin.feedbackReport.cronExpression" | translate }}</mat-label>
+					<input matInput formControlName="cronExpression" placeholder="0 0 8 * * MON" />
+					<mat-hint>{{ "admin.feedbackReport.cronExpression.hint" | translate }}</mat-hint>
+					<mat-error *ngIf="form.get('cronExpression')?.hasError('required')">
+						{{ "admin.feedbackReport.required" | translate }}
+					</mat-error>
+				</mat-form-field>
+
+				<mat-form-field appearance="outline">
+					<mat-label>{{ "admin.feedbackReport.zoneId" | translate }}</mat-label>
+					<input matInput formControlName="zoneId" placeholder="Europe/Zurich" />
+					<mat-hint>{{ "admin.feedbackReport.zoneId.hint" | translate }}</mat-hint>
+					<mat-error *ngIf="form.get('zoneId')?.hasError('required')">
+						{{ "admin.feedbackReport.required" | translate }}
+					</mat-error>
+				</mat-form-field>
+
+				<mat-form-field appearance="outline">
+					<mat-label>{{ "admin.feedbackReport.lookbackDays" | translate }}</mat-label>
+					<input matInput type="number" min="1" formControlName="lookbackDays" />
+					<mat-hint>{{ "admin.feedbackReport.lookbackDays.hint" | translate }}</mat-hint>
+					<mat-error *ngIf="form.get('lookbackDays')?.hasError('required')">
+						{{ "admin.feedbackReport.required" | translate }}
+					</mat-error>
+					<mat-error *ngIf="form.get('lookbackDays')?.hasError('min')">
+						{{ "admin.feedbackReport.min" | translate }}
+					</mat-error>
+				</mat-form-field>
+			</div>
+
+			<mat-form-field appearance="outline" class="recipients-field">
+				<mat-label>{{ "admin.feedbackReport.recipients" | translate }}</mat-label>
+				<mat-chip-grid #chipGrid [formControl]="recipientsCtrl">
+					<mat-chip-row *ngFor="let recipient of recipients" (removed)="removeRecipient(recipient)" [editable]="true" (edited)="editRecipient(recipient, $event)">
+						{{ recipient }}
+						<mat-icon svgIcon="cancel-circle" matChipRemove></mat-icon>
+					</mat-chip-row>
+					<input
+						[matChipInputFor]="chipGrid"
+						[matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+						[matChipInputAddOnBlur]="true"
+						(matChipInputTokenEnd)="addRecipient($event)"
+						placeholder="{{ 'admin.feedbackReport.recipients.placeholder' | translate }}"
+					/>
+				</mat-chip-grid>
+				<mat-hint>{{ "admin.feedbackReport.recipients.hint" | translate }}</mat-hint>
+				<mat-error *ngIf="recipientsCtrl.hasError('required')">
+					{{ "admin.feedbackReport.recipients.required" | translate }}
+				</mat-error>
+			</mat-form-field>
+
+			<div class="actions">
+				<button mat-button [obButton]="'primary'" (click)="save()" [disabled]="form.invalid || recipients.length === 0 || isSaving">
+					<mat-icon svgIcon="checkmark"></mat-icon>
+					{{ "admin.feedbackReport.save" | translate }}
+				</button>
+			</div>
+		</form>
+	</mat-card>
+</div>

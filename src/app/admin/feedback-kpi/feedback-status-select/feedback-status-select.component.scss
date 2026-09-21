@@ -1,0 +1,29 @@
+:host {
+	display: inline-block;
+}
+
+.status-select {
+	width: auto;
+	min-width: 110px;
+}
+
+.status-chip {
+	display: inline-block;
+	padding: 0.15rem 0.6rem;
+	border-radius: 999px;
+	font-size: 0.78rem;
+	font-weight: 600;
+
+	&.status-new {
+		background: rgba(33, 150, 243, 0.15);
+		color: #1565c0;
+	}
+	&.status-treated {
+		background: rgba(76, 175, 80, 0.15);
+		color: #2e7d32;
+	}
+	&.status-obsolete {
+		background: rgba(158, 158, 158, 0.2);
+		color: #616161;
+	}
+}

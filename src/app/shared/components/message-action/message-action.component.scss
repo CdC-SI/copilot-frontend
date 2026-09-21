@@ -27,3 +27,10 @@
 textarea {
 	width: 100%;
 }
+
+.feedback-category-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 12px;
+}

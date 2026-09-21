@@ -29,6 +29,11 @@
 <ng-template #feedbackDialog>
 	<h4 mat-dialog-title>{{ feedBackTitle | translate }}</h4>
 	<div mat-dialog-content class="mt16" ngForm>
+		<mat-radio-group *ngIf="isNegativeFeedback" [formControl]="categoryFrmCtrl" class="feedback-category-group" aria-label="feedback category">
+			<mat-radio-button *ngFor="let cat of answerFeedbackCategories" [value]="cat">
+				{{ "feedback.category." + cat | translate }}
+			</mat-radio-button>
+		</mat-radio-group>
 		<textarea [formControl]="feedbackFrmCtrl" placeholder="{{ 'feedback.comment.placeholder' | translate }}"></textarea>
 	</div>
 	<div mat-dialog-actions>

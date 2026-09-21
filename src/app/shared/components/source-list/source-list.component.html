@@ -75,6 +75,10 @@
 						{{ (previousVote === "upvote" ? "sourceList.common.helpful" : "sourceList.common.unhelpful") | translate }}
 					</span>
 				</div>
+
+				<div class="category-badge" *ngIf="selectedCategory">
+					{{ "feedback.category." + selectedCategory | translate }}
+				</div>
 			</div>
 
 			<button type="button" class="dialog-close" (click)="closeFeedback()" [attr.aria-label]="'sourceList.dialog.ariaClose' | translate">×</button>
