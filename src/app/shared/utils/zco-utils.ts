@@ -1,4 +1,6 @@
-export const ANCHOR_TAG_REGEX = /<source><id>(.*?)<\/id><url>(.*?)<\/url><file>(.*?)<\/file><pn>(.*?)<\/pn><sub>(.*?)<\/sub><v>(.*?)<\/v><\/source>/gi;
+// Les balises <type> (URL | FILE | BUSINESS_PROCESS) et <t> (titre) sont optionnelles (rétrocompatibilité).
+export const ANCHOR_TAG_REGEX =
+	/<source><id>(.*?)<\/id><url>(.*?)<\/url><file>(.*?)<\/file><pn>(.*?)<\/pn><sub>(.*?)<\/sub><v>(.*?)<\/v>(?:<type>(.*?)<\/type>)?(?:<t>(.*?)<\/t>)?<\/source>/gi;
 export const MESSAGE_ID_REGEX = /<message_uuid>(.*)<\/message_uuid>/gi;
 export const RETRIEVING_TAG_REGEX = /<retrieval>(.*?)<\/retrieval>/gi;
 export const TOPIC_CHECK_REGEX = /<topic_check>(.*?)<\/topic_check>/gi;

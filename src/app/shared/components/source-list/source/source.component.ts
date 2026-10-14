@@ -24,6 +24,10 @@ export class SourceComponent {
 		return s.type === 'URL';
 	}
 
+	isBusinessProcess(s: MessageSource): boolean {
+		return s.type === 'BUSINESS_PROCESS';
+	}
+
 	extractLabel(link: string): string {
 		try {
 			const {hostname, pathname} = new URL(link);

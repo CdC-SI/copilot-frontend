@@ -66,7 +66,7 @@
 				<strong *ngIf="isEditing">{{ "sourceList.dialog.title.update" | translate }}</strong>
 
 				<div class="dialog-subtitle" *ngIf="selectedSource">
-					{{ isUrl(selectedSource) ? extractLabel(selectedSource.link) : fileName(selectedSource.link) }}
+					                                        {{ selectedSource.type === 'BUSINESS_PROCESS' ? (selectedSource.title || selectedSource.link) : isUrl(selectedSource) ? extractLabel(selectedSource.link) : fileName(selectedSource.link) }}
 				</div>
 
 				<div class="prev-info" *ngIf="isEditing">

@@ -9,6 +9,12 @@
 		<ng-container *ngIf="isFile(source)">
 			<button type="button" (click)="downloadFile(source)">{{ fileName(source.link) }}</button>
 		</ng-container>
+		<ng-container *ngIf="isBusinessProcess(source)">
+			<a *ngIf="source.link; else processTitle" [href]="source.link" target="_blank" rel="noopener noreferrer">
+				{{ source.title || source.link }}
+			</a>
+			<ng-template #processTitle>{{ source.title }}</ng-template>
+		</ng-container>
 	</h3>
 </header>
 

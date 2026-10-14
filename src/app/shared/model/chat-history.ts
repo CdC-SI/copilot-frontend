@@ -38,8 +38,11 @@ export interface ChatHistoryMessage {
 }
 
 export interface MessageSource {
+	/** 'URL' | 'FILE' | 'BUSINESS_PROCESS' */
 	type: string;
 	link: string;
+	/** Titre affiché (processus métier : nom du processus). */
+	title?: string;
 	pageNumber?: string;
 	subsection?: string;
 	version?: string;
