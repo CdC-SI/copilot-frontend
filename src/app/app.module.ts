@@ -53,6 +53,7 @@ import {WorkspacesComponent} from './admin/workspaces/workspaces.component';
 import {WorkspaceEditDialogComponent} from './admin/workspaces/workspace-edit-dialog/workspace-edit-dialog.component';
 import {FeedbackStatusSelectComponent} from './admin/feedback-kpi/feedback-status-select/feedback-status-select.component';
 import {FeedbackReportConfigComponent} from './admin/feedback-kpi/feedback-report-config/feedback-report-config.component';
+import {CatalogImportDialogComponent} from './admin/catalog-import-dialog/catalog-import-dialog.component';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -94,7 +95,8 @@ function bannerFactory(configurationService: ConfigurationService) {
 		WorkspacesComponent,
 		WorkspaceEditDialogComponent,
 		FeedbackStatusSelectComponent,
-		FeedbackReportConfigComponent
+		FeedbackReportConfigComponent,
+		CatalogImportDialogComponent
 	],
 	imports: [
 		BrowserModule,
