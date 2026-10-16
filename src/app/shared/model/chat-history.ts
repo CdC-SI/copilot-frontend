@@ -1,3 +1,5 @@
+import {UploadErrorCode} from './upload-error';
+
 /**
  * Type de conversation renvoyé par le backend :
  * - COMPLETE : conversation standard, l'assistant peut rechercher dans le Corpus documentaire.
@@ -57,6 +59,8 @@ export interface Attachment {
 	file?: File;
 	isUploading?: boolean;
 	status?: AttachmentStatus;
+	/** Cause de l'échec, renseignée uniquement si status === 'FAILED'. */
+	errorCode?: UploadErrorCode;
 }
 
 export interface AttachmentDTO {
@@ -64,6 +68,7 @@ export interface AttachmentDTO {
 	filename: string;
 	fileSize: number;
 	status: AttachmentStatus;
+	errorCode?: UploadErrorCode;
 }
 
 export interface ConversationAttachments {

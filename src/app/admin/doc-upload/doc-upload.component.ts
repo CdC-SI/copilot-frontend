@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {IDocument} from '../../shared/model/document';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {UploadService} from '../../shared/services/upload.service';
+import {uploadErrorNotification} from '../../shared/utils/upload-error.utils';
 
 @Component({
 	selector: 'zco-doc-upload',
@@ -36,7 +37,7 @@ export class DocUploadComponent {
 				this.notifService.success('admin.document.upload.success');
 				this.documentsToUpload = [];
 			},
-			error: () => this.notifService.error('admin.document.upload.error')
+			error: err => this.notifService.error(uploadErrorNotification(err, 'admin.document.upload.error'))
 		});
 	}
 }

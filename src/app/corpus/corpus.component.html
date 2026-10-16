@@ -72,6 +72,12 @@
 									</mat-chip>
 								</div>
 							</mat-card-header>
+							<mat-card-content *ngIf="getDocumentErrorKey(doc) as errorKey">
+								<div class="failed-reason" role="alert">
+									<mat-icon svgIcon="cancel-circle"></mat-icon>
+									<span>{{ errorKey | translate }}</span>
+								</div>
+							</mat-card-content>
 							<mat-card-content *ngIf="doc.availabilityStatus || (doc.timeToLiveInDays !== undefined && doc.timeToLiveInDays !== null)">
 								<div class="availability-info">
 									<mat-chip *ngIf="doc.availabilityStatus" [class]="getAvailabilityStatusClass(doc)">

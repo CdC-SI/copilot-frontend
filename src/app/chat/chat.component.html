@@ -194,10 +194,16 @@
 							</span>
 						</span>
 						<span class="upload-status" *ngIf="attachment.isUploading">{{ "attachment.uploading" | translate }}</span>
-						<span class="upload-status failed-status" *ngIf="attachment.status === 'FAILED'">{{ "attachment.failed" | translate }}</span>
+						<span
+							class="upload-status failed-status"
+							*ngIf="attachment.status === 'FAILED'"
+							[title]="getAttachmentFailureKey(attachment) | translate"
+							role="alert"
+							>{{ getAttachmentFailureKey(attachment) | translate }}</span
+						>
 					</span>
 					<button
-						*ngIf="attachment.status === 'FAILED' && attachment.file"
+						*ngIf="canRetryAttachment(attachment)"
 						mat-button
 						(click)="$event.stopPropagation(); retryAttachment(attachment)"
 						[attr.aria-label]="'attachment.retry' | translate"
