@@ -1,0 +1,75 @@
+.catalog-import-content {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.hint {
+	margin: 0;
+}
+
+.format-example {
+	margin: 0;
+	padding: 8px 12px;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.04);
+	font-size: 0.85em;
+	overflow-x: auto;
+}
+
+.selected-file {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.errors {
+	padding: 8px 12px;
+	border-left: 4px solid #d8232a;
+	background: rgba(216, 35, 42, 0.06);
+
+	ul {
+		margin: 4px 0 0;
+		padding-left: 20px;
+	}
+
+	li {
+		font-family: monospace;
+		white-space: pre-wrap;
+	}
+}
+
+.report {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+
+	h3 {
+		margin: 8px 0 4px;
+	}
+}
+
+.report-kind {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 4px;
+}
+
+.report-label {
+	font-weight: 600;
+}
+
+.none {
+	font-style: italic;
+	opacity: 0.7;
+}
+
+.actions {
+	display: flex;
+	gap: 8px;
+}
+
+.spacer {
+	flex: 1;
+}

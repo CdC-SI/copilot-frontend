@@ -6,6 +6,7 @@ import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
 import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle, ConversationType} from '../shared/model/chat-history';
+import {extractUploadErrorCode, isRetryableUploadError, uploadErrorKey, uploadErrorNotification} from '../shared/utils/upload-error.utils';
 import {ConversationService} from '../shared/services/conversation.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
@@ -379,7 +380,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 		this.conversationService.uploadAttachments(this.currentConversationTitle, ...event).subscribe({
 			next: httpEvent => this.handleUploadEvent(httpEvent, pendingAttachments),
-			error: () => this.handleUploadError(pendingAttachments)
+			error: err => this.handleUploadError(pendingAttachments, err)
 		});
 	}
 
@@ -410,6 +411,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		});
 	}
 
+	canRetryAttachment(attachment: Attachment): boolean {
+		return attachment.status === 'FAILED' && !!attachment.file && isRetryableUploadError(attachment.errorCode);
+	}
+
+	getAttachmentFailureKey(attachment: Attachment): string {
+		return attachment.errorCode ? uploadErrorKey(attachment.errorCode) : 'attachment.failed';
+	}
+
 	retryAttachment(attachment: Attachment): void {
 		if (!attachment.file || !this.currentConversationTitle) return;
 		attachment.status = 'PENDING';
@@ -423,6 +432,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 					if (serverAtt) {
 						attachment.id = serverAtt.id;
 						attachment.status = serverAtt.status;
+						attachment.errorCode = serverAtt.errorCode;
 						attachment.isUploading = serverAtt.status === 'PENDING';
 					}
 					this.cdr.markForCheck();
@@ -433,10 +443,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 					}
 				}
 			},
-			error: () => {
+			error: err => {
 				attachment.status = 'FAILED';
+				attachment.errorCode = extractUploadErrorCode(err);
 				attachment.isUploading = false;
-				this.notif.error('attachment.upload.error');
+				this.notif.error(uploadErrorNotification(err, 'attachment.upload.error', attachment.fileName));
 				this.cdr.markForCheck();
 			}
 		});
@@ -493,6 +504,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			if (localAtt) {
 				localAtt.id = serverAtt.id;
 				localAtt.status = serverAtt.status;
+				localAtt.errorCode = serverAtt.errorCode;
 				localAtt.isUploading = serverAtt.status === 'PENDING';
 			}
 		});
@@ -504,13 +516,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			fileName: convAtt.filename,
 			fileSize: convAtt.fileSize,
 			status: convAtt.status,
+			errorCode: convAtt.errorCode,
 			isUploading: convAtt.status === 'PENDING'
 		}));
 	}
 
-	private handleUploadError(pendingAttachments: Attachment[]): void {
+	private handleUploadError(pendingAttachments: Attachment[], error: unknown): void {
 		this.attachments = this.attachments.filter(att => !pendingAttachments.includes(att));
-		this.notif.error('attachment.upload.error');
+		this.notif.error(uploadErrorNotification(error, 'attachment.upload.error'));
 	}
 
 	private hasPendingAttachments(): boolean {
@@ -560,6 +573,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			const localAtt = this.attachments.find(att => att.id === serverAtt.id);
 			if (localAtt) {
 				localAtt.status = serverAtt.status;
+				localAtt.errorCode = serverAtt.errorCode;
 				localAtt.isUploading = serverAtt.status === 'PENDING';
 			}
 		});

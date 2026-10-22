@@ -52,7 +52,8 @@ export class UploadService {
 					uploadedAt: new Date(doc.uploadedAt),
 					status: doc.status,
 					availabilityStatus: doc.availabilityStatus,
-					timeToLiveInDays: doc.timeToLiveInDays
+					timeToLiveInDays: doc.timeToLiveInDays,
+					errorCode: doc.errorCode
 				}))
 			)
 		);

@@ -367,6 +367,9 @@
 
 					&.failed-status {
 						color: rgba(220, 53, 69, 0.9);
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
 					}
 				}
 			}
