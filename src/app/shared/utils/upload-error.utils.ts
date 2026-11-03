@@ -5,7 +5,7 @@ import {UPLOAD_ERROR_CODES, UploadErrorCode, UploadErrorResponse} from '../model
 const UPLOAD_ERROR_KEY_PREFIX = 'upload.errors.';
 
 /** Codes pour lesquels renvoyer le même fichier ne peut pas réussir. */
-const NON_RETRYABLE_CODES: readonly UploadErrorCode[] = ['FILE_TOO_LARGE', 'FILE_TYPE_UNSUPPORTED', 'FILE_CONTENT_INVALID', 'CSV_CONTENT_INVALID'];
+const NON_RETRYABLE_CODES: readonly UploadErrorCode[] = ['FILE_TOO_LARGE', 'TOO_MANY_PAGES', 'FILE_TYPE_UNSUPPORTED', 'FILE_CONTENT_INVALID', 'CSV_CONTENT_INVALID'];
 
 export function isUploadErrorCode(value: unknown): value is UploadErrorCode {
 	return typeof value === 'string' && (UPLOAD_ERROR_CODES as readonly string[]).includes(value);

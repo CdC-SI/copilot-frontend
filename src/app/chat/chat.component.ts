@@ -28,8 +28,8 @@ import {
 } from './services';
 import {Subject, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
 
-const ATTACHMENT_POLL_INTERVAL_MS = 10_000;
-const ATTACHMENT_POLL_MAX_ATTEMPTS = 15;
+const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
+const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
 
 @Component({
 	selector: 'zco-chat',
