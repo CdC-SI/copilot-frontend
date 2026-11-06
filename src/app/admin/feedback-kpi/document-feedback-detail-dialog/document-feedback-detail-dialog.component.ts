@@ -4,6 +4,7 @@ import {FeedbackStatus, IDocumentFeedbackDetail, ISourceFeedback} from '../../..
 import {UploadService} from '../../../shared/services/upload.service';
 import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../../shared/services/feedback.service';
+import {openOrDownloadBlob} from '../../../shared/utils/file-download.utils';
 
 @Component({
 	selector: 'zco-document-feedback-detail-dialog',
@@ -20,11 +21,7 @@ export class DocumentFeedbackDetailDialogComponent {
 
 	downloadFile() {
 		this.uploadService.downloadSourceDocument(this.data.documentTitle).subscribe({
-			next: blob => {
-				const pdfBlob = new Blob([blob], {type: 'application/pdf'});
-				const url = window.URL.createObjectURL(pdfBlob);
-				window.open(url, '_blank');
-			},
+			next: blob => openOrDownloadBlob(blob, this.data.documentTitle),
 			error: () => this.notifService.error('Erreur lors du téléchargement du fichier')
 		});
 	}

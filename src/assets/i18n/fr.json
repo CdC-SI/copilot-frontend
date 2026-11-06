@@ -206,7 +206,7 @@
   "admin.manage.users.description": "Gérer les statuts et rôles des utilisateurs",
   "admin.manage.users.list": "Liste des utilisateurs",
   "admin.manage.documents": "Gestion des documents",
-  "admin.manage.documents.description": "Uploader les documents (CSV ou PDF) sources pour le RAG",
+  "admin.manage.documents.description": "Uploader les documents sources pour le RAG (PDF, Word, Excel, PowerPoint ou CSV)",
   "admin.manage.retention": "Rétention des documents",
   "admin.manage.retention.description": "Configurer la durée de vie avant archivage et suppression des documents personnels",
   "admin.retention.title": "Configuration de la rétention",

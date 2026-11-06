@@ -34,7 +34,6 @@ interface ProcessingState {
 
 interface StreamProcessingResult {
 	shouldEnableSearch: boolean;
-	shouldRefreshConversations: boolean;
 	hasNewSuggestion: boolean;
 	newSuggestion?: string;
 }
@@ -46,7 +45,6 @@ export class ChatStreamProcessorService {
 	processChunk(chunk: string, message: ChatMessage): StreamProcessingResult {
 		const result: StreamProcessingResult = {
 			shouldEnableSearch: false,
-			shouldRefreshConversations: false,
 			hasNewSuggestion: false
 		};
 
@@ -108,7 +106,6 @@ export class ChatStreamProcessorService {
 			message.id = messageIdTagMatch[1];
 			message.isCompleted = true;
 			result.shouldEnableSearch = true;
-			result.shouldRefreshConversations = true;
 		}
 
 		return result;

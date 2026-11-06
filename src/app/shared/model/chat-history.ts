@@ -17,6 +17,8 @@ export interface ChatTitle {
 	timestamp: Date;
 	selected?: boolean;
 	type?: ConversationType;
+	/** Conversation créée localement dont le titre n'a pas encore été généré par le backend. */
+	provisional?: boolean;
 }
 
 export interface Conversation {

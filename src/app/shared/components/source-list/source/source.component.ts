@@ -2,6 +2,7 @@ import {Component, Input} from '@angular/core';
 import {MessageSource} from '../../../model/chat-history';
 import {ObNotificationService} from '@oblique/oblique';
 import {UploadService} from '../../../services/upload.service';
+import {openOrDownloadBlob} from '../../../utils/file-download.utils';
 
 @Component({
 	selector: 'zco-source',
@@ -39,11 +40,7 @@ export class SourceComponent {
 
 	downloadFile(source: MessageSource): void {
 		this.uploadService.downloadSourceDocument(source.link).subscribe({
-			next: blob => {
-				const pdfBlob = new Blob([blob], {type: 'application/pdf'});
-				const url = window.URL.createObjectURL(pdfBlob);
-				window.open(url, '_blank');
-			},
+			next: blob => openOrDownloadBlob(blob, this.fileName(source.link)),
 			error: () => this.notifService.error('sourceList.download.error')
 		});
 	}

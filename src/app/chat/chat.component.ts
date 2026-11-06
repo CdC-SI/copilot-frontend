@@ -27,9 +27,15 @@ import {
 	UserAuthDialogService
 } from './services';
 import {Subject, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
+import {v4 as uuidv4} from 'uuid';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 10_000;
 const ATTACHMENT_POLL_MAX_ATTEMPTS = 15;
+
+interface StreamingTarget {
+	question: ChatMessage;
+	answer: ChatMessage;
+}
 
 @Component({
 	selector: 'zco-chat',
@@ -227,8 +233,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	doSendToLLM(): void {
 		const inputText = this.searchCtrl.value;
-		this.prepareForStreaming(inputText);
-		this.startStreamingRequest(inputText);
+		const target = this.prepareForStreaming(inputText);
+		this.startStreamingRequest(target, inputText);
 		this.clearSearch();
 		this.scrollToLastUserMessage();
 	}
@@ -240,8 +246,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	onWorkspaceChange(event: {question: string; workspace: string}): void {
 		if (!event?.question || !event.workspace) return;
-		this.prepareForStreaming(event.question);
-		this.startStreamingRequest(event.question, event.workspace);
+		const target = this.prepareForStreaming(event.question);
+		this.startStreamingRequest(target, event.question, event.workspace);
 		this.scrollToLastUserMessage();
 	}
 
@@ -489,13 +495,33 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private createConversationFromUpload(response: AttachmentUploadResponse): void {
+		this.ensureCurrentConversation('Processing attachments...', response.conversationAttachments.conversationId);
+	}
+
+	/**
+	 * Crée localement la conversation courante si elle n'existe pas encore : le front est propriétaire
+	 * de son identifiant (ou réutilise celui fourni par le backend), ce qui permet de rattacher les
+	 * questions suivantes sans attendre la génération du titre côté backend.
+	 */
+	private ensureCurrentConversation(title: string, conversationId?: string): void {
+		if (this.currentConversationTitle) return;
 		this.currentConversationTitle = {
-			conversationId: response.conversationAttachments.conversationId,
-			title: 'Processing attachments...',
+			conversationId: conversationId ?? uuidv4(),
+			title,
 			timestamp: new Date(),
 			selected: true,
-			type: this.ragEnabled ? ConversationType.COMPLETE : ConversationType.NO_RAG
+			type: this.ragEnabled ? ConversationType.COMPLETE : ConversationType.NO_RAG,
+			provisional: true
 		};
+		this.conversationManager.transferNewChatToConversation(this.currentConversationTitle.conversationId);
+	}
+
+	/** Affiche immédiatement une conversation provisoire dans la liste, avec la question comme titre temporaire. */
+	private listProvisionalConversation(question: string): void {
+		const current = this.currentConversationTitle;
+		if (!current?.provisional || this.conversationTitles.includes(current)) return;
+		current.title = question;
+		this.conversationTitles = [current, ...this.conversationTitles];
 	}
 
 	private syncAttachmentsFromResponse(response: AttachmentUploadResponse, pendingAttachments: Attachment[]): void {
@@ -594,15 +620,22 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.showScrollToLastMessage = false;
 	}
 
-	private prepareForStreaming(inputText: string): void {
-		this.conversationManager.setActiveStreamingConversation(this.currentConversationTitle?.conversationId);
-		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.USER, inputText);
-		this.conversationManager.addMessage(this.currentConversationTitle?.conversationId, ChatMessageSource.LLM, '', false, false);
+	private prepareForStreaming(inputText: string): StreamingTarget {
+		this.ensureCurrentConversation(inputText);
+		this.listProvisionalConversation(inputText);
+		const conversationId = this.currentConversationTitle?.conversationId;
+		const question = this.conversationManager.addMessage(conversationId, ChatMessageSource.USER, inputText);
+		const answer = this.conversationManager.addMessage(conversationId, ChatMessageSource.LLM, '', false, false);
 		this.disableSearch();
 		this.suggestionService.clearSpecificSuggestions();
+		return {question, answer};
 	}
 
-	private startStreamingRequest(inputText: string, workspace?: string): void {
+	/**
+	 * Chaque requête alimente sa propre paire question/réponse (`target`) : une requête qui se termine
+	 * (ex. pendant la génération du titre côté backend) n'interfère pas avec une question de suivi en cours.
+	 */
+	private startStreamingRequest(target: StreamingTarget, inputText: string, workspace?: string): void {
 		const currentLang = this.translateService.currentLang;
 		const mappedLanguage = LANGUAGE_MAP[currentLang] || Language.DE;
 
@@ -616,33 +649,29 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
 			next: chunk => {
-				this.processStreamChunk(chunk);
+				this.processStreamChunk(chunk, target);
 				this.cdr.markForCheck();
 			},
 			error: err => {
-				this.handleStreamError(err);
+				this.handleStreamError(err, target);
+				this.cdr.markForCheck();
 			},
 			complete: () => {
-				this.conversationManager.clearActiveStreamingConversation();
+				// Le stream ne se termine qu'après la persistance de l'échange et la génération du titre.
+				const conversation = this.conversationTitles.find(c => c.conversationId === requestConfig.conversationId);
+				if (conversation?.provisional) {
+					this.refreshConversations();
+				}
 			}
 		});
 	}
 
-	private processStreamChunk(chunk: string): void {
-		const streamingMessages = this.conversationManager.getStreamingMessages();
-		if (!streamingMessages || streamingMessages.length === 0) return;
-
-		const partialChatMessage = streamingMessages.at(-1);
-		if (!partialChatMessage) return;
-
-		const result = this.streamProcessor.processChunk(chunk, partialChatMessage);
+	private processStreamChunk(chunk: string, target: StreamingTarget): void {
+		const result = this.streamProcessor.processChunk(chunk, target.answer);
 
 		// The workspace used to answer is surfaced on the question rather than the answer bubble.
-		if (partialChatMessage.workspace) {
-			const questionMessage = streamingMessages.at(-2);
-			if (questionMessage && questionMessage.source === ChatMessageSource.USER) {
-				questionMessage.workspace = partialChatMessage.workspace;
-			}
+		if (target.answer.workspace) {
+			target.question.workspace = target.answer.workspace;
 		}
 
 		if (result.hasNewSuggestion && result.newSuggestion) {
@@ -653,30 +682,21 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.enableSearch();
 		}
 
-		if (result.shouldRefreshConversations && (!this.currentConversationTitle || this.currentConversationTitle.title === 'Processing attachments...')) {
-			this.refreshConversations();
-		}
-
 		this.updateScrollButtonVisibility();
 	}
 
-	private handleStreamError(err: any): void {
+	private handleStreamError(err: any, target: StreamingTarget): void {
 		if (err.message !== 'network error') {
-			const streamingMessages = this.conversationManager.getStreamingMessages();
-			if (streamingMessages) {
-				streamingMessages.pop();
-				streamingMessages.push({
-					message: 'Une erreur est survenue. Veuillez réessayer.',
-					source: ChatMessageSource.LLM,
-					timestamp: new Date(),
-					isCompleted: true,
-					inError: true,
-					beingSpoken: false,
-					sources: []
-				});
-			}
+			Object.assign(target.answer, {
+				message: 'Une erreur est survenue. Veuillez réessayer.',
+				source: ChatMessageSource.LLM,
+				timestamp: new Date(),
+				isCompleted: true,
+				inError: true,
+				beingSpoken: false,
+				sources: []
+			});
 		}
-		this.conversationManager.clearActiveStreamingConversation();
 		this.enableSearch();
 	}
 
@@ -686,25 +706,38 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			this.conversationService.update(this.currentConversationTitle.conversationId, [this.messages.at(-2), this.messages.at(-1)]);
 		} else {
 			this.conversationService.init(this.messages).subscribe(() => {
-				this.refreshConversations();
+				this.refreshConversations(true);
 			});
 		}
 	}
 
-	private refreshConversations() {
-		setTimeout(() => {
-			this.conversationService.getConversationTitles().subscribe(conversations => {
-				this.setAndSortConversations(conversations);
-				this.currentConversationTitle = this.conversationTitles[0];
-				this.currentConversationTitle.selected = true;
-				// Le type de conversation fait désormais foi une fois renvoyé par le backend.
-				if (this.currentConversationTitle.type) {
-					this.ragEnabled = this.currentConversationTitle.type !== ConversationType.NO_RAG;
-				}
-				// Transfer messages from NEW_CHAT_KEY to the new conversation
-				this.conversationManager.transferNewChatToConversation(this.currentConversationTitle.conversationId);
-			});
-		}, 1_500);
+	/**
+	 * Recharge les titres depuis le backend et resynchronise la conversation courante par son identifiant
+	 * (titre provisoire remplacé par le titre généré). `selectNewest` est réservé au flux FAQ, où le backend
+	 * génère l'id sans le renvoyer : la conversation la plus récente devient alors la conversation courante.
+	 */
+	private refreshConversations(selectNewest = false) {
+		this.conversationService.getConversationTitles().subscribe(conversations => {
+			const serverIds = new Set(conversations.map(c => c.conversationId));
+			// Les conversations provisoires pas encore connues du backend (titre en cours de génération) sont conservées.
+			const pending = this.conversationTitles.filter(c => c.provisional && !serverIds.has(c.conversationId));
+			this.setAndSortConversations([...pending, ...conversations]);
+			const newest = this.conversationTitles.find(c => serverIds.has(c.conversationId));
+
+			if (selectNewest && !this.currentConversationTitle && newest) {
+				this.currentConversationTitle = newest;
+				this.conversationManager.transferNewChatToConversation(newest.conversationId);
+			}
+
+			const current = this.conversationTitles.find(c => c.conversationId === this.currentConversationTitle?.conversationId);
+			if (!current) return;
+			current.selected = true;
+			this.currentConversationTitle = current;
+			// Le type de conversation fait désormais foi une fois renvoyé par le backend.
+			if (current.type) {
+				this.ragEnabled = current.type !== ConversationType.NO_RAG;
+			}
+		});
 	}
 
 	private setAndSortConversations(conversations: ChatTitle[]) {

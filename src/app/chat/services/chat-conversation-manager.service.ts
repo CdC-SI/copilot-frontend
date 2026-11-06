@@ -9,7 +9,6 @@ import {NEW_CHAT_KEY} from './chat.constants';
 })
 export class ChatConversationManagerService {
 	private readonly conversationMessages: Map<string, ChatMessage[]> = new Map();
-	private activeStreamingConversationId: string | null = null;
 
 	getMessages(conversationId: string | null): ChatMessage[] {
 		const id = conversationId || NEW_CHAT_KEY;
@@ -29,13 +28,12 @@ export class ChatConversationManagerService {
 		faqItemId?: number,
 		url?: string,
 		sources?: MessageSource[]
-	): void {
-		const id = this.activeStreamingConversationId || conversationId || NEW_CHAT_KEY;
+	): ChatMessage {
+		const id = conversationId || NEW_CHAT_KEY;
 		if (!this.conversationMessages.has(id)) {
 			this.conversationMessages.set(id, []);
 		}
-		const messages = this.conversationMessages.get(id);
-		messages.push({
+		const chatMessage: ChatMessage = {
 			faqItemId,
 			message,
 			source,
@@ -46,24 +44,9 @@ export class ChatConversationManagerService {
 			inError,
 			beingSpoken: false,
 			sources: sources || []
-		});
-	}
-
-	setActiveStreamingConversation(conversationId: string | null): void {
-		this.activeStreamingConversationId = conversationId || NEW_CHAT_KEY;
-	}
-
-	clearActiveStreamingConversation(): void {
-		this.activeStreamingConversationId = null;
-	}
-
-	getActiveStreamingConversationId(): string | null {
-		return this.activeStreamingConversationId;
-	}
-
-	getStreamingMessages(): ChatMessage[] | undefined {
-		if (!this.activeStreamingConversationId) return undefined;
-		return this.conversationMessages.get(this.activeStreamingConversationId);
+		};
+		this.conversationMessages.get(id).push(chatMessage);
+		return chatMessage;
 	}
 
 	setConversationMessages(conversationId: string, messages: ChatMessage[]): void {
