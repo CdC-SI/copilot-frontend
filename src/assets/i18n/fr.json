@@ -276,6 +276,7 @@
   "upload.error": "Erreur lors de l'upload du fichier",
   "upload.errors.NO_FILE": "Aucun fichier n'a été transmis",
   "upload.errors.FILE_TOO_LARGE": "Le fichier est trop volumineux",
+  "upload.errors.TOO_MANY_PAGES": "Le document dépasse le nombre maximal de pages autorisé",
   "upload.errors.FILE_TYPE_UNSUPPORTED": "Le type de fichier n'est pas supporté",
   "upload.errors.FILE_CONTENT_INVALID": "Le fichier est vide, corrompu ou son contenu ne correspond pas à son extension",
   "upload.errors.CSV_CONTENT_INVALID": "Le fichier CSV est mal formé (colonnes, métadonnées ou embeddings invalides)",

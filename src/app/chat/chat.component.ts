@@ -29,8 +29,8 @@ import {
 import {Subject, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
 import {v4 as uuidv4} from 'uuid';
 
-const ATTACHMENT_POLL_INTERVAL_MS = 10_000;
-const ATTACHMENT_POLL_MAX_ATTEMPTS = 15;
+const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
+const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
 
 interface StreamingTarget {
 	question: ChatMessage;

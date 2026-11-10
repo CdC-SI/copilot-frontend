@@ -5,6 +5,7 @@
 export type UploadErrorCode =
 	| 'NO_FILE'
 	| 'FILE_TOO_LARGE'
+	| 'TOO_MANY_PAGES'
 	| 'FILE_TYPE_UNSUPPORTED'
 	| 'FILE_CONTENT_INVALID'
 	| 'CSV_CONTENT_INVALID'
@@ -19,6 +20,7 @@ export type UploadErrorCode =
 export const UPLOAD_ERROR_CODES: readonly UploadErrorCode[] = [
 	'NO_FILE',
 	'FILE_TOO_LARGE',
+	'TOO_MANY_PAGES',
 	'FILE_TYPE_UNSUPPORTED',
 	'FILE_CONTENT_INVALID',
 	'CSV_CONTENT_INVALID',
