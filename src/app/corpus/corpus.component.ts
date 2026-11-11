@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, Subject, forkJoin, timer} from 'rxjs';
-import {finalize, switchMap, takeUntil, takeWhile} from 'rxjs/operators';
+import {Observable, Subject, forkJoin, of, timer} from 'rxjs';
+import {catchError, finalize, map, switchMap, takeUntil, takeWhile} from 'rxjs/operators';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {MatDialog} from '@angular/material/dialog';
 import {IDocument} from '../shared/model/document';
@@ -11,9 +11,15 @@ import {SourceRequestService} from '../shared/services/source-request.service';
 import {RequestSourceDialogComponent} from './request-source-dialog/request-source-dialog.component';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {UserStatus} from '../shared/model/user';
+import {uploadErrorKey, uploadErrorNotification} from '../shared/utils/upload-error.utils';
 
 const BYTES_TO_KB = 1024;
 const AUTO_REFRESH_INTERVAL_MS = 30_000;
+
+interface UploadResult {
+	doc: IDocument;
+	error?: unknown;
+}
 
 @Component({
 	selector: 'zco-corpus',
@@ -215,6 +221,11 @@ export class CorpusComponent implements OnInit, OnDestroy {
 		return doc.status === 'PROCESSED';
 	}
 
+	/** Clé de traduction de la cause d'échec du traitement, si le document est en échec. */
+	getDocumentErrorKey(doc: IPersonalDocument): string | undefined {
+		return doc.status === 'FAILED' && doc.errorCode ? uploadErrorKey(doc.errorCode) : undefined;
+	}
+
 	hasPendingDocuments(): boolean {
 		return this.userDocuments.some(doc => doc.status === 'PENDING');
 	}
@@ -239,11 +250,22 @@ export class CorpusComponent implements OnInit, OnDestroy {
 		return this.documentsToUpload.length === 0;
 	}
 
-	private createUploadRequests(): Observable<void>[] {
-		return this.documentsToUpload.filter((doc): doc is IDocument & {file: File} => !!doc.file).map(doc => this.uploadService.uploadPersonalPdf(doc.file));
+	private createUploadRequests(): Observable<UploadResult>[] {
+		return this.documentsToUpload
+			.filter((doc): doc is IDocument & {file: File} => !!doc.file)
+			.map(doc =>
+				this.uploadService.uploadPersonalPdf(doc.file).pipe(
+					map((): UploadResult => ({doc})),
+					catchError(error => of<UploadResult>({doc, error}))
+				)
+			);
 	}
 
-	private executeUploads(uploadRequests: Observable<void>[]): void {
+	/**
+	 * Chaque upload est traité indépendamment : un fichier refusé n'interrompt pas les autres,
+	 * et l'utilisateur est informé de la raison de chaque échec.
+	 */
+	private executeUploads(uploadRequests: Observable<UploadResult>[]): void {
 		this.isUploading = true;
 
 		forkJoin(uploadRequests)
@@ -251,22 +273,25 @@ export class CorpusComponent implements OnInit, OnDestroy {
 				takeUntil(this.destroy$),
 				finalize(() => (this.isUploading = false))
 			)
-			.subscribe({
-				next: () => this.handleUploadSuccess(),
-				error: () => this.handleUploadError()
+			.subscribe(results => {
+				const failed = results.filter(result => result.error);
+				failed.forEach(result => this.handleUploadError(result));
+				if (failed.length < results.length) {
+					this.handleUploadSuccess(failed.map(result => result.doc));
+				}
 			});
 	}
 
-	private handleUploadSuccess(): void {
+	private handleUploadSuccess(remainingDocuments: IDocument[]): void {
 		this.notifService.success('personal.documents.upload.success');
-		this.documentsToUpload = [];
+		this.documentsToUpload = remainingDocuments;
 		this.showUploadInfo = true;
 		this.loadUserDocuments();
 		this.startAutoRefresh();
 	}
 
-	private handleUploadError(): void {
-		this.notifService.error('personal.documents.upload.error');
+	private handleUploadError(result: UploadResult): void {
+		this.notifService.error(uploadErrorNotification(result.error, 'personal.documents.upload.error', result.doc.fileName));
 	}
 
 	private saveFile(blob: Blob, filename: string): void {

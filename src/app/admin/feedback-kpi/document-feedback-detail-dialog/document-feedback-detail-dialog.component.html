@@ -21,11 +21,16 @@
 						{{ item.feedbackType === "POSITIVE" ? "👍" : "👎" }}
 					</span>
 					{{ item.timestamp | date: "yyyy-MM-dd HH:mm" }}
+					<span class="category-chip" *ngIf="item.category">{{ "feedback.category." + item.category | translate }}</span>
 				</mat-panel-title>
 				<mat-panel-description>
 					{{ item.comment || ("(no comment)" | translate) }}
 				</mat-panel-description>
 			</mat-expansion-panel-header>
+			<div class="item-status" (click)="$event.stopPropagation()">
+				<strong>{{ "status" | translate }}: </strong>
+				<zco-feedback-status-select [status]="item.status" (statusChange)="onStatusChange(item, $event)"></zco-feedback-status-select>
+			</div>
 			<div class="qa">
 				<h3>{{ "question" | translate }}</h3>
 				<p>{{ item.question }}</p>

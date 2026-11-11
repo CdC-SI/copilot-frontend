@@ -66,7 +66,7 @@
 				<strong *ngIf="isEditing">{{ "sourceList.dialog.title.update" | translate }}</strong>
 
 				<div class="dialog-subtitle" *ngIf="selectedSource">
-					{{ isUrl(selectedSource) ? extractLabel(selectedSource.link) : fileName(selectedSource.link) }}
+					                                        {{ selectedSource.type === 'BUSINESS_PROCESS' ? (selectedSource.title || selectedSource.link) : isUrl(selectedSource) ? extractLabel(selectedSource.link) : fileName(selectedSource.link) }}
 				</div>
 
 				<div class="prev-info" *ngIf="isEditing">
@@ -74,6 +74,10 @@
 					<span class="prev-badge" [class.pos]="previousVote === 'upvote'" [class.neg]="previousVote === 'downvote'">
 						{{ (previousVote === "upvote" ? "sourceList.common.helpful" : "sourceList.common.unhelpful") | translate }}
 					</span>
+				</div>
+
+				<div class="category-badge" *ngIf="selectedCategory">
+					{{ "feedback.category." + selectedCategory | translate }}
 				</div>
 			</div>
 

@@ -1,0 +1,72 @@
+<h2 mat-dialog-title>{{ "admin.catalog.import.title" | translate }}</h2>
+
+<mat-dialog-content class="catalog-import-content">
+	<p class="hint">{{ "admin.catalog.import.hint" | translate }}</p>
+	<pre class="format-example">
+version: 1
+sources:
+  - name: avs
+    description: ...
+    hypotheticalQuestions: [...]
+workspaces:
+  - name: general
+    description: ...
+    hypotheticalQuestions: [...]
+    sources: [avs]</pre
+	>
+
+	<ob-file-upload
+		*ngIf="!file && !importing"
+		[accept]="['.yaml', '.yml']"
+		[maxFileSize]="maxFileSizeMb"
+		[multiple]="false"
+		(uploadEvent)="onFileChosen($event)"
+	></ob-file-upload>
+
+	<div class="selected-file" *ngIf="file">
+		<mat-icon svgIcon="file"></mat-icon>
+		<span>{{ file.name }} ({{ file.size / 1024 | number: "1.0-1" }} KB)</span>
+		<button mat-icon-button type="button" [disabled]="importing" [matTooltip]="'admin.actions.remove' | translate" (click)="removeFile()">
+			<mat-icon svgIcon="trash"></mat-icon>
+		</button>
+	</div>
+
+	<mat-progress-bar *ngIf="importing" mode="indeterminate"></mat-progress-bar>
+
+	<div class="errors" *ngIf="errors.length" role="alert">
+		<strong>{{ "admin.catalog.import.errors" | translate }}</strong>
+		<ul>
+			<li *ngFor="let message of errors">{{ message }}</li>
+		</ul>
+	</div>
+
+	<div class="report" *ngIf="report">
+		<div class="report-section" *ngFor="let section of reportSections">
+			<h3>{{ section.label | translate }}</h3>
+			<div class="report-kind" *ngFor="let kind of reportKinds">
+				<span class="report-label">{{ kind.label | translate }} ({{ report[section.key][kind.key].length }})</span>
+				<mat-chip-set *ngIf="report[section.key][kind.key].length; else none">
+					<mat-chip *ngFor="let name of report[section.key][kind.key]">{{ name }}</mat-chip>
+				</mat-chip-set>
+				<ng-template #none>
+					<span class="none">{{ "admin.catalog.import.report.none" | translate }}</span>
+				</ng-template>
+			</div>
+		</div>
+	</div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="actions">
+	<button mat-button type="button" [obButton]="'secondary'" [disabled]="exporting" (click)="exportCatalog()">
+		<mat-icon svgIcon="download"></mat-icon>
+		{{ "admin.catalog.export.cta" | translate }}
+	</button>
+	<span class="spacer"></span>
+	<button mat-button type="button" [obButton]="'secondary'" [disabled]="importing" (click)="close()">
+		{{ "admin.catalog.import.close" | translate }}
+	</button>
+	<button mat-button type="button" [obButton]="'primary'" [disabled]="!file || importing" (click)="importFile()">
+		<mat-icon svgIcon="upload"></mat-icon>
+		{{ "admin.catalog.import.submit" | translate }}
+	</button>
+</mat-dialog-actions>

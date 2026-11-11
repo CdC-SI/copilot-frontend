@@ -16,13 +16,29 @@
 		<!-- Feedback KPI -->
 		<mat-expansion-panel (opened)="onFeedbackPanelOpened()">
 			<mat-expansion-panel-header>
-				<mat-panel-title>{{ "admin.manage.feedback" | translate }}</mat-panel-title>
+				<mat-panel-title>
+					{{ "admin.manage.feedback" | translate }}
+					<span class="new-feedback-badge" *ngIf="(newFeedbackCount$ | async) as newCount">{{ newCount }}</span>
+				</mat-panel-title>
 				<mat-panel-description>{{ "admin.manage.feedback.description" | translate }}</mat-panel-description>
 			</mat-expansion-panel-header>
 
 			<!-- lazy instantiation of feedback kpi component -->
 			<ng-template matExpansionPanelContent>
 				<zco-feedback-kpi #feedbackKpiComponent></zco-feedback-kpi>
+			</ng-template>
+		</mat-expansion-panel>
+
+		<!-- Feedback Report Configuration -->
+		<mat-expansion-panel (opened)="onFeedbackReportPanelOpened()">
+			<mat-expansion-panel-header>
+				<mat-panel-title>{{ "admin.manage.feedbackReport" | translate }}</mat-panel-title>
+				<mat-panel-description>{{ "admin.manage.feedbackReport.description" | translate }}</mat-panel-description>
+			</mat-expansion-panel-header>
+
+			<!-- lazy instantiation of feedback report config component -->
+			<ng-template matExpansionPanelContent>
+				<zco-feedback-report-config #feedbackReportConfigComponent></zco-feedback-report-config>
 			</ng-template>
 		</mat-expansion-panel>
 

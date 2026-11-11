@@ -1,0 +1,15 @@
+<mat-select
+	class="status-select"
+	[ngClass]="'status-' + status.toLowerCase()"
+	[value]="status"
+	[disabled]="disabled"
+	(selectionChange)="onChange($event.value)"
+	(click)="$event.stopPropagation()"
+>
+	<mat-select-trigger>
+		<span class="status-chip" [ngClass]="'status-' + status.toLowerCase()">{{ "feedback.status." + status | translate }}</span>
+	</mat-select-trigger>
+	<mat-option *ngFor="let s of statuses" [value]="s">
+		{{ "feedback.status." + s | translate }}
+	</mat-option>
+</mat-select>

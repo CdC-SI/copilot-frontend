@@ -1,4 +1,8 @@
-<ob-file-upload [accept]="['.pdf', '.csv']" [maxFileSize]="10" (uploadEvent)="uploadAdminDocument($event)"></ob-file-upload>
+<ob-file-upload
+	[accept]="['.pdf', '.csv', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx']"
+	[maxFileSize]="10"
+	(uploadEvent)="uploadAdminDocument($event)"
+></ob-file-upload>
 <ul>
 	<li *ngFor="let doc of documentsToUpload">
 		<div class="doc-to-upload">

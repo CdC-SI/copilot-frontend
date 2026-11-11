@@ -7,7 +7,7 @@
 		<mat-tab [label]="'personal.documents.tab.my.documents' | translate">
 			<div class="tab-content">
 				<div class="upload-section">
-					<ob-file-upload [accept]="['.pdf']" [maxFileSize]="10" (uploadEvent)="uploadPersonalDocument($event)"></ob-file-upload>
+					<ob-file-upload [accept]="['.pdf']" [maxFileSize]="20" (uploadEvent)="uploadPersonalDocument($event)"></ob-file-upload>
 
 					<ul class="documents-list" *ngIf="documentsToUpload.length > 0">
 						<li *ngFor="let doc of documentsToUpload">
@@ -72,6 +72,12 @@
 									</mat-chip>
 								</div>
 							</mat-card-header>
+							<mat-card-content *ngIf="getDocumentErrorKey(doc) as errorKey">
+								<div class="failed-reason" role="alert">
+									<mat-icon svgIcon="cancel-circle"></mat-icon>
+									<span>{{ errorKey | translate }}</span>
+								</div>
+							</mat-card-content>
 							<mat-card-content *ngIf="doc.availabilityStatus || (doc.timeToLiveInDays !== undefined && doc.timeToLiveInDays !== null)">
 								<div class="availability-info">
 									<mat-chip *ngIf="doc.availabilityStatus" [class]="getAvailabilityStatusClass(doc)">

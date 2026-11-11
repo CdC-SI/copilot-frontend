@@ -25,14 +25,12 @@ Gère l'état des conversations et des messages.
 
 **Responsabilités :**
 - Maintient la Map des messages par conversation
-- Gère l'ID de conversation en cours de streaming
-- Ajoute, récupère et supprime des messages
+- Ajoute, récupère et supprime des messages (`addMessage` renvoie le message créé, que chaque requête de streaming alimente directement)
 - Convertit les messages d'historique en messages de chat
 
 **Méthodes principales :**
 - `getMessages(conversationId: string | null): ChatMessage[]`
-- `addMessage(...)`
-- `setActiveStreamingConversation(conversationId: string | null)`
+- `addMessage(...): ChatMessage`
 - `historyMessageToChatMessage(historyMessage: ChatHistoryMessage): ChatMessage`
 
 #### 3. **ChatSuggestionService** (`chat-suggestion.service.ts`)
@@ -99,9 +97,10 @@ ragService.process().subscribe({
                   ↓
                 streamProcessor.processChunk(chunk, message)
                   ↓
-                Retourne { shouldEnableSearch, shouldRefreshConversations, hasNewSuggestion }
+                Retourne { shouldEnableSearch, hasNewSuggestion }
                   ↓
                 Actions basées sur le résultat
+  complete: si la conversation est provisoire → refreshConversations() (titre généré, sélection par conversationId)
 })
 ```
 

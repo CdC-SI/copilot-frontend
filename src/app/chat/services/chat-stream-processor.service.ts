@@ -34,7 +34,6 @@ interface ProcessingState {
 
 interface StreamProcessingResult {
 	shouldEnableSearch: boolean;
-	shouldRefreshConversations: boolean;
 	hasNewSuggestion: boolean;
 	newSuggestion?: string;
 }
@@ -46,7 +45,6 @@ export class ChatStreamProcessorService {
 	processChunk(chunk: string, message: ChatMessage): StreamProcessingResult {
 		const result: StreamProcessingResult = {
 			shouldEnableSearch: false,
-			shouldRefreshConversations: false,
 			hasNewSuggestion: false
 		};
 
@@ -108,7 +106,6 @@ export class ChatStreamProcessorService {
 			message.id = messageIdTagMatch[1];
 			message.isCompleted = true;
 			result.shouldEnableSearch = true;
-			result.shouldRefreshConversations = true;
 		}
 
 		return result;
@@ -157,10 +154,17 @@ export class ChatStreamProcessorService {
 			const pageNumber = sourceMatch[4];
 			const subSection = sourceMatch[5];
 			const version = sourceMatch[6];
+			const type = sourceMatch[7];
+			const title = sourceMatch[8];
 
-			const source: MessageSource = sourceUrl
-				? {documentId: docId, type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version}
-				: {documentId: docId, type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
+			let source: MessageSource;
+			if (type === 'BUSINESS_PROCESS') {
+				source = {documentId: docId, type: 'BUSINESS_PROCESS', link: sourceUrl, title, version};
+			} else if (sourceUrl) {
+				source = {documentId: docId, type: 'URL', link: sourceUrl, pageNumber, subsection: subSection, version};
+			} else {
+				source = {documentId: docId, type: 'FILE', link: sourceFile, pageNumber, subsection: subSection, version};
+			}
 
 			message.sources.push(source);
 			message.message = message.message.replace(sourceMatch[0], '');

@@ -7,7 +7,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
 import {ChatMessage} from '../../model/chat-message';
 import {FaqItemsService} from '../../services/faq-items.service';
-import {Feedback} from '../../model/feedback';
+import {ANSWER_FEEDBACK_CATEGORIES, Feedback, FeedbackCategory} from '../../model/feedback';
 import {AuthenticationServiceV2} from '../../services/auth.service';
 
 @Component({
@@ -25,6 +25,9 @@ export class MessageActionComponent {
 	feedBackTitle: string;
 	faqItemFrmCtrl = new FormControl<IFaqItem>(null, [Validators.required]);
 	feedbackFrmCtrl = new FormControl<string>(null, [Validators.required]);
+	categoryFrmCtrl = new FormControl<FeedbackCategory>(null);
+	isNegativeFeedback = false;
+	readonly answerFeedbackCategories = ANSWER_FEEDBACK_CATEGORIES;
 
 	constructor(
 		private readonly speechService: SpeechService,
@@ -58,6 +61,8 @@ export class MessageActionComponent {
 
 	openFeedbackDialog(positive: boolean) {
 		this.feedbackFrmCtrl.reset();
+		this.isNegativeFeedback = !positive;
+		this.categoryFrmCtrl.setValue(positive ? null : 'WRONG_ANSWER');
 		this.feedBackTitle = positive ? 'feedback.positive' : 'feedback.negative';
 		this.dialog
 			.open(this.feedbackDialog, {width: '500px'})
@@ -107,7 +112,8 @@ export class MessageActionComponent {
 			question: this.previousMessage.message,
 			answer: this.message.message,
 			isPositive,
-			comment
+			comment,
+			category: isPositive ? undefined : this.categoryFrmCtrl.value ?? undefined
 		});
 	}
 }

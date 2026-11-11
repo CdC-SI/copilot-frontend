@@ -1,3 +1,5 @@
+import {UploadErrorCode} from './upload-error';
+
 /**
  * Type de conversation renvoyé par le backend :
  * - COMPLETE : conversation standard, l'assistant peut rechercher dans le Corpus documentaire.
@@ -15,6 +17,8 @@ export interface ChatTitle {
 	timestamp: Date;
 	selected?: boolean;
 	type?: ConversationType;
+	/** Conversation créée localement dont le titre n'a pas encore été généré par le backend. */
+	provisional?: boolean;
 }
 
 export interface Conversation {
@@ -38,8 +42,11 @@ export interface ChatHistoryMessage {
 }
 
 export interface MessageSource {
+	/** 'URL' | 'FILE' | 'BUSINESS_PROCESS' */
 	type: string;
 	link: string;
+	/** Titre affiché (processus métier : nom du processus). */
+	title?: string;
 	pageNumber?: string;
 	subsection?: string;
 	version?: string;
@@ -57,6 +64,8 @@ export interface Attachment {
 	file?: File;
 	isUploading?: boolean;
 	status?: AttachmentStatus;
+	/** Cause de l'échec, renseignée uniquement si status === 'FAILED'. */
+	errorCode?: UploadErrorCode;
 }
 
 export interface AttachmentDTO {
@@ -64,6 +73,7 @@ export interface AttachmentDTO {
 	filename: string;
 	fileSize: number;
 	status: AttachmentStatus;
+	errorCode?: UploadErrorCode;
 }
 
 export interface ConversationAttachments {

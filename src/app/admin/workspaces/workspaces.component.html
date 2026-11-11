@@ -1,5 +1,9 @@
 <div class="workspaces-root">
 	<div class="actions-bar">
+		<button mat-button [obButton]="'secondary'" (click)="openImportDialog()">
+			<mat-icon svgIcon="upload"></mat-icon>
+			{{ "admin.catalog.import.cta" | translate }}
+		</button>
 		<button mat-button [obButton]="'primary'" (click)="openCreateDialog()">
 			<mat-icon svgIcon="plus"></mat-icon>
 			{{ "admin.workspaces.create.cta" | translate }}

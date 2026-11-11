@@ -6,6 +6,7 @@ import {CreateWorkspaceRequest, UpdateWorkspaceRequest, WorkspaceDto} from '../.
 import {WorkspaceService} from '../../shared/services/workspace.service';
 import {WorkspaceEditDialogComponent, WorkspaceEditDialogResult} from './workspace-edit-dialog/workspace-edit-dialog.component';
 import {ConfirmDialogComponent} from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import {CatalogImportDialogComponent, CatalogImportDialogResult} from '../catalog-import-dialog/catalog-import-dialog.component';
 
 @Component({
 	selector: 'zco-workspaces',
@@ -51,6 +52,16 @@ export class WorkspacesComponent implements OnInit {
 
 	openCreateDialog(): void {
 		this.openDialog();
+	}
+
+	/** Ouvre la modale d'import YAML ; recharge la liste des workspaces à sa fermeture si un import a été appliqué. */
+	openImportDialog(): void {
+		this.dialog
+			.open<CatalogImportDialogComponent, void, CatalogImportDialogResult>(CatalogImportDialogComponent, {width: '700px'})
+			.afterClosed()
+			.subscribe(result => {
+				if (result?.imported) this.reload();
+			});
 	}
 
 	openEditDialog(workspace: WorkspaceDto): void {
