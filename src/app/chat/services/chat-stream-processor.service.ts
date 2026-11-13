@@ -32,10 +32,25 @@ interface ProcessingState {
 	isProcessingTags?: boolean;
 }
 
+/** Balises de statut (affichées à la place du contenu tant que la réponse n'a pas commencé), par ordre de priorité. */
+const STATUS_TAGS: [RegExp, ProcessingState][] = [
+	[RETRIEVING_TAG_REGEX, {isRetrieving: true}],
+	[OCR_TAG_REGEX, {isRetrieving: true}],
+	[ATTACHMENT_TAG_REGEX, {isRetrieving: true}],
+	[TOOL_TAG_REGEX, {isToolUse: true}],
+	[INTENT_TAG_REGEX, {isProcessingIntent: true}],
+	[SOURCE_TAG_REGEX, {isProcessingSources: true}],
+	[TAGS_TAG_REGEX, {isProcessingTags: true}],
+	[AGENT_TAG_REGEX, {isAgent: true}],
+	[ROUTING_TAG_REGEX, {isRouting: true}],
+	[TOPIC_CHECK_REGEX, {isValidating: true}],
+	[II_TARIFFS_TAG_REGEX, {isRetrieving: true}],
+	[II_TARIFFS_ANSWER_TAG_REGEX, {isRetrieving: true}]
+];
+
 interface StreamProcessingResult {
 	shouldEnableSearch: boolean;
-	hasNewSuggestion: boolean;
-	newSuggestion?: string;
+	newSuggestions: string[];
 }
 
 @Injectable({
@@ -43,30 +58,13 @@ interface StreamProcessingResult {
 })
 export class ChatStreamProcessorService {
 	processChunk(chunk: string, message: ChatMessage): StreamProcessingResult {
-		const result: StreamProcessingResult = {
-			shouldEnableSearch: false,
-			hasNewSuggestion: false
-		};
-
+		const result: StreamProcessingResult = {shouldEnableSearch: false, newSuggestions: []};
 		if (!chunk) return result;
 
-		// Process status tags
-		if (this.processStatusTag(chunk, message, RETRIEVING_TAG_REGEX, {isRetrieving: true})) return result;
-		if (this.processStatusTag(chunk, message, OCR_TAG_REGEX, {isRetrieving: true})) return result;
-		if (this.processStatusTag(chunk, message, ATTACHMENT_TAG_REGEX, {isRetrieving: true})) return result;
-		if (this.processStatusTag(chunk, message, TOOL_TAG_REGEX, {isToolUse: true})) return result;
-		if (this.processStatusTag(chunk, message, INTENT_TAG_REGEX, {isProcessingIntent: true})) return result;
-		if (this.processStatusTag(chunk, message, SOURCE_TAG_REGEX, {isProcessingSources: true})) return result;
-		if (this.processStatusTag(chunk, message, TAGS_TAG_REGEX, {isProcessingTags: true})) return result;
-		if (this.processStatusTag(chunk, message, AGENT_TAG_REGEX, {isAgent: true})) return result;
-		if (this.processStatusTag(chunk, message, ROUTING_TAG_REGEX, {isRouting: true})) return result;
-		if (this.processStatusTag(chunk, message, TOPIC_CHECK_REGEX, {isValidating: true})) return result;
-		if (this.processStatusTag(chunk, message, II_TARIFFS_TAG_REGEX, {isRetrieving: true})) return result;
-		if (this.processStatusTag(chunk, message, II_TARIFFS_ANSWER_TAG_REGEX, {isRetrieving: true})) return result;
+		if (STATUS_TAGS.some(([regex, state]) => this.processStatusTag(chunk, message, regex, state))) return result;
 
 		// Handle off-topic (clears validation)
-		const offTopicMatch = OFF_TOPIC_REGEX.exec(chunk);
-		if (offTopicMatch) {
+		if (OFF_TOPIC_REGEX.test(chunk)) {
 			message.isValidating = false;
 			return result;
 		}
@@ -77,38 +75,37 @@ export class ChatStreamProcessorService {
 			message.message = '';
 		}
 
-		// Append content
 		message.message += chunk;
+		message.sources ??= [];
 
-		// Initialize sources array if needed
-		if (!message.sources) {
-			message.sources = [];
+		// Une balise ne peut se compléter que dans le chunk qui apporte son > final :
+		// inutile de re-scanner tout le message pour les autres chunks.
+		if (chunk.includes('>')) {
+			this.extractTags(message, result);
 		}
 
-		// Extract and remove source tags
-		this.extractSources(message);
+		return result;
+	}
 
-		// Extract and remove workspace tag
+	private extractTags(message: ChatMessage, result: StreamProcessingResult): void {
+		this.extractSources(message);
 		this.extractWorkspace(message);
 
-		// Extract and remove suggestion tags
-		const suggestionMatch = SUGGESTION_TAG_REGEX.exec(message.message);
-		if (suggestionMatch) {
-			message.message = message.message.replace(SUGGESTION_TAG_REGEX, '');
-			result.hasNewSuggestion = true;
-			result.newSuggestion = suggestionMatch[1];
+		let suggestionMatch: RegExpExecArray | null;
+		while ((suggestionMatch = SUGGESTION_TAG_REGEX.exec(message.message)) !== null) {
+			message.message = message.message.replace(suggestionMatch[0], '');
+			if (suggestionMatch[1]) {
+				result.newSuggestions.push(suggestionMatch[1]);
+			}
 		}
 
-		// Extract and remove message ID tag
 		const messageIdTagMatch = MESSAGE_ID_REGEX.exec(message.message);
 		if (messageIdTagMatch) {
-			message.message = message.message.replace(MESSAGE_ID_REGEX, '');
+			message.message = message.message.replace(messageIdTagMatch[0], '');
 			message.id = messageIdTagMatch[1];
 			message.isCompleted = true;
 			result.shouldEnableSearch = true;
 		}
-
-		return result;
 	}
 
 	private processStatusTag(chunk: string, message: ChatMessage, regex: RegExp, state: ProcessingState): boolean {
@@ -146,7 +143,7 @@ export class ChatStreamProcessorService {
 	}
 
 	private extractSources(message: ChatMessage): void {
-		let sourceMatch;
+		let sourceMatch: RegExpExecArray | null;
 		while ((sourceMatch = ANCHOR_TAG_REGEX.exec(message.message)) !== null) {
 			const docId = sourceMatch[1];
 			const sourceUrl = sourceMatch[2];
@@ -175,7 +172,7 @@ export class ChatStreamProcessorService {
 		const workspaceMatch = WORKSPACE_TAG_REGEX.exec(message.message);
 		if (workspaceMatch) {
 			message.workspace = workspaceMatch[1];
-			message.message = message.message.replace(WORKSPACE_TAG_REGEX, '');
+			message.message = message.message.replace(workspaceMatch[0], '');
 		}
 	}
 }
