@@ -123,6 +123,9 @@
 						[previousMessage]="i > 0 ? messages[i - 1] : null"
 						(feedback)="sendFeedback($event)"
 						(workspaceChange)="onWorkspaceChange($event)"
+						[replayable]="isReplayable(message)"
+						(regenerate)="regenerateLastAnswer()"
+						(editQuestion)="editLastQuestion($event)"
 					></zco-chat-message>
 				</div>
 			</div>
@@ -164,9 +167,22 @@
 				(submitMessage)="sendToLLM()"
 			/>
 
-			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
-				<mat-icon svgIcon="paper-plane"></mat-icon>
+			<button
+				*ngIf="isGenerating; else sendButton"
+				type="button"
+				mat-icon-button
+				[obButton]="'primary'"
+				(click)="stopGeneration()"
+				[attr.aria-label]="'chat.generation.stop' | translate"
+				[title]="'chat.generation.stop' | translate"
+			>
+				<mat-icon svgIcon="stop"></mat-icon>
 			</button>
+			<ng-template #sendButton>
+				<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
+					<mat-icon svgIcon="paper-plane"></mat-icon>
+				</button>
+			</ng-template>
 
 			<button type="button" mat-icon-button (click)="clearSearch()" [obButton]="'secondary'">
 				<mat-icon svgIcon="trash"></mat-icon>

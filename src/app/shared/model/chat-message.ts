@@ -23,6 +23,8 @@ export interface ChatMessage {
 	isProcessingTags?: boolean;
 	/** Nom du workspace utilisé par le backend pour répondre à cette question (affiché au niveau de la question). */
 	workspace?: string;
+	/** Génération arrêtée avant la fin (bouton Stop ou changement de conversation) : réponse partielle. */
+	interrupted?: boolean;
 }
 
 export enum ChatMessageSource {

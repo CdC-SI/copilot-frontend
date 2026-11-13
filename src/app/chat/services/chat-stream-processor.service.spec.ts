@@ -65,4 +65,19 @@ describe('ChatStreamProcessorService', () => {
 		expect(end.shouldEnableSearch).toBe(true);
 		expect(message.id).toBe('abc');
 	});
+	it('interrupt conserve la réponse partielle et la marque interrompue', () => {
+		feed('Début de réponse');
+		processor.interrupt(message);
+		expect(message.message).toBe('Début de réponse');
+		expect(message.isCompleted).toBe(true);
+		expect(message.interrupted).toBe(true);
+	});
+
+	it('interrupt efface le texte de statut si la réponse n’a pas commencé', () => {
+		feed('<retrieval>Recherche…</retrieval>');
+		processor.interrupt(message);
+		expect(message.message).toBe('');
+		expect(message.isRetrieving).toBe(false);
+		expect(message.interrupted).toBe(true);
+	});
 });

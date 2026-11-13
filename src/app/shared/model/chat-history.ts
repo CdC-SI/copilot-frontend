@@ -39,6 +39,8 @@ export interface ChatHistoryMessage {
 	sources?: MessageSource[];
 	suggestions?: string[];
 	workspace?: string;
+	/** Réponse partielle enregistrée après l'arrêt de la génération. */
+	interrupted?: boolean;
 }
 
 export interface MessageSource {

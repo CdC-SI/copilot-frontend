@@ -4,6 +4,7 @@ import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
 import {StreamHttpError} from '../shared/services/sse-client.service';
 import {FrameBatcher} from '../shared/utils/frame-batcher';
+import {ChatRequest} from '../shared/model/rag';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
@@ -37,6 +38,12 @@ const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
 interface ActiveStream {
 	subscription: Subscription;
 	batcher: FrameBatcher<string>;
+}
+
+interface StreamingOptions {
+	/** Workspace imposé par l'utilisateur (sinon routing automatique). */
+	workspace?: string;
+	replaceLastTurn?: boolean;
 }
 
 interface StreamingTarget {
@@ -250,6 +257,41 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.scrollToLastUserMessage();
 	}
 
+	/** Une réponse est en cours de génération (avant <message_uuid>). */
+	get isGenerating(): boolean {
+		return [...this.activeStreams.keys()].some(target => !target.answer.isCompleted);
+	}
+
+	/** Dernier échange question/réponse, s'il peut être régénéré ou modifié. */
+	get replayableTurn(): StreamingTarget | null {
+		const question = this.messages.at(-2);
+		const answer = this.messages.at(-1);
+		const isTurn = question?.source === ChatMessageSource.USER && answer?.source === ChatMessageSource.LLM;
+		return isTurn && answer.isCompleted && !this.isGenerating ? {question, answer} : null;
+	}
+
+	isReplayable(message: ChatMessage): boolean {
+		const turn = this.replayableTurn;
+		return !!turn && (message === turn.question || message === turn.answer);
+	}
+
+	stopGeneration(): void {
+		this.cancelPendingGenerations();
+		this.cdr.markForCheck();
+	}
+
+	regenerateLastAnswer(): void {
+		const turn = this.replayableTurn;
+		if (turn) this.replayTurn(turn);
+	}
+
+	editLastQuestion(text: string): void {
+		const turn = this.replayableTurn;
+		if (!turn || !text?.trim()) return;
+		turn.question.message = text.trim();
+		this.replayTurn(turn);
+	}
+
 	/**
 	 * Renvoie une question déjà posée en imposant explicitement le workspace à utiliser
 	 * (choisi par l'utilisateur via le badge affiché sous la question). Ajoute une nouvelle
@@ -258,7 +300,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	onWorkspaceChange(event: {question: string; workspace: string}): void {
 		if (!event?.question || !event.workspace) return;
 		const target = this.prepareForStreaming(event.question);
-		this.startStreamingRequest(target, event.question, event.workspace);
+		this.startStreamingRequest(target, event.question, {workspace: event.workspace});
 		this.scrollToLastUserMessage();
 	}
 
@@ -647,17 +689,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * Chaque requête alimente sa propre paire question/réponse (`target`) : une requête qui se termine
 	 * (ex. pendant la génération du titre côté backend) n'interfère pas avec une question de suivi en cours.
 	 */
-	private startStreamingRequest(target: StreamingTarget, inputText: string, workspace?: string): void {
-		const currentLang = this.translateService.currentLang;
-		const mappedLanguage = LANGUAGE_MAP[currentLang] || Language.DE;
-
-		const requestConfig = {
-			query: inputText,
-			conversationId: this.currentConversationTitle?.conversationId,
-			language: mappedLanguage,
-			workspace,
-			ragEnabled: !this.isLlmOnlyMode()
-		};
+	private startStreamingRequest(target: StreamingTarget, inputText: string, options: StreamingOptions = {}): void {
+		const requestConfig = this.buildChatRequest(inputText, options);
 
 		// Les chunks sont traités un par un (balises de statut), mais un seul rendu est déclenché par frame.
 		const batcher = new FrameBatcher<string>(chunks => {
@@ -682,6 +715,19 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		}
 	}
 
+	private buildChatRequest(inputText: string, {workspace, replaceLastTurn}: StreamingOptions): ChatRequest {
+		const currentLang = this.translateService.currentLang;
+		return {
+			query: inputText,
+			conversationId: this.currentConversationTitle?.conversationId,
+			language: LANGUAGE_MAP[currentLang] || Language.DE,
+			workspace,
+			ragEnabled: !this.isLlmOnlyMode(),
+			// N'est envoyé que s'il est vrai, pour rester compatible avec un backend qui ne le connaît pas.
+			replaceLastTurn: replaceLastTurn || undefined
+		};
+	}
+
 	private onStreamComplete(target: StreamingTarget, conversationId: string | undefined): void {
 		this.activeStreams.delete(target);
 		this.completeUnfinishedAnswer(target);
@@ -703,9 +749,33 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			if (target.answer.isCompleted) return;
 			subscription.unsubscribe();
 			this.activeStreams.delete(target);
-			target.answer.isCompleted = true;
+			this.streamProcessor.interrupt(target.answer);
 		});
 		this.enableSearch();
+	}
+
+	/**
+	 * Rejoue le dernier échange en le remplaçant (côté backend si l'échange a été enregistré).
+	 * La réponse est remplacée par un nouvel objet : un flux précédent encore ouvert (génération du titre)
+	 * ne peut ainsi pas modifier la nouvelle réponse.
+	 */
+	private replayTurn(turn: StreamingTarget): void {
+		const replaceLastTurn = !!(turn.answer.id || turn.answer.interrupted);
+		const messages = this.messages;
+		const answer: ChatMessage = {
+			message: '',
+			source: ChatMessageSource.LLM,
+			timestamp: new Date(),
+			isCompleted: false,
+			beingSpoken: false,
+			sources: []
+		};
+		messages[messages.indexOf(turn.answer)] = answer;
+		turn.question.workspace = undefined;
+		this.disableSearch();
+		this.suggestionService.clearSpecificSuggestions();
+		this.startStreamingRequest({question: turn.question, answer}, turn.question.message, {replaceLastTurn});
+		this.scrollToLastUserMessage();
 	}
 
 	/** Flux terminé sans <message_uuid> : on clôt la réponse pour ne pas bloquer la saisie. */

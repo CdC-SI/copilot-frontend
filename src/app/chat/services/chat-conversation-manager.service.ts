@@ -85,7 +85,8 @@ export class ChatConversationManagerService {
 			faqItemId: historyMessage.faqItemId,
 			sources: historyMessage.sources,
 			suggestions: historyMessage.suggestions,
-			workspace: historyMessage.workspace
+			workspace: historyMessage.workspace,
+			interrupted: historyMessage.interrupted
 		};
 	}
 }
