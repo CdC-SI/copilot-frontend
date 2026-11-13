@@ -15,7 +15,7 @@ Applique les événements typés du flux de réponse (T1) au message de l'assist
 - `start {conversationId, messageId}` : premier événement (`generationId` du message).
 - `status {code, label}` : étape en cours, affichée tant que la réponse n'a pas commencé (`message.status`).
 - `text_delta {text}`, `source {…}`, `suggestion {text}`, `workspace {name}`.
-- `done {messageId, interrupted}` : terminal, émis **après** l'enregistrement de l'échange (`id`, `isCompleted`, `hasSavedExchange`).
+- `done {messageId, interrupted}` : terminal, émis **après** l'enregistrement de l'échange (`id`, `isCompleted`).
 - `error {code, message}` : terminal, rien n'est enregistré.
 
 **Méthodes principales :**
@@ -105,6 +105,15 @@ ragService.process().subscribe({            // Observable<ChatStreamEvent>, regr
   complete: si la conversation est provisoire → refreshConversations() (titre généré, sélection par conversationId)
 })
 ```
+
+### Stop et régénération (F3b)
+
+- **Stop** : `POST /conversations/{id}/generations/{generationId}/stop` ; le flux continue jusqu'à `done {interrupted: true}`,
+  émis après l'enregistrement de la réponse partielle (`stopping` pendant l'attente). Sans réponse du backend (404, erreur,
+  10 s), la requête est abandonnée : la réponse est interrompue et `replaceableId = generationId`.
+- **Navigation** : abandon de la requête (le backend enregistre la réponse partielle).
+- **Régénérer / Modifier** : uniquement sur une réponse terminée ; envoie `replaceMessageId = id ?? replaceableId`. Le backend
+  attend les enregistrements en cours et refuse (409) une réponse qui n'est plus la dernière : le tour est alors rétabli.
 
 ## Avantages du refactoring
 

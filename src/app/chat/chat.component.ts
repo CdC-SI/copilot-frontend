@@ -30,21 +30,29 @@ import {
 	LANGUAGE_MAP,
 	UserAuthDialogService
 } from './services';
-import {Subject, Subscription, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
+import {Subject, Subscription, merge, switchMap, take, takeUntil, takeWhile, timeout, timer} from 'rxjs';
 import {v4 as uuidv4} from 'uuid';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
 const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
+/** Délai maximal entre la demande de Stop et `done` ; au-delà, la requête est abandonnée côté client. */
+const STOP_TIMEOUT_MS = 10_000;
 
 interface ActiveStream {
 	subscription: Subscription;
 	batcher: FrameBatcher<ChatStreamEvent>;
+	conversationId?: string;
+	/** Demande de Stop et attente de `done` (abandon de la requête au-delà de STOP_TIMEOUT_MS). */
+	stop?: Subscription;
 }
 
 interface StreamingOptions {
 	/** Workspace imposé par l'utilisateur (sinon routing automatique). */
 	workspace?: string;
-	replaceLastTurn?: boolean;
+	/** Régénération : réponse enregistrée remplacée (cf. ChatRequest.replaceMessageId). */
+	replaceMessageId?: string;
+	/** Régénération refusée (409) : rétablit le tour tel qu'il était avant. */
+	restore?: () => void;
 }
 
 interface StreamingTarget {
@@ -276,8 +284,31 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		return !!turn && (message === turn.question || message === turn.answer);
 	}
 
+	/** Stop demandé, en attente de l'enregistrement de la réponse partielle. */
+	get isStopping(): boolean {
+		return [...this.activeStreams.keys()].some(target => target.answer.stopping);
+	}
+
+	/**
+	 * Stop : le backend arrête la génération, enregistre la réponse partielle puis termine le flux par
+	 * `done {interrupted: true}` ; Régénérer n'est possible qu'après. Sans réponse du backend, la requête est abandonnée.
+	 */
 	stopGeneration(): void {
-		this.cancelPendingGenerations();
+		this.activeStreams.forEach((stream, target) => {
+			if (target.answer.isCompleted || target.answer.stopping) return;
+			if (!target.answer.generationId || !stream.conversationId) {
+				this.abortGeneration(target);
+				return;
+			}
+			target.answer.stopping = true;
+			stream.stop = merge(
+				this.conversationService.stopGeneration(stream.conversationId, target.answer.generationId).pipe(timeout(STOP_TIMEOUT_MS)),
+				timer(STOP_TIMEOUT_MS)
+			).subscribe({
+				next: () => this.abortGeneration(target),
+				error: () => this.abortGeneration(target)
+			});
+		});
 		this.cdr.markForCheck();
 	}
 
@@ -289,8 +320,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	editLastQuestion(text: string): void {
 		const turn = this.replayableTurn;
 		if (!turn || !text?.trim()) return;
+		const previousQuestion = turn.question.message;
 		turn.question.message = text.trim();
-		this.replayTurn(turn);
+		this.replayTurn(turn, previousQuestion);
 	}
 
 	/**
@@ -702,8 +734,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			next: event => batcher.push(event),
 			error: err => {
 				batcher.flush();
-				this.activeStreams.delete(target);
-				this.handleStreamError(err, target);
+				this.removeActiveStream(target);
+				this.handleStreamError(err, target, options);
 				this.cdr.markForCheck();
 			},
 			complete: () => {
@@ -712,11 +744,16 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			}
 		});
 		if (!subscription.closed) {
-			this.activeStreams.set(target, {subscription, batcher});
+			this.activeStreams.set(target, {subscription, batcher, conversationId: requestConfig.conversationId});
 		}
 	}
 
-	private buildChatRequest(inputText: string, {workspace, replaceLastTurn}: StreamingOptions): ChatRequest {
+	private removeActiveStream(target: StreamingTarget): void {
+		this.activeStreams.get(target)?.stop?.unsubscribe();
+		this.activeStreams.delete(target);
+	}
+
+	private buildChatRequest(inputText: string, {workspace, replaceMessageId}: StreamingOptions): ChatRequest {
 		const currentLang = this.translateService.currentLang;
 		return {
 			query: inputText,
@@ -724,13 +761,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			language: LANGUAGE_MAP[currentLang] || Language.DE,
 			workspace,
 			ragEnabled: !this.isLlmOnlyMode(),
-			// N'est envoyé que s'il est vrai, pour rester compatible avec un backend qui ne le connaît pas.
-			replaceLastTurn: replaceLastTurn || undefined
+			replaceMessageId
 		};
 	}
 
 	private onStreamComplete(target: StreamingTarget, conversationId: string | undefined): void {
-		this.activeStreams.delete(target);
+		this.removeActiveStream(target);
 		this.completeUnfinishedAnswer(target);
 		// Le stream ne se termine qu'après la persistance de l'échange et la génération du titre.
 		const conversation = this.conversationTitles.find(c => c.conversationId === conversationId);
@@ -745,23 +781,42 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * Les flux déjà terminés côté réponse continuent : le backend y génère le titre.
 	 */
 	private cancelPendingGenerations(): void {
-		this.activeStreams.forEach(({subscription, batcher}, target) => {
+		this.activeStreams.forEach(({batcher}, target) => {
 			batcher.flush();
-			if (target.answer.isCompleted) return;
-			subscription.unsubscribe();
-			this.activeStreams.delete(target);
-			this.streamProcessor.interrupt(target.answer);
+			if (!target.answer.isCompleted) this.abortGeneration(target);
 		});
 		this.enableSearch();
 	}
 
 	/**
-	 * Rejoue le dernier échange en le remplaçant (côté backend si l'échange a été enregistré).
-	 * La réponse est remplacée par un nouvel objet : un flux précédent encore ouvert (génération du titre)
-	 * ne peut ainsi pas modifier la nouvelle réponse.
+	 * Abandon de la requête (navigation, Stop sans réponse du backend) : le backend enregistre la réponse partielle
+	 * sous `generationId`, qui devient la réponse à remplacer pour rejouer ce tour.
 	 */
-	private replayTurn(turn: StreamingTarget): void {
-		const replaceLastTurn = !!(turn.answer.hasSavedExchange || turn.answer.id);
+	private abortGeneration(target: StreamingTarget): void {
+		const stream = this.activeStreams.get(target);
+		if (!stream || target.answer.isCompleted) return;
+		stream.batcher.flush();
+		stream.subscription.unsubscribe();
+		this.removeActiveStream(target);
+		this.markInterruptedWithoutDone(target.answer);
+		this.enableSearch();
+		this.cdr.markForCheck();
+	}
+
+	/** Réponse arrêtée sans `done` : conservée comme interrompue, rejouable via l'identifiant annoncé par `start`. */
+	private markInterruptedWithoutDone(answer: ChatMessage): void {
+		this.streamProcessor.interrupt(answer);
+		answer.replaceableId = answer.generationId ?? answer.replaceableId;
+	}
+
+	/**
+	 * Rejoue le dernier échange en remplaçant la réponse enregistrée (`id`, sinon `replaceableId`).
+	 * La réponse est remplacée par un nouvel objet : un flux précédent encore ouvert (génération du titre)
+	 * ne peut ainsi pas modifier la nouvelle réponse. Si le backend refuse (409), le tour est rétabli.
+	 */
+	private replayTurn(turn: StreamingTarget, previousQuestion = turn.question.message): void {
+		const replaceMessageId = turn.answer.id ?? turn.answer.replaceableId;
+		const previousWorkspace = turn.question.workspace;
 		const messages = this.messages;
 		const answer: ChatMessage = {
 			message: '',
@@ -770,13 +825,19 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			isCompleted: false,
 			beingSpoken: false,
 			sources: [],
-			hasSavedExchange: replaceLastTurn
+			replaceableId: replaceMessageId
 		};
 		messages[messages.indexOf(turn.answer)] = answer;
 		turn.question.workspace = undefined;
+		const restore = () => {
+			const index = messages.indexOf(answer);
+			if (index >= 0) messages[index] = turn.answer;
+			turn.question.message = previousQuestion;
+			turn.question.workspace = previousWorkspace;
+		};
 		this.disableSearch();
 		this.suggestionService.clearSpecificSuggestions();
-		this.startStreamingRequest({question: turn.question, answer}, turn.question.message, {replaceLastTurn});
+		this.startStreamingRequest({question: turn.question, answer}, turn.question.message, {replaceMessageId, restore});
 		this.scrollToLastUserMessage();
 	}
 
@@ -787,7 +848,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	private completeUnfinishedAnswer(target: StreamingTarget): void {
 		if (target.answer.isCompleted) return;
 		if (target.answer.message && !target.answer.status) {
-			this.streamProcessor.interrupt(target.answer);
+			this.markInterruptedWithoutDone(target.answer);
 		} else {
 			this.markAnswerInError(target, 'chat.stream.error.incomplete');
 		}
@@ -805,6 +866,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		result.newSuggestions.forEach(suggestion => this.suggestionService.addSpecificSuggestion(suggestion));
 
 		if (result.completed) {
+			this.activeStreams.get(target)?.stop?.unsubscribe();
 			this.enableSearch();
 		} else if (result.failed) {
 			this.markAnswerInError(target, 'chat.stream.error');
@@ -814,8 +876,16 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.updateScrollButtonVisibility();
 	}
 
-	private handleStreamError(err: unknown, target: StreamingTarget): void {
-		if (err instanceof StreamHttpError && err.status === 401) {
+	private handleStreamError(err: unknown, target: StreamingTarget, {restore}: StreamingOptions): void {
+		if (err instanceof StreamHttpError && err.status === 409) {
+			const key = err.code === 'TURN_NOT_REPLACEABLE' ? 'chat.stream.error.not-replaceable' : 'chat.stream.error.conflict';
+			if (restore) {
+				restore();
+				this.notif.warning(key);
+			} else {
+				this.markAnswerInError(target, key);
+			}
+		} else if (err instanceof StreamHttpError && err.status === 401) {
 			this.markAnswerInError(target, 'chat.stream.error.session');
 		} else if (!target.answer.isCompleted) {
 			this.markAnswerInError(target, 'chat.stream.error');

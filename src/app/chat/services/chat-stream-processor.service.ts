@@ -52,6 +52,7 @@ export class ChatStreamProcessorService {
 	/** Arrêt de la génération : la réponse partielle est conservée, le statut effacé. */
 	interrupt(message: ChatMessage): void {
 		this.clearStatus(message);
+		message.stopping = undefined;
 		message.isCompleted = true;
 		message.interrupted = true;
 	}
@@ -69,7 +70,8 @@ export class ChatStreamProcessorService {
 		this.clearStatus(message);
 		message.id = messageId;
 		message.isCompleted = true;
-		message.hasSavedExchange = true;
+		message.replaceableId = undefined;
+		message.stopping = undefined;
 		message.interrupted = interrupted || undefined;
 	}
 

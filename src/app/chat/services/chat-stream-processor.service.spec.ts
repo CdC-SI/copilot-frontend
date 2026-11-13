@@ -54,11 +54,13 @@ describe('ChatStreamProcessorService', () => {
 	});
 
 	it('done termine la réponse, l’identifie et la marque enregistrée', () => {
+		Object.assign(message, {replaceableId: 'ancienne', stopping: true});
 		const [, end] = feed(text('Réponse'), {type: 'done', data: {messageId: 'm-1', interrupted: false}});
 		expect(end.completed).toBe(true);
 		expect(message.id).toBe('m-1');
 		expect(message.isCompleted).toBe(true);
-		expect(message.hasSavedExchange).toBe(true);
+		expect(message.replaceableId).toBeUndefined();
+		expect(message.stopping).toBeUndefined();
 		expect(message.interrupted).toBeUndefined();
 		expect(message.message).toBe('Réponse');
 	});
@@ -74,7 +76,6 @@ describe('ChatStreamProcessorService', () => {
 		const [, failure] = feed(status('retrieval', 'Recherche…'), {type: 'error', data: {code: 'GENERATION_FAILED'}});
 		expect(failure.failed).toBe(true);
 		expect(message.id).toBeUndefined();
-		expect(message.hasSavedExchange).toBeUndefined();
 		expect(message.status).toBeUndefined();
 	});
 
