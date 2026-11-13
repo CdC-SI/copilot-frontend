@@ -760,7 +760,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * ne peut ainsi pas modifier la nouvelle réponse.
 	 */
 	private replayTurn(turn: StreamingTarget): void {
-		const replaceLastTurn = !!(turn.answer.id || turn.answer.interrupted);
+		const replaceLastTurn = !!(turn.answer.hasSavedExchange || turn.answer.id);
 		const messages = this.messages;
 		const answer: ChatMessage = {
 			message: '',
@@ -768,7 +768,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			timestamp: new Date(),
 			isCompleted: false,
 			beingSpoken: false,
-			sources: []
+			sources: [],
+			hasSavedExchange: replaceLastTurn
 		};
 		messages[messages.indexOf(turn.answer)] = answer;
 		turn.question.workspace = undefined;
@@ -791,6 +792,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	private processStreamChunk(chunk: string, target: StreamingTarget): void {
 		const result = this.streamProcessor.processChunk(chunk, target.answer);
+		if (target.answer.id) target.answer.hasSavedExchange = true;
 
 		// The workspace used to answer is surfaced on the question rather than the answer bubble.
 		if (target.answer.workspace) {

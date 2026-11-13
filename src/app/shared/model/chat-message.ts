@@ -25,6 +25,8 @@ export interface ChatMessage {
 	workspace?: string;
 	/** Génération arrêtée avant la fin (bouton Stop ou changement de conversation) : réponse partielle. */
 	interrupted?: boolean;
+	/** L'échange correspondant a été enregistré côté backend, même si la réponse affichée est en erreur. */
+	hasSavedExchange?: boolean;
 }
 
 export enum ChatMessageSource {

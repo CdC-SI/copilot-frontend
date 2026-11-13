@@ -29,6 +29,7 @@ export class ChatMessageComponent {
 	}
 
 	startEdit(): void {
+		if (!this.replayable) return;
 		this.editedQuestion = this.message.message ?? '';
 		this.editing = true;
 	}
@@ -39,11 +40,17 @@ export class ChatMessageComponent {
 
 	submitEdit(): void {
 		const question = this.editedQuestion.trim();
-		if (!question) return;
+		if (!question || !this.replayable) return;
 		this.editing = false;
 		if (question !== this.message.message) {
 			this.editQuestion.emit(question);
 		}
+	}
+
+	submitEditOnEnter(event: KeyboardEvent): void {
+		if (event.shiftKey) return;
+		event.preventDefault();
+		this.submitEdit();
 	}
 
 	/**

@@ -1,5 +1,5 @@
 <div *ngIf="message.source === ChatMessageSource.USER">
-	<ng-container *ngIf="!editing; else editForm">
+	<ng-container *ngIf="!editing || !replayable; else editForm">
 		<markdown class="no-margin" [data]="message.message"></markdown>
 		<zco-workspace-badge
 			*ngIf="message.workspace"
@@ -27,6 +27,7 @@
 				[(ngModel)]="editedQuestion"
 				[attr.aria-label]="'chat.question.edit' | translate"
 				(keydown.escape)="cancelEdit()"
+				(keydown.enter)="submitEditOnEnter($event)"
 				cdkTextareaAutosize
 			></textarea>
 			<div class="turn-controls">
