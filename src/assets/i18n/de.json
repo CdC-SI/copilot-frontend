@@ -182,6 +182,12 @@
   "attachment.retry": "Erneut versuchen",
   "attachment.process.success": "Anhänge erfolgreich verarbeitet",
   "attachment.process.error": "Fehler bei der Verarbeitung der Anhänge",
+
+  "chat.stream.error": "Bei der Generierung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+
+  "chat.stream.error.session": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an und versuchen Sie es noch einmal.",
+
+  "chat.stream.error.incomplete": "Die Antwort wurde unterbrochen, bevor sie vollständig war. Bitte versuchen Sie es erneut.",
   "attachment.process.timeout": "Die Verarbeitung der Anhänge dauert zu lange. Bitte Status manuell aktualisieren.",
   "attachment.refresh": "Status aktualisieren",
   "attachment.drop.here": "Dateien hier ablegen oder klicken, um sie auszuwählen",

@@ -2,6 +2,7 @@ import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnIn
 import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
+import {StreamHttpError} from '../shared/services/sse-client.service';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
@@ -26,7 +27,7 @@ import {
 	LANGUAGE_MAP,
 	UserAuthDialogService
 } from './services';
-import {Subject, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
+import {Subject, Subscription, merge, switchMap, take, takeUntil, takeWhile, timer} from 'rxjs';
 import {v4 as uuidv4} from 'uuid';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
@@ -73,6 +74,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	protected readonly ChatMessageSource = ChatMessageSource;
 
 	private readonly destroy$ = new Subject<void>();
+	/** Flux en cours, par paire question/réponse (plusieurs peuvent coexister, cf. startStreamingRequest). */
+	private readonly activeStreams = new Map<StreamingTarget, Subscription>();
 	private pollingStop$ = new Subject<void>();
 	private pollingCancelled = false;
 
@@ -129,6 +132,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	ngOnDestroy() {
 		this.pollingCancelled = true;
 		this.containerResizeObserver?.disconnect();
+		this.cancelPendingGenerations();
 		this.destroy$.next();
 		this.destroy$.complete();
 	}
@@ -207,6 +211,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	newChat(ragEnabled = true): void {
+		this.cancelPendingGenerations();
 		if (this.currentConversationTitle) this.currentConversationTitle.selected = false;
 		this.currentConversationTitle = null;
 		this.ragEnabled = ragEnabled;
@@ -287,6 +292,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	selectConversation(chatTitle: ChatTitle) {
+		this.cancelPendingGenerations();
 		this.stopAttachmentsPolling();
 		this.attachmentsPollingTimedOut = false;
 		this.conversationService.getConversation(chatTitle.conversationId).subscribe(conversation => {
@@ -647,23 +653,57 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			ragEnabled: !this.isLlmOnlyMode()
 		};
 
-		this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
+		const subscription = this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
 			next: chunk => {
 				this.processStreamChunk(chunk, target);
 				this.cdr.markForCheck();
 			},
 			error: err => {
+				this.activeStreams.delete(target);
 				this.handleStreamError(err, target);
 				this.cdr.markForCheck();
 			},
-			complete: () => {
-				// Le stream ne se termine qu'après la persistance de l'échange et la génération du titre.
-				const conversation = this.conversationTitles.find(c => c.conversationId === requestConfig.conversationId);
-				if (conversation?.provisional) {
-					this.refreshConversations();
-				}
-			}
+			complete: () => this.onStreamComplete(target, requestConfig.conversationId)
 		});
+		if (!subscription.closed) {
+			this.activeStreams.set(target, subscription);
+		}
+	}
+
+	private onStreamComplete(target: StreamingTarget, conversationId: string | undefined): void {
+		this.activeStreams.delete(target);
+		this.completeUnfinishedAnswer(target);
+		// Le stream ne se termine qu'après la persistance de l'échange et la génération du titre.
+		const conversation = this.conversationTitles.find(c => c.conversationId === conversationId);
+		if (conversation?.provisional) {
+			this.refreshConversations();
+		}
+		this.cdr.markForCheck();
+	}
+
+	/**
+	 * Annule les générations dont la réponse n'est pas encore terminée (pas de <message_uuid>).
+	 * Les flux déjà terminés côté réponse continuent : le backend y persiste l'échange et génère le titre.
+	 */
+	private cancelPendingGenerations(): void {
+		this.activeStreams.forEach((subscription, target) => {
+			if (target.answer.isCompleted) return;
+			subscription.unsubscribe();
+			this.activeStreams.delete(target);
+			target.answer.isCompleted = true;
+		});
+		this.enableSearch();
+	}
+
+	/** Flux terminé sans <message_uuid> : on clôt la réponse pour ne pas bloquer la saisie. */
+	private completeUnfinishedAnswer(target: StreamingTarget): void {
+		if (target.answer.isCompleted) return;
+		if (target.answer.message) {
+			target.answer.isCompleted = true;
+		} else {
+			this.markAnswerInError(target, 'chat.stream.error.incomplete');
+		}
+		this.enableSearch();
 	}
 
 	private processStreamChunk(chunk: string, target: StreamingTarget): void {
@@ -686,18 +726,24 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private handleStreamError(err: unknown, target: StreamingTarget): void {
-		if (!(err instanceof Error) || err.message !== 'network error') {
-			Object.assign(target.answer, {
-				message: 'Une erreur est survenue. Veuillez réessayer.',
-				source: ChatMessageSource.LLM,
-				timestamp: new Date(),
-				isCompleted: true,
-				inError: true,
-				beingSpoken: false,
-				sources: []
-			});
+		if (err instanceof StreamHttpError && err.status === 401) {
+			this.markAnswerInError(target, 'chat.stream.error.session');
+		} else if (!target.answer.isCompleted) {
+			this.markAnswerInError(target, 'chat.stream.error');
 		}
 		this.enableSearch();
+	}
+
+	private markAnswerInError(target: StreamingTarget, messageKey: string): void {
+		Object.assign(target.answer, {
+			message: this.translateService.instant(messageKey),
+			source: ChatMessageSource.LLM,
+			timestamp: new Date(),
+			isCompleted: true,
+			inError: true,
+			beingSpoken: false,
+			sources: []
+		});
 	}
 
 	private updateCurrentConversation() {

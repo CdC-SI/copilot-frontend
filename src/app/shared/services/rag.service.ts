@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
-import {Observable, Subscriber} from 'rxjs';
-import {AuthenticationServiceV2} from './auth.service';
+import {Observable} from 'rxjs';
+import {SseClientService} from './sse-client.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -10,33 +10,12 @@ import {AuthenticationServiceV2} from './auth.service';
 export class RagService {
 	constructor(
 		private readonly config: ConfigurationService,
-		private readonly authService: AuthenticationServiceV2
+		private readonly sseClient: SseClientService
 	) {}
 
+	/** Flux des données SSE de la réponse ; se désabonner annule la génération côté client. */
 	process(ragRequest: ChatRequest): Observable<string> {
-		const headers = new Headers({Accept: 'text/event-stream'});
-		const token = this.authService.jwtToken;
-		if (token) headers.append('Blue', `Bearer ${token}`);
-
-		const form = this.buildFormDataFromChatRequest(ragRequest);
-
-		return new Observable<string>(observer => {
-			fetch(this.config.backendApi('/conversations'), {
-				method: 'POST',
-				headers,
-				body: form
-			})
-				.then(response => {
-					const reader = response.body.getReader();
-					const decoder = new TextDecoder('utf-8');
-					const buffer = '';
-
-					this.readStream(reader, decoder, buffer, observer);
-				})
-				.catch(error => {
-					observer.error(error);
-				});
-		});
+		return this.sseClient.post(this.config.backendApi('/conversations'), this.buildFormDataFromChatRequest(ragRequest));
 	}
 
 	private buildFormDataFromChatRequest(ragRequest: ChatRequest): FormData {
@@ -58,49 +37,5 @@ export class RagService {
 		if (value !== undefined && value !== null) {
 			fd.append(key, String(value));
 		}
-	}
-
-	private readStream(reader: ReadableStreamDefaultReader<Uint8Array>, decoder: TextDecoder, buffer: string, observer: Subscriber<string>) {
-		reader
-			.read()
-			.then(({done, value}) => {
-				if (done) {
-					observer.complete();
-					return;
-				}
-
-				buffer += decoder.decode(value, {stream: true});
-				buffer = this.processBuffer(buffer, observer);
-				this.readStream(reader, decoder, buffer, observer);
-			})
-			.catch(error => {
-				observer.error(error);
-			});
-	}
-
-	private processBuffer(buffer: string, observer: Subscriber<string>) {
-		const events = buffer.split('\n\n');
-		buffer = events.pop()!; // Save incomplete event back to buffer
-		events.forEach(event => {
-			const parsedData = this.parseEvent(event);
-			if (parsedData) {
-				observer.next(parsedData);
-			}
-		});
-		return buffer;
-	}
-
-	private parseEvent(eventString: string) {
-		const lines = eventString.split('\n');
-		let data = '';
-		lines.forEach((line, index) => {
-			if (line.startsWith('data:')) {
-				data += `${line.substring(5)}`;
-			}
-			if (index < lines.length - 1) {
-				data += '\n';
-			}
-		});
-		return data;
 	}
 }

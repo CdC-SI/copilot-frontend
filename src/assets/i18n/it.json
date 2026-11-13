@@ -182,6 +182,12 @@
   "attachment.retry": "Riprova",
   "attachment.process.success": "Allegati elaborati con successo",
   "attachment.process.error": "Errore durante l'elaborazione degli allegati",
+
+  "chat.stream.error": "Si è verificato un errore durante la generazione. Riprovi.",
+
+  "chat.stream.error.session": "La sessione è scaduta. Effettui di nuovo l’accesso e riprovi.",
+
+  "chat.stream.error.incomplete": "La risposta è stata interrotta prima di essere completa. Riprovi.",
   "attachment.process.timeout": "L'elaborazione degli allegati richiede troppo tempo. Aggiornare lo stato manualmente.",
   "attachment.refresh": "Aggiorna stato",
   "personal.updates": "Visualizza gli allegati della conversazione",

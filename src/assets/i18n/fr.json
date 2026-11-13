@@ -182,6 +182,12 @@
   "attachment.retry": "Réessayer",
   "attachment.process.success": "Pièces jointes traitées avec succès",
   "attachment.process.error": "Erreur lors du traitement des pièces jointes",
+
+  "chat.stream.error": "Une erreur est survenue pendant la génération. Veuillez réessayer.",
+
+  "chat.stream.error.session": "Votre session a expiré. Reconnectez-vous puis réessayez.",
+
+  "chat.stream.error.incomplete": "La réponse a été interrompue avant d’être complète. Veuillez réessayer.",
   "attachment.process.timeout": "Le traitement des pièces jointes prend trop de temps. Actualisez le statut manuellement.",
   "attachment.refresh": "Actualiser le statut",
   "attachment.drop.here": "Déposez vos fichiers ici",
