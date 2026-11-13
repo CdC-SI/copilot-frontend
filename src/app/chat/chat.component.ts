@@ -5,6 +5,7 @@ import {RagService} from '../shared/services/rag.service';
 import {StreamHttpError} from '../shared/services/sse-client.service';
 import {FrameBatcher} from '../shared/utils/frame-batcher';
 import {ChatRequest} from '../shared/model/rag';
+import {ChatStreamEvent} from '../shared/model/chat-stream-event';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
@@ -37,7 +38,7 @@ const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
 
 interface ActiveStream {
 	subscription: Subscription;
-	batcher: FrameBatcher<string>;
+	batcher: FrameBatcher<ChatStreamEvent>;
 }
 
 interface StreamingOptions {
@@ -104,18 +105,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		return this.suggestionService.getSpecificSuggestions();
 	}
 
-	/**
-	 * Indique si la conversation courante est en mode "sans Corpus" (LLM seul). Une fois la conversation
-	 * persistée côté backend, le type qu'elle a reçu à sa création fait foi ; sinon (nouvelle conversation
-	 * pas encore envoyée) on se base sur le choix fait via le bouton "Nouvelle conversation sans Corpus".
-	 */
-	isLlmOnlyMode(): boolean {
-		if (this.currentConversationTitle?.type) {
-			return this.currentConversationTitle.type === ConversationType.NO_RAG;
-		}
-		return !this.ragEnabled;
-	}
-
 	constructor(
 		private readonly ragService: RagService,
 		private readonly cdr: ChangeDetectorRef,
@@ -132,6 +121,18 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		private readonly autocompleteService: ChatAutocompleteService,
 		private readonly authDialogService: UserAuthDialogService
 	) {}
+
+	/**
+	 * Indique si la conversation courante est en mode "sans Corpus" (LLM seul). Une fois la conversation
+	 * persistée côté backend, le type qu'elle a reçu à sa création fait foi ; sinon (nouvelle conversation
+	 * pas encore envoyée) on se base sur le choix fait via le bouton "Nouvelle conversation sans Corpus".
+	 */
+	isLlmOnlyMode(): boolean {
+		if (this.currentConversationTitle?.type) {
+			return this.currentConversationTitle.type === ConversationType.NO_RAG;
+		}
+		return !this.ragEnabled;
+	}
 
 	ngAfterViewInit() {
 		const el = this.messageContainer?.nativeElement;
@@ -257,7 +258,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.scrollToLastUserMessage();
 	}
 
-	/** Une réponse est en cours de génération (avant <message_uuid>). */
+	/** Une réponse est en cours de génération (avant `done` ou `error`). */
 	get isGenerating(): boolean {
 		return [...this.activeStreams.keys()].some(target => !target.answer.isCompleted);
 	}
@@ -692,13 +693,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	private startStreamingRequest(target: StreamingTarget, inputText: string, options: StreamingOptions = {}): void {
 		const requestConfig = this.buildChatRequest(inputText, options);
 
-		// Les chunks sont traités un par un (balises de statut), mais un seul rendu est déclenché par frame.
-		const batcher = new FrameBatcher<string>(chunks => {
-			chunks.forEach(chunk => this.processStreamChunk(chunk, target));
+		// Les événements sont appliqués un par un, mais un seul rendu est déclenché par frame.
+		const batcher = new FrameBatcher<ChatStreamEvent>(events => {
+			events.forEach(event => this.processStreamEvent(event, target));
 			this.cdr.markForCheck();
 		});
 		const subscription = this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
-			next: chunk => batcher.push(chunk),
+			next: event => batcher.push(event),
 			error: err => {
 				batcher.flush();
 				this.activeStreams.delete(target);
@@ -740,8 +741,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	/**
-	 * Annule les générations dont la réponse n'est pas encore terminée (pas de <message_uuid>).
-	 * Les flux déjà terminés côté réponse continuent : le backend y persiste l'échange et génère le titre.
+	 * Annule les générations dont la réponse n'est pas encore terminée (pas de `done`).
+	 * Les flux déjà terminés côté réponse continuent : le backend y génère le titre.
 	 */
 	private cancelPendingGenerations(): void {
 		this.activeStreams.forEach(({subscription, batcher}, target) => {
@@ -779,20 +780,22 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.scrollToLastUserMessage();
 	}
 
-	/** Flux terminé sans <message_uuid> : on clôt la réponse pour ne pas bloquer la saisie. */
+	/**
+	 * Flux fermé sans `done` ni `error` (coupure réseau, proxy) : rien ne garantit que l'échange a été enregistré.
+	 * La réponse partielle est conservée comme interrompue, sinon la réponse passe en erreur.
+	 */
 	private completeUnfinishedAnswer(target: StreamingTarget): void {
 		if (target.answer.isCompleted) return;
-		if (target.answer.message) {
-			target.answer.isCompleted = true;
+		if (target.answer.message && !target.answer.status) {
+			this.streamProcessor.interrupt(target.answer);
 		} else {
 			this.markAnswerInError(target, 'chat.stream.error.incomplete');
 		}
 		this.enableSearch();
 	}
 
-	private processStreamChunk(chunk: string, target: StreamingTarget): void {
-		const result = this.streamProcessor.processChunk(chunk, target.answer);
-		if (target.answer.id) target.answer.hasSavedExchange = true;
+	private processStreamEvent(event: ChatStreamEvent, target: StreamingTarget): void {
+		const result = this.streamProcessor.processEvent(event, target.answer);
 
 		// The workspace used to answer is surfaced on the question rather than the answer bubble.
 		if (target.answer.workspace) {
@@ -801,7 +804,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 		result.newSuggestions.forEach(suggestion => this.suggestionService.addSpecificSuggestion(suggestion));
 
-		if (result.shouldEnableSearch) {
+		if (result.completed) {
+			this.enableSearch();
+		} else if (result.failed) {
+			this.markAnswerInError(target, 'chat.stream.error');
 			this.enableSearch();
 		}
 

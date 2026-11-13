@@ -1,6 +1,7 @@
 import {TextDecoder as NodeTextDecoder, TextEncoder as NodeTextEncoder} from 'util';
 import {SseClientService, StreamHttpError} from './sse-client.service';
 import {GatewayAuthService} from './gateway-auth.service';
+import {SseEvent} from '../utils/sse-parser';
 
 // Évite de charger les dépendances ESM (zas-design-system, nanoid) du vrai service.
 jest.mock('./gateway-auth.service', () => ({GatewayAuthService: class {}}));
@@ -53,14 +54,18 @@ describe('SseClientService', () => {
 	});
 
 	it('envoie les en-têtes de la gateway et émet les événements, y compris le reliquat en fin de flux', async () => {
-		fetchMock.mockResolvedValue(fakeResponse({chunks: ['data:a\n\nda', 'ta:b\n\ndata:c'], headers: {blue: 'nouveau'}}));
-		const received: string[] = [];
+		fetchMock.mockResolvedValue(fakeResponse({chunks: ['event:start\ndata:a\n\nda', 'ta:b\n\ndata:c'], headers: {blue: 'nouveau'}}));
+		const received: SseEvent[] = [];
 		let completed = false;
 
 		client.post('/api', new FormData()).subscribe({next: d => received.push(d), complete: () => (completed = true)});
 		await flush();
 
-		expect(received).toEqual(['a', 'b', 'c']);
+		expect(received).toEqual([
+			{event: 'start', data: 'a'},
+			{event: 'message', data: 'b'},
+			{event: 'message', data: 'c'}
+		]);
 		expect(completed).toBe(true);
 		const init = fetchMock.mock.calls[0][1];
 		expect(init.headers).toEqual(expect.objectContaining({Accept: 'text/event-stream', blue: 'Bearer t', 'X-Correlation-Id': 'id'}));
