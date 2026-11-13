@@ -1,4 +1,4 @@
-import {APP_INITIALIZER, LOCALE_ID, NgModule} from '@angular/core';
+import {APP_INITIALIZER, ErrorHandler, LOCALE_ID, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
@@ -54,6 +54,7 @@ import {WorkspaceEditDialogComponent} from './admin/workspaces/workspace-edit-di
 import {FeedbackStatusSelectComponent} from './admin/feedback-kpi/feedback-status-select/feedback-status-select.component';
 import {FeedbackReportConfigComponent} from './admin/feedback-kpi/feedback-report-config/feedback-report-config.component';
 import {CatalogImportDialogComponent} from './admin/catalog-import-dialog/catalog-import-dialog.component';
+import {GlobalErrorHandler} from './core/global-error-handler';
 
 registerLocaleData(localeDECH);
 registerLocaleData(localeFRCH);
@@ -121,7 +122,8 @@ function bannerFactory(configurationService: ConfigurationService) {
 		{provide: APP_INITIALIZER, useFactory: appInitializerFactory, deps: [ConfigurationService], multi: true},
 		{provide: OB_BANNER, useFactory: bannerFactory, deps: [ConfigurationService]},
 		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true},
-		{provide: HTTP_INTERCEPTORS, useClass: BlueGatewayInterceptorV2, multi: true}
+		{provide: HTTP_INTERCEPTORS, useClass: BlueGatewayInterceptorV2, multi: true},
+		{provide: ErrorHandler, useClass: GlobalErrorHandler}
 	],
 	bootstrap: [AppComponent]
 })

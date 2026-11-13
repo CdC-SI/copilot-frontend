@@ -223,7 +223,7 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	}
 
 	private updateLatestTable(msgs: IMessageFeedback[]): void {
-		this.latestData.data = (msgs as any).toSorted ? (msgs as any).toSorted(this.sortByTimestampDesc) : [...msgs].sort(this.sortByTimestampDesc);
+		this.latestData.data = [...msgs].sort(this.sortByTimestampDesc);
 
 		// brancher paginator/sort après rendu
 		queueMicrotask(() => {

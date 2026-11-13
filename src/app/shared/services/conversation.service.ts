@@ -34,7 +34,7 @@ export class ConversationService {
 		return this.http.delete<void>(this.config.backendApi(`/conversations/${id}`));
 	}
 
-	renameConversation(id: string, newTitle: string): Observable<any> {
+	renameConversation(id: string, newTitle: string): Observable<void> {
 		return this.http.put<void>(this.config.backendApi(`/conversations/titles/${id}`), {newTitle});
 	}
 

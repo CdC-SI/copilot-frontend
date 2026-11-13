@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {VisionService} from '../../shared/services/vision.service';
+import {MedicalService, SumexInvoice} from '../../shared/model/vision';
 
 @Component({
 	selector: 'zco-sumex',
@@ -9,8 +10,8 @@ import {VisionService} from '../../shared/services/vision.service';
 	styleUrl: './sumex.component.scss'
 })
 export class SumexComponent implements OnInit {
-	invoiceForm: FormGroup = new FormGroup<any>({});
-	documentFrmGrp: FormGroup = new FormGroup<any>({});
+	invoiceForm: FormGroup = new FormGroup({});
+	documentFrmGrp: FormGroup = new FormGroup({});
 	isLoading = false;
 
 	constructor(
@@ -95,8 +96,8 @@ export class SumexComponent implements OnInit {
 		return this.invoiceForm.get('medicalServices') as FormArray;
 	}
 
-	createMedicalService(data?: any): FormGroup {
-		const a = this.fb.group({
+	createMedicalService(data?: MedicalService): FormGroup {
+		const a: FormGroup = this.fb.group({
 			date: [''],
 			description: [''],
 			tariff: [''],
@@ -110,7 +111,7 @@ export class SumexComponent implements OnInit {
 		return a;
 	}
 
-	ajouterPosition(data?: any): void {
+	ajouterPosition(data?: MedicalService): void {
 		this.medicalServices.push(this.createMedicalService(data));
 	}
 
@@ -126,12 +127,11 @@ export class SumexComponent implements OnInit {
 		this.isLoading = true;
 		this.invoiceForm.disable({onlySelf: false});
 		this.visionService.sumex(this.documentCtrl.value.file).subscribe({
-			next: result => {
+			next: (result: SumexInvoice) => {
 				this.invoiceForm.patchValue(result);
 				this.invoiceForm.markAsTouched({onlySelf: false});
 				this.invoiceForm.markAllAsTouched();
-				// @ts-ignore
-				result.medicalServices.forEach(a => {
+				(result.medicalServices ?? []).forEach(a => {
 					this.ajouterPosition(a);
 				});
 				this.isLoading = false;
@@ -151,7 +151,7 @@ export class SumexComponent implements OnInit {
 	}
 
 	submitInvoice() {
-		this.visionService.submitInvoice(this.invoiceForm.getRawValue()).subscribe({
+		this.visionService.submitInvoice(this.invoiceForm.getRawValue() as SumexInvoice).subscribe({
 			next: response => {
 				this.notifService.success('La facture a été soumise avec succès.');
 				const blob = response.body;
@@ -160,7 +160,7 @@ export class SumexComponent implements OnInit {
 				let filename = 'sumex-invoice.xml';
 				if (contentDisposition) {
 					const matches = /filename\*?=(?:UTF-8'')?("?)([^";]+)\1/.exec(contentDisposition);
-					if (matches && matches[2]) {
+					if (matches?.[2]) {
 						filename = decodeURIComponent(matches[2]);
 					}
 				}

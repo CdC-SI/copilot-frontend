@@ -1,27 +1,60 @@
-# ZAS/EAK CopilotGPT Frontend
+# ZIA — Frontend (copilot-frontend)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.6.
+Interface web de ZIA, l'assistant IA de la ZAS : chat RAG en streaming, gestion du corpus documentaire, outils (analyse de documents, contrôle d'identité, Sumex, synthèse de carrière) et administration.
 
-## Development server
+Stack : Angular 17 (NgModules), Oblique 11, Angular Material, ngx-translate (fr/de/it), ngx-markdown, Jest.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Prérequis
 
-## Code scaffolding
+- Node.js 20+ et npm (registre interne Nexus configuré).
+- Le backend `copilot-backend` accessible sur `http://localhost:8080` pour le développement local.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm ci
+```
 
-## Build
+## Scripts
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+| Commande | Rôle |
+|---|---|
+| `npm start` / `npm run start:dev` | Serveur de dev sur `http://localhost:4200` (configuration development). |
+| `npm run build:prod` | Build de production dans `dist/zas-eak-copilot-frontend/browser`. |
+| `npm test` | Tests unitaires Jest. Un seul fichier : `npx ng test --test-path-pattern=<motif>`. |
+| `npm run lint` / `npm run format` | ESLint (+ Prettier) ; `format` applique les corrections automatiques. |
 
-## Running unit tests
+Vérification rapide des types (TS + templates) sans build : `npx ngc -p tsconfig.app.json --noEmit`.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Développement local
 
-## Running end-to-end tests
+`proxy.conf.json` redirige `/zia/api/**` vers `http://localhost:8080` (backend). En local, l'intercepteur `BlueGatewayInterceptorV2` injecte un jeton de développement (`src/app/core/app-configuration/token.ts`, à ne pas commiter).
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+L'environnement (local, dev, test, prod…) est déterminé à l'exécution à partir de l'URL (`core/app-configuration`), il n'y a pas de fichiers `environment.*.ts`.
 
-## Further help
+## Structure
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```
+src/app/
+  chat/        Chat RAG (streaming, pièces jointes, formulaires dynamiques)
+  corpus/      Documents personnels et sources officielles
+  tools/       Outils métier (analyse de documents, identité, Sumex, carrière)
+  admin/       Administration (feedbacks/KPI, FAQ, sources, workspaces, alertes…)
+  shared/      Composants, services, modèles, intercepteurs et utilitaires partagés
+  core/        Configuration applicative et gestion globale des erreurs
+src/assets/i18n/   Traductions fr / de / it
+```
+
+## Docker
+
+L'image est construite à partir du build Angular déjà produit (pas de build dans le Dockerfile) :
+
+```bash
+npm run build:prod
+docker build -t copilot-frontend .
+docker compose up   # http://localhost:8080
+```
+
+Base : `nginx:ubi-angular` (image ZAS), servie sur le port 8080.
+
+## Conventions
+
+Voir [`AGENTS.md`](AGENTS.md) pour les conventions de code, de branches et de validation.

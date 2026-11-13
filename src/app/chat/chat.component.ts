@@ -16,7 +16,7 @@ import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {FormDef} from '../shared/model/form-definition';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
-import {HttpEventType} from '@angular/common/http';
+import {HttpEvent, HttpEventType} from '@angular/common/http';
 import {
 	AutocompleteType,
 	ChatAutocompleteService,
@@ -475,9 +475,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		}));
 	}
 
-	private handleUploadEvent(httpEvent: any, pendingAttachments: Attachment[]): void {
+	private handleUploadEvent(httpEvent: HttpEvent<AttachmentUploadResponse>, pendingAttachments: Attachment[]): void {
 		if (httpEvent.type === HttpEventType.Response) {
-			this.handleUploadResponse(httpEvent.body as AttachmentUploadResponse, pendingAttachments);
+			this.handleUploadResponse(httpEvent.body, pendingAttachments);
 		}
 	}
 
@@ -685,8 +685,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		this.updateScrollButtonVisibility();
 	}
 
-	private handleStreamError(err: any, target: StreamingTarget): void {
-		if (err.message !== 'network error') {
+	private handleStreamError(err: unknown, target: StreamingTarget): void {
+		if (!(err instanceof Error) || err.message !== 'network error') {
 			Object.assign(target.answer, {
 				message: 'Une erreur est survenue. Veuillez réessayer.',
 				source: ChatMessageSource.LLM,

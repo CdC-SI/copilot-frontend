@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
-import {Observable} from 'rxjs';
+import {Observable, Subscriber} from 'rxjs';
 import {AuthenticationServiceV2} from './auth.service';
 
 @Injectable({
@@ -45,9 +45,6 @@ export class RagService {
 		// required
 		fd.append('query', ragRequest.query);
 
-		// files
-		(ragRequest.attachments ?? []).forEach(f => fd.append('attachments', f, f.name));
-
 		// optional
 		this.append(fd, 'language', ragRequest.language);
 		this.append(fd, 'conversationId', ragRequest.conversationId);
@@ -57,18 +54,13 @@ export class RagService {
 		return fd;
 	}
 
-	private append(fd: FormData, key: string, value: any) {
+	private append(fd: FormData, key: string, value: string | boolean | undefined | null) {
 		if (value !== undefined && value !== null) {
 			fd.append(key, String(value));
 		}
 	}
 
-	private appendList(fd: FormData, key: string, list?: (string | number | boolean)[] | null) {
-		if (!list?.length) return;
-		for (const v of list) this.append(fd, key, v);
-	}
-
-	private readStream(reader: ReadableStreamDefaultReader<Uint8Array>, decoder: TextDecoder, buffer: string, observer: any) {
+	private readStream(reader: ReadableStreamDefaultReader<Uint8Array>, decoder: TextDecoder, buffer: string, observer: Subscriber<string>) {
 		reader
 			.read()
 			.then(({done, value}) => {
@@ -86,7 +78,7 @@ export class RagService {
 			});
 	}
 
-	private processBuffer(buffer: string, observer: any) {
+	private processBuffer(buffer: string, observer: Subscriber<string>) {
 		const events = buffer.split('\n\n');
 		buffer = events.pop()!; // Save incomplete event back to buffer
 		events.forEach(event => {

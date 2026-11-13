@@ -46,11 +46,11 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 	@ViewChild('itemFilterInput', {static: true}) itemFilterInput: ElementRef;
 	@ViewChild('autosize') autosize: CdkTextareaAutosize;
 
-	destroyed$ = new Subject<any>();
+	destroyed$ = new Subject<void>();
 	formControl: FormControl;
 	options: Observable<T[]> = of([]);
 	_onTouched: () => void;
-	_onChange: (p: any) => void;
+	_onChange: (p: T | string | null) => void;
 	selected = false;
 
 	constructor(
@@ -75,11 +75,11 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 	}
 
 	ngOnDestroy(): void {
-		this.destroyed$.next(null);
+		this.destroyed$.next();
 		this.destroyed$.complete();
 	}
 
-	registerOnChange(fn: any): void {
+	registerOnChange(fn: (p: T | string | null) => void): void {
 		this._onChange = fn;
 	}
 
@@ -91,7 +91,7 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 		}
 	}
 
-	registerOnTouched(fn: any): void {
+	registerOnTouched(fn: () => void): void {
 		this._onTouched = fn;
 	}
 
@@ -99,12 +99,12 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 		this.formControl.setValue(value);
 	}
 
-	getOptionLabel(option: any): string {
+	getOptionLabel(option: T): string {
 		const optionLbl = this.optionLabelFn(option);
 		return this.highlightTextPipe.transform(optionLbl, this.formControl.value);
 	}
 
-	fireOptionSelected(value: any) {
+	fireOptionSelected(value: T) {
 		this.itemFilterInput.nativeElement.value = this.inputLabelFn(value);
 		this.options = of([]);
 		this.selected = !!value;

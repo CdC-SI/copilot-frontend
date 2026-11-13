@@ -8,6 +8,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {VisionService} from '../../shared/services/vision.service';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 import {jsPDF} from 'jspdf';
+import {StructuredFields, ZasDocumentType} from '../../shared/model/vision';
 
 @Component({
 	selector: 'zco-document-analysis',
@@ -16,21 +17,21 @@ import {jsPDF} from 'jspdf';
 	standalone: false
 })
 export class DocumentAnalysisComponent implements OnInit {
-	@ViewChild('translateDialog') translateDialog!: TemplateRef<any>;
-	@ViewChild('extractDataDialog') extractDataDialog!: TemplateRef<any>;
+	@ViewChild('translateDialog') translateDialog!: TemplateRef<unknown>;
+	@ViewChild('extractDataDialog') extractDataDialog!: TemplateRef<unknown>;
 
 	separatorKeysCodes: readonly number[] = [ENTER, COMMA];
 	languageCtrl = new FormControl();
-	documentFrmGrp: FormGroup = new FormGroup<any>({});
+	documentFrmGrp: FormGroup = new FormGroup({});
 	requestFields: string[] = [];
 	loading = false;
 	requestSubscription: Subscription | null = null;
 
 	// RESULTS
-	documentType: any;
+	documentType: ZasDocumentType | null = null;
 	translations: {translatedText: string; detectedLanguage?: string}[] = [];
 	selectedPageIndex = 0;
-	visionFrmGrp: FormGroup = new FormGroup<any>({});
+	visionFrmGrp: FormGroup<Record<string, FormControl<string | null>>> = new FormGroup({});
 	dragging = false;
 	detectedLanguage: string | null = null;
 	translationTargetLang: string | null = null;
@@ -170,7 +171,7 @@ export class DocumentAnalysisComponent implements OnInit {
 		});
 
 		this.requestSubscription = this.visionService.ocrFile(this.documentCtrl.value.file, this.fieldCtrl.value.join(',')).subscribe({
-			next: result => {
+			next: (result: StructuredFields) => {
 				Object.keys(result).forEach(key => this.addCtrlToVisionForm(key, result[key]));
 				this.cancelRequest();
 			},
@@ -189,14 +190,14 @@ export class DocumentAnalysisComponent implements OnInit {
 	}
 
 	resetVisionForm() {
-		this.visionFrmGrp = new FormGroup<any>({});
+		this.visionFrmGrp = new FormGroup({});
 		this.documentType = null;
 		this.translations = [];
 		this.selectedPageIndex = 0;
 	}
 
-	addCtrlToVisionForm(key: string, value: string) {
-		this.visionFrmGrp.addControl(key, new FormControl(value));
+	addCtrlToVisionForm(key: string, value: string | null) {
+		this.visionFrmGrp.addControl(key, new FormControl<string | null>(value));
 	}
 
 	hasTranslatorRole(): boolean {
@@ -267,9 +268,7 @@ export class DocumentAnalysisComponent implements OnInit {
 				doc.addPage();
 				doc.setFontSize(fontSize);
 			}
-			const text = page.translatedText
-				.replace(/[#*_`~>-]/g, '')
-				.replace(/\n{3,}/g, '\n\n');
+			const text = page.translatedText.replace(/[#*_`~>-]/g, '').replace(/\n{3,}/g, '\n\n');
 			const lines = doc.splitTextToSize(text, maxWidth);
 			let y = margin;
 			for (const line of lines) {
