@@ -11,15 +11,46 @@ export class ChatMessageComponent {
 	@Input() previousMessage: ChatMessage;
 	@Input() message: ChatMessage;
 	@Input() conversationId: string;
+	/** Message appartenant au dernier échange, qui peut être régénéré (réponse) ou modifié (question). */
+	@Input() replayable = false;
 	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
 	@Output() readonly workspaceChange = new EventEmitter<{question: string; workspace: string}>();
+	@Output() readonly regenerate = new EventEmitter<void>();
+	@Output() readonly editQuestion = new EventEmitter<string>();
 	sourcePanelOpen: boolean;
+	editing = false;
+	editedQuestion = '';
 	protected readonly ChatMessageSource = ChatMessageSource;
 
 	constructor() {}
 
 	sendFeedback(event: Feedback) {
 		this.feedback.emit(event);
+	}
+
+	startEdit(): void {
+		if (!this.replayable) return;
+		this.editedQuestion = this.message.message ?? '';
+		this.editing = true;
+	}
+
+	cancelEdit(): void {
+		this.editing = false;
+	}
+
+	submitEdit(): void {
+		const question = this.editedQuestion.trim();
+		if (!question || !this.replayable) return;
+		this.editing = false;
+		if (question !== this.message.message) {
+			this.editQuestion.emit(question);
+		}
+	}
+
+	submitEditOnEnter(event: KeyboardEvent): void {
+		if (event.shiftKey) return;
+		event.preventDefault();
+		this.submitEdit();
 	}
 
 	/**

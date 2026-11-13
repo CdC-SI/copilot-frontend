@@ -29,6 +29,7 @@ export class RagService {
 		this.append(fd, 'conversationId', ragRequest.conversationId);
 		this.append(fd, 'workspace', ragRequest.workspace);
 		this.append(fd, 'ragEnabled', ragRequest.ragEnabled);
+		this.append(fd, 'replaceLastTurn', ragRequest.replaceLastTurn);
 
 		return fd;
 	}

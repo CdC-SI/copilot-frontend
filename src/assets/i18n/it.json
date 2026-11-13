@@ -188,6 +188,24 @@
   "chat.stream.error.session": "La sessione è scaduta. Effettui di nuovo l’accesso e riprovi.",
 
   "chat.stream.error.incomplete": "La risposta è stata interrotta prima di essere completa. Riprovi.",
+
+
+  "chat.generation.stop": "Interrompere la generazione",
+
+
+  "chat.answer.interrupted": "Risposta interrotta",
+
+
+  "chat.answer.regenerate": "Rigenerare la risposta",
+
+
+  "chat.question.edit": "Modificare la domanda",
+
+
+  "chat.question.edit.submit": "Inviare la domanda modificata",
+
+
+  "chat.question.edit.cancel": "Annullare la modifica",
   "attachment.process.timeout": "L'elaborazione degli allegati richiede troppo tempo. Aggiornare lo stato manualmente.",
   "attachment.refresh": "Aggiorna stato",
   "personal.updates": "Visualizza gli allegati della conversazione",

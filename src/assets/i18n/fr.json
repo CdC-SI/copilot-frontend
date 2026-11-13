@@ -188,6 +188,24 @@
   "chat.stream.error.session": "Votre session a expiré. Reconnectez-vous puis réessayez.",
 
   "chat.stream.error.incomplete": "La réponse a été interrompue avant d’être complète. Veuillez réessayer.",
+
+
+  "chat.generation.stop": "Arrêter la génération",
+
+
+  "chat.answer.interrupted": "Réponse interrompue",
+
+
+  "chat.answer.regenerate": "Régénérer la réponse",
+
+
+  "chat.question.edit": "Modifier la question",
+
+
+  "chat.question.edit.submit": "Envoyer la question modifiée",
+
+
+  "chat.question.edit.cancel": "Annuler la modification",
   "attachment.process.timeout": "Le traitement des pièces jointes prend trop de temps. Actualisez le statut manuellement.",
   "attachment.refresh": "Actualiser le statut",
   "attachment.drop.here": "Déposez vos fichiers ici",

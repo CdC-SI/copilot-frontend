@@ -54,3 +54,32 @@ a {
         }
     }
 }
+
+.turn-controls {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+
+.interrupted-badge {
+	padding: 0.125rem 0.5rem;
+	border-radius: 1rem;
+	background: $ob-warning-light;
+	color: $ob-warning-dark;
+	font-size: 0.8rem;
+	margin-right: auto;
+}
+
+.edit-question {
+	display: flex;
+	flex-direction: column;
+	min-width: min(40rem, 70vw);
+}
+
+.edit-question-input {
+	width: 100%;
+	resize: none;
+	font: inherit;
+	padding: 0.5rem;
+}

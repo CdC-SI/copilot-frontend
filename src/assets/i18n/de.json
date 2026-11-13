@@ -188,6 +188,24 @@
   "chat.stream.error.session": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an und versuchen Sie es noch einmal.",
 
   "chat.stream.error.incomplete": "Die Antwort wurde unterbrochen, bevor sie vollständig war. Bitte versuchen Sie es erneut.",
+
+
+  "chat.generation.stop": "Generierung stoppen",
+
+
+  "chat.answer.interrupted": "Antwort unterbrochen",
+
+
+  "chat.answer.regenerate": "Antwort neu generieren",
+
+
+  "chat.question.edit": "Frage bearbeiten",
+
+
+  "chat.question.edit.submit": "Bearbeitete Frage senden",
+
+
+  "chat.question.edit.cancel": "Bearbeitung abbrechen",
   "attachment.process.timeout": "Die Verarbeitung der Anhänge dauert zu lange. Bitte Status manuell aktualisieren.",
   "attachment.refresh": "Status aktualisieren",
   "attachment.drop.here": "Dateien hier ablegen oder klicken, um sie auszuwählen",

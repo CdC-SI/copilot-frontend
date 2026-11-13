@@ -87,6 +87,16 @@ export class ChatStreamProcessorService {
 		return result;
 	}
 
+	/** Arrêt de la génération : la réponse partielle est conservée, les états de traitement effacés. */
+	interrupt(message: ChatMessage): void {
+		if (this.isInProcessingState(message)) {
+			this.clearProcessingStates(message);
+			message.message = '';
+		}
+		message.isCompleted = true;
+		message.interrupted = true;
+	}
+
 	private extractTags(message: ChatMessage, result: StreamProcessingResult): void {
 		this.extractSources(message);
 		this.extractWorkspace(message);
