@@ -188,9 +188,12 @@
   "chat.stream.error.session": "La sessione è scaduta. Effettui di nuovo l’accesso e riprovi.",
 
   "chat.stream.error.incomplete": "La risposta è stata interrotta prima di essere completa. Riprovi.",
+  "chat.stream.error.conflict": "In questa conversazione è già in corso la generazione di una risposta. Attenda e riprovi.",
+  "chat.stream.error.not-replaceable": "Questa risposta non può più essere rigenerata perché la conversazione è cambiata. Ricarichi la conversazione e riprovi.",
 
 
   "chat.generation.stop": "Interrompere la generazione",
+  "chat.generation.stopping": "Interruzione in corso…",
 
 
   "chat.answer.interrupted": "Risposta interrotta",

@@ -188,9 +188,12 @@
   "chat.stream.error.session": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an und versuchen Sie es noch einmal.",
 
   "chat.stream.error.incomplete": "Die Antwort wurde unterbrochen, bevor sie vollständig war. Bitte versuchen Sie es erneut.",
+  "chat.stream.error.conflict": "In dieser Unterhaltung wird bereits eine Antwort generiert. Bitte warten Sie und versuchen Sie es erneut.",
+  "chat.stream.error.not-replaceable": "Diese Antwort kann nicht mehr neu generiert werden, da sich die Unterhaltung geändert hat. Bitte laden Sie die Unterhaltung neu und versuchen Sie es erneut.",
 
 
   "chat.generation.stop": "Generierung stoppen",
+  "chat.generation.stopping": "Wird gestoppt…",
 
 
   "chat.answer.interrupted": "Antwort unterbrochen",

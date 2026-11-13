@@ -16,11 +16,13 @@ interface FakeResponseInit {
 	status?: number;
 	chunks?: string[];
 	headers?: Record<string, string>;
+	json?: unknown;
 }
 
-const fakeResponse = ({status = 200, chunks = [], headers = {}}: FakeResponseInit) => {
+const fakeResponse = ({status = 200, chunks = [], headers = {}, json}: FakeResponseInit) => {
 	const queue = chunks.map(c => encoder.encode(c));
 	return {
+		json: () => (json === undefined ? Promise.reject(new SyntaxError('pas de JSON')) : Promise.resolve(json)),
 		ok: status >= 200 && status < 300,
 		status,
 		statusText: status === 401 ? 'Unauthorized' : '',
@@ -83,6 +85,17 @@ describe('SseClientService', () => {
 		expect(error).toBeInstanceOf(StreamHttpError);
 		expect((error as StreamHttpError).status).toBe(500);
 		expect(gateway.displayUnauthorized).not.toHaveBeenCalled();
+	});
+
+	it('expose le code métier d’un refus 409', async () => {
+		fetchMock.mockResolvedValue(fakeResponse({status: 409, json: {STATUS: 409, MESSAGE: 'TURN_NOT_REPLACEABLE'}}));
+		let error: unknown;
+
+		client.post('/api', new FormData()).subscribe({error: e => (error = e)});
+		await flush();
+
+		expect((error as StreamHttpError).status).toBe(409);
+		expect((error as StreamHttpError).code).toBe('TURN_NOT_REPLACEABLE');
 	});
 
 	it("affiche le dialogue d'authentification sur 401", async () => {

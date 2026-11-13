@@ -30,6 +30,11 @@ export class ConversationService {
 		this.http.put(this.config.backendApi(`/conversations/${id}`), messages).subscribe();
 	}
 
+	/** Arrête une génération en cours (202) ; 404 si elle est inconnue ou déjà terminée. */
+	stopGeneration(conversationId: string, messageId: string): Observable<void> {
+		return this.http.post<void>(this.config.backendApi(`/conversations/${conversationId}/generations/${messageId}/stop`), null);
+	}
+
 	deleteConversation(id: string) {
 		return this.http.delete<void>(this.config.backendApi(`/conversations/${id}`));
 	}
