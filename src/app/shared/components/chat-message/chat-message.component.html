@@ -84,7 +84,7 @@
 		</div>
 
 		<zco-message-action
-			[hidden]="!message.isCompleted || message.inError"
+			[hidden]="!message.isCompleted || message.inError || (message.interrupted && !message.id)"
 			[message]="message"
 			[previousMessage]="previousMessage"
 			(feedback)="sendFeedback($event)"
