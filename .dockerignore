@@ -1,6 +1,3 @@
-nodes_modules/
-.dockerignore
-.git
-Dockerfile
-.idea
-README.md
+# Seul dist/ est copié dans l'image
+*
+!dist/zas-eak-copilot-frontend/browser/**
