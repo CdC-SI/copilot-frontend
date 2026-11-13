@@ -1,38 +1,12 @@
 import {Language} from './answer';
 
+/** Champs envoyés à `POST /conversations` (record `Question` côté backend). */
 export interface ChatRequest {
 	query: string;
-	attachments?: File[];
 	language?: Language;
-	tags?: string[];
-	sources?: string[];
-	llmModel?: string;
-	topP?: number;
-	temperature?: number;
-	maxOutputTokens?: number;
-	retrievalMethods?: string[];
-	kRetrieve?: number;
-	kMemory?: number;
-	responseStyle?: string;
-	responseFormat?: string;
-	command?: string;
-	commandArgs?: string;
-	autocomplete?: boolean;
-	agenticRag?: boolean;
-	sourceValidation?: boolean;
-	topicCheck?: boolean;
-	isFollowUpQ?: boolean;
 	conversationId?: string;
 	/** Nom du workspace explicitement choisi par l'utilisateur (override du routing automatique). */
 	workspace?: string;
 	/** Si false, la question est traitée en mode "LLM seul" : aucune recherche n'est faite dans le Corpus documentaire. */
 	ragEnabled?: boolean;
-}
-
-export enum ChatRequestConfigFields {
-	LANGUAGE = 'language',
-	TAGS = 'tags',
-	SOURCES = 'sources',
-	RESPONSE_STYLE = 'responseStyle',
-	RESPONSE_FORMAT = 'responseFormat'
 }

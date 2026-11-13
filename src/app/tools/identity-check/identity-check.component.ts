@@ -4,6 +4,7 @@ import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {VisionService} from '../../shared/services/vision.service';
+import {IdentityCheckStartRequest, IdentityCheckStatus} from '../../shared/model/identity-check';
 
 @Component({
 	selector: 'zco-identity-check',
@@ -16,9 +17,9 @@ export class IdentityCheckComponent implements OnInit {
 	capturedImage: string | null = null;
 	stream!: MediaStream;
 
-	identityCheckStatus: any;
+	identityCheckStatus: IdentityCheckStatus | null = null;
 	form: FormGroup;
-	dialogRef!: MatDialogRef<any>;
+	dialogRef!: MatDialogRef<unknown>;
 
 	constructor(
 		private readonly authenticateService: IdentityCheckService,
@@ -109,21 +110,21 @@ export class IdentityCheckComponent implements OnInit {
 
 		this.visionService.ocrFile(file, fields).subscribe(ocrResult => {
 			this.form.patchValue({
-				dateOfBirth: ocrResult.dateOfBirth,
-				street: ocrResult.residenceStreet,
-				streetNr: ocrResult.residenceStreetNr,
-				zip: ocrResult.residenceZip,
-				city: ocrResult.residenceCity,
-				country: ocrResult.country,
-				nationality: ocrResult.nationality,
-				idNumber: ocrResult.documentNumber,
-				idType: ocrResult.documentType,
-				gender: ocrResult.gender
+				dateOfBirth: ocrResult['dateOfBirth'],
+				street: ocrResult['residenceStreet'],
+				streetNr: ocrResult['residenceStreetNr'],
+				zip: ocrResult['residenceZip'],
+				city: ocrResult['residenceCity'],
+				country: ocrResult['country'],
+				nationality: ocrResult['nationality'],
+				idNumber: ocrResult['documentNumber'],
+				idType: ocrResult['documentType'],
+				gender: ocrResult['gender']
 			});
 		});
 	}
 
-	openDialog(template: TemplateRef<any>) {
+	openDialog(template: TemplateRef<unknown>) {
 		this.dialogRef = this.dialog.open(template, {width: '700px'});
 	}
 
@@ -137,7 +138,7 @@ export class IdentityCheckComponent implements OnInit {
 
 	submitDialog() {
 		if (this.form.valid) {
-			const formData = this.form.value;
+			const formData = this.form.value as IdentityCheckStartRequest;
 			this.dialogRef.close();
 			this.authenticateService.startIdentyCheck(formData).subscribe(response => {
 				window.open(response.endpoint, '_blank');

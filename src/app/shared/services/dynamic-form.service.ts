@@ -164,26 +164,25 @@ export class DynamicFormService {
 		const def = this.catalog.find(f => f.actionId === action);
 		const group = new FormGroup({});
 
-		const allControls: ControlDef[] = def.sections ? def.sections.flatMap(s => s.controls) : def.controls ?? [];
+		const allControls: ControlDef[] = def.sections ? def.sections.flatMap(s => s.controls) : (def.controls ?? []);
 		allControls.forEach(c => group.addControl(c.key, new FormControl('', c.validators || [])));
 
 		return {def, group};
 	}
 
-	hydrate(def: FormDef, raw: any): string {
-		return def.messageTemplate.replace(/{{(.*?)}}/g, (_, k) => raw[k]);
+	hydrate(def: FormDef, raw: Record<string, unknown>): string {
+		return def.messageTemplate.replace(/{{(.*?)}}/g, (_, k: string) => String(raw[k] ?? ''));
 	}
 
 	parseAssistantMessage(def: FormDef, message: string): Partial<Record<string, any>> {
 		const result: Record<string, any> = {};
 
 		/* 1. Récupère tous les ControlDef (sections ou non) */
-		const allControls = def.sections ? def.sections.flatMap(s => s.controls) : def.controls ?? [];
+		const allControls = def.sections ? def.sections.flatMap(s => s.controls) : (def.controls ?? []);
 
 		/* 2. Boucle sur les contrôles munis d’un parsePattern */
 		allControls.forEach(c => {
 			if (!c.parsePattern) return;
-			console.log('parsing', c.key, 'with pattern', c.parsePattern);
 			const m = c.parsePattern.exec(message);
 			if (!m) return;
 

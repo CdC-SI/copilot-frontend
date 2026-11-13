@@ -19,6 +19,6 @@ export const II_TARIFFS_ANSWER_TAG_REGEX = /<ii_tariffs_answer>(.*?)<\/ii_tariff
 export const WORKSPACE_TAG_REGEX = /<workspace><name>(.*?)<\/name><\/workspace>/gi;
 
 // Remove null, undefined and empty string value from object
-export const clearNullAndEmpty = (obj: any): any => {
-	return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null && v !== ''));
+export const clearNullAndEmpty = <T extends object>(obj: T): T => {
+	return Object.fromEntries(Object.entries(obj).filter(([, v]) => v != null && v !== '')) as T;
 };

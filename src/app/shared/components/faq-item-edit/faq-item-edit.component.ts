@@ -88,7 +88,7 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 		this.faqItemFrmGrp.valueChanges?.pipe(takeUntil(this.destroyed$)).subscribe(() => fn(this.faqItemFrmGrp.getRawValue()));
 	}
 
-	registerOnTouched(fn: any): void {
+	registerOnTouched(fn: () => void): void {
 		this._onTouched = fn;
 	}
 

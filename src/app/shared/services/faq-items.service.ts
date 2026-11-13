@@ -18,7 +18,7 @@ export class FaqItemsService {
 		return this.http.get<IQuestion[]>(this.config.backendApi('/faq-items'), {params: new HttpParams().set('question', requested)});
 	}
 
-	add(faqItem: IFaqItem): Observable<any> {
+	add(faqItem: IFaqItem): Observable<unknown> {
 		const headers = {'Content-Type': 'application/json', Accept: 'application/json'};
 		return this.http.post(this.config.backendApi('/faq-items'), faqItem, {headers});
 	}
