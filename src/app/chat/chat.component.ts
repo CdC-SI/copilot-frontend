@@ -3,6 +3,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
 import {StreamHttpError} from '../shared/services/sse-client.service';
+import {FrameBatcher} from '../shared/utils/frame-batcher';
 import {clearNullAndEmpty} from '../shared/utils/zco-utils';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {SpeechService} from '../shared/services/speech.service';
@@ -32,6 +33,11 @@ import {v4 as uuidv4} from 'uuid';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
 const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
+
+interface ActiveStream {
+	subscription: Subscription;
+	batcher: FrameBatcher<string>;
+}
 
 interface StreamingTarget {
 	question: ChatMessage;
@@ -75,7 +81,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	private readonly destroy$ = new Subject<void>();
 	/** Flux en cours, par paire question/réponse (plusieurs peuvent coexister, cf. startStreamingRequest). */
-	private readonly activeStreams = new Map<StreamingTarget, Subscription>();
+	private readonly activeStreams = new Map<StreamingTarget, ActiveStream>();
 	private pollingStop$ = new Subject<void>();
 	private pollingCancelled = false;
 
@@ -653,20 +659,26 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			ragEnabled: !this.isLlmOnlyMode()
 		};
 
+		// Les chunks sont traités un par un (balises de statut), mais un seul rendu est déclenché par frame.
+		const batcher = new FrameBatcher<string>(chunks => {
+			chunks.forEach(chunk => this.processStreamChunk(chunk, target));
+			this.cdr.markForCheck();
+		});
 		const subscription = this.ragService.process(clearNullAndEmpty(requestConfig)).subscribe({
-			next: chunk => {
-				this.processStreamChunk(chunk, target);
-				this.cdr.markForCheck();
-			},
+			next: chunk => batcher.push(chunk),
 			error: err => {
+				batcher.flush();
 				this.activeStreams.delete(target);
 				this.handleStreamError(err, target);
 				this.cdr.markForCheck();
 			},
-			complete: () => this.onStreamComplete(target, requestConfig.conversationId)
+			complete: () => {
+				batcher.flush();
+				this.onStreamComplete(target, requestConfig.conversationId);
+			}
 		});
 		if (!subscription.closed) {
-			this.activeStreams.set(target, subscription);
+			this.activeStreams.set(target, {subscription, batcher});
 		}
 	}
 
@@ -686,7 +698,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * Les flux déjà terminés côté réponse continuent : le backend y persiste l'échange et génère le titre.
 	 */
 	private cancelPendingGenerations(): void {
-		this.activeStreams.forEach((subscription, target) => {
+		this.activeStreams.forEach(({subscription, batcher}, target) => {
+			batcher.flush();
 			if (target.answer.isCompleted) return;
 			subscription.unsubscribe();
 			this.activeStreams.delete(target);
@@ -714,9 +727,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			target.question.workspace = target.answer.workspace;
 		}
 
-		if (result.hasNewSuggestion && result.newSuggestion) {
-			this.suggestionService.addSpecificSuggestion(result.newSuggestion);
-		}
+		result.newSuggestions.forEach(suggestion => this.suggestionService.addSpecificSuggestion(suggestion));
 
 		if (result.shouldEnableSearch) {
 			this.enableSearch();
