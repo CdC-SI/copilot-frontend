@@ -11,16 +11,12 @@ export interface ChatMessage {
 	isCompleted?: boolean;
 	lang?: string;
 	inError?: boolean;
-	isRetrieving?: boolean;
-	isValidating?: boolean;
-	isRouting?: boolean;
-	isAgent?: boolean;
+	/** Étape en cours (code de `status`), affichée à la place du contenu tant que la réponse n'a pas commencé. */
+	status?: string;
 	sources?: MessageSource[];
 	suggestions?: string[];
-	isToolUse?: boolean;
-	isProcessingIntent?: boolean;
-	isProcessingSources?: boolean;
-	isProcessingTags?: boolean;
+	/** Identifiant annoncé par `start` pour la réponse en cours de génération ; `id` n'est posé qu'à `done`. */
+	generationId?: string;
 	/** Nom du workspace utilisé par le backend pour répondre à cette question (affiché au niveau de la question). */
 	workspace?: string;
 	/** Génération arrêtée avant la fin (bouton Stop ou changement de conversation) : réponse partielle. */

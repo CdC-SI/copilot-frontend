@@ -101,11 +101,7 @@
 				*ngFor="let message of messages; let last = last; let i = index"
 				class="message"
 				#messageEl
-				[class.retrieving]="message.isRetrieving"
-				[class.validating]="message.isValidating"
-				[class.routing]="message.isRouting"
-				[class.agent]="message.isAgent"
-				[class.tool]="message.isToolUse"
+				[class.in-progress]="!!message.status"
 				[class.assistant]="message.source !== ChatMessageSource.USER"
 				[class.user]="message.source === ChatMessageSource.USER"
 			>
