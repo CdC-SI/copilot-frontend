@@ -1,6 +1,8 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 import {Feedback} from '../../model/feedback';
+
+const MIN_EDIT_WIDTH_PX = 240;
 
 @Component({
 	selector: 'zco-chat-message',
@@ -17,12 +19,27 @@ export class ChatMessageComponent {
 	@Output() readonly workspaceChange = new EventEmitter<{question: string; workspace: string}>();
 	@Output() readonly regenerate = new EventEmitter<void>();
 	@Output() readonly editQuestion = new EventEmitter<string>();
+	/** Arrêt de la génération en cours, demandé depuis la réponse. */
+	@Output() readonly stop = new EventEmitter<void>();
+	@ViewChild('editInput') editInput?: ElementRef<HTMLTextAreaElement>;
 	sourcePanelOpen: boolean;
 	editing = false;
 	editedQuestion = '';
+	/** Largeur de la bulle figée pendant l'édition (px). */
+	editWidth?: number;
 	protected readonly ChatMessageSource = ChatMessageSource;
 
-	constructor() {}
+	constructor(private readonly host: ElementRef<HTMLElement>) {}
+
+	/** Réponse en cours de génération. */
+	get isGenerating(): boolean {
+		return this.message.source !== ChatMessageSource.USER && !this.message.isCompleted;
+	}
+
+	/** Barre d'actions (feedback, copier, régénérer) : réponse terminée et enregistrée. */
+	get showActions(): boolean {
+		return !!this.message.isCompleted && !this.message.inError && !(this.message.interrupted && !this.message.id);
+	}
 
 	sendFeedback(event: Feedback) {
 		this.feedback.emit(event);
@@ -31,7 +48,9 @@ export class ChatMessageComponent {
 	startEdit(): void {
 		if (!this.replayable) return;
 		this.editedQuestion = this.message.message ?? '';
+		this.editWidth = Math.max(this.host.nativeElement.offsetWidth, MIN_EDIT_WIDTH_PX);
 		this.editing = true;
+		setTimeout(() => this.editInput?.nativeElement.focus());
 	}
 
 	cancelEdit(): void {

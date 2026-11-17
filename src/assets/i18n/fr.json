@@ -193,6 +193,8 @@
 
 
   "chat.generation.stop": "Arrêter la génération",
+  "chat.generation.stop.shortcut": "Arrêter la génération (Échap)",
+  "chat.generation.stop.inline": "Arrêter",
   "chat.generation.stopping": "Arrêt en cours…",
 
 

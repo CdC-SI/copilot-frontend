@@ -65,7 +65,8 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 	ngAfterViewInit(): void {
 		this.formControl.valueChanges.subscribe(value => {
 			this._onChange(value);
-			this.inputChange.emit(value);
+			// Texte saisi uniquement : null (réinitialisation) ou option sélectionnée (objet) → chaîne vide.
+			this.inputChange.emit(typeof value === 'string' ? value : '');
 		});
 
 		this.formControl.valueChanges.pipe(debounceTime(200)).subscribe(value => {

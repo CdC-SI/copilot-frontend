@@ -229,12 +229,21 @@
 	}
 
 	.my-message {
+		position: relative;
 		border-radius: 1.5rem;
 		padding: 16px;
 		background: palette.$ob-white;
 		max-width: 48%;
 		justify-self: end;
 		margin: 16px 0;
+	}
+
+	// Actions de la question (modifier) : affichées sous la bulle au survol ou au focus.
+	.my-message:hover,
+	.my-message:focus-within {
+		::ng-deep .question-actions {
+			opacity: 1;
+		}
 	}
 
 	.ia-message {
