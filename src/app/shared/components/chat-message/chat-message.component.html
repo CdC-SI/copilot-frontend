@@ -56,8 +56,6 @@
 </div>
 <div *ngIf="message.source !== ChatMessageSource.USER">
 	<div class="flex-column">
-		<markdown class="markdown-content" [data]="message.message"></markdown>
-
 		<div *ngIf="isGenerating" class="turn-controls">
 			<button
 				type="button"
@@ -70,6 +68,8 @@
 				<span>{{ (message.stopping ? "chat.generation.stopping" : "chat.generation.stop.inline") | translate }}</span>
 			</button>
 		</div>
+
+		<markdown class="markdown-content" [data]="message.message"></markdown>
 
 		<mat-expansion-panel *ngIf="hasMultipleSources" class="sources-panel" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">
 			<mat-expansion-panel-header>

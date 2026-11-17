@@ -6,7 +6,8 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.25rem;
-		padding: 4px;
+		padding: 0;
+		line-height: 0;
 		border: none;
 		border-radius: 0;
 		background: none;
@@ -15,7 +16,9 @@
 		font-style: normal;
 		cursor: pointer;
 
+		// Mêmes dimensions que les icônes de zco-message-action (thumbs up / down).
 		mat-icon {
+			padding: 4px;
 			font-size: 24px;
 		}
 

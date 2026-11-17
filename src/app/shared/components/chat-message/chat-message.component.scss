@@ -87,10 +87,6 @@ a {
 	&:focus-within {
 		opacity: 1;
 	}
-
-	@media (hover: none) {
-		opacity: 1;
-	}
 }
 
 // Édition dans la bulle, à largeur figée : la bulle ne change pas de taille.
@@ -111,14 +107,17 @@ a {
 	resize: none;
 }
 
+// Au-dessus de la réponse : le bouton ne se déplace pas pendant le streaming.
 .stop-inline {
-	padding: 2px 10px 2px 6px;
+	padding: 0 10px 0 2px;
+	line-height: normal;
 	border: 1px solid $ob-gray;
 	border-radius: 1rem;
 	font-size: 0.875rem;
 	margin-right: auto;
 
 	mat-icon {
+		padding: 2px;
 		font-size: 20px;
 		width: 20px;
 		height: 20px;
