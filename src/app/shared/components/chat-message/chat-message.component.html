@@ -7,21 +7,22 @@
 			[question]="message.message"
 			(workspaceChange)="workspaceChange.emit($event)"
 		></zco-workspace-badge>
-		<div *ngIf="replayable" class="turn-controls">
+		<div *ngIf="replayable" class="question-actions">
 			<button
 				type="button"
-				mat-icon-button
+				class="action-icon"
 				(click)="startEdit()"
 				[attr.aria-label]="'chat.question.edit' | translate"
-				[title]="'chat.question.edit' | translate"
+				[matTooltip]="'chat.question.edit' | translate"
 			>
 				<mat-icon svgIcon="pen"></mat-icon>
 			</button>
 		</div>
 	</ng-container>
 	<ng-template #editForm>
-		<form class="edit-question" (ngSubmit)="submitEdit()">
+		<form class="edit-question" [style.width.px]="editWidth" (ngSubmit)="submitEdit()">
 			<textarea
+				#editInput
 				class="edit-question-input"
 				name="editedQuestion"
 				[(ngModel)]="editedQuestion"
@@ -30,22 +31,22 @@
 				(keydown.enter)="submitEditOnEnter($event)"
 				cdkTextareaAutosize
 			></textarea>
-			<div class="turn-controls">
+			<div class="question-actions editing">
 				<button
 					type="submit"
-					mat-icon-button
+					class="action-icon"
 					[disabled]="!editedQuestion.trim()"
 					[attr.aria-label]="'chat.question.edit.submit' | translate"
-					[title]="'chat.question.edit.submit' | translate"
+					[matTooltip]="'chat.question.edit.submit' | translate"
 				>
 					<mat-icon svgIcon="checkmark"></mat-icon>
 				</button>
 				<button
 					type="button"
-					mat-icon-button
+					class="action-icon"
 					(click)="cancelEdit()"
 					[attr.aria-label]="'chat.question.edit.cancel' | translate"
-					[title]="'chat.question.edit.cancel' | translate"
+					[matTooltip]="'chat.question.edit.cancel' | translate"
 				>
 					<mat-icon svgIcon="cancel"></mat-icon>
 				</button>
@@ -55,6 +56,19 @@
 </div>
 <div *ngIf="message.source !== ChatMessageSource.USER">
 	<div class="flex-column">
+		<div *ngIf="isGenerating" class="turn-controls">
+			<button
+				type="button"
+				class="action-icon stop-inline"
+				(click)="stop.emit()"
+				[disabled]="message.stopping"
+				[matTooltip]="'chat.generation.stop.shortcut' | translate"
+			>
+				<mat-icon svgIcon="stop"></mat-icon>
+				<span>{{ (message.stopping ? "chat.generation.stopping" : "chat.generation.stop.inline") | translate }}</span>
+			</button>
+		</div>
+
 		<markdown class="markdown-content" [data]="message.message"></markdown>
 
 		<mat-expansion-panel *ngIf="hasMultipleSources" class="sources-panel" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">
@@ -70,25 +84,27 @@
 			></zco-source-list>
 		</mat-expansion-panel>
 
-		<div *ngIf="message.interrupted || replayable" class="turn-controls">
+		<div *ngIf="message.interrupted || (replayable && !showActions)" class="turn-controls">
 			<span *ngIf="message.interrupted" class="interrupted-badge">{{ "chat.answer.interrupted" | translate }}</span>
 			<button
-				*ngIf="replayable"
+				*ngIf="replayable && !showActions"
 				type="button"
-				mat-icon-button
+				class="action-icon"
 				(click)="regenerate.emit()"
 				[attr.aria-label]="'chat.answer.regenerate' | translate"
-				[title]="'chat.answer.regenerate' | translate"
+				[matTooltip]="'chat.answer.regenerate' | translate"
 			>
 				<mat-icon svgIcon="refresh"></mat-icon>
 			</button>
 		</div>
 
 		<zco-message-action
-			[hidden]="!message.isCompleted || message.inError || (message.interrupted && !message.id)"
+			[hidden]="!showActions"
 			[message]="message"
 			[previousMessage]="previousMessage"
+			[regenerable]="replayable"
 			(feedback)="sendFeedback($event)"
+			(regenerate)="regenerate.emit()"
 		></zco-message-action>
 	</div>
 </div>

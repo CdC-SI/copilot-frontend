@@ -1,0 +1,37 @@
+@use '@oblique/oblique/styles/scss/core/variables';
+
+// Bouton d'action de message (régénérer, modifier, arrêter…) : même rendu que la barre thumbs up / down.
+@mixin action-icon {
+	.action-icon {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0;
+		line-height: 0;
+		border: none;
+		border-radius: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+		font-style: normal;
+		cursor: pointer;
+
+		// Mêmes dimensions que les icônes de zco-message-action (thumbs up / down).
+		mat-icon {
+			padding: 4px;
+			font-size: 24px;
+		}
+
+		&:hover:not(:disabled),
+		&:focus-visible {
+			background: variables.$ob-gray-dark;
+			color: white;
+			outline: none;
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: default;
+		}
+	}
+}

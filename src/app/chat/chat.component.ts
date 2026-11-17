@@ -1,4 +1,17 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren} from '@angular/core';
+import {
+	AfterViewInit,
+	ChangeDetectorRef,
+	Component,
+	ElementRef,
+	HostListener,
+	OnDestroy,
+	OnInit,
+	QueryList,
+	TemplateRef,
+	ViewChild,
+	ViewChildren
+} from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
 import {FormControl, FormGroup} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
@@ -127,7 +140,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		private readonly conversationManager: ChatConversationManagerService,
 		private readonly suggestionService: ChatSuggestionService,
 		private readonly autocompleteService: ChatAutocompleteService,
-		private readonly authDialogService: UserAuthDialogService
+		private readonly authDialogService: UserAuthDialogService,
+		private readonly dialog: MatDialog
 	) {}
 
 	/**
@@ -293,6 +307,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * Stop : le backend arrête la génération, enregistre la réponse partielle puis termine le flux par
 	 * `done {interrupted: true}` ; Régénérer n'est possible qu'après. Sans réponse du backend, la requête est abandonnée.
 	 */
+	/** Échap arrête la génération en cours (sauf si une boîte de dialogue est ouverte). */
+	@HostListener('document:keydown.escape')
+	onEscape(): void {
+		if (this.isGenerating && !this.isStopping && this.dialog.openDialogs.length === 0) {
+			this.stopGeneration();
+		}
+	}
+
 	stopGeneration(): void {
 		this.activeStreams.forEach((stream, target) => {
 			if (target.answer.isCompleted || target.answer.stopping) return;
@@ -302,12 +324,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			}
 			target.answer.stopping = true;
 			stream.stop = merge(
-				this.conversationService
-					.stopGeneration(stream.conversationId, target.answer.generationId)
-					.pipe(
-						timeout(STOP_TIMEOUT_MS),
-						switchMap(() => [])
-					),
+				this.conversationService.stopGeneration(stream.conversationId, target.answer.generationId).pipe(
+					timeout(STOP_TIMEOUT_MS),
+					switchMap(() => [])
+				),
 				timer(STOP_TIMEOUT_MS)
 			).subscribe({
 				next: () => this.abortGeneration(target),

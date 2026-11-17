@@ -122,6 +122,7 @@
 						[replayable]="isReplayable(message)"
 						(regenerate)="regenerateLastAnswer()"
 						(editQuestion)="editLastQuestion($event)"
+						(stop)="stopGeneration()"
 					></zco-chat-message>
 				</div>
 			</div>
@@ -158,7 +159,7 @@
 				[minLength]="0"
 				[formControl]="searchCtrl"
 				(optionSelected)="handleOptionSelected($event)"
-				(inputChange)="isCommandMode = $event.startsWith('/')"
+				(inputChange)="isCommandMode = !!$event?.startsWith('/')"
 				(attachmentsSelected)="onAttachmentsSelected($event)"
 				(submitMessage)="sendToLLM()"
 			/>
@@ -171,7 +172,7 @@
 				(click)="stopGeneration()"
 				[disabled]="isStopping"
 				[attr.aria-label]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
-				[title]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
+				[matTooltip]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop.shortcut') | translate"
 			>
 				<mat-icon svgIcon="stop"></mat-icon>
 			</button>

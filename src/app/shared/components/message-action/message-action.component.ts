@@ -18,7 +18,10 @@ import {AuthenticationServiceV2} from '../../services/auth.service';
 export class MessageActionComponent {
 	@Input() message: ChatMessage;
 	@Input() previousMessage: ChatMessage;
+	/** Dernière réponse de la conversation : l'action Régénérer est proposée. */
+	@Input() regenerable = false;
 	@Output() readonly feedback: EventEmitter<Feedback> = new EventEmitter<Feedback>();
+	@Output() readonly regenerate = new EventEmitter<void>();
 
 	@ViewChild('addFaqItemDialog') addFaqItemDialog: TemplateRef<any>;
 	@ViewChild('feedbackDialog') feedbackDialog: TemplateRef<any>;
@@ -113,7 +116,7 @@ export class MessageActionComponent {
 			answer: this.message.message,
 			isPositive,
 			comment,
-			category: isPositive ? undefined : this.categoryFrmCtrl.value ?? undefined
+			category: isPositive ? undefined : (this.categoryFrmCtrl.value ?? undefined)
 		});
 	}
 }

@@ -1,7 +1,9 @@
 @use '@oblique/oblique/styles/scss/core/variables' as *;
 @use '@oblique/oblique/styles/scss/core/mixins/layout';
 @use 'styles/markdown-content' as markdown;
+@use 'styles/action-icon';
 @include markdown.markdown-content;
+@include action-icon.action-icon;
 
 .message {
     width: 100%;
@@ -71,15 +73,53 @@ a {
 	margin-right: auto;
 }
 
-.edit-question {
+// Actions de la question : sous la bulle (positionnée par .my-message), visibles au survol / focus (cf. chat.component.scss).
+.question-actions {
+	position: absolute;
+	top: 100%;
+	right: 0.5rem;
 	display: flex;
-	flex-direction: column;
-	min-width: min(40rem, 70vw);
+	gap: 0.25rem;
+	opacity: 0;
+	transition: opacity 0.15s ease-in-out;
+
+	&.editing,
+	&:focus-within {
+		opacity: 1;
+	}
+}
+
+// Édition dans la bulle, à largeur figée : la bulle ne change pas de taille.
+.edit-question {
+	max-width: 100%;
 }
 
 .edit-question-input {
+	display: block;
 	width: 100%;
-	resize: none;
+	margin: 0;
+	padding: 0;
+	border: none;
+	outline: none;
+	background: transparent;
+	color: inherit;
 	font: inherit;
-	padding: 0.5rem;
+	resize: none;
+}
+
+// Au-dessus de la réponse : le bouton ne se déplace pas pendant le streaming.
+.stop-inline {
+	padding: 0 10px 0 2px;
+	line-height: normal;
+	border: 1px solid $ob-gray;
+	border-radius: 1rem;
+	font-size: 0.875rem;
+	margin-right: auto;
+
+	mat-icon {
+		padding: 2px;
+		font-size: 20px;
+		width: 20px;
+		height: 20px;
+	}
 }

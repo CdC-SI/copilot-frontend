@@ -8,6 +8,16 @@
 	(click)="speak()"
 ></mat-icon>
 <mat-icon [matTooltip]="'copy.answer' | translate" [svgIcon]="'duplicate'" (click)="copyAnswer()"></mat-icon>
+<mat-icon
+	*ngIf="regenerable"
+	role="button"
+	tabindex="0"
+	[matTooltip]="'chat.answer.regenerate' | translate"
+	[attr.aria-label]="'chat.answer.regenerate' | translate"
+	svgIcon="refresh"
+	(click)="regenerate.emit()"
+	(keydown.enter)="regenerate.emit()"
+></mat-icon>
 
 <ng-template #addFaqItemDialog>
 	<h4 mat-dialog-title>{{ "edit.question.answer" | translate }}</h4>

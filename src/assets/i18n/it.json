@@ -193,6 +193,8 @@
 
 
   "chat.generation.stop": "Interrompere la generazione",
+  "chat.generation.stop.shortcut": "Interrompere la generazione (Esc)",
+  "chat.generation.stop.inline": "Interrompi",
   "chat.generation.stopping": "Interruzione in corso…",
 
 

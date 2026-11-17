@@ -1,3 +1,4 @@
+import {ElementRef} from '@angular/core';
 import {ChatMessageComponent} from './chat-message.component';
 import {ChatMessageSource} from '../../model/chat-message';
 
@@ -6,17 +7,39 @@ describe('ChatMessageComponent (modification de la question)', () => {
 	let emitted: string[];
 
 	beforeEach(() => {
-		component = new ChatMessageComponent();
+		component = new ChatMessageComponent({nativeElement: {offsetWidth: 320}} as ElementRef<HTMLElement>);
 		component.message = {message: 'Question initiale', source: ChatMessageSource.USER, timestamp: new Date()};
 		component.replayable = true;
 		emitted = [];
 		component.editQuestion.subscribe(q => emitted.push(q));
 	});
 
-	it('pré-remplit le formulaire avec la question', () => {
+	it('pré-remplit le formulaire avec la question, à la largeur de la bulle', () => {
 		component.startEdit();
 		expect(component.editing).toBe(true);
 		expect(component.editedQuestion).toBe('Question initiale');
+		expect(component.editWidth).toBe(320);
+	});
+
+	it('impose une largeur minimale pour une question courte', () => {
+		component = new ChatMessageComponent({nativeElement: {offsetWidth: 40}} as ElementRef<HTMLElement>);
+		component.message = {message: 'Oui', source: ChatMessageSource.USER, timestamp: new Date()};
+		component.replayable = true;
+		component.startEdit();
+		expect(component.editWidth).toBe(240);
+	});
+
+	it('expose la génération en cours et la barre d’actions selon l’état de la réponse', () => {
+		component.message = {message: '', source: ChatMessageSource.LLM, timestamp: new Date(), isCompleted: false};
+		expect(component.isGenerating).toBe(true);
+		expect(component.showActions).toBe(false);
+
+		Object.assign(component.message, {isCompleted: true, interrupted: true});
+		expect(component.isGenerating).toBe(false);
+		expect(component.showActions).toBe(false);
+
+		component.message.id = 'm-1';
+		expect(component.showActions).toBe(true);
 	});
 
 	it('émet la question modifiée, sans espaces superflus', () => {
