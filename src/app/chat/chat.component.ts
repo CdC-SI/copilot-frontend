@@ -302,7 +302,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			}
 			target.answer.stopping = true;
 			stream.stop = merge(
-				this.conversationService.stopGeneration(stream.conversationId, target.answer.generationId).pipe(timeout(STOP_TIMEOUT_MS)),
+				this.conversationService
+					.stopGeneration(stream.conversationId, target.answer.generationId)
+					.pipe(
+						timeout(STOP_TIMEOUT_MS),
+						switchMap(() => [])
+					),
 				timer(STOP_TIMEOUT_MS)
 			).subscribe({
 				next: () => this.abortGeneration(target),
@@ -796,6 +801,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 		const stream = this.activeStreams.get(target);
 		if (!stream || target.answer.isCompleted) return;
 		stream.batcher.flush();
+		if (target.answer.isCompleted) return;
 		stream.subscription.unsubscribe();
 		this.removeActiveStream(target);
 		this.markInterruptedWithoutDone(target.answer);
