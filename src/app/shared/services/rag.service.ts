@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
-import {Observable} from 'rxjs';
+import {Observable, filter, map} from 'rxjs';
 import {SseClientService} from './sse-client.service';
+import {ChatStreamEvent, toChatStreamEvent} from '../model/chat-stream-event';
 
 @Injectable({
 	providedIn: 'root'
@@ -13,9 +14,12 @@ export class RagService {
 		private readonly sseClient: SseClientService
 	) {}
 
-	/** Flux des données SSE de la réponse ; se désabonner annule la génération côté client. */
-	process(ragRequest: ChatRequest): Observable<string> {
-		return this.sseClient.post(this.config.backendApi('/conversations'), this.buildFormDataFromChatRequest(ragRequest));
+	/** Flux des événements typés de la réponse ; se désabonner annule la génération côté client. */
+	process(ragRequest: ChatRequest): Observable<ChatStreamEvent> {
+		return this.sseClient.post(this.config.backendApi('/conversations'), this.buildFormDataFromChatRequest(ragRequest)).pipe(
+			map(toChatStreamEvent),
+			filter((event): event is ChatStreamEvent => event !== null)
+		);
 	}
 
 	private buildFormDataFromChatRequest(ragRequest: ChatRequest): FormData {

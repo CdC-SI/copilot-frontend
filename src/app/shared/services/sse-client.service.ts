@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subscriber} from 'rxjs';
 import {GatewayAuthService} from './gateway-auth.service';
-import {SseParser} from '../utils/sse-parser';
+import {SseEvent, SseParser} from '../utils/sse-parser';
 
 /** Réponse HTTP en erreur (4xx/5xx) reçue à l'ouverture d'un flux. */
 export class StreamHttpError extends Error {
@@ -22,8 +22,8 @@ export class StreamHttpError extends Error {
 export class SseClientService {
 	constructor(private readonly gatewayAuth: GatewayAuthService) {}
 
-	post(url: string, body: FormData): Observable<string> {
-		return new Observable<string>(subscriber => {
+	post(url: string, body: FormData): Observable<SseEvent> {
+		return new Observable<SseEvent>(subscriber => {
 			const controller = new AbortController();
 			this.stream(url, body, controller.signal, subscriber).catch((error: unknown) => {
 				if (!controller.signal.aborted) {
@@ -34,7 +34,7 @@ export class SseClientService {
 		});
 	}
 
-	private async stream(url: string, body: FormData, signal: AbortSignal, subscriber: Subscriber<string>): Promise<void> {
+	private async stream(url: string, body: FormData, signal: AbortSignal, subscriber: Subscriber<SseEvent>): Promise<void> {
 		const headers = {Accept: 'text/event-stream', ...this.gatewayAuth.requestHeaders()};
 		const response = await fetch(url, {method: 'POST', headers, body, signal});
 		this.checkResponse(response);
@@ -42,7 +42,7 @@ export class SseClientService {
 		const reader = response.body.getReader();
 		const decoder = new TextDecoder('utf-8');
 		const parser = new SseParser();
-		const emit = (events: string[]) => events.forEach(event => subscriber.next(event));
+		const emit = (events: SseEvent[]) => events.forEach(event => subscriber.next(event));
 
 		let chunk = await reader.read();
 		while (!chunk.done) {

@@ -47,8 +47,8 @@ export class ChatMessageComponent {
 		}
 	}
 
-	submitEditOnEnter(event: KeyboardEvent): void {
-		if (event.shiftKey) return;
+	submitEditOnEnter(event: Event): void {
+		if ((event as KeyboardEvent).shiftKey) return;
 		event.preventDefault();
 		this.submitEdit();
 	}

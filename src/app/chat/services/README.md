@@ -9,16 +9,18 @@ Le composant Chat a été refactorisé pour améliorer la lisibilité et réduir
 ### Services
 
 #### 1. **ChatStreamProcessorService** (`chat-stream-processor.service.ts`)
-Gère le traitement des chunks de streaming du LLM.
+Applique les événements typés du flux de réponse (T1) au message de l'assistant.
 
-**Responsabilités :**
-- Parse les tags XML dans les chunks (12 types de tags: tool, intent, source, routing, etc.)
-- Gère les états de traitement des messages (isRetrieving, isValidating, isRouting, etc.)
-- Extrait les sources et les suggestions depuis les messages
-- Retourne des signaux pour les actions à effectuer (enableSearch, refreshConversations, etc.)
+**Contrat (SSE `event: <type>` + `data: <json>`, cf. `shared/model/chat-stream-event.ts`) :**
+- `start {conversationId, messageId}` : premier événement (`generationId` du message).
+- `status {code, label}` : étape en cours, affichée tant que la réponse n'a pas commencé (`message.status`).
+- `text_delta {text}`, `source {…}`, `suggestion {text}`, `workspace {name}`.
+- `done {messageId, interrupted}` : terminal, émis **après** l'enregistrement de l'échange (`id`, `isCompleted`, `hasSavedExchange`).
+- `error {code, message}` : terminal, rien n'est enregistré.
 
 **Méthodes principales :**
-- `processChunk(chunk: string, message: ChatMessage): StreamProcessingResult`
+- `processEvent(event: ChatStreamEvent, message: ChatMessage): StreamProcessingResult` (`completed`, `failed`, `newSuggestions`)
+- `interrupt(message: ChatMessage)` : arrêt, réponse partielle conservée
 
 #### 2. **ChatConversationManagerService** (`chat-conversation-manager.service.ts`)
 Gère l'état des conversations et des messages.
@@ -92,12 +94,12 @@ Le `ChatComponent` agit maintenant comme un orchestrateur léger qui :
 ```
 sendToLLM()
   ↓
-ragService.process().subscribe({
-  next: chunk → processStreamChunk(chunk)
+ragService.process().subscribe({            // Observable<ChatStreamEvent>, regroupé par frame (FrameBatcher)
+  next: event → processStreamEvent(event)
                   ↓
-                streamProcessor.processChunk(chunk, message)
+                streamProcessor.processEvent(event, message)
                   ↓
-                Retourne { shouldEnableSearch, hasNewSuggestion }
+                Retourne { completed, failed, newSuggestions }
                   ↓
                 Actions basées sur le résultat
   complete: si la conversation est provisoire → refreshConversations() (titre généré, sélection par conversationId)
