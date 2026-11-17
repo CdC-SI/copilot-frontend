@@ -101,7 +101,7 @@
 				*ngFor="let message of messages; let last = last; let i = index"
 				class="message"
 				#messageEl
-				[class.in-progress]="!!message.status"
+				[class.in-progress]="!!message.status && !message.isCompleted"
 				[class.assistant]="message.source !== ChatMessageSource.USER"
 				[class.user]="message.source === ChatMessageSource.USER"
 			>
