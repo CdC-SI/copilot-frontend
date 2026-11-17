@@ -817,8 +817,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	private handleStreamError(err: unknown, target: StreamingTarget): void {
 		if (err instanceof StreamHttpError && err.status === 401) {
 			this.markAnswerInError(target, 'chat.stream.error.session');
-		} else if (!target.answer.isCompleted) {
-			this.markAnswerInError(target, 'chat.stream.error');
+		} else {
+			this.completeUnfinishedAnswer(target);
 		}
 		this.enableSearch();
 	}
