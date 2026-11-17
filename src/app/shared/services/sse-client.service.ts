@@ -7,7 +7,9 @@ import {SseEvent, SseParser} from '../utils/sse-parser';
 export class StreamHttpError extends Error {
 	constructor(
 		readonly status: number,
-		readonly statusText: string
+		readonly statusText: string,
+		/** Code d'erreur métier renvoyé par le backend (champ `MESSAGE`), ex. `TURN_NOT_REPLACEABLE`. */
+		readonly code?: string
 	) {
 		super(`HTTP ${status} ${statusText}`.trim());
 		this.name = 'StreamHttpError';
@@ -37,7 +39,7 @@ export class SseClientService {
 	private async stream(url: string, body: FormData, signal: AbortSignal, subscriber: Subscriber<SseEvent>): Promise<void> {
 		const headers = {Accept: 'text/event-stream', ...this.gatewayAuth.requestHeaders()};
 		const response = await fetch(url, {method: 'POST', headers, body, signal});
-		this.checkResponse(response);
+		await this.checkResponse(response);
 
 		const reader = response.body.getReader();
 		const decoder = new TextDecoder('utf-8');
@@ -54,7 +56,7 @@ export class SseClientService {
 		subscriber.complete();
 	}
 
-	private checkResponse(response: Response): void {
+	private async checkResponse(response: Response): Promise<void> {
 		if (!this.gatewayAuth.isLocalhost()) {
 			this.gatewayAuth.checkSession();
 			this.gatewayAuth.refreshToken(response.headers);
@@ -63,10 +65,19 @@ export class SseClientService {
 			if (response.status === 401 && !this.gatewayAuth.isLocalhost()) {
 				this.gatewayAuth.displayUnauthorized();
 			}
-			throw new StreamHttpError(response.status, response.statusText);
+			throw new StreamHttpError(response.status, response.statusText, await this.readErrorCode(response));
 		}
 		if (!response.body) {
 			throw new Error('Réponse de streaming sans corps');
+		}
+	}
+
+	private async readErrorCode(response: Response): Promise<string | undefined> {
+		try {
+			const body = (await response.json()) as {MESSAGE?: unknown};
+			return typeof body?.MESSAGE === 'string' ? body.MESSAGE : undefined;
+		} catch {
+			return undefined;
 		}
 	}
 }

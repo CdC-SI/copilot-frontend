@@ -9,6 +9,9 @@ export interface ChatRequest {
 	workspace?: string;
 	/** Si false, la question est traitée en mode "LLM seul" : aucune recherche n'est faite dans le Corpus documentaire. */
 	ragEnabled?: boolean;
-	/** Remplace le dernier échange de la conversation (Régénérer / Modifier la dernière question). */
-	replaceLastTurn?: boolean;
+	/**
+	 * Régénérer / Modifier la dernière question : identifiant de la dernière réponse enregistrée, remplacée avec sa
+	 * question (409 si ce n'est plus la dernière réponse de la conversation).
+	 */
+	replaceMessageId?: string;
 }

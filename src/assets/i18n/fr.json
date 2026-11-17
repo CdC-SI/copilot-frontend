@@ -188,9 +188,12 @@
   "chat.stream.error.session": "Votre session a expiré. Reconnectez-vous puis réessayez.",
 
   "chat.stream.error.incomplete": "La réponse a été interrompue avant d’être complète. Veuillez réessayer.",
+  "chat.stream.error.conflict": "Une réponse est déjà en cours de génération dans cette conversation. Veuillez patienter puis réessayer.",
+  "chat.stream.error.not-replaceable": "Cette réponse ne peut plus être régénérée, car la conversation a changé. Rechargez la conversation puis réessayez.",
 
 
   "chat.generation.stop": "Arrêter la génération",
+  "chat.generation.stopping": "Arrêt en cours…",
 
 
   "chat.answer.interrupted": "Réponse interrompue",

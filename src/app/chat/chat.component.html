@@ -169,8 +169,9 @@
 				mat-icon-button
 				[obButton]="'primary'"
 				(click)="stopGeneration()"
-				[attr.aria-label]="'chat.generation.stop' | translate"
-				[title]="'chat.generation.stop' | translate"
+				[disabled]="isStopping"
+				[attr.aria-label]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
+				[title]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
 			>
 				<mat-icon svgIcon="stop"></mat-icon>
 			</button>
