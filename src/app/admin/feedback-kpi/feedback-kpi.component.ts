@@ -257,7 +257,7 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 			map.set(s.documentId, row);
 		}
 
-		const rows = Array.from(map.values()).filter(row => this.statusFilter === 'ALL' || row.statusCounts[this.statusFilter as FeedbackStatus] > 0);
+		const rows = Array.from(map.values()).filter(row => this.statusFilter === 'ALL' || row.statusCounts[this.statusFilter] > 0);
 
 		this.sourcesData.data = rows;
 

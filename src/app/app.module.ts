@@ -17,7 +17,7 @@ import {registerLocaleData} from '@angular/common';
 import localeDECH from '@angular/common/locales/de-CH';
 import localeFRCH from '@angular/common/locales/fr-CH';
 import localeITCH from '@angular/common/locales/it-CH';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {TranslateModule} from '@ngx-translate/core';
 import {ChatComponent} from './chat/chat.component';
 import {TipsComponent} from './tips/tips.component';
@@ -99,6 +99,7 @@ function bannerFactory(configurationService: ConfigurationService) {
 		FeedbackReportConfigComponent,
 		CatalogImportDialogComponent
 	],
+	bootstrap: [AppComponent],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
@@ -106,7 +107,6 @@ function bannerFactory(configurationService: ConfigurationService) {
 		BrowserAnimationsModule,
 		ObButtonModule,
 		ObIconModule.forRoot(),
-		HttpClientModule,
 		TranslateModule.forRoot(multiTranslateLoader()),
 		ObExternalLinkModule,
 		SharedModule,
@@ -123,8 +123,8 @@ function bannerFactory(configurationService: ConfigurationService) {
 		{provide: OB_BANNER, useFactory: bannerFactory, deps: [ConfigurationService]},
 		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true},
 		{provide: HTTP_INTERCEPTORS, useClass: BlueGatewayInterceptorV2, multi: true},
-		{provide: ErrorHandler, useClass: GlobalErrorHandler}
-	],
-	bootstrap: [AppComponent]
+		{provide: ErrorHandler, useClass: GlobalErrorHandler},
+		provideHttpClient(withInterceptorsFromDi())
+	]
 })
 export class AppModule {}
