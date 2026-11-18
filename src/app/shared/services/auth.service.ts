@@ -43,7 +43,6 @@ export class AuthenticationServiceV2 {
 	 * Login case on app startup, we have a token
 	 */
 	login(): void {
-		// eslint-disable-next-line prefer-regex-literals
 		const match: RegExpExecArray | null = /[?&]ACCESS_TOKEN/.exec(this.window.location.search);
 		/*
 		 * No token on startup, redirect to /v2/authenticate

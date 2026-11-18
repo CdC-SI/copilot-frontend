@@ -54,7 +54,7 @@ export class AlertBannerComponent implements OnInit, OnDestroy {
 
 	getAlertText(alert: Alert): string {
 		const currentLang = this.translate.getCurrentLang();
-		let text = '';
+		let text: string;
 
 		switch (currentLang) {
 			case 'fr':
