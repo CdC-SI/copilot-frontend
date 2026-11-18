@@ -97,7 +97,7 @@
 											<div class="availability-info">
 												@if (doc.availabilityStatus) {
 													<mat-chip [class]="getAvailabilityStatusClass(doc)">
-														<mat-icon svgIcon="{{ isArchived(doc) ? 'archive' : 'checkmark-circle' }}"></mat-icon>
+														<mat-icon svgIcon="{{ isArchived(doc) ? 'archive-box' : 'checkmark_circle' }}"></mat-icon>
 														{{ "personal.documents.availability." + doc.availabilityStatus.toLowerCase() | translate }}
 													</mat-chip>
 												}

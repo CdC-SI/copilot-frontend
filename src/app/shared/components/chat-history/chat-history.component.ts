@@ -19,9 +19,9 @@ export class ChatHistoryComponent {
 	@Input() titles!: ChatTitle[] | null;
 	constructor(private readonly conversationService: ConversationService) {}
 
-	/** Icône représentant le type de conversation : Corpus documentaire (book) ou LLM seul (bolt). */
+	/** Icône représentant le type de conversation : Corpus documentaire (book) ou LLM seul (lightning). */
 	getTypeIcon(title: ChatTitle): string {
-		return title.type === ConversationType.NO_RAG ? 'bolt' : 'book';
+		return title.type === ConversationType.NO_RAG ? 'lightning' : 'book';
 	}
 
 	/** Libellé accessible/tooltip associé à l'icône de type de conversation. */

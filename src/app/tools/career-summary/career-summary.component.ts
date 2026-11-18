@@ -202,9 +202,9 @@ export class CareerSummaryComponent implements OnInit {
 			case SummaryTaskStatus.TERMINEE:
 				return 'checkmark';
 			case SummaryTaskStatus.ERREUR:
-				return 'cancel-circle';
+				return 'xmark_circle';
 			default:
-				return 'info-circle';
+				return 'info_circle';
 		}
 	}
 }

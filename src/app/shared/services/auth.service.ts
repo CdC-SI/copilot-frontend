@@ -36,7 +36,7 @@ export class AuthenticationServiceV2 {
 	}
 
 	isConnected(): boolean {
-		return this.window.localStorage.getItem(AuthenticationServiceV2.CONNECTED_KEY) === 'true';
+		return this.window.localStorage.getItem(AuthenticationServiceV2.CONNECTED_KEY) !== 'false';
 	}
 
 	/**
