@@ -8,86 +8,105 @@
 		</div>
 	</div>
 
-	<div *ngIf="isLoading" class="loading-container">
-		<mat-spinner diameter="40"></mat-spinner>
-		<p>{{ "corpus.workspaces.loading" | translate }}</p>
-	</div>
+	@if (isLoading) {
+		<div class="loading-container">
+			<mat-spinner diameter="40"></mat-spinner>
+			<p>{{ "corpus.workspaces.loading" | translate }}</p>
+		</div>
+	}
 
-	<div *ngIf="!isLoading && !workspaces.length && !otherSources.length" class="empty-state">
-		<mat-icon svgIcon="book" class="empty-icon"></mat-icon>
-		<p>{{ "corpus.workspaces.empty" | translate }}</p>
-	</div>
+	@if (!isLoading && !workspaces.length && !otherSources.length) {
+		<div class="empty-state">
+			<mat-icon svgIcon="book" class="empty-icon"></mat-icon>
+			<p>{{ "corpus.workspaces.empty" | translate }}</p>
+		</div>
+	}
 
 	<!-- Niveau 1 : Workspaces (le workspace "Général" est mis en avant et regroupe aussi les sources sans workspace) -->
-	<mat-accordion multi class="workspaces-accordion" *ngIf="!isLoading && workspaces.length">
-		<mat-expansion-panel *ngFor="let workspace of workspaces" [class.general-panel]="isGeneralWorkspace(workspace)">
-			<mat-expansion-panel-header>
-				<mat-panel-title>
-					<mat-icon [svgIcon]="isGeneralWorkspace(workspace) ? 'globe' : 'folder'" class="panel-icon"></mat-icon>
-					{{ workspace.name | translate }}
-				</mat-panel-title>
-				<mat-panel-description class="workspace-panel-description">
-					<span class="sources-count" [class.general-badge]="isGeneralWorkspace(workspace)">
-						{{
-							isGeneralWorkspace(workspace)
-								? ("corpus.workspaces.general.badge" | translate)
-								: ("corpus.workspaces.sources.count" | translate: { count: workspace.sources.length })
-						}}
-					</span>
-				</mat-panel-description>
-			</mat-expansion-panel-header>
-
-			<!-- La description complète n'est affichée qu'une fois le panneau ouvert, pour garder l'en-tête compact. -->
-			<p class="workspace-description-full" *ngIf="isGeneralWorkspace(workspace); else standardDescription">
-				{{ "corpus.workspaces.general.description" | translate }}
-			</p>
-			<ng-template #standardDescription>
-				<p class="workspace-description-full" *ngIf="workspace.description">{{ workspace.description }}</p>
-			</ng-template>
-
-			<!-- Niveau 2 : Sources du workspace -->
-			<div *ngIf="!getWorkspaceSourceNames(workspace).length" class="no-sources">
-				{{ "corpus.workspaces.sources.empty" | translate }}
-			</div>
-
-			<mat-accordion multi class="sources-accordion" *ngIf="getWorkspaceSourceNames(workspace).length">
-				<mat-expansion-panel *ngFor="let sourceName of getWorkspaceSourceNames(workspace)" (opened)="loadSourceContents(sourceName)">
+	@if (!isLoading && workspaces.length) {
+		<mat-accordion multi class="workspaces-accordion">
+			@for (workspace of workspaces; track workspace) {
+				<mat-expansion-panel [class.general-panel]="isGeneralWorkspace(workspace)">
 					<mat-expansion-panel-header>
 						<mat-panel-title>
-							<mat-icon svgIcon="book" class="panel-icon"></mat-icon>
-							<span class="source-name">{{ "sources." + sourceName | translate }}</span>
+							<mat-icon [svgIcon]="isGeneralWorkspace(workspace) ? 'globe' : 'folder'" class="panel-icon"></mat-icon>
+							{{ workspace.name | translate }}
 						</mat-panel-title>
+						<mat-panel-description class="workspace-panel-description">
+							<span class="sources-count" [class.general-badge]="isGeneralWorkspace(workspace)">
+								{{
+									isGeneralWorkspace(workspace)
+										? ("corpus.workspaces.general.badge" | translate)
+										: ("corpus.workspaces.sources.count" | translate: { count: workspace.sources.length })
+								}}
+							</span>
+						</mat-panel-description>
 					</mat-expansion-panel-header>
-
-					<p class="source-description-full" *ngIf="resolveSource(sourceName)?.description">
-						{{ resolveSource(sourceName)?.description }}
-					</p>
-
-					<!-- Niveau 3 : Contenus de la source -->
-					<ng-container *ngTemplateOutlet="contentsTpl; context: { name: sourceName }"></ng-container>
+					<!-- La description complète n'est affichée qu'une fois le panneau ouvert, pour garder l'en-tête compact. -->
+					@if (isGeneralWorkspace(workspace)) {
+						<p class="workspace-description-full">
+							{{ "corpus.workspaces.general.description" | translate }}
+						</p>
+					} @else {
+						@if (workspace.description) {
+							<p class="workspace-description-full">{{ workspace.description }}</p>
+						}
+					}
+					<!-- Niveau 2 : Sources du workspace -->
+					@if (!getWorkspaceSourceNames(workspace).length) {
+						<div class="no-sources">
+							{{ "corpus.workspaces.sources.empty" | translate }}
+						</div>
+					}
+					@if (getWorkspaceSourceNames(workspace).length) {
+						<mat-accordion multi class="sources-accordion">
+							@for (sourceName of getWorkspaceSourceNames(workspace); track sourceName) {
+								<mat-expansion-panel (opened)="loadSourceContents(sourceName)">
+									<mat-expansion-panel-header>
+										<mat-panel-title>
+											<mat-icon svgIcon="book" class="panel-icon"></mat-icon>
+											<span class="source-name">{{ "sources." + sourceName | translate }}</span>
+										</mat-panel-title>
+									</mat-expansion-panel-header>
+									@if (resolveSource(sourceName)?.description) {
+										<p class="source-description-full">
+											{{ resolveSource(sourceName)?.description }}
+										</p>
+									}
+									<!-- Niveau 3 : Contenus de la source -->
+									<ng-container *ngTemplateOutlet="contentsTpl; context: { name: sourceName }"></ng-container>
+								</mat-expansion-panel>
+							}
+						</mat-accordion>
+					}
 				</mat-expansion-panel>
-			</mat-accordion>
-		</mat-expansion-panel>
-	</mat-accordion>
+			}
+		</mat-accordion>
+	}
 
 	<!-- Template partagé pour le niveau 3 (contenus), utilisé par tous les panneaux de source -->
 	<ng-template #contentsTpl let-name="name">
-		<div *ngIf="isLoadingContents(name)" class="contents-loading">
-			<mat-icon svgIcon="refresh" class="spin"></mat-icon>
-			{{ "corpus.workspaces.contents.loading" | translate }}
-		</div>
+		@if (isLoadingContents(name)) {
+			<div class="contents-loading">
+				<mat-icon svgIcon="refresh" class="spin"></mat-icon>
+				{{ "corpus.workspaces.contents.loading" | translate }}
+			</div>
+		}
 
-		<ng-container *ngIf="!isLoadingContents(name) && getContents(name) as detail">
-			<ul class="contents-list" *ngIf="detail.contents?.length; else noContents">
-				<li *ngFor="let content of detail.contents">
-					<mat-icon svgIcon="file" class="content-icon"></mat-icon>
-					{{ content.title || content.url }}
-				</li>
-			</ul>
-			<ng-template #noContents>
+		@if (!isLoadingContents(name) && getContents(name); as detail) {
+			@if (detail.contents?.length) {
+				<ul class="contents-list">
+					@for (content of detail.contents; track content) {
+						<li>
+							<mat-icon svgIcon="file" class="content-icon"></mat-icon>
+							{{ content.title || content.url }}
+						</li>
+					}
+				</ul>
+			} @else {
 				<span class="no-contents">{{ "corpus.workspaces.contents.empty" | translate }}</span>
-			</ng-template>
-		</ng-container>
+			}
+		}
 	</ng-template>
 
 	<!-- Info bubble about official sources -->

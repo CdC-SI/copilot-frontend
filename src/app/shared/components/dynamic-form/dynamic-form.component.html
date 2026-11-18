@@ -2,64 +2,108 @@
 	<button mat-icon-button type="button" class="close-btn" (click)="onEscape()" aria-label="Close">
 		<mat-icon svgIcon="xmark_circle"></mat-icon>
 	</button>
-	<mat-accordion class="section-accordion" multi *ngIf="def.sections; else flat">
-		<mat-expansion-panel *ngFor="let s of def.sections; let idx = index" [ngClass]="s.cssClass || 'section-wrapper'" [expanded]="s.expanded ?? idx === 0">
-			<mat-expansion-panel-header>
-				<mat-panel-title>
-					{{ s.title || "Section " + (idx + 1) }}
-				</mat-panel-title>
-			</mat-expansion-panel-header>
-			<div class="section-grid">
-				<ng-container *ngFor="let c of s.controls">
-					<mat-form-field appearance="outline" [ngSwitch]="c.type" [ngClass]="c.extraClass">
-						<mat-label>{{ c.label }}</mat-label>
+	@if (def.sections) {
+		<mat-accordion class="section-accordion" multi>
+			@for (s of def.sections; track $index; let idx = $index) {
+				<mat-expansion-panel [ngClass]="s.cssClass || 'section-wrapper'" [expanded]="s.expanded ?? idx === 0">
+					<mat-expansion-panel-header>
+						<mat-panel-title>
+							{{ s.title || "Section " + (idx + 1) }}
+						</mat-panel-title>
+					</mat-expansion-panel-header>
+					<div class="section-grid">
+						@for (c of s.controls; track c.key) {
+							@if (c.type === "date") {
+								<mat-form-field appearance="outline" [ngClass]="c.extraClass">
+									<mat-label>{{ c.label }}</mat-label>
+									<input matInput [matDatepicker]="picker" [formControlName]="c.key" />
+									<mat-datepicker-toggle matSuffix [for]="picker" />
+									<mat-datepicker #picker></mat-datepicker>
+									@if (form.get(c.key)?.invalid && form.touched) {
+										<mat-error>{{ c.validationMessage }}</mat-error>
+									}
+								</mat-form-field>
+							} @else {
+								<mat-form-field appearance="outline" [ngClass]="c.extraClass">
+									<mat-label>{{ c.label }}</mat-label>
 
-						<input *ngSwitchCase="'text'" matInput [formControlName]="c.key" />
-						<input *ngSwitchCase="'number'" matInput type="number" [formControlName]="c.key" />
-						<ng-container *ngSwitchCase="'date'">
-							<input matInput [matDatepicker]="picker" [formControlName]="c.key" />
-							<mat-datepicker-toggle matSuffix [for]="picker" />
-							<mat-datepicker #picker></mat-datepicker>
-						</ng-container>
-						<textarea *ngSwitchCase="'textarea'" matInput rows="3" [formControlName]="c.key"></textarea>
-						<mat-select *ngSwitchCase="'select'" [formControlName]="c.key">
-							<mat-option *ngFor="let option of c.options" [value]="option.value">
-								{{ option.label }}
-							</mat-option>
-						</mat-select>
+									@switch (c.type) {
+										@case ("text") {
+											<input matInput [formControlName]="c.key" />
+										}
+										@case ("number") {
+											<input matInput type="number" [formControlName]="c.key" />
+										}
+										@case ("textarea") {
+											<textarea matInput rows="3" [formControlName]="c.key"></textarea>
+										}
+										@case ("select") {
+											<mat-select [formControlName]="c.key">
+												@for (option of c.options; track option.value) {
+													<mat-option [value]="option.value">
+														{{ option.label }}
+													</mat-option>
+												}
+											</mat-select>
+										}
+									}
 
-						<mat-error *ngIf="form.get(c.key)?.invalid && form.touched">{{ c.validationMessage }}</mat-error>
-					</mat-form-field>
-				</ng-container>
-			</div>
-		</mat-expansion-panel>
-	</mat-accordion>
-
-	<ng-template #flat>
+									@if (form.get(c.key)?.invalid && form.touched) {
+										<mat-error>{{ c.validationMessage }}</mat-error>
+									}
+								</mat-form-field>
+							}
+						}
+					</div>
+				</mat-expansion-panel>
+			}
+		</mat-accordion>
+	} @else {
 		<div class="section-grid">
-			<ng-container *ngFor="let c of def.controls">
-				<mat-form-field appearance="outline" [ngSwitch]="c.type" [ngClass]="c.extraClass">
-					<mat-label>{{ c.label }}</mat-label>
-
-					<input *ngSwitchCase="'text'" matInput [formControlName]="c.key" />
-					<input *ngSwitchCase="'number'" matInput type="number" [formControlName]="c.key" />
-					<ng-container *ngSwitchCase="'date'">
+			@for (c of def.controls; track c.key) {
+				@if (c.type === "date") {
+					<mat-form-field appearance="outline" [ngClass]="c.extraClass">
+						<mat-label>{{ c.label }}</mat-label>
 						<input matInput [matDatepicker]="pickerFlat" [formControlName]="c.key" />
 						<mat-datepicker-toggle matSuffix [for]="pickerFlat" />
 						<mat-datepicker #pickerFlat></mat-datepicker>
-					</ng-container>
-					<textarea *ngSwitchCase="'textarea'" matInput rows="3" [formControlName]="c.key"></textarea>
-					<mat-select *ngSwitchCase="'select'" [formControlName]="c.key">
-						<mat-option *ngFor="let option of c.options" [value]="option.value">
-							{{ option.label }}
-						</mat-option>
-					</mat-select>
+						@if (form.get(c.key)?.invalid && form.touched) {
+							<mat-error> Champ requis </mat-error>
+						}
+					</mat-form-field>
+				} @else {
+					<mat-form-field appearance="outline" [ngClass]="c.extraClass">
+						<mat-label>{{ c.label }}</mat-label>
 
-					<mat-error *ngIf="form.get(c.key)?.invalid && form.touched"> Champ requis </mat-error>
-				</mat-form-field>
-			</ng-container>
+						@switch (c.type) {
+							@case ("text") {
+								<input matInput [formControlName]="c.key" />
+							}
+							@case ("number") {
+								<input matInput type="number" [formControlName]="c.key" />
+							}
+							@case ("textarea") {
+								<textarea matInput rows="3" [formControlName]="c.key"></textarea>
+							}
+							@case ("select") {
+								<mat-select [formControlName]="c.key">
+									@for (option of c.options; track option.value) {
+										<mat-option [value]="option.value">
+											{{ option.label }}
+										</mat-option>
+									}
+								</mat-select>
+							}
+						}
+
+						@if (form.get(c.key)?.invalid && form.touched) {
+							<mat-error> Champ requis </mat-error>
+						}
+					</mat-form-field>
+				}
+			}
 		</div>
-	</ng-template>
+	}
 
 	<button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="!form.valid">Envoyer</button>
 </form>

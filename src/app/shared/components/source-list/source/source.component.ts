@@ -34,7 +34,7 @@ export class SourceComponent {
 		try {
 			const {hostname, pathname} = new URL(link);
 			return hostname.replace(/^www\./, '') + pathname;
-		} catch (_) {
+		} catch {
 			return link;
 		}
 	}

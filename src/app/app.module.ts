@@ -4,7 +4,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {OB_BANNER, ObButtonModule, ObExternalLinkModule, ObHttpApiInterceptor, ObMasterLayoutModule, provideObliqueConfiguration} from '@oblique/oblique';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {registerLocaleData} from '@angular/common';
 import localeDECH from '@angular/common/locales/de-CH';
 import localeFRCH from '@angular/common/locales/fr-CH';
@@ -96,7 +95,7 @@ function bannerFactory(configurationService: ConfigurationService) {
 		BrowserModule,
 		AppRoutingModule,
 		ObMasterLayoutModule,
-		BrowserAnimationsModule,
+
 		ObButtonModule,
 		TranslateModule,
 		ObExternalLinkModule,

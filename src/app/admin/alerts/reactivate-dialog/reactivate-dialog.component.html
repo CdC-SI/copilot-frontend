@@ -7,17 +7,21 @@
 			<input matInput [matDatepicker]="picker" formControlName="date" />
 			<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
 			<mat-datepicker #picker></mat-datepicker>
-			<mat-error *ngIf="form.get('date')?.hasError('required')">
-				{{ "admin.alerts.reactivate.date.required" | translate }}
-			</mat-error>
+			@if (form.get("date")?.hasError("required")) {
+				<mat-error>
+					{{ "admin.alerts.reactivate.date.required" | translate }}
+				</mat-error>
+			}
 		</mat-form-field>
 
 		<mat-form-field appearance="outline">
 			<mat-label>{{ "admin.alerts.time" | translate }}</mat-label>
 			<input matInput placeholder="HH:mm" formControlName="time" />
-			<mat-error *ngIf="form.get('time')?.invalid">
-				{{ "admin.alerts.reactivate.time.invalid" | translate }}
-			</mat-error>
+			@if (form.get("time")?.invalid) {
+				<mat-error>
+					{{ "admin.alerts.reactivate.time.invalid" | translate }}
+				</mat-error>
+			}
 		</mat-form-field>
 	</form>
 </mat-dialog-content>

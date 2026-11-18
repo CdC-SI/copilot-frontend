@@ -4,40 +4,45 @@
 		<span class="chip neg">👎 {{ data?.neg || 0 }}</span>
 		<span class="chip pos">👍 {{ data?.pos || 0 }}</span>
 		<span class="chip">Σ {{ data?.neg + data?.pos || 0 }}</span>
-		<a *ngIf="data?.documentUrl; else download" [href]="data?.documentUrl" mat-button>{{ "open" | translate }}</a>
-		<ng-template #download>
+		@if (data?.documentUrl) {
+			<a [href]="data?.documentUrl" mat-button>{{ "open" | translate }}</a>
+		} @else {
 			<button mat-button [obButton]="'secondary'" (click)="downloadFile()">
 				<mat-icon svgIcon="download"></mat-icon>
 				{{ "download" | translate }}
 			</button>
-		</ng-template>
+		}
 	</div>
 
 	<mat-accordion>
-		<mat-expansion-panel *ngFor="let item of data.feedbacks">
-			<mat-expansion-panel-header>
-				<mat-panel-title>
-					<span [class.pos]="item.feedbackType === 'POSITIVE'" [class.neg]="item.feedbackType === 'NEGATIVE'">
-						{{ item.feedbackType === "POSITIVE" ? "👍" : "👎" }}
-					</span>
-					{{ item.timestamp | date: "yyyy-MM-dd HH:mm" }}
-					<span class="category-chip" *ngIf="item.category">{{ "feedback.category." + item.category | translate }}</span>
-				</mat-panel-title>
-				<mat-panel-description>
-					{{ item.comment || ("(no comment)" | translate) }}
-				</mat-panel-description>
-			</mat-expansion-panel-header>
-			<div class="item-status" (click)="$event.stopPropagation()">
-				<strong>{{ "status" | translate }}: </strong>
-				<zco-feedback-status-select [status]="item.status" (statusChange)="onStatusChange(item, $event)"></zco-feedback-status-select>
-			</div>
-			<div class="qa">
-				<h3>{{ "question" | translate }}</h3>
-				<p>{{ item.question }}</p>
-				<h3>{{ "answer" | translate }}</h3>
-				<markdown [data]="item.answer"></markdown>
-			</div>
-		</mat-expansion-panel>
+		@for (item of data.feedbacks; track item) {
+			<mat-expansion-panel>
+				<mat-expansion-panel-header>
+					<mat-panel-title>
+						<span [class.pos]="item.feedbackType === 'POSITIVE'" [class.neg]="item.feedbackType === 'NEGATIVE'">
+							{{ item.feedbackType === "POSITIVE" ? "👍" : "👎" }}
+						</span>
+						{{ item.timestamp | date: "yyyy-MM-dd HH:mm" }}
+						@if (item.category) {
+							<span class="category-chip">{{ "feedback.category." + item.category | translate }}</span>
+						}
+					</mat-panel-title>
+					<mat-panel-description>
+						{{ item.comment || ("(no comment)" | translate) }}
+					</mat-panel-description>
+				</mat-expansion-panel-header>
+				<div class="item-status" (click)="$event.stopPropagation()">
+					<strong>{{ "status" | translate }}: </strong>
+					<zco-feedback-status-select [status]="item.status" (statusChange)="onStatusChange(item, $event)"></zco-feedback-status-select>
+				</div>
+				<div class="qa">
+					<h3>{{ "question" | translate }}</h3>
+					<p>{{ item.question }}</p>
+					<h3>{{ "answer" | translate }}</h3>
+					<markdown [data]="item.answer"></markdown>
+				</div>
+			</mat-expansion-panel>
+		}
 	</mat-accordion>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

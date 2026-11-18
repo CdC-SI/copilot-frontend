@@ -17,9 +17,9 @@
 				<mat-icon svgIcon="shuffle" class="status-initiated"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.initiated" | translate }}</span>
-					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
-						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
-					</span>
+					@if (identityCheckStatus?.timestamp) {
+						<span class="status-date"> {{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }} </span>
+					}
 				</div>
 			</div>
 
@@ -34,9 +34,9 @@
 				<mat-icon svgIcon="checkmark" class="status-success"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.success" | translate }}</span>
-					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
-						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
-					</span>
+					@if (identityCheckStatus?.timestamp) {
+						<span class="status-date"> {{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }} </span>
+					}
 				</div>
 			</div>
 
@@ -44,9 +44,9 @@
 				<mat-icon svgIcon="xmark_circle" class="status-failed"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.rejected" | translate }}</span>
-					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
-						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
-					</span>
+					@if (identityCheckStatus?.timestamp) {
+						<span class="status-date"> {{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }} </span>
+					}
 				</div>
 			</div>
 
@@ -54,9 +54,9 @@
 				<mat-icon svgIcon="alert" class="status-error"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.error" | translate }}</span>
-					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
-						{{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }}
-					</span>
+					@if (identityCheckStatus?.timestamp) {
+						<span class="status-date"> {{ "identity-check.last-update" | translate }} {{ identityCheckStatus.timestamp | date: "short" }} </span>
+					}
 				</div>
 			</div>
 
@@ -82,12 +82,14 @@
 			</button>
 		</div>
 
-		<div *ngIf="capturedImage" style="display: flex; flex-direction: column">
-			<img [src]="capturedImage" alt="{{ 'user-info.previewAlt' | translate }}" />
-			<button mat-raised-button type="button" color="primary" (click)="retakePhoto()">
-				{{ "user-info.retake" | translate }}
-			</button>
-		</div>
+		@if (capturedImage) {
+			<div style="display: flex; flex-direction: column">
+				<img [src]="capturedImage" alt="{{ 'user-info.previewAlt' | translate }}" />
+				<button mat-raised-button type="button" color="primary" (click)="retakePhoto()">
+					{{ "user-info.retake" | translate }}
+				</button>
+			</div>
+		}
 	</div>
 
 	<button mat-raised-button color="primary" type="button" [hidden]="!!stream" (click)="startCamera()" style="margin-bottom: 16px">

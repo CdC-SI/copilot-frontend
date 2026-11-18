@@ -23,12 +23,13 @@
 				</div>
 			</mat-card-header>
 			<mat-card-content>
-				<zco-chat-history
-					*ngIf="isRegistered()"
-					[titles]="conversationTitles"
-					(conversationSelected)="selectConversation($event)"
-					(conversationDeleted)="deleteConversation($event)"
-				></zco-chat-history>
+				@if (isRegistered()) {
+					<zco-chat-history
+						[titles]="conversationTitles"
+						(conversationSelected)="selectConversation($event)"
+						(conversationDeleted)="deleteConversation($event)"
+					></zco-chat-history>
+				}
 			</mat-card-content>
 		</mat-card>
 
@@ -81,165 +82,181 @@
 		(dragleave)="onDragLeave($event)"
 		(drop)="onDrop($event)"
 	>
-		<div class="drag-overlay" *ngIf="isDragOver">
-			<mat-icon svgIcon="upload"></mat-icon>
-			<span>{{ "attachment.drop.here" | translate }}</span>
-		</div>
-		<div class="llm-only-banner" *ngIf="isLlmOnlyMode()">
-			<mat-icon svgIcon="lightning"></mat-icon>
-			<div class="llm-only-banner-text">
-				<strong>{{ "chat.llm-only-mode.banner.title" | translate }}</strong>
-				<span>{{ "chat.llm-only-mode.banner.text" | translate }}</span>
+		@if (isDragOver) {
+			<div class="drag-overlay">
+				<mat-icon svgIcon="upload"></mat-icon>
+				<span>{{ "attachment.drop.here" | translate }}</span>
 			</div>
-		</div>
-		<div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
-			<div class="logo" *ngIf="messages.length <= 0">
-				<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
-			</div>
-			<div class="message-spacer"></div>
-			<div
-				*ngFor="let message of messages; let last = last; let i = index"
-				class="message"
-				#messageEl
-				[class.in-progress]="!!message.status && !message.isCompleted"
-				[class.assistant]="message.source !== ChatMessageSource.USER"
-				[class.user]="message.source === ChatMessageSource.USER"
-			>
-				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
-					<img
-						[hidden]="message.source === ChatMessageSource.USER"
-						[ngClass]="last && !message.isCompleted ? 'blink' : ''"
-						class="mr16 ia-avatar"
-						src="./assets/images/copilot_logo.png"
-						alt="copilot-logo"
-					/>
-					<zco-chat-message
-						[conversationId]="currentConversationTitle?.conversationId"
-						[message]="message"
-						[previousMessage]="i > 0 ? messages[i - 1] : null"
-						(feedback)="sendFeedback($event)"
-						(workspaceChange)="onWorkspaceChange($event)"
-						[replayable]="isReplayable(message)"
-						(regenerate)="regenerateLastAnswer()"
-						(editQuestion)="editLastQuestion($event)"
-						(stop)="stopGeneration()"
-					></zco-chat-message>
+		}
+		@if (isLlmOnlyMode()) {
+			<div class="llm-only-banner">
+				<mat-icon svgIcon="lightning"></mat-icon>
+				<div class="llm-only-banner-text">
+					<strong>{{ "chat.llm-only-mode.banner.title" | translate }}</strong>
+					<span>{{ "chat.llm-only-mode.banner.text" | translate }}</span>
 				</div>
 			</div>
+		}
+		<div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
+			@if (messages.length <= 0) {
+				<div class="logo">
+					<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+				</div>
+			}
+			<div class="message-spacer"></div>
+			@for (message of messages; track message; let last = $last; let i = $index) {
+				<div
+					class="message"
+					#messageEl
+					[class.in-progress]="!!message.status && !message.isCompleted"
+					[class.assistant]="message.source !== ChatMessageSource.USER"
+					[class.user]="message.source === ChatMessageSource.USER"
+				>
+					<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
+						<img
+							[hidden]="message.source === ChatMessageSource.USER"
+							[ngClass]="last && !message.isCompleted ? 'blink' : ''"
+							class="mr16 ia-avatar"
+							src="./assets/images/copilot_logo.png"
+							alt="copilot-logo"
+						/>
+						<zco-chat-message
+							[conversationId]="currentConversationTitle?.conversationId"
+							[message]="message"
+							[previousMessage]="i > 0 ? messages[i - 1] : null"
+							(feedback)="sendFeedback($event)"
+							(workspaceChange)="onWorkspaceChange($event)"
+							[replayable]="isReplayable(message)"
+							(regenerate)="regenerateLastAnswer()"
+							(editQuestion)="editLastQuestion($event)"
+							(stop)="stopGeneration()"
+						></zco-chat-message>
+					</div>
+				</div>
+			}
 			<div #scrollAnchor class="scroll-anchor"></div>
 			<div class="message-bottom-spacer"></div>
 		</div>
-		<button *ngIf="showScrollToLastMessage" class="scroll-to-bottom" mat-mini-fab (click)="scrollToLastUserMessage()">
-			<mat-icon svgIcon="arrow_down"></mat-icon>
-		</button>
-		<zco-dynamic-form
-			class="form-container"
-			*ngIf="activeForm"
-			[def]="activeForm.def"
-			[form]="activeForm.group"
-			(submitted)="onFormSubmit()"
-			(closeForm)="onCloseForm()"
-		></zco-dynamic-form>
-		<zco-question-suggestion *ngIf="messages.length <= 0"></zco-question-suggestion>
-		<zco-action-suggestions
-			*ngIf="isRegistered() && !activeForm"
-			[suggestions]="defaultSuggestions.concat(specificSuggestions || [])"
-			(actionSelected)="handleSuggestionAction($event)"
-		>
-		</zco-action-suggestions>
-		<form *ngIf="!activeForm" class="question-container" ngForm>
-			<ut-autocomplete-input
-				*ngIf="!displayTextArea"
-				class="mr8"
-				[required]="false"
-				[i18nLabel]="'enter.message'"
-				[optionLabelFn]="searchOptionLabelFn"
-				[inputLabelFn]="searchOptionLabelFn"
-				[optionService]="getOptionService()"
-				[minLength]="0"
-				[formControl]="searchCtrl"
-				(optionSelected)="handleOptionSelected($event)"
-				(inputChange)="isCommandMode = !!$event?.startsWith('/')"
-				(attachmentsSelected)="onAttachmentsSelected($event)"
-				(submitMessage)="sendToLLM()"
-			/>
-
-			<button
-				*ngIf="isGenerating; else sendButton"
-				type="button"
-				mat-icon-button
-				[obButton]="'primary'"
-				(click)="stopGeneration()"
-				[disabled]="isStopping"
-				[attr.aria-label]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
-				[matTooltip]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop.shortcut') | translate"
-			>
-				<mat-icon svgIcon="stop-gesture"></mat-icon>
+		@if (showScrollToLastMessage) {
+			<button class="scroll-to-bottom" mat-mini-fab (click)="scrollToLastUserMessage()">
+				<mat-icon svgIcon="arrow_down"></mat-icon>
 			</button>
-			<ng-template #sendButton>
-				<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
-					<mat-icon svgIcon="send"></mat-icon>
+		}
+		@if (activeForm) {
+			<zco-dynamic-form
+				class="form-container"
+				[def]="activeForm.def"
+				[form]="activeForm.group"
+				(submitted)="onFormSubmit()"
+				(closeForm)="onCloseForm()"
+			></zco-dynamic-form>
+		}
+		@if (messages.length <= 0) {
+			<zco-question-suggestion></zco-question-suggestion>
+		}
+		@if (isRegistered() && !activeForm) {
+			<zco-action-suggestions [suggestions]="defaultSuggestions.concat(specificSuggestions || [])" (actionSelected)="handleSuggestionAction($event)">
+			</zco-action-suggestions>
+		}
+		@if (!activeForm) {
+			<form class="question-container" ngForm>
+				@if (!displayTextArea) {
+					<ut-autocomplete-input
+						class="mr8"
+						[required]="false"
+						[i18nLabel]="'enter.message'"
+						[optionLabelFn]="searchOptionLabelFn"
+						[inputLabelFn]="searchOptionLabelFn"
+						[optionService]="getOptionService()"
+						[minLength]="0"
+						[formControl]="searchCtrl"
+						(optionSelected)="handleOptionSelected($event)"
+						(inputChange)="isCommandMode = !!$event?.startsWith('/')"
+						(attachmentsSelected)="onAttachmentsSelected($event)"
+						(submitMessage)="sendToLLM()"
+					/>
+				}
+				@if (isGenerating) {
+					<button
+						type="button"
+						mat-icon-button
+						[obButton]="'primary'"
+						(click)="stopGeneration()"
+						[disabled]="isStopping"
+						[attr.aria-label]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
+						[matTooltip]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop.shortcut') | translate"
+					>
+						<mat-icon svgIcon="stop-gesture"></mat-icon>
+					</button>
+				} @else {
+					<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
+						<mat-icon svgIcon="send"></mat-icon>
+					</button>
+				}
+				<button type="button" mat-icon-button (click)="clearSearch()" [obButton]="'secondary'">
+					<mat-icon svgIcon="delete"></mat-icon>
 				</button>
-			</ng-template>
-
-			<button type="button" mat-icon-button (click)="clearSearch()" [obButton]="'secondary'">
-				<mat-icon svgIcon="delete"></mat-icon>
-			</button>
-		</form>
+			</form>
+		}
 		<p class="ai-disclaimer">{{ "chat.ai-disclaimer" | translate }}</p>
 
-		<div *ngIf="attachments.length" class="attachments-container">
-			<mat-chip-listbox>
-				<mat-chip
-					*ngFor="let attachment of attachments"
-					[class.uploading]="attachment.isUploading"
-					[class.failed]="attachment.status === 'FAILED'"
-					[class.downloadable]="attachment.status === 'PROCESSED'"
-					(click)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
-					(keydown.enter)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
-					(keydown.space)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
-				>
-					<div class="loading-stripes" *ngIf="attachment.isUploading"></div>
-					<span class="attachment-content">
-						<span class="attachment-name">
-							{{ attachment.fileName }}
-							<span class="attachment-size" *ngIf="attachment.status === 'PROCESSED' && attachment.fileSize">
-								({{ attachment.fileSize / 1000 | number: "1.0-0" }} Ko)
-							</span>
-						</span>
-						<span class="upload-status" *ngIf="attachment.isUploading">{{ "attachment.uploading" | translate }}</span>
-						<span
-							class="upload-status failed-status"
-							*ngIf="attachment.status === 'FAILED'"
-							[title]="getAttachmentFailureKey(attachment) | translate"
-							role="alert"
-							>{{ getAttachmentFailureKey(attachment) | translate }}</span
+		@if (attachments.length) {
+			<div class="attachments-container">
+				<mat-chip-listbox>
+					@for (attachment of attachments; track attachment) {
+						<mat-chip
+							[class.uploading]="attachment.isUploading"
+							[class.failed]="attachment.status === 'FAILED'"
+							[class.downloadable]="attachment.status === 'PROCESSED'"
+							(click)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
+							(keydown.enter)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
+							(keydown.space)="attachment.status === 'PROCESSED' && downloadAttachment(attachment)"
 						>
-					</span>
-					<button
-						*ngIf="canRetryAttachment(attachment)"
-						mat-button
-						(click)="$event.stopPropagation(); retryAttachment(attachment)"
-						[attr.aria-label]="'attachment.retry' | translate"
-						class="retry-button"
-					>
-						{{ "attachment.retry" | translate }}
-					</button>
-					<button
-						*ngIf="!attachment.isUploading"
-						matChipRemove
-						(click)="$event.stopPropagation(); removeAttachment(attachment.id)"
-						aria-label="Remove attachment"
-					>
-						<mat-icon svgIcon="xmark"></mat-icon>
-					</button>
-				</mat-chip>
-			</mat-chip-listbox>
-			<div *ngIf="attachmentsPollingTimedOut" class="polling-timeout-banner">
-				<span>{{ "attachment.process.timeout" | translate }}</span>
-				<button mat-button (click)="refreshAttachmentsStatus()">{{ "attachment.refresh" | translate }}</button>
+							@if (attachment.isUploading) {
+								<div class="loading-stripes"></div>
+							}
+							<span class="attachment-content">
+								<span class="attachment-name">
+									{{ attachment.fileName }}
+									@if (attachment.status === "PROCESSED" && attachment.fileSize) {
+										<span class="attachment-size"> ({{ attachment.fileSize / 1000 | number: "1.0-0" }} Ko) </span>
+									}
+								</span>
+								@if (attachment.isUploading) {
+									<span class="upload-status">{{ "attachment.uploading" | translate }}</span>
+								}
+								@if (attachment.status === "FAILED") {
+									<span class="upload-status failed-status" [title]="getAttachmentFailureKey(attachment) | translate" role="alert">{{
+										getAttachmentFailureKey(attachment) | translate
+									}}</span>
+								}
+							</span>
+							@if (canRetryAttachment(attachment)) {
+								<button
+									mat-button
+									(click)="$event.stopPropagation(); retryAttachment(attachment)"
+									[attr.aria-label]="'attachment.retry' | translate"
+									class="retry-button"
+								>
+									{{ "attachment.retry" | translate }}
+								</button>
+							}
+							@if (!attachment.isUploading) {
+								<button matChipRemove (click)="$event.stopPropagation(); removeAttachment(attachment.id)" aria-label="Remove attachment">
+									<mat-icon svgIcon="xmark"></mat-icon>
+								</button>
+							}
+						</mat-chip>
+					}
+				</mat-chip-listbox>
+				@if (attachmentsPollingTimedOut) {
+					<div class="polling-timeout-banner">
+						<span>{{ "attachment.process.timeout" | translate }}</span>
+						<button mat-button (click)="refreshAttachmentsStatus()">{{ "attachment.refresh" | translate }}</button>
+					</div>
+				}
 			</div>
-		</div>
+		}
 	</div>
 </ob-column-layout>
 

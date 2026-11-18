@@ -7,7 +7,6 @@ import {AutocompleteInputComponent} from './components/autocomplete-input/autoco
 import {TranslateModule, TranslatePipe} from '@ngx-translate/core';
 import {HighlightTextPipe} from './pipes/highlight-text.pipe';
 import {FormatNavsPipe} from './pipes/format-navs.pipe';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MarkdownModule} from 'ngx-markdown';
 import {ConfirmDialogComponent} from './components/confirm-dialog/confirm-dialog.component';
 import {ChatMessageComponent} from './components/chat-message/chat-message.component';
@@ -56,7 +55,7 @@ import {WorkspaceContentDialogComponent} from './components/workspace-content-di
 		ObliqueModule,
 		MaterialModule,
 		TranslateModule,
-		BrowserAnimationsModule,
+
 		MarkdownModule.forRoot(),
 		MatLine,
 		MatBadge,
@@ -70,7 +69,7 @@ import {WorkspaceContentDialogComponent} from './components/workspace-content-di
 		ObliqueModule,
 		AutocompleteInputComponent,
 		TranslateModule,
-		BrowserAnimationsModule,
+
 		MarkdownModule,
 		ConfirmDialogComponent,
 		ChatMessageComponent,

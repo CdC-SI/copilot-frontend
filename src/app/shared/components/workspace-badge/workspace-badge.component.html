@@ -22,11 +22,17 @@
 </span>
 
 <mat-menu #workspaceMenu="matMenu">
-	<div *ngIf="isLoadingWorkspaces" class="workspace-menu-loading">
-		<mat-spinner diameter="20"></mat-spinner>
-	</div>
-	<button mat-menu-item *ngFor="let workspace of availableWorkspaces" (click)="selectWorkspace(workspace)" [disabled]="isCurrent(workspace)">
-		<mat-icon svgIcon="checkmark" *ngIf="isCurrent(workspace)"></mat-icon>
-		<span>{{ workspace.name | translate }}</span>
-	</button>
+	@if (isLoadingWorkspaces) {
+		<div class="workspace-menu-loading">
+			<mat-spinner diameter="20"></mat-spinner>
+		</div>
+	}
+	@for (workspace of availableWorkspaces; track workspace) {
+		<button mat-menu-item (click)="selectWorkspace(workspace)" [disabled]="isCurrent(workspace)">
+			@if (isCurrent(workspace)) {
+				<mat-icon svgIcon="checkmark"></mat-icon>
+			}
+			<span>{{ workspace.name | translate }}</span>
+		</button>
+	}
 </mat-menu>

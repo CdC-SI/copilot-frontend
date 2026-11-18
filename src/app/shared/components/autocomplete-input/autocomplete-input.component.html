@@ -23,6 +23,8 @@
 		(optionSelected)="fireOptionSelected($event.option.value)"
 		[displayWith]="getProposalLabelFn()"
 	>
-		<mat-option *ngFor="let option of options | async" [value]="option" [innerHTML]="getOptionLabel(option)"></mat-option>
+		@for (option of options | async; track option) {
+			<mat-option [value]="option" [innerHTML]="getOptionLabel(option)"></mat-option>
+		}
 	</mat-autocomplete>
 </mat-form-field>

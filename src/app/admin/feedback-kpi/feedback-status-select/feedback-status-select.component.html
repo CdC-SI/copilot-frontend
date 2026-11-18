@@ -9,7 +9,9 @@
 	<mat-select-trigger>
 		<span class="status-chip" [ngClass]="'status-' + status.toLowerCase()">{{ "feedback.status." + status | translate }}</span>
 	</mat-select-trigger>
-	<mat-option *ngFor="let s of statuses" [value]="s">
-		{{ "feedback.status." + s | translate }}
-	</mat-option>
+	@for (s of statuses; track s) {
+		<mat-option [value]="s">
+			{{ "feedback.status." + s | translate }}
+		</mat-option>
+	}
 </mat-select>

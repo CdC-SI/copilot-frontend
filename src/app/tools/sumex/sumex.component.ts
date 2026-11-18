@@ -120,10 +120,6 @@ export class SumexComponent implements OnInit {
 		this.medicalServices.removeAt(index);
 	}
 
-	trackByIndex(index: number): number {
-		return index;
-	}
-
 	extractData() {
 		this.isLoading = true;
 		this.invoiceForm.disable({onlySelf: false});

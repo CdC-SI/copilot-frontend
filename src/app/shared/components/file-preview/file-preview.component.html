@@ -1,11 +1,11 @@
-<div *ngIf="previewUrl" class="file-preview-container">
-	<ng-container *ngIf="isImage; else pdfPreview">
-		<div class="image-preview">
-			<img [src]="previewUrl" alt="Preview" />
-		</div>
-	</ng-container>
-
-	<ng-template #pdfPreview>
-		<iframe [src]="previewUrl" class="pdf-preview"></iframe>
-	</ng-template>
-</div>
+@if (previewUrl) {
+	<div class="file-preview-container">
+		@if (isImage) {
+			<div class="image-preview">
+				<img [src]="previewUrl" alt="Preview" />
+			</div>
+		} @else {
+			<iframe [src]="previewUrl" class="pdf-preview"></iframe>
+		}
+	</div>
+}

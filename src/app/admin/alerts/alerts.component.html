@@ -9,7 +9,9 @@
 					<mat-form-field appearance="outline">
 						<mat-label>{{ "admin.alerts.level" | translate }}</mat-label>
 						<mat-select formControlName="level">
-							<mat-option *ngFor="let l of levels" [value]="l">{{ l }}</mat-option>
+							@for (l of levels; track l) {
+								<mat-option [value]="l">{{ l }}</mat-option>
+							}
 						</mat-select>
 					</mat-form-field>
 
@@ -23,14 +25,18 @@
 					<mat-form-field appearance="outline">
 						<mat-label>{{ "admin.alerts.time" | translate }}</mat-label>
 						<input matInput placeholder="HH:mm" formControlName="time" />
-						<mat-hint *ngIf="form.get('time')?.invalid && form.get('time')?.touched">HH:mm</mat-hint>
+						@if (form.get("time")?.invalid && form.get("time")?.touched) {
+							<mat-hint>HH:mm</mat-hint>
+						}
 					</mat-form-field>
 				</div>
 
 				<!-- Indication texte par défaut (affichée si tout est vide) -->
-				<div class="default-hint" *ngIf="allTextEmpty()">
-					{{ "admin.alerts.defaultText.hint" | translate }}
-				</div>
+				@if (allTextEmpty()) {
+					<div class="default-hint">
+						{{ "admin.alerts.defaultText.hint" | translate }}
+					</div>
+				}
 
 				<!-- Textes optionnels en accordéon -->
 				<mat-accordion multi="false" class="texts-accordion">
