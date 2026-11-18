@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MatDialogRef} from '@angular/material/dialog';
@@ -16,6 +16,7 @@ export interface CatalogImportDialogResult {
 	selector: 'zco-catalog-import-dialog',
 	templateUrl: './catalog-import-dialog.component.html',
 	styleUrl: './catalog-import-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class CatalogImportDialogComponent {

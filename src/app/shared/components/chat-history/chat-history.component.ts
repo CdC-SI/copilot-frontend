@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {ConversationService} from '../../services/conversation.service';
 import {ChatTitle, ConversationType} from '../../model/chat-history';
 
@@ -6,6 +6,7 @@ import {ChatTitle, ConversationType} from '../../model/chat-history';
 	selector: 'zco-chat-history',
 	templateUrl: './chat-history.component.html',
 	styleUrl: './chat-history.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class ChatHistoryComponent {

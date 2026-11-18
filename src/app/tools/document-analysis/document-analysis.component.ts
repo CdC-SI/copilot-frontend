@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostListener, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {MatChipEditedEvent, MatChipInputEvent} from '@angular/material/chips';
@@ -14,6 +14,7 @@ import {StructuredFields, ZasDocumentType} from '../../shared/model/vision';
 	selector: 'zco-document-analysis',
 	templateUrl: './document-analysis.component.html',
 	styleUrl: './document-analysis.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class DocumentAnalysisComponent implements OnInit {

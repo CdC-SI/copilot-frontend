@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
@@ -12,6 +12,7 @@ import {CatalogImportDialogComponent, CatalogImportDialogResult} from '../catalo
 	selector: 'zco-sources',
 	templateUrl: './sources.component.html',
 	styleUrl: './sources.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class SourcesComponent implements OnInit {

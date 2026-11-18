@@ -8,8 +8,7 @@ import {registerLocaleData} from '@angular/common';
 import localeDECH from '@angular/common/locales/de-CH';
 import localeFRCH from '@angular/common/locales/fr-CH';
 import localeITCH from '@angular/common/locales/it-CH';
-import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-import {TranslateModule} from '@ngx-translate/core';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr} from '@angular/common/http';
 import {ChatComponent} from './chat/chat.component';
 import {TipsComponent} from './tips/tips.component';
 import {ConfigurationService} from './core/app-configuration/configuration.service';
@@ -97,7 +96,6 @@ function bannerFactory(configurationService: ConfigurationService) {
 		ObMasterLayoutModule,
 
 		ObButtonModule,
-		TranslateModule,
 		ObExternalLinkModule,
 		SharedModule,
 		MatProgressBar,
@@ -123,7 +121,7 @@ function bannerFactory(configurationService: ConfigurationService) {
 		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true},
 		{provide: HTTP_INTERCEPTORS, useClass: BlueGatewayInterceptorV2, multi: true},
 		{provide: ErrorHandler, useClass: GlobalErrorHandler},
-		provideHttpClient(withInterceptorsFromDi())
+		provideHttpClient(withXhr(), withInterceptorsFromDi())
 	]
 })
 export class AppModule {}

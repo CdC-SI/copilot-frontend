@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {UserService} from './shared/services/user.service';
 import {ObINavigationLink, ObNotificationService} from '@oblique/oblique';
@@ -13,6 +13,7 @@ import {LegalDocumentDialogComponent} from './shared/components/legal-document-d
 	selector: 'zco-root',
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.css',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class AppComponent implements OnInit {

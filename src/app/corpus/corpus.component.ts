@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subject, forkJoin, of, timer} from 'rxjs';
 import {catchError, finalize, map, switchMap, takeUntil, takeWhile} from 'rxjs/operators';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
@@ -25,6 +25,7 @@ interface UploadResult {
 	selector: 'zco-corpus',
 	templateUrl: './corpus.component.html',
 	styleUrl: './corpus.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class CorpusComponent implements OnInit, OnDestroy {

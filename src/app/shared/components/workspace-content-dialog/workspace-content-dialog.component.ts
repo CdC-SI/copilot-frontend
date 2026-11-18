@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
 import {WorkspaceDto} from '../../model/workspace';
@@ -19,6 +19,7 @@ export interface WorkspaceContentDialogData {
 	selector: 'zco-workspace-content-dialog',
 	templateUrl: './workspace-content-dialog.component.html',
 	styleUrl: './workspace-content-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class WorkspaceContentDialogComponent implements OnInit {

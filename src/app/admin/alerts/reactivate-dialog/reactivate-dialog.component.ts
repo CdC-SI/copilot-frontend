@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 
@@ -8,6 +8,7 @@ type DialogData = {current?: string | null}; // LocalDateTime string "YYYY-MM-DD
 	selector: 'zco-reactivate-alert-dialog',
 	templateUrl: './reactivate-dialog.component.html',
 	styleUrl: './reactivate-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class ReactivateDialogComponent {

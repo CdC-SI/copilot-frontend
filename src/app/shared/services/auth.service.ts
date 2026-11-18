@@ -11,6 +11,8 @@ export const FULLTOKEN_FILTERING_ROLES: Role[] = [Role.ADMIN, Role.EXPERT, Role.
 @Injectable({providedIn: 'root'})
 export class AuthenticationServiceV2 {
 	readonly $authenticatedUser: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(null);
+	/** Indicateur partagé entre onglets pour détecter une déconnexion faite dans un autre onglet. */
+	private static readonly CONNECTED_KEY = 'zia-connected';
 	private _jwtToken: string | null = null;
 
 	constructor(
@@ -33,6 +35,10 @@ export class AuthenticationServiceV2 {
 		this._jwtToken = value;
 	}
 
+	isConnected(): boolean {
+		return this.window.localStorage.getItem(AuthenticationServiceV2.CONNECTED_KEY) === 'true';
+	}
+
 	/**
 	 * Login case on app startup, we have a token
 	 */
@@ -53,7 +59,7 @@ export class AuthenticationServiceV2 {
 	 */
 	logout(redirect?: string): void {
 		this.jwtToken = null;
-		this.localStorageService.setConnected(false);
+		this.setConnected(false);
 
 		// If redirect is undefined we redirect to the root of the application
 		if (!redirect) {
@@ -77,7 +83,7 @@ export class AuthenticationServiceV2 {
 			.pipe(
 				mergeMap(token => {
 					this.jwtToken = token;
-					this.localStorageService.setConnected(true);
+					this.setConnected(true);
 					const uri = this.window.location.toString();
 					if (uri.indexOf('?') > 0) {
 						this.window.history.replaceState({}, this.document.title, cleanUri(uri));
@@ -137,6 +143,10 @@ export class AuthenticationServiceV2 {
 			return user.username;
 		}
 		return '';
+	}
+
+	private setConnected(connected: boolean): void {
+		this.window.localStorage.setItem(AuthenticationServiceV2.CONNECTED_KEY, String(connected));
 	}
 }
 

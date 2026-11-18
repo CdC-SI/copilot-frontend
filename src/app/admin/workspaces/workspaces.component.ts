@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
@@ -12,6 +12,7 @@ import {CatalogImportDialogComponent, CatalogImportDialogResult} from '../catalo
 	selector: 'zco-workspaces',
 	templateUrl: './workspaces.component.html',
 	styleUrl: './workspaces.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class WorkspacesComponent implements OnInit {

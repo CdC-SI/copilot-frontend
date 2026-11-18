@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {LEGAL_CONFIDENTIALITY_TEXT, LEGAL_GCU_TEXT} from '../../constants/legal-texts.constants';
 
@@ -10,6 +10,7 @@ export interface LegalDocumentDialogData {
 	selector: 'zco-legal-document-dialog',
 	templateUrl: './legal-document-dialog.component.html',
 	styleUrl: './legal-document-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class LegalDocumentDialogComponent {

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
 import {WorkspaceDto} from '../../model/workspace';
@@ -14,6 +14,7 @@ import {WorkspaceContentDialogComponent} from '../workspace-content-dialog/works
 	selector: 'zco-workspace-badge',
 	templateUrl: './workspace-badge.component.html',
 	styleUrl: './workspace-badge.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class WorkspaceBadgeComponent {

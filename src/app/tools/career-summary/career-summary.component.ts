@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
 import {ObNotificationService} from '@oblique/oblique';
 import {SummaryService} from '../../shared/services/summary.service';
@@ -8,6 +8,7 @@ import {SummaryDetailResponse, SummaryTaskResponse, SummaryTaskStatus} from '../
 	selector: 'zco-career-summary',
 	templateUrl: './career-summary.component.html',
 	styleUrl: './career-summary.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class CareerSummaryComponent implements OnInit {

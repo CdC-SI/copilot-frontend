@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {FeedbackStatus, IDocumentFeedbackDetail, ISourceFeedback} from '../../../shared/model/feedback';
 import {UploadService} from '../../../shared/services/upload.service';
@@ -10,6 +10,7 @@ import {openOrDownloadBlob} from '../../../shared/utils/file-download.utils';
 	selector: 'zco-document-feedback-detail-dialog',
 	templateUrl: './document-feedback-detail-dialog.component.html',
 	styleUrl: './document-feedback-detail-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class DocumentFeedbackDetailDialogComponent {

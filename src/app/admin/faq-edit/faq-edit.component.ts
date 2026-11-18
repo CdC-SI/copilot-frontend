@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {ConfirmDialogComponent} from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {FaqItemsService} from '../../shared/services/faq-items.service';
@@ -9,6 +9,7 @@ import {ObNotificationService} from '@oblique/oblique';
 	selector: 'zco-faq-edit',
 	templateUrl: './faq-edit.component.html',
 	styleUrl: './faq-edit.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class FaqEditComponent implements OnInit {

@@ -4,7 +4,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ObliqueModule} from '@oblique/oblique';
 import {MaterialModule} from './material/material.module';
 import {AutocompleteInputComponent} from './components/autocomplete-input/autocomplete-input.component';
-import {TranslateModule, TranslatePipe} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {HighlightTextPipe} from './pipes/highlight-text.pipe';
 import {FormatNavsPipe} from './pipes/format-navs.pipe';
 import {MarkdownModule} from 'ngx-markdown';
@@ -54,7 +54,7 @@ import {WorkspaceContentDialogComponent} from './components/workspace-content-di
 		ReactiveFormsModule,
 		ObliqueModule,
 		MaterialModule,
-		TranslateModule,
+		TranslatePipe,
 
 		MarkdownModule.forRoot(),
 		MatLine,
@@ -68,7 +68,7 @@ import {WorkspaceContentDialogComponent} from './components/workspace-content-di
 		MaterialModule,
 		ObliqueModule,
 		AutocompleteInputComponent,
-		TranslateModule,
+		TranslatePipe,
 
 		MarkdownModule,
 		ConfirmDialogComponent,

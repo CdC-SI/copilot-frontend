@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
 import {MatExpansionPanel} from '@angular/material/expansion';
 import {FeedbackKpiComponent} from './feedback-kpi/feedback-kpi.component';
 import {UserAccountsComponent} from './user-accounts/user-accounts.component';
@@ -13,6 +13,7 @@ import {FeedbackReportConfigComponent} from './feedback-kpi/feedback-report-conf
 	selector: 'zco-admin',
 	templateUrl: './admin.component.html',
 	styleUrl: './admin.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class AdminComponent implements OnInit {

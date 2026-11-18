@@ -1,5 +1,6 @@
 import {
 	AfterViewInit,
+	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	ElementRef,
@@ -77,6 +78,7 @@ interface StreamingTarget {
 	selector: 'zco-chat',
 	templateUrl: './chat.component.html',
 	styleUrls: ['./chat.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -780,7 +782,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private buildChatRequest(inputText: string, {workspace, replaceMessageId}: StreamingOptions): ChatRequest {
-		const currentLang = this.translateService.currentLang;
+		const currentLang = this.translateService.getCurrentLang();
 		return {
 			query: inputText,
 			conversationId: this.currentConversationTitle?.conversationId,

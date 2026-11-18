@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
 import {MessageSource} from '../../model/chat-history';
 import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../services/feedback.service';
@@ -12,6 +12,7 @@ type FeedbackVote = 'upvote' | 'downvote';
 	selector: 'zco-source-list',
 	templateUrl: './source-list.component.html',
 	styleUrl: './source-list.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class SourceListComponent implements OnChanges {

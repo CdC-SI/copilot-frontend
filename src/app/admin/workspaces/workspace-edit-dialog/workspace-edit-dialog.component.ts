@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatChipInputEvent} from '@angular/material/chips';
@@ -17,6 +17,7 @@ export type WorkspaceEditDialogResult = {name: string; request: CreateWorkspaceR
 	selector: 'zco-workspace-edit-dialog',
 	templateUrl: './workspace-edit-dialog.component.html',
 	styleUrl: './workspace-edit-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class WorkspaceEditDialogComponent implements OnInit {

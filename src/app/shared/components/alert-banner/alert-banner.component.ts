@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {AlertsService} from '../../services/alert.service';
 import {Alert} from '../../model/alerts';
 import {Subject, takeUntil} from 'rxjs';
@@ -10,6 +10,7 @@ import {AuthenticationServiceV2} from '../../services/auth.service';
 	selector: 'zco-alert-banner',
 	templateUrl: './alert-banner.component.html',
 	styleUrls: ['./alert-banner.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class AlertBannerComponent implements OnInit, OnDestroy {
@@ -52,7 +53,7 @@ export class AlertBannerComponent implements OnInit, OnDestroy {
 	}
 
 	getAlertText(alert: Alert): string {
-		const currentLang = this.translate.currentLang;
+		const currentLang = this.translate.getCurrentLang();
 		let text = '';
 
 		switch (currentLang) {

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 
 /** A help illustration (example image). */
 interface HelpImage {
@@ -27,6 +27,7 @@ interface HelpDocument {
 	selector: 'zco-tips',
 	templateUrl: './tips.component.html',
 	styleUrls: ['./tips.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class TipsComponent {

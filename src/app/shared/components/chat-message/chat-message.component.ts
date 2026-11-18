@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 import {Feedback} from '../../model/feedback';
 
@@ -8,6 +8,7 @@ const MIN_EDIT_WIDTH_PX = 240;
 	selector: 'zco-chat-message',
 	templateUrl: './chat-message.component.html',
 	styleUrl: './chat-message.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class ChatMessageComponent {
