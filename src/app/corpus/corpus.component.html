@@ -17,7 +17,7 @@
 									{{ doc.fileName }} ({{ getFileSizeInKB(doc.fileSize) }} KB)
 								</span>
 								<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)" [attr.aria-label]="'Remove ' + doc.fileName">
-									<mat-icon svgIcon="trash"></mat-icon>
+									<mat-icon svgIcon="delete"></mat-icon>
 								</button>
 							</div>
 						</li>
@@ -74,7 +74,7 @@
 							</mat-card-header>
 							<mat-card-content *ngIf="getDocumentErrorKey(doc) as errorKey">
 								<div class="failed-reason" role="alert">
-									<mat-icon svgIcon="cancel-circle"></mat-icon>
+									<mat-icon svgIcon="xmark_circle"></mat-icon>
 									<span>{{ errorKey | translate }}</span>
 								</div>
 							</mat-card-content>
@@ -125,7 +125,7 @@
 									[attr.aria-label]="'Delete ' + doc.title"
 									matTooltip="{{ 'personal.documents.delete' | translate }}"
 								>
-									<mat-icon svgIcon="trash"></mat-icon>
+									<mat-icon svgIcon="delete"></mat-icon>
 								</button>
 							</mat-card-actions>
 						</mat-card>
@@ -151,21 +151,21 @@
 					<ul class="lifecycle-steps">
 						<li>
 							<mat-chip class="availability-active">
-								<mat-icon svgIcon="checkmark-circle"></mat-icon>
+								<mat-icon svgIcon="checkmark_circle"></mat-icon>
 								{{ "personal.documents.availability.active" | translate }}
 							</mat-chip>
 							<span>{{ "personal.documents.lifecycle.active" | translate }}</span>
 						</li>
 						<li>
 							<mat-chip class="availability-archived">
-								<mat-icon svgIcon="archive"></mat-icon>
+								<mat-icon svgIcon="archive-box"></mat-icon>
 								{{ "personal.documents.availability.archived" | translate }}
 							</mat-chip>
 							<span>{{ "personal.documents.lifecycle.archived" | translate }}</span>
 						</li>
 						<li>
 							<mat-chip class="availability-deleted">
-								<mat-icon svgIcon="trash"></mat-icon>
+								<mat-icon svgIcon="delete"></mat-icon>
 								{{ "personal.documents.lifecycle.deleted.label" | translate }}
 							</mat-chip>
 							<span>{{ "personal.documents.lifecycle.deleted" | translate }}</span>
@@ -245,7 +245,7 @@
 									matTooltip="{{ 'sources.request.delete' | translate }}"
 									[disabled]="request.status === SourceRequestStatus.INTEGRATED"
 								>
-									<mat-icon svgIcon="trash"></mat-icon>
+									<mat-icon svgIcon="delete"></mat-icon>
 								</button>
 							</mat-card-actions>
 						</mat-card>

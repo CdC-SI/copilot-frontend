@@ -1,5 +1,5 @@
 <zco-alert-banner></zco-alert-banner>
-<ob-column-layout class="h100" [left]="isRegistered()" [right]="false">
+<ob-column-layout class="h100" [left]="isRegistered() ? 'OPENED' : 'NONE'" right="NONE">
 	<div column-left-content class="h100">
 		<mat-card class="history-card">
 			<mat-card-header class="flex-row aic jcsb">
@@ -9,7 +9,7 @@
 						<mat-icon svgIcon="book"></mat-icon>
 					</button>
 					<button mat-icon-button [obButton]="'secondary'" (click)="newChat(false)" [matTooltip]="'chat.new-conversation-llm-only.short-tooltip' | translate">
-						<mat-icon svgIcon="bolt"></mat-icon>
+						<mat-icon svgIcon="lightning"></mat-icon>
 					</button>
 					<button
 						mat-icon-button
@@ -18,7 +18,7 @@
 						[matTooltip]="'chat.modes-help.trigger' | translate"
 						[attr.aria-label]="'chat.modes-help.trigger' | translate"
 					>
-						<mat-icon svgIcon="help-circle"></mat-icon>
+						<mat-icon svgIcon="question_circle"></mat-icon>
 					</button>
 				</div>
 			</mat-card-header>
@@ -52,7 +52,7 @@
 
 				<div class="modes-help-section llm-only">
 					<div class="modes-help-section-header">
-						<mat-icon svgIcon="bolt"></mat-icon>
+						<mat-icon svgIcon="lightning"></mat-icon>
 						<span class="modes-help-section-title">{{ "chat.modes-help.llm-only.title" | translate }}</span>
 					</div>
 					<p class="modes-help-section-text">{{ "chat.modes-help.llm-only.text" | translate }}</p>
@@ -86,7 +86,7 @@
 			<span>{{ "attachment.drop.here" | translate }}</span>
 		</div>
 		<div class="llm-only-banner" *ngIf="isLlmOnlyMode()">
-			<mat-icon svgIcon="bolt"></mat-icon>
+			<mat-icon svgIcon="lightning"></mat-icon>
 			<div class="llm-only-banner-text">
 				<strong>{{ "chat.llm-only-mode.banner.title" | translate }}</strong>
 				<span>{{ "chat.llm-only-mode.banner.text" | translate }}</span>
@@ -130,7 +130,7 @@
 			<div class="message-bottom-spacer"></div>
 		</div>
 		<button *ngIf="showScrollToLastMessage" class="scroll-to-bottom" mat-mini-fab (click)="scrollToLastUserMessage()">
-			<mat-icon svgIcon="arrow-down"></mat-icon>
+			<mat-icon svgIcon="arrow_down"></mat-icon>
 		</button>
 		<zco-dynamic-form
 			class="form-container"
@@ -174,16 +174,16 @@
 				[attr.aria-label]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
 				[matTooltip]="(isStopping ? 'chat.generation.stopping' : 'chat.generation.stop.shortcut') | translate"
 			>
-				<mat-icon svgIcon="stop"></mat-icon>
+				<mat-icon svgIcon="stop-gesture"></mat-icon>
 			</button>
 			<ng-template #sendButton>
 				<button type="submit" mat-icon-button [obButton]="'primary'" (click)="sendToLLM()" [disabled]="!canAskLLM()">
-					<mat-icon svgIcon="paper-plane"></mat-icon>
+					<mat-icon svgIcon="send"></mat-icon>
 				</button>
 			</ng-template>
 
 			<button type="button" mat-icon-button (click)="clearSearch()" [obButton]="'secondary'">
-				<mat-icon svgIcon="trash"></mat-icon>
+				<mat-icon svgIcon="delete"></mat-icon>
 			</button>
 		</form>
 		<p class="ai-disclaimer">{{ "chat.ai-disclaimer" | translate }}</p>
@@ -231,7 +231,7 @@
 						(click)="$event.stopPropagation(); removeAttachment(attachment.id)"
 						aria-label="Remove attachment"
 					>
-						<mat-icon svgIcon="cancel"></mat-icon>
+						<mat-icon svgIcon="xmark"></mat-icon>
 					</button>
 				</mat-chip>
 			</mat-chip-listbox>
@@ -250,7 +250,7 @@
 		<p>{{ "copilot.register.info.text.2" | translate }}</p>
 		<p>
 			{{ "copilot.register.info.text.3" | translate }}
-			<mat-icon svgIcon="user-pen" style="color: blue !important" />
+			<mat-icon svgIcon="person_pencil" style="color: blue !important" />
 		</p>
 	</div>
 </ng-template>

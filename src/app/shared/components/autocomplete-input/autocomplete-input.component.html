@@ -12,7 +12,7 @@
 		rows="1"
 	></textarea>
 	<button mat-icon-button matPrefix type="button" aria-label="Add attachments" (click)="file.click()" [matTooltip]="'add.attachment' | translate">
-		<mat-icon svgIcon="file-plus"></mat-icon>
+		<mat-icon svgIcon="file_add"></mat-icon>
 	</button>
 	<input #file type="file" multiple hidden (change)="onFilesChange($event)" />
 

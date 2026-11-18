@@ -28,7 +28,7 @@
 				<mat-chip-row *ngFor="let question of hypotheticalQuestions" (removed)="removeQuestion(question)">
 					{{ question }}
 					<button matChipRemove [attr.aria-label]="'admin.actions.remove' | translate">
-						<mat-icon svgIcon="cancel"></mat-icon>
+						<mat-icon svgIcon="xmark"></mat-icon>
 					</button>
 				</mat-chip-row>
 				<input

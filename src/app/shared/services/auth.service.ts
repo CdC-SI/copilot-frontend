@@ -1,6 +1,6 @@
-import {Inject, Injectable} from '@angular/core';
+import {DOCUMENT, Inject, Injectable} from '@angular/core';
 import {ObNotificationService, WINDOW} from '@oblique/oblique';
-import {DOCUMENT, LocationStrategy} from '@angular/common';
+import {LocationStrategy} from '@angular/common';
 import {EnvironmentService, LocalStorageService} from '@zas-design-system/zas-design-system';
 import {BehaviorSubject, EMPTY, Observable, catchError, mergeMap, of} from 'rxjs';
 import {HttpClient, HttpErrorResponse, HttpParams, HttpStatusCode} from '@angular/common/http';

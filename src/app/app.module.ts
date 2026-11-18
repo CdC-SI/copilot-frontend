@@ -110,10 +110,11 @@ function bannerFactory(configurationService: ConfigurationService) {
 	providers: [
 		provideObliqueConfiguration({
 			accessibilityStatement: {
+				createdOn: new Date('2026-11-18'),
 				applicationName: 'ZIA',
 				conformity: 'none',
 				applicationOperator: 'Centrale de compensation (CdC), Genève',
-				contact: {phones: ['+41 58 461 91 11']}
+				contact: [{phone: '+41 58 461 91 11'}]
 			}
 		}),
 		{provide: ZCO_CONFIGURATIONS_TOKEN, useValue: ZCO_CONFIGURATIONS},

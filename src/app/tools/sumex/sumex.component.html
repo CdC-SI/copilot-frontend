@@ -1,4 +1,4 @@
-<ob-column-layout class="mt16" [left]="true" [right]="false">
+<ob-column-layout class="mt16" left="OPENED" right="NONE">
 	<mat-card column-left-content>
 		<mat-card-header>
 			<mat-card-title>
@@ -12,7 +12,7 @@
 							<mat-icon svgIcon="play"></mat-icon>
 						</button>
 						<button class="ml8" mat-icon-button *ngIf="documentCtrl.value" [obButton]="'secondary'" (click)="reinit()">
-							<mat-icon svgIcon="cancel"></mat-icon>
+							<mat-icon svgIcon="xmark"></mat-icon>
 						</button>
 					</div>
 				</div>
@@ -202,7 +202,7 @@
 									<input class="col-montant" formControlName="amount" type="number" step="0.01" placeholder="Montant" />
 									<div class="col-actions">
 										<button mat-icon-button [obButton]="'primary'" (click)="supprimerPosition(i)">
-											<mat-icon svgIcon="trash"></mat-icon>
+											<mat-icon svgIcon="delete"></mat-icon>
 										</button>
 									</div>
 								</div>

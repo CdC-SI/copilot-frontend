@@ -7,14 +7,14 @@
 
 		<mat-card-content style="display: flex; flex-direction: row; align-items: center; justify-content: space-between">
 			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'NOT_STARTED' || !identityCheckStatus">
-				<mat-icon svgIcon="info-circle" class="status-not-started"></mat-icon>
+				<mat-icon svgIcon="info_circle" class="status-not-started"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.not-started" | translate }}</span>
 				</div>
 			</div>
 
 			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'initiated'">
-				<mat-icon svgIcon="random" class="status-initiated"></mat-icon>
+				<mat-icon svgIcon="shuffle" class="status-initiated"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.initiated" | translate }}</span>
 					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
@@ -41,7 +41,7 @@
 			</div>
 
 			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'identificationRejected'">
-				<mat-icon svgIcon="cancel-circle" class="status-failed"></mat-icon>
+				<mat-icon svgIcon="xmark_circle" class="status-failed"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.rejected" | translate }}</span>
 					<span class="status-date" *ngIf="identityCheckStatus?.timestamp">
@@ -67,7 +67,7 @@
 	</mat-card>
 
 	<button style="margin-top: 16px; width: 100%" mat-raised-button color="primary" (click)="openDialog(userInfoDialog)">
-		<mat-icon svgIcon="arrow-right"></mat-icon>
+		<mat-icon svgIcon="arrow_right"></mat-icon>
 		{{ "identity-check.start-new" | translate }}
 	</button>
 </div>

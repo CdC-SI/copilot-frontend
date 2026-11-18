@@ -16,7 +16,7 @@
 			</mat-card-content>
 			<mat-card-actions>
 				<button mat-raised-button color="primary" (click)="closeSummary()">
-					<mat-icon svgIcon="arrow-left"></mat-icon>
+					<mat-icon svgIcon="arrow_left"></mat-icon>
 					{{ "career-summary.back-to-list" | translate }}
 				</button>
 				<button mat-raised-button color="accent" (click)="retrySummary(selectedSummary.id, $event)">
@@ -53,7 +53,7 @@
 						</mat-error>
 					</mat-form-field>
 					<button mat-raised-button color="primary" type="submit" [disabled]="navsForm.invalid || isLoading" style="width: 100%; margin-top: 8px">
-						<mat-icon svgIcon="arrow-right"></mat-icon>
+						<mat-icon svgIcon="arrow_right"></mat-icon>
 						{{ "career-summary.create-button" | translate }}
 					</button>
 				</form>
@@ -75,7 +75,7 @@
 						<mat-label>{{ "career-summary.filter-by-navs" | translate }}</mat-label>
 						<input matInput [(ngModel)]="navsFilter" (ngModelChange)="applyFilter()" placeholder="756.1234.5678.90" />
 						<button mat-icon-button matSuffix *ngIf="navsFilter" (click)="clearFilter()">
-							<mat-icon svgIcon="cancel"></mat-icon>
+							<mat-icon svgIcon="xmark"></mat-icon>
 						</button>
 					</mat-form-field>
 					<mat-form-field appearance="outline" class="sort-field">
@@ -92,7 +92,7 @@
 				</div>
 
 				<div *ngIf="!isLoadingTasks && filteredTasks.length === 0" class="no-tasks">
-					<mat-icon svgIcon="info-circle"></mat-icon>
+					<mat-icon svgIcon="info_circle"></mat-icon>
 					<p>{{ navsFilter ? ("career-summary.no-tasks-filtered" | translate) : ("career-summary.no-tasks" | translate) }}</p>
 				</div>
 
@@ -113,7 +113,7 @@
 									{{ "career-summary.processing-time" | translate }}: {{ getProcessingTime(task) }}
 								</span>
 								<button *ngIf="task.status === SummaryTaskStatus.TERMINEE" mat-button color="primary" (click)="viewSummary(task.id)">
-									<mat-icon svgIcon="arrow-right"></mat-icon>
+									<mat-icon svgIcon="arrow_right"></mat-icon>
 									{{ "career-summary.view-summary" | translate }}
 								</button>
 								<button *ngIf="task.status === SummaryTaskStatus.ERREUR" mat-button color="warn" (click)="retrySummary(task.id, $event)">

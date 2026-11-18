@@ -1,6 +1,6 @@
 <form class="dynamic-form mat-typography" [ngClass]="def.cssClass" [formGroup]="form" (ngSubmit)="submit()" (keydown.escape)="onEscape()">
 	<button mat-icon-button type="button" class="close-btn" (click)="onEscape()" aria-label="Close">
-		<mat-icon svgIcon="cancel-circle"></mat-icon>
+		<mat-icon svgIcon="xmark_circle"></mat-icon>
 	</button>
 	<mat-accordion class="section-accordion" multi *ngIf="def.sections; else flat">
 		<mat-expansion-panel *ngFor="let s of def.sections; let idx = index" [ngClass]="s.cssClass || 'section-wrapper'" [expanded]="s.expanded ?? idx === 0">

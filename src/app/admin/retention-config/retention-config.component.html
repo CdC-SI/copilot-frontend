@@ -19,7 +19,7 @@
 				<mat-form-field appearance="outline">
 					<mat-label>{{ "admin.retention.daysBeforeArchival" | translate }}</mat-label>
 					<input matInput type="number" min="1" formControlName="daysBeforeArchival" />
-					<mat-icon matSuffix svgIcon="archive"></mat-icon>
+					<mat-icon matSuffix svgIcon="archive-box"></mat-icon>
 					<mat-hint>{{ "admin.retention.daysBeforeArchival.hint" | translate }}</mat-hint>
 					<mat-error *ngIf="form.get('daysBeforeArchival')?.hasError('required')">
 						{{ "admin.retention.required" | translate }}
@@ -29,12 +29,12 @@
 					</mat-error>
 				</mat-form-field>
 
-				<mat-icon class="flow-arrow" svgIcon="arrow-right"></mat-icon>
+				<mat-icon class="flow-arrow" svgIcon="arrow_right"></mat-icon>
 
 				<mat-form-field appearance="outline">
 					<mat-label>{{ "admin.retention.daysBeforeDeletion" | translate }}</mat-label>
 					<input matInput type="number" min="1" formControlName="daysBeforeDeletion" />
-					<mat-icon matSuffix svgIcon="trash"></mat-icon>
+					<mat-icon matSuffix svgIcon="delete"></mat-icon>
 					<mat-hint>{{ "admin.retention.daysBeforeDeletion.hint" | translate }}</mat-hint>
 					<mat-error *ngIf="form.get('daysBeforeDeletion')?.hasError('required')">
 						{{ "admin.retention.required" | translate }}

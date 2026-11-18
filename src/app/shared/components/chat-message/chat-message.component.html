@@ -15,7 +15,7 @@
 				[attr.aria-label]="'chat.question.edit' | translate"
 				[matTooltip]="'chat.question.edit' | translate"
 			>
-				<mat-icon svgIcon="pen"></mat-icon>
+				<mat-icon svgIcon="pencil"></mat-icon>
 			</button>
 		</div>
 	</ng-container>
@@ -48,7 +48,7 @@
 					[attr.aria-label]="'chat.question.edit.cancel' | translate"
 					[matTooltip]="'chat.question.edit.cancel' | translate"
 				>
-					<mat-icon svgIcon="cancel"></mat-icon>
+					<mat-icon svgIcon="xmark"></mat-icon>
 				</button>
 			</div>
 		</form>
@@ -64,7 +64,7 @@
 				[disabled]="message.stopping"
 				[matTooltip]="'chat.generation.stop.shortcut' | translate"
 			>
-				<mat-icon svgIcon="stop"></mat-icon>
+				<mat-icon svgIcon="stop-gesture"></mat-icon>
 				<span>{{ (message.stopping ? "chat.generation.stopping" : "chat.generation.stop.inline") | translate }}</span>
 			</button>
 		</div>

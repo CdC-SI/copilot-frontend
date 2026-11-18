@@ -56,7 +56,7 @@
 				<mat-chip-grid #chipGrid [formControl]="recipientsCtrl">
 					<mat-chip-row *ngFor="let recipient of recipients" (removed)="removeRecipient(recipient)" [editable]="true" (edited)="editRecipient(recipient, $event)">
 						{{ recipient }}
-						<mat-icon svgIcon="cancel-circle" matChipRemove></mat-icon>
+						<mat-icon svgIcon="xmark_circle" matChipRemove></mat-icon>
 					</mat-chip-row>
 					<input
 						[matChipInputFor]="chipGrid"

@@ -22,7 +22,7 @@
 				<div class="card-preview">
 					<img [src]="image.src" [alt]="image.titleKey | translate" />
 					<div class="card-overlay">
-						<mat-icon svgIcon="plus-circle"></mat-icon>
+						<mat-icon svgIcon="plus_circle"></mat-icon>
 					</div>
 						<div class="card-tooltip" *ngIf="image.descriptionKey">
 							{{ image.descriptionKey | translate }}
@@ -51,7 +51,7 @@
 				(keyup.enter)="downloadDocument(document)"
 			>
 				<div class="card-preview doc-preview">
-					<mat-icon svgIcon="file-pdf"></mat-icon>
+					<mat-icon svgIcon="file_pdf"></mat-icon>
 					<div class="card-overlay">
 						<mat-icon svgIcon="download"></mat-icon>
 					</div>
@@ -100,7 +100,7 @@
 
 <div class="lightbox-overlay" *ngIf="selectedImage" (click)="closeImage()">
 	<button type="button" class="lightbox-close" [attr.aria-label]="'tips.actions.close' | translate" (click)="closeImage()">
-		<mat-icon svgIcon="cancel"></mat-icon>
+		<mat-icon svgIcon="xmark"></mat-icon>
 	</button>
 	<figure class="lightbox-content" (click)="$event.stopPropagation()">
 		<img [src]="selectedImage.src" [alt]="selectedImage.titleKey | translate" />
