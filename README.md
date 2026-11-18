@@ -2,11 +2,11 @@
 
 Interface web de ZIA, l'assistant IA de la ZAS : chat RAG en streaming, gestion du corpus documentaire, outils (analyse de documents, contrôle d'identité, Sumex, synthèse de carrière) et administration.
 
-Stack : Angular 17 (NgModules), Oblique 11, Angular Material, ngx-translate (fr/de/it), ngx-markdown, Jest.
+Stack : Angular 22 (NgModules), Oblique 16, ZDS 22, Angular Material, ngx-translate (fr/de/it), ngx-markdown, Jest 30.
 
 ## Prérequis
 
-- Node.js 20+ et npm (registre interne Nexus configuré).
+- Node.js 22.22+ ou 24.15+ (24 recommandé) et npm 11 (registre interne Nexus configuré).
 - Le backend `copilot-backend` accessible sur `http://localhost:8080` pour le développement local.
 
 ```bash
@@ -19,7 +19,7 @@ npm ci
 |---|---|
 | `npm start` / `npm run start:dev` | Serveur de dev sur `http://localhost:4200` (configuration development). |
 | `npm run build:prod` | Build de production dans `dist/zas-eak-copilot-frontend/browser`. |
-| `npm test` | Tests unitaires Jest. Un seul fichier : `npx ng test --test-path-pattern=<motif>`. |
+| `npm test` | Tests unitaires Jest. Un seul fichier : `npx ng test --test-path-patterns=<motif>`. |
 | `npm run lint` / `npm run format` | ESLint (+ Prettier) ; `format` applique les corrections automatiques. |
 
 Vérification rapide des types (TS + templates) sans build : `npx ngc -p tsconfig.app.json --noEmit`.

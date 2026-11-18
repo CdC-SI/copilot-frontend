@@ -6,19 +6,25 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 
 ## Stack
 
-- **Angular 17** (architecture à **NgModules** : `AppModule`, `SharedModule`, `MaterialModule` ;
-  aucun composant standalone pour l'instant), **TypeScript 5.4**, **RxJS**.
-- UI : **Oblique 11** (`@oblique/oblique`, master layout) + Angular Material/CDK + `zas-design-system`
-  (environnements, gateway, jeton `blue`).
-- i18n : **ngx-translate**, fichiers `src/assets/i18n/{fr,de,it}.json`.
-- Tests : **Jest** via `@angular-builders/jest` (`tests/` : `jest.config.js`, `setupJest.ts`, mocks).
-- Lint/format : ESLint (`@angular-eslint`) + Prettier (`.prettierrc`).
+- **Angular 22** (architecture à **NgModules** : `AppModule`, `SharedModule`, `MaterialModule` ;
+  composants `standalone: false`, migration standalone prévue en FE1b), **TypeScript 6.0**, **RxJS**,
+  Node 22.22+/24.15+ (`engines`). Templates en control flow (`@if`/`@for`/`@switch`) ;
+  `ChangeDetectionStrategy.Eager` explicite (passage OnPush prévu avec FE1b/FE4).
+- UI : **Oblique 16** (`@oblique/oblique`, master layout, inputs en signals) + Angular Material/CDK 22
+  + **ZDS 22** (`@zas-design-system/zas-design-system` : environnements, gateway, jeton `blue`).
+- i18n : **ngx-translate 18** (`TranslateService` fourni par `provideObliqueConfiguration`,
+  `TranslatePipe` exporté par `SharedModule`, `getCurrentLang()`), fichiers `src/assets/i18n/{fr,de,it}.json`.
+- Tests : **Jest 30** via `@angular-builders/jest` (`tests/` : `jest.config.js`, `setupJest.ts`, mocks).
+- Lint/format : ESLint 10 en flat config (`eslint.config.mjs`, paquets `angular-eslint` et
+  `typescript-eslint`) + Prettier (`.prettierrc`).
+- `package.json` : `allowScripts` liste les paquets autorisés à exécuter un script d'installation,
+  épinglés par version : à revoir à chaque montée de version (`npm approve-scripts`, npm ≥ 11.16).
 
 ## Commandes
 
 - Dev : `npm run start:dev` (proxy `/zia/api/**` → `http://localhost:8080`, voir `proxy.conf.json`).
 - Build : `npm run build` ; production : `npm run build:prod`.
-- Tests : `npm test` (Jest) ; un fichier : `npx ng test --test-path-pattern=<motif>`.
+- Tests : `npm test` (Jest) ; un fichier : `npx ng test --test-path-patterns=<motif>`.
 - Lint : `npm run lint` ; correction auto : `npm run format`.
 - Après une modification : au minimum `npm run build` (ou les diagnostics IDE), plus `npm run lint`
   sur les fichiers touchés, avant de conclure.
@@ -39,8 +45,8 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - Style Prettier : **tabulations**, guillemets simples, point-virgule, pas d'espace dans les accolades
   (`{a}`), pas de virgule finale, `arrowParens: avoid`.
 - Injection par constructeur avec `private readonly`. Services `providedIn: 'root'`.
-- Nouveaux composants : rester cohérent avec les NgModules existants tant que la migration Angular
-  (FE1) n'est pas faite.
+- Nouveaux composants : rester cohérent avec les NgModules existants tant que la migration standalone
+  (FE1b) n'est pas faite ; utiliser le control flow (`@if`/`@for`), pas `*ngIf`/`*ngFor`.
 - Tout texte visible passe par ngx-translate : ajouter la clé dans **fr, de et it** (y compris
   `aria-label`).
 - Éviter `any` ; typer les modèles dans `shared/model`.
