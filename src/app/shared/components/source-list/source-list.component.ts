@@ -11,7 +11,8 @@ type FeedbackVote = 'upvote' | 'downvote';
 @Component({
 	selector: 'zco-source-list',
 	templateUrl: './source-list.component.html',
-	styleUrl: './source-list.component.scss'
+	styleUrl: './source-list.component.scss',
+	standalone: false
 })
 export class SourceListComponent implements OnChanges {
 	@Input() message!: ChatMessage;

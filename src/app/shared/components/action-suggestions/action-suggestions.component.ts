@@ -3,7 +3,8 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 @Component({
 	selector: 'zco-action-suggestions',
 	templateUrl: './action-suggestions.component.html',
-	styleUrls: ['./action-suggestions.component.scss']
+	styleUrls: ['./action-suggestions.component.scss'],
+	standalone: false
 })
 export class ActionSuggestionsComponent {
 	@Input() suggestions: {text: string; action: string}[];

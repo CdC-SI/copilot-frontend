@@ -18,7 +18,8 @@ export interface WorkspaceContentDialogData {
 @Component({
 	selector: 'zco-workspace-content-dialog',
 	templateUrl: './workspace-content-dialog.component.html',
-	styleUrl: './workspace-content-dialog.component.scss'
+	styleUrl: './workspace-content-dialog.component.scss',
+	standalone: false
 })
 export class WorkspaceContentDialogComponent implements OnInit {
 	workspace: WorkspaceDto | null = null;

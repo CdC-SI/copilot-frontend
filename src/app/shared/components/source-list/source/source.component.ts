@@ -7,7 +7,8 @@ import {openOrDownloadBlob} from '../../../utils/file-download.utils';
 @Component({
 	selector: 'zco-source',
 	templateUrl: './source.component.html',
-	styleUrl: './source.component.scss'
+	styleUrl: './source.component.scss',
+	standalone: false
 })
 export class SourceComponent {
 	@Input() source: MessageSource;

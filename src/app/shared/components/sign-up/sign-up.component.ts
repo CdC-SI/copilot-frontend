@@ -7,7 +7,8 @@ import {LEGAL_CONFIDENTIALITY_TEXT, LEGAL_GCU_TEXT} from '../../constants/legal-
 @Component({
 	selector: 'zco-sign-up',
 	templateUrl: './sign-up.component.html',
-	styleUrl: './sign-up.component.scss'
+	styleUrl: './sign-up.component.scss',
+	standalone: false
 })
 export class SignUpComponent implements OnInit {
 	FORM_FIELDS = UserFormFields;

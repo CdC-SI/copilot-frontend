@@ -4,7 +4,8 @@ import {FEEDBACK_STATUSES, FeedbackStatus} from '../../../shared/model/feedback'
 @Component({
 	selector: 'zco-feedback-status-select',
 	templateUrl: './feedback-status-select.component.html',
-	styleUrl: './feedback-status-select.component.scss'
+	styleUrl: './feedback-status-select.component.scss',
+	standalone: false
 })
 export class FeedbackStatusSelectComponent {
 	@Input() status: FeedbackStatus = 'NEW';

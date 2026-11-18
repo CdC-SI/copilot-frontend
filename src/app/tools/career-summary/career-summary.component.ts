@@ -7,7 +7,8 @@ import {SummaryDetailResponse, SummaryTaskResponse, SummaryTaskStatus} from '../
 @Component({
 	selector: 'zco-career-summary',
 	templateUrl: './career-summary.component.html',
-	styleUrl: './career-summary.component.scss'
+	styleUrl: './career-summary.component.scss',
+	standalone: false
 })
 export class CareerSummaryComponent implements OnInit {
 	@ViewChild(FormGroupDirective) formDirective: FormGroupDirective;

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {take} from 'rxjs/operators';
 import {nanoid} from 'nanoid';
-import {AuthenticationDialogComponent, EnvironmentService, LocalStorageService} from 'zas-design-system';
+import {AuthenticationDialogComponent, EnvironmentService, LocalStorageService} from '@zas-design-system/zas-design-system';
 import {AuthenticationServiceV2} from './auth.service';
 
 /** Accès minimal aux en-têtes, commun à `HttpHeaders` (HttpClient) et `Headers` (fetch). */

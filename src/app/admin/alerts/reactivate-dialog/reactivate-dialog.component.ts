@@ -7,7 +7,8 @@ type DialogData = {current?: string | null}; // LocalDateTime string "YYYY-MM-DD
 @Component({
 	selector: 'zco-reactivate-alert-dialog',
 	templateUrl: './reactivate-dialog.component.html',
-	styleUrl: './reactivate-dialog.component.scss'
+	styleUrl: './reactivate-dialog.component.scss',
+	standalone: false
 })
 export class ReactivateDialogComponent {
 	form: FormGroup;

@@ -26,7 +26,8 @@ interface HelpDocument {
 @Component({
 	selector: 'zco-tips',
 	templateUrl: './tips.component.html',
-	styleUrls: ['./tips.component.scss']
+	styleUrls: ['./tips.component.scss'],
+	standalone: false
 })
 export class TipsComponent {
 	images: HelpImage[] = [

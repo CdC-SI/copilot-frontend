@@ -3,7 +3,8 @@ import {Component, OnInit} from '@angular/core';
 @Component({
 	selector: 'zco-question-suggestion',
 	templateUrl: './question-suggestion.component.html',
-	styleUrl: './question-suggestion.component.scss'
+	styleUrl: './question-suggestion.component.scss',
+	standalone: false
 })
 export class QuestionSuggestionComponent implements OnInit {
 	sentences: string[] = [

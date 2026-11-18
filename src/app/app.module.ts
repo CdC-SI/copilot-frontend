@@ -3,15 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {
-	OB_BANNER,
-	ObButtonModule,
-	ObExternalLinkModule,
-	ObHttpApiInterceptor,
-	ObIconModule,
-	ObMasterLayoutModule,
-	multiTranslateLoader
-} from '@oblique/oblique';
+import {OB_BANNER, ObButtonModule, ObExternalLinkModule, ObHttpApiInterceptor, ObMasterLayoutModule, provideObliqueConfiguration} from '@oblique/oblique';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {registerLocaleData} from '@angular/common';
 import localeDECH from '@angular/common/locales/de-CH';
@@ -106,8 +98,7 @@ function bannerFactory(configurationService: ConfigurationService) {
 		ObMasterLayoutModule,
 		BrowserAnimationsModule,
 		ObButtonModule,
-		ObIconModule.forRoot(),
-		TranslateModule.forRoot(multiTranslateLoader()),
+		TranslateModule,
 		ObExternalLinkModule,
 		SharedModule,
 		MatProgressBar,
@@ -117,6 +108,14 @@ function bannerFactory(configurationService: ConfigurationService) {
 		MatProgressSpinnerModule
 	],
 	providers: [
+		provideObliqueConfiguration({
+			accessibilityStatement: {
+				applicationName: 'ZIA',
+				conformity: 'none',
+				applicationOperator: 'Centrale de compensation (CdC), Genève',
+				contact: {phones: ['+41 58 461 91 11']}
+			}
+		}),
 		{provide: ZCO_CONFIGURATIONS_TOKEN, useValue: ZCO_CONFIGURATIONS},
 		{provide: LOCALE_ID, useValue: 'fr-CH'},
 		{provide: APP_INITIALIZER, useFactory: appInitializerFactory, deps: [ConfigurationService], multi: true},

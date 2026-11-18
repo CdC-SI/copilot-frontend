@@ -7,7 +7,8 @@ const MIN_EDIT_WIDTH_PX = 240;
 @Component({
 	selector: 'zco-chat-message',
 	templateUrl: './chat-message.component.html',
-	styleUrl: './chat-message.component.scss'
+	styleUrl: './chat-message.component.scss',
+	standalone: false
 })
 export class ChatMessageComponent {
 	@Input() previousMessage: ChatMessage;

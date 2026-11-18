@@ -5,7 +5,8 @@ import {ChatTitle, ConversationType} from '../../model/chat-history';
 @Component({
 	selector: 'zco-chat-history',
 	templateUrl: './chat-history.component.html',
-	styleUrl: './chat-history.component.scss'
+	styleUrl: './chat-history.component.scss',
+	standalone: false
 })
 export class ChatHistoryComponent {
 	selected: ChatTitle;

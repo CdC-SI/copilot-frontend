@@ -11,7 +11,8 @@ import {MatPaginator} from '@angular/material/paginator';
 @Component({
 	selector: 'zco-user-accounts',
 	templateUrl: './user-accounts.component.html',
-	styleUrl: './user-accounts.component.scss'
+	styleUrl: './user-accounts.component.scss',
+	standalone: false
 })
 export class UserAccountsComponent implements AfterViewInit {
 	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internalUser', 'actions'];

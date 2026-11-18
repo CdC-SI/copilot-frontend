@@ -24,7 +24,8 @@ interface UploadResult {
 @Component({
 	selector: 'zco-corpus',
 	templateUrl: './corpus.component.html',
-	styleUrl: './corpus.component.scss'
+	styleUrl: './corpus.component.scss',
+	standalone: false
 })
 export class CorpusComponent implements OnInit, OnDestroy {
 	documentsToUpload: IDocument[] = [];

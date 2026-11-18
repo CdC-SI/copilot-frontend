@@ -7,7 +7,8 @@ import {MedicalService, SumexInvoice} from '../../shared/model/vision';
 @Component({
 	selector: 'zco-sumex',
 	templateUrl: './sumex.component.html',
-	styleUrl: './sumex.component.scss'
+	styleUrl: './sumex.component.scss',
+	standalone: false
 })
 export class SumexComponent implements OnInit {
 	invoiceForm: FormGroup = new FormGroup({});

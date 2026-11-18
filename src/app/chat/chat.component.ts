@@ -43,7 +43,7 @@ import {
 	LANGUAGE_MAP,
 	UserAuthDialogService
 } from './services';
-import {Subject, Subscription, merge, switchMap, take, takeUntil, takeWhile, timeout, timer} from 'rxjs';
+import {EMPTY, Subject, Subscription, merge, switchMap, take, takeUntil, takeWhile, timeout, timer} from 'rxjs';
 import {v4 as uuidv4} from 'uuid';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
@@ -76,7 +76,8 @@ interface StreamingTarget {
 @Component({
 	selector: 'zco-chat',
 	templateUrl: './chat.component.html',
-	styleUrls: ['./chat.component.scss']
+	styleUrls: ['./chat.component.scss'],
+	standalone: false
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	Object = Object;
@@ -326,7 +327,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			stream.stop = merge(
 				this.conversationService.stopGeneration(stream.conversationId, target.answer.generationId).pipe(
 					timeout(STOP_TIMEOUT_MS),
-					switchMap(() => [])
+					switchMap(() => EMPTY)
 				),
 				timer(STOP_TIMEOUT_MS)
 			).subscribe({
@@ -582,7 +583,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 			fileName: file.name,
 			fileSize: file.size,
 			file,
-			status: 'PENDING' as AttachmentStatus,
+			status: 'PENDING',
 			isUploading: true
 		}));
 	}

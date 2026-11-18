@@ -8,7 +8,8 @@ import {DocumentRetentionConfig} from '../../shared/model/document-retention-con
 @Component({
 	selector: 'zco-retention-config',
 	templateUrl: './retention-config.component.html',
-	styleUrl: './retention-config.component.scss'
+	styleUrl: './retention-config.component.scss',
+	standalone: false
 })
 export class RetentionConfigComponent implements OnInit, OnDestroy {
 	form!: FormGroup;

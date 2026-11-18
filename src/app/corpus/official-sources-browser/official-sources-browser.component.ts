@@ -10,7 +10,8 @@ import {WorkspaceService} from '../../shared/services/workspace.service';
 @Component({
 	selector: 'zco-official-sources-browser',
 	templateUrl: './official-sources-browser.component.html',
-	styleUrl: './official-sources-browser.component.scss'
+	styleUrl: './official-sources-browser.component.scss',
+	standalone: false
 })
 export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 	workspaces: WorkspaceDto[] = [];

@@ -14,7 +14,8 @@ import {ReactivateDialogComponent} from './reactivate-dialog/reactivate-dialog.c
 @Component({
 	selector: 'zco-admin-alerts',
 	templateUrl: './alerts.component.html',
-	styleUrl: './alerts.component.scss'
+	styleUrl: './alerts.component.scss',
+	standalone: false
 })
 export class AlertsComponent implements OnInit, OnDestroy {
 	form!: FormGroup;

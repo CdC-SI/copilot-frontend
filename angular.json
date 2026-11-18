@@ -40,7 +40,6 @@
             ],
             "styles": [
               "node_modules/@oblique/oblique/styles/css/oblique-core.css",
-              "node_modules/@oblique/oblique/styles/css/frutiger.css",
               "node_modules/@oblique/oblique/styles/css/oblique-components.css",
               "src/styles/styles.scss"
             ],

@@ -8,7 +8,8 @@ import {ObNotificationService} from '@oblique/oblique';
 @Component({
 	selector: 'zco-faq-edit',
 	templateUrl: './faq-edit.component.html',
-	styleUrl: './faq-edit.component.scss'
+	styleUrl: './faq-edit.component.scss',
+	standalone: false
 })
 export class FaqEditComponent implements OnInit {
 	addFaqItemFormGrp: FormGroup;

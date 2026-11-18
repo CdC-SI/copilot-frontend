@@ -7,7 +7,8 @@ import {ObNotificationService} from '@oblique/oblique';
 @Component({
 	selector: 'zco-feedback-detail-dialog',
 	templateUrl: './feedback-detail-dialog.component.html',
-	styleUrl: './feedback-detail-dialog.component.scss'
+	styleUrl: './feedback-detail-dialog.component.scss',
+	standalone: false
 })
 export class FeedbackDetailDialogComponent {
 	constructor(

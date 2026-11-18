@@ -13,7 +13,8 @@ import {WorkspaceContentDialogComponent} from '../workspace-content-dialog/works
 @Component({
 	selector: 'zco-workspace-badge',
 	templateUrl: './workspace-badge.component.html',
-	styleUrl: './workspace-badge.component.scss'
+	styleUrl: './workspace-badge.component.scss',
+	standalone: false
 })
 export class WorkspaceBadgeComponent {
 	@Input() workspaceName: string;

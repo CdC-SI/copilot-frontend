@@ -9,7 +9,8 @@ import {openOrDownloadBlob} from '../../../shared/utils/file-download.utils';
 @Component({
 	selector: 'zco-document-feedback-detail-dialog',
 	templateUrl: './document-feedback-detail-dialog.component.html',
-	styleUrl: './document-feedback-detail-dialog.component.scss'
+	styleUrl: './document-feedback-detail-dialog.component.scss',
+	standalone: false
 })
 export class DocumentFeedbackDetailDialogComponent {
 	constructor(

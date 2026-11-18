@@ -7,7 +7,8 @@ import {uploadErrorNotification} from '../../shared/utils/upload-error.utils';
 @Component({
 	selector: 'zco-doc-upload',
 	templateUrl: './doc-upload.component.html',
-	styleUrl: './doc-upload.component.scss'
+	styleUrl: './doc-upload.component.scss',
+	standalone: false
 })
 export class DocUploadComponent {
 	documentsToUpload: IDocument[] = [];

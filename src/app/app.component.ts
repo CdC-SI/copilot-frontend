@@ -12,7 +12,8 @@ import {LegalDocumentDialogComponent} from './shared/components/legal-document-d
 @Component({
 	selector: 'zco-root',
 	templateUrl: './app.component.html',
-	styleUrl: './app.component.css'
+	styleUrl: './app.component.css',
+	standalone: false
 })
 export class AppComponent implements OnInit {
 	navigationGuest: ObINavigationLink[] = [{url: '/chat', label: 'chat'}];

@@ -2,7 +2,7 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
-import {CreateWorkspaceRequest, UpdateWorkspaceRequest, WorkspaceDto} from '../../shared/model/workspace';
+import {CreateWorkspaceRequest, WorkspaceDto} from '../../shared/model/workspace';
 import {WorkspaceService} from '../../shared/services/workspace.service';
 import {WorkspaceEditDialogComponent, WorkspaceEditDialogResult} from './workspace-edit-dialog/workspace-edit-dialog.component';
 import {ConfirmDialogComponent} from '../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -11,7 +11,8 @@ import {CatalogImportDialogComponent, CatalogImportDialogResult} from '../catalo
 @Component({
 	selector: 'zco-workspaces',
 	templateUrl: './workspaces.component.html',
-	styleUrl: './workspaces.component.scss'
+	styleUrl: './workspaces.component.scss',
+	standalone: false
 })
 export class WorkspacesComponent implements OnInit {
 	displayedColumns: string[] = ['name', 'description', 'sources', 'updatedAt', 'actions'];
@@ -94,7 +95,7 @@ export class WorkspacesComponent implements OnInit {
 			.subscribe((result: WorkspaceEditDialogResult | undefined) => {
 				if (!result) return;
 				const call$ = result.isEdit
-					? this.workspaceService.update(result.name, result.request as UpdateWorkspaceRequest)
+					? this.workspaceService.update(result.name, result.request)
 					: this.workspaceService.create(result.request as CreateWorkspaceRequest);
 				call$.subscribe({
 					next: () => {

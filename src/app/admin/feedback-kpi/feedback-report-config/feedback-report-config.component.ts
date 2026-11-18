@@ -10,7 +10,8 @@ import {FeedbackReportConfig} from '../../../shared/model/feedback';
 @Component({
 	selector: 'zco-feedback-report-config',
 	templateUrl: './feedback-report-config.component.html',
-	styleUrl: './feedback-report-config.component.scss'
+	styleUrl: './feedback-report-config.component.scss',
+	standalone: false
 })
 export class FeedbackReportConfigComponent implements OnInit, OnDestroy {
 	form!: FormGroup;

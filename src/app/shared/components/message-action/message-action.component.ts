@@ -13,7 +13,8 @@ import {AuthenticationServiceV2} from '../../services/auth.service';
 @Component({
 	selector: 'zco-message-action',
 	templateUrl: './message-action.component.html',
-	styleUrl: './message-action.component.scss'
+	styleUrl: './message-action.component.scss',
+	standalone: false
 })
 export class MessageActionComponent {
 	@Input() message: ChatMessage;

@@ -15,7 +15,8 @@ export interface CatalogImportDialogResult {
 @Component({
 	selector: 'zco-catalog-import-dialog',
 	templateUrl: './catalog-import-dialog.component.html',
-	styleUrl: './catalog-import-dialog.component.scss'
+	styleUrl: './catalog-import-dialog.component.scss',
+	standalone: false
 })
 export class CatalogImportDialogComponent {
 	readonly maxFileSizeMb = 1;

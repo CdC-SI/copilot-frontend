@@ -9,7 +9,8 @@ export interface LegalDocumentDialogData {
 @Component({
 	selector: 'zco-legal-document-dialog',
 	templateUrl: './legal-document-dialog.component.html',
-	styleUrl: './legal-document-dialog.component.scss'
+	styleUrl: './legal-document-dialog.component.scss',
+	standalone: false
 })
 export class LegalDocumentDialogComponent {
 	selectedTabIndex: number = 0;

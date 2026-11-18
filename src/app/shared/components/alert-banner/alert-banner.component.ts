@@ -9,7 +9,8 @@ import {AuthenticationServiceV2} from '../../services/auth.service';
 @Component({
 	selector: 'zco-alert-banner',
 	templateUrl: './alert-banner.component.html',
-	styleUrls: ['./alert-banner.component.scss']
+	styleUrls: ['./alert-banner.component.scss'],
+	standalone: false
 })
 export class AlertBannerComponent implements OnInit, OnDestroy {
 	alerts: Alert[] = [];

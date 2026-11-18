@@ -16,7 +16,8 @@ export type WorkspaceEditDialogResult = {name: string; request: CreateWorkspaceR
 @Component({
 	selector: 'zco-workspace-edit-dialog',
 	templateUrl: './workspace-edit-dialog.component.html',
-	styleUrl: './workspace-edit-dialog.component.scss'
+	styleUrl: './workspace-edit-dialog.component.scss',
+	standalone: false
 })
 export class WorkspaceEditDialogComponent implements OnInit {
 	readonly isEdit: boolean;

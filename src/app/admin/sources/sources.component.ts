@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
-import {CreateSourceRequest, SourceDto, UpdateSourceRequest} from '../../shared/model/source';
+import {CreateSourceRequest, SourceDto} from '../../shared/model/source';
 import {SourceService} from '../../shared/services/source.service';
 import {SourceEditDialogComponent, SourceEditDialogResult} from './source-edit-dialog/source-edit-dialog.component';
 import {ConfirmDialogComponent} from '../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -11,7 +11,8 @@ import {CatalogImportDialogComponent, CatalogImportDialogResult} from '../catalo
 @Component({
 	selector: 'zco-sources',
 	templateUrl: './sources.component.html',
-	styleUrl: './sources.component.scss'
+	styleUrl: './sources.component.scss',
+	standalone: false
 })
 export class SourcesComponent implements OnInit {
 	displayedColumns: string[] = ['name', 'description', 'contents', 'updatedAt', 'actions'];
@@ -117,9 +118,7 @@ export class SourcesComponent implements OnInit {
 			.afterClosed()
 			.subscribe((result: SourceEditDialogResult | undefined) => {
 				if (!result) return;
-				const call$ = result.isEdit
-					? this.sourceService.update(result.name, result.request as UpdateSourceRequest)
-					: this.sourceService.create(result.request as CreateSourceRequest);
+				const call$ = result.isEdit ? this.sourceService.update(result.name, result.request) : this.sourceService.create(result.request as CreateSourceRequest);
 				call$.subscribe({
 					next: () => {
 						this.notif.success(result.isEdit ? 'admin.sources.update.success' : 'admin.sources.create.success');

@@ -12,7 +12,8 @@ import {FeedbackReportConfigComponent} from './feedback-kpi/feedback-report-conf
 @Component({
 	selector: 'zco-admin',
 	templateUrl: './admin.component.html',
-	styleUrl: './admin.component.scss'
+	styleUrl: './admin.component.scss',
+	standalone: false
 })
 export class AdminComponent implements OnInit {
 	@ViewChild('feedbackKpiComponent') feedbackKpi?: FeedbackKpiComponent;

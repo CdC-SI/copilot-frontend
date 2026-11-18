@@ -14,7 +14,8 @@ export type SourceEditDialogResult = {name: string; request: CreateSourceRequest
 @Component({
 	selector: 'zco-source-edit-dialog',
 	templateUrl: './source-edit-dialog.component.html',
-	styleUrl: './source-edit-dialog.component.scss'
+	styleUrl: './source-edit-dialog.component.scss',
+	standalone: false
 })
 export class SourceEditDialogComponent {
 	readonly isEdit: boolean;

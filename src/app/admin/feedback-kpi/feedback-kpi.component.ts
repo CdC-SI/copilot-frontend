@@ -31,7 +31,8 @@ const ALL_CATEGORIES: FeedbackCategory[] = ['WRONG_SOURCE', 'WRONG_ANSWER', 'INC
 @Component({
 	selector: 'zco-feedback-kpi',
 	templateUrl: './feedback-kpi.component.html',
-	styleUrl: './feedback-kpi.component.scss'
+	styleUrl: './feedback-kpi.component.scss',
+	standalone: false
 })
 export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	range: TimeRange = '30d';
