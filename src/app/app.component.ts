@@ -105,13 +105,13 @@ export class AppComponent implements OnInit, DoCheck {
 			case UserStatus.ACTIVE:
 				return {status: 'active', icon: 'checkmark_circle'};
 			case UserStatus.PENDING_ACTIVATION:
-				return {status: 'pending', icon: 'user-cog'};
+				return {status: 'pending', icon: 'person_settings'};
 			case UserStatus.INACTIVE:
-				return {status: 'inactive', icon: 'warning-circle'};
+				return {status: 'inactive', icon: 'exclamation_circle'};
 			case UserStatus.GUEST:
 				return {status: 'guest', icon: 'person_pencil'};
 			case UserStatus.JOHN_DOE:
-				return {status: 'john-doe', icon: 'user'};
+				return {status: 'john-doe', icon: 'person'};
 		}
 	}
 

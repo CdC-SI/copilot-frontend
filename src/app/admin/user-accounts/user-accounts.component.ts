@@ -45,10 +45,10 @@ export class UserAccountsComponent implements AfterViewInit {
 	ACTION_CATALOG: Record<string, IUserAction> = {
 		validate: {id: 'validate', icon: 'checkmark', tooltip: 'admin.actions.validate'},
 		deactivate: {id: 'deactivate', icon: 'lock', tooltip: 'admin.actions.deactivate'},
-		reactivate: {id: 'reactivate', icon: 'unlock', tooltip: 'admin.actions.reactivate'},
-		grant: {id: 'grant', icon: 'user', tooltip: 'admin.actions.grant'},
+		reactivate: {id: 'reactivate', icon: 'lock_open', tooltip: 'admin.actions.reactivate'},
+		grant: {id: 'grant', icon: 'person', tooltip: 'admin.actions.grant'},
 		internalize: {id: 'internalize', icon: 'eye', tooltip: 'admin.actions.internalize'},
-		externalize: {id: 'externalize', icon: 'eye-slash', tooltip: 'admin.actions.externalize'}
+		externalize: {id: 'externalize', icon: 'eye_off', tooltip: 'admin.actions.externalize'}
 	};
 
 	private readonly refresh$ = new Subject<void>();

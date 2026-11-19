@@ -240,7 +240,7 @@
 
 					@if (!isLoadingRequests && sourceRequests.length === 0) {
 						<div class="empty-state">
-							<mat-icon svgIcon="playlist-add-check" class="empty-icon"></mat-icon>
+							<mat-icon svgIcon="checkmark_circle" class="empty-icon"></mat-icon>
 							<p>{{ "sources.requests.no.requests" | translate }}</p>
 							<button mat-button [obButton]="'primary'" (click)="openRequestSourceDialog()">
 								<mat-icon svgIcon="plus"></mat-icon>
