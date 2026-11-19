@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {IdentityCheckService} from '../../shared/services/identity-check.service';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
@@ -10,6 +10,7 @@ import {IdentityCheckStartRequest, IdentityCheckStatus} from '../../shared/model
 	selector: 'zco-identity-check',
 	templateUrl: './identity-check.component.html',
 	styleUrls: ['./identity-check.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
 export class IdentityCheckComponent implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {UserService} from './shared/services/user.service';
 import {ObINavigationLink, ObNotificationService} from '@oblique/oblique';
@@ -12,7 +12,9 @@ import {LegalDocumentDialogComponent} from './shared/components/legal-document-d
 @Component({
 	selector: 'zco-root',
 	templateUrl: './app.component.html',
-	styleUrl: './app.component.css'
+	styleUrl: './app.component.css',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class AppComponent implements OnInit {
 	navigationGuest: ObINavigationLink[] = [{url: '/chat', label: 'chat'}];
@@ -89,13 +91,13 @@ export class AppComponent implements OnInit {
 	getIconStatus() {
 		switch (this.authService.userStatus()) {
 			case UserStatus.ACTIVE:
-				return {status: 'active', icon: 'checkmark-circle'};
+				return {status: 'active', icon: 'checkmark_circle'};
 			case UserStatus.PENDING_ACTIVATION:
 				return {status: 'pending', icon: 'user-cog'};
 			case UserStatus.INACTIVE:
 				return {status: 'inactive', icon: 'warning-circle'};
 			case UserStatus.GUEST:
-				return {status: 'guest', icon: 'user-pen'};
+				return {status: 'guest', icon: 'person_pencil'};
 			case UserStatus.JOHN_DOE:
 				return {status: 'john-doe', icon: 'user'};
 		}

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {IDocument} from '../../shared/model/document';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {UploadService} from '../../shared/services/upload.service';
@@ -7,7 +7,9 @@ import {uploadErrorNotification} from '../../shared/utils/upload-error.utils';
 @Component({
 	selector: 'zco-doc-upload',
 	templateUrl: './doc-upload.component.html',
-	styleUrl: './doc-upload.component.scss'
+	styleUrl: './doc-upload.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class DocUploadComponent {
 	documentsToUpload: IDocument[] = [];

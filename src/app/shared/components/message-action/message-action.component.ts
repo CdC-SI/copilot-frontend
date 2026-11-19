@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
 import {SpeechService} from '../../services/speech.service';
 import {TranslateService} from '@ngx-translate/core';
 import {FormControl, Validators} from '@angular/forms';
@@ -13,7 +13,9 @@ import {AuthenticationServiceV2} from '../../services/auth.service';
 @Component({
 	selector: 'zco-message-action',
 	templateUrl: './message-action.component.html',
-	styleUrl: './message-action.component.scss'
+	styleUrl: './message-action.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class MessageActionComponent {
 	@Input() message: ChatMessage;
@@ -57,7 +59,7 @@ export class MessageActionComponent {
 		speech.text = message.message;
 		speech.rate = 1.5;
 		speech.pitch = 1;
-		speech.voice = this.speechService.getVoice(message.lang || this.translateService.currentLang);
+		speech.voice = this.speechService.getVoice(message.lang || this.translateService.getCurrentLang());
 		speech.onend = () => (this.message.beingSpoken = false);
 		speechSynthesis.speak(speech);
 	};
@@ -80,7 +82,7 @@ export class MessageActionComponent {
 			text: this.previousMessage.message,
 			answer: this.message.message,
 			url: this.message.url,
-			language: this.translateService.currentLang
+			language: this.translateService.getCurrentLang()
 		});
 		this.dialog
 			.open(this.addFaqItemDialog, {width: '800px'})

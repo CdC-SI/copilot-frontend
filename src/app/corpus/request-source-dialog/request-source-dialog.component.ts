@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MatDialogRef} from '@angular/material/dialog';
 import {ISourceRequest} from '../../shared/model/source-request';
@@ -6,7 +6,9 @@ import {ISourceRequest} from '../../shared/model/source-request';
 @Component({
 	selector: 'zco-request-source-dialog',
 	templateUrl: './request-source-dialog.component.html',
-	styleUrl: './request-source-dialog.component.scss'
+	styleUrl: './request-source-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class RequestSourceDialogComponent {
 	form: FormGroup;

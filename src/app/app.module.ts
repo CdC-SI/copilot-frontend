@@ -3,22 +3,12 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {
-	OB_BANNER,
-	ObButtonModule,
-	ObExternalLinkModule,
-	ObHttpApiInterceptor,
-	ObIconModule,
-	ObMasterLayoutModule,
-	multiTranslateLoader
-} from '@oblique/oblique';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {OB_BANNER, ObButtonModule, ObExternalLinkModule, ObHttpApiInterceptor, ObMasterLayoutModule, provideObliqueConfiguration} from '@oblique/oblique';
 import {registerLocaleData} from '@angular/common';
 import localeDECH from '@angular/common/locales/de-CH';
 import localeFRCH from '@angular/common/locales/fr-CH';
 import localeITCH from '@angular/common/locales/it-CH';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {TranslateModule} from '@ngx-translate/core';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr} from '@angular/common/http';
 import {ChatComponent} from './chat/chat.component';
 import {TipsComponent} from './tips/tips.component';
 import {ConfigurationService} from './core/app-configuration/configuration.service';
@@ -99,15 +89,13 @@ function bannerFactory(configurationService: ConfigurationService) {
 		FeedbackReportConfigComponent,
 		CatalogImportDialogComponent
 	],
+	bootstrap: [AppComponent],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		ObMasterLayoutModule,
-		BrowserAnimationsModule,
+
 		ObButtonModule,
-		ObIconModule.forRoot(),
-		HttpClientModule,
-		TranslateModule.forRoot(multiTranslateLoader()),
 		ObExternalLinkModule,
 		SharedModule,
 		MatProgressBar,
@@ -117,14 +105,23 @@ function bannerFactory(configurationService: ConfigurationService) {
 		MatProgressSpinnerModule
 	],
 	providers: [
+		provideObliqueConfiguration({
+			accessibilityStatement: {
+				createdOn: new Date('2026-11-18'),
+				applicationName: 'ZIA',
+				conformity: 'none',
+				applicationOperator: 'Centrale de compensation (CdC), Genève',
+				contact: [{phone: '+41 58 461 91 11'}]
+			}
+		}),
 		{provide: ZCO_CONFIGURATIONS_TOKEN, useValue: ZCO_CONFIGURATIONS},
 		{provide: LOCALE_ID, useValue: 'fr-CH'},
 		{provide: APP_INITIALIZER, useFactory: appInitializerFactory, deps: [ConfigurationService], multi: true},
 		{provide: OB_BANNER, useFactory: bannerFactory, deps: [ConfigurationService]},
 		{provide: HTTP_INTERCEPTORS, useClass: ObHttpApiInterceptor, multi: true},
 		{provide: HTTP_INTERCEPTORS, useClass: BlueGatewayInterceptorV2, multi: true},
-		{provide: ErrorHandler, useClass: GlobalErrorHandler}
-	],
-	bootstrap: [AppComponent]
+		{provide: ErrorHandler, useClass: GlobalErrorHandler},
+		provideHttpClient(withXhr(), withInterceptorsFromDi())
+	]
 })
 export class AppModule {}

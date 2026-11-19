@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {Subject, forkJoin} from 'rxjs';
 import {finalize, takeUntil} from 'rxjs/operators';
 import {ObNotificationService} from '@oblique/oblique';
@@ -10,7 +10,9 @@ import {WorkspaceService} from '../../shared/services/workspace.service';
 @Component({
 	selector: 'zco-official-sources-browser',
 	templateUrl: './official-sources-browser.component.html',
-	styleUrl: './official-sources-browser.component.scss'
+	styleUrl: './official-sources-browser.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 	workspaces: WorkspaceDto[] = [];

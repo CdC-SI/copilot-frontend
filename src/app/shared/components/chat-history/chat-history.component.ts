@@ -1,11 +1,13 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {ConversationService} from '../../services/conversation.service';
 import {ChatTitle, ConversationType} from '../../model/chat-history';
 
 @Component({
 	selector: 'zco-chat-history',
 	templateUrl: './chat-history.component.html',
-	styleUrl: './chat-history.component.scss'
+	styleUrl: './chat-history.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class ChatHistoryComponent {
 	selected: ChatTitle;
@@ -17,9 +19,9 @@ export class ChatHistoryComponent {
 	@Input() titles!: ChatTitle[] | null;
 	constructor(private readonly conversationService: ConversationService) {}
 
-	/** Icône représentant le type de conversation : Corpus documentaire (book) ou LLM seul (bolt). */
+	/** Icône représentant le type de conversation : Corpus documentaire (book) ou LLM seul (lightning). */
 	getTypeIcon(title: ChatTitle): string {
-		return title.type === ConversationType.NO_RAG ? 'bolt' : 'book';
+		return title.type === ConversationType.NO_RAG ? 'lightning' : 'book';
 	}
 
 	/** Libellé accessible/tooltip associé à l'icône de type de conversation. */

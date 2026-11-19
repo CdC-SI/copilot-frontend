@@ -8,16 +8,20 @@
 			<strong>{{ "score" | translate }}: </strong
 			><span [class.pos]="data.score === 1" [class.neg]="data.score === -1">{{ data.score === 1 ? "👍" : "👎" }}</span>
 		</div>
-		<div *ngIf="data.category">
-			<strong>{{ "category" | translate }}: </strong>{{ "feedback.category." + data.category | translate }}
-		</div>
+		@if (data.category) {
+			<div>
+				<strong>{{ "category" | translate }}: </strong>{{ "feedback.category." + data.category | translate }}
+			</div>
+		}
 		<div>
 			<strong>{{ "status" | translate }}: </strong>
 			<zco-feedback-status-select [status]="data.status" (statusChange)="onStatusChange($event)"></zco-feedback-status-select>
 		</div>
-		<div *ngIf="data.comment">
-			<strong>{{ "comment" | translate }}: </strong>{{ data.comment }}
-		</div>
+		@if (data.comment) {
+			<div>
+				<strong>{{ "comment" | translate }}: </strong>{{ data.comment }}
+			</div>
+		}
 	</section>
 	<section class="qa">
 		<h3>{{ "question" | translate }}</h3>
@@ -25,12 +29,16 @@
 		<h3>{{ "answer" | translate }}</h3>
 		<markdown [data]="data.answer"></markdown>
 	</section>
-	<section class="source-list" *ngIf="data.sources?.length">
-		<h3>{{ "sources.title" | translate }}</h3>
-		<article class="source-card" *ngFor="let s of data.sources">
-			<zco-source [source]="s"></zco-source>
-		</article>
-	</section>
+	@if (data.sources?.length) {
+		<section class="source-list">
+			<h3>{{ "sources.title" | translate }}</h3>
+			@for (s of data.sources; track s) {
+				<article class="source-card">
+					<zco-source [source]="s"></zco-source>
+				</article>
+			}
+		</section>
+	}
 </mat-dialog-content>
 <mat-dialog-actions align="end">
 	<button mat-button mat-dialog-close [obButton]="'secondary'">{{ "close" | translate }}</button>

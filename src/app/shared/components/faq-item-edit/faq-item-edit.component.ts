@@ -25,7 +25,8 @@ import {UserStatus} from '../../model/user';
 			useExisting: FaqItemEditComponent
 		}
 	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	standalone: false
 })
 export class FaqItemEditComponent implements ControlValueAccessor, Validator, OnInit, OnDestroy {
 	readonly FORM_FIELDS = FaqItemFields;
@@ -57,7 +58,7 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 		this.loadTags();
 
 		this.authService.$authenticatedUser.pipe(takeUntil(this.destroyed$)).subscribe(user => {
-			if (user && user.status === UserStatus.ACTIVE) {
+			if (user?.status === UserStatus.ACTIVE) {
 				this.loadTags();
 			}
 		});

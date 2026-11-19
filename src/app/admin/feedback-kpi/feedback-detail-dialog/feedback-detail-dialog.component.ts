@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {FeedbackStatus, IMessageFeedback} from '../../../shared/model/feedback';
 import {FeedbackService} from '../../../shared/services/feedback.service';
@@ -7,7 +7,9 @@ import {ObNotificationService} from '@oblique/oblique';
 @Component({
 	selector: 'zco-feedback-detail-dialog',
 	templateUrl: './feedback-detail-dialog.component.html',
-	styleUrl: './feedback-detail-dialog.component.scss'
+	styleUrl: './feedback-detail-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class FeedbackDetailDialogComponent {
 	constructor(

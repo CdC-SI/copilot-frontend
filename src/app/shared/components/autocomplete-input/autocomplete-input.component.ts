@@ -27,7 +27,8 @@ import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 			useExisting: AutocompleteInputComponent,
 			multi: true
 		}
-	]
+	],
+	standalone: false
 })
 export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccessor, OnDestroy, AfterViewInit {
 	@Input() i18nLabel: string;

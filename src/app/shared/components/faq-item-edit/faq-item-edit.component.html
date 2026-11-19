@@ -12,7 +12,9 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "parameters.tags" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.TAGS" multiple>
-			<mat-option *ngFor="let tag of TAGS" [value]="tag">{{ "tags." + tag | translate }}</mat-option>
+			@for (tag of TAGS; track tag) {
+				<mat-option [value]="tag">{{ "tags." + tag | translate }}</mat-option>
+			}
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>
@@ -24,9 +26,11 @@
 	<mat-form-field obErrorMessages>
 		<mat-label>{{ "language" | translate }}</mat-label>
 		<mat-select [formControlName]="FORM_FIELDS.LANGUAGE">
-			<mat-option *ngFor="let language of languages" [value]="language">
-				{{ language | translate }}
-			</mat-option>
+			@for (language of languages; track language) {
+				<mat-option [value]="language">
+					{{ language | translate }}
+				</mat-option>
+			}
 		</mat-select>
 		<mat-error></mat-error>
 	</mat-form-field>

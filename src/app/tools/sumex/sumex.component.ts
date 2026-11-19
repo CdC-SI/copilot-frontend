@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
 import {VisionService} from '../../shared/services/vision.service';
@@ -7,7 +7,9 @@ import {MedicalService, SumexInvoice} from '../../shared/model/vision';
 @Component({
 	selector: 'zco-sumex',
 	templateUrl: './sumex.component.html',
-	styleUrl: './sumex.component.scss'
+	styleUrl: './sumex.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class SumexComponent implements OnInit {
 	invoiceForm: FormGroup = new FormGroup({});
@@ -117,10 +119,6 @@ export class SumexComponent implements OnInit {
 
 	supprimerPosition(index: number): void {
 		this.medicalServices.removeAt(index);
-	}
-
-	trackByIndex(index: number): number {
-		return index;
 	}
 
 	extractData() {

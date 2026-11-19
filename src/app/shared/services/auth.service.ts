@@ -1,7 +1,7 @@
-import {Inject, Injectable} from '@angular/core';
+import {DOCUMENT, Inject, Injectable} from '@angular/core';
 import {ObNotificationService, WINDOW} from '@oblique/oblique';
-import {DOCUMENT, LocationStrategy} from '@angular/common';
-import {EnvironmentService, LocalStorageService} from 'zas-design-system';
+import {LocationStrategy} from '@angular/common';
+import {EnvironmentService, LocalStorageService} from '@zas-design-system/zas-design-system';
 import {BehaviorSubject, EMPTY, Observable, catchError, mergeMap, of} from 'rxjs';
 import {HttpClient, HttpErrorResponse, HttpParams, HttpStatusCode} from '@angular/common/http';
 import {IUser, Role, UserStatus} from '../model/user';
@@ -11,6 +11,8 @@ export const FULLTOKEN_FILTERING_ROLES: Role[] = [Role.ADMIN, Role.EXPERT, Role.
 @Injectable({providedIn: 'root'})
 export class AuthenticationServiceV2 {
 	readonly $authenticatedUser: BehaviorSubject<IUser> = new BehaviorSubject<IUser>(null);
+	/** Indicateur partagé entre onglets pour détecter une déconnexion faite dans un autre onglet. */
+	private static readonly CONNECTED_KEY = 'zia-connected';
 	private _jwtToken: string | null = null;
 
 	constructor(
@@ -33,11 +35,14 @@ export class AuthenticationServiceV2 {
 		this._jwtToken = value;
 	}
 
+	isConnected(): boolean {
+		return this.window.localStorage.getItem(AuthenticationServiceV2.CONNECTED_KEY) !== 'false';
+	}
+
 	/**
 	 * Login case on app startup, we have a token
 	 */
 	login(): void {
-		// eslint-disable-next-line prefer-regex-literals
 		const match: RegExpExecArray | null = /[?&]ACCESS_TOKEN/.exec(this.window.location.search);
 		/*
 		 * No token on startup, redirect to /v2/authenticate
@@ -53,7 +58,7 @@ export class AuthenticationServiceV2 {
 	 */
 	logout(redirect?: string): void {
 		this.jwtToken = null;
-		this.localStorageService.setConnected(false);
+		this.setConnected(false);
 
 		// If redirect is undefined we redirect to the root of the application
 		if (!redirect) {
@@ -77,7 +82,7 @@ export class AuthenticationServiceV2 {
 			.pipe(
 				mergeMap(token => {
 					this.jwtToken = token;
-					this.localStorageService.setConnected(true);
+					this.setConnected(true);
 					const uri = this.window.location.toString();
 					if (uri.indexOf('?') > 0) {
 						this.window.history.replaceState({}, this.document.title, cleanUri(uri));
@@ -137,6 +142,10 @@ export class AuthenticationServiceV2 {
 			return user.username;
 		}
 		return '';
+	}
+
+	private setConnected(connected: boolean): void {
+		this.window.localStorage.setItem(AuthenticationServiceV2.CONNECTED_KEY, String(connected));
 	}
 }
 

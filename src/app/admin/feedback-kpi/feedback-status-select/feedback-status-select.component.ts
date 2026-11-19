@@ -1,10 +1,12 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {FEEDBACK_STATUSES, FeedbackStatus} from '../../../shared/model/feedback';
 
 @Component({
 	selector: 'zco-feedback-status-select',
 	templateUrl: './feedback-status-select.component.html',
-	styleUrl: './feedback-status-select.component.scss'
+	styleUrl: './feedback-status-select.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class FeedbackStatusSelectComponent {
 	@Input() status: FeedbackStatus = 'NEW';

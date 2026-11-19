@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {MessageSource} from '../../../model/chat-history';
 import {ObNotificationService} from '@oblique/oblique';
 import {UploadService} from '../../../services/upload.service';
@@ -7,7 +7,9 @@ import {openOrDownloadBlob} from '../../../utils/file-download.utils';
 @Component({
 	selector: 'zco-source',
 	templateUrl: './source.component.html',
-	styleUrl: './source.component.scss'
+	styleUrl: './source.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class SourceComponent {
 	@Input() source: MessageSource;
@@ -33,7 +35,7 @@ export class SourceComponent {
 		try {
 			const {hostname, pathname} = new URL(link);
 			return hostname.replace(/^www\./, '') + pathname;
-		} catch (_) {
+		} catch {
 			return link;
 		}
 	}

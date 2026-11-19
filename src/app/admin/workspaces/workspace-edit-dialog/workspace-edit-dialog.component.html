@@ -5,9 +5,11 @@
 		<mat-form-field appearance="outline">
 			<mat-label>{{ "admin.workspaces.name" | translate }}</mat-label>
 			<input matInput formControlName="name" maxlength="255" />
-			<mat-error *ngIf="form.get('name')?.hasError('required')">
-				{{ "admin.workspaces.name.required" | translate }}
-			</mat-error>
+			@if (form.get("name")?.hasError("required")) {
+				<mat-error>
+					{{ "admin.workspaces.name.required" | translate }}
+				</mat-error>
+			}
 		</mat-form-field>
 
 		<mat-form-field appearance="outline">
@@ -18,19 +20,23 @@
 		<mat-form-field appearance="outline">
 			<mat-label>{{ "admin.workspaces.sources" | translate }}</mat-label>
 			<mat-select formControlName="sources" multiple>
-				<mat-option *ngFor="let source of availableSources" [value]="source.name">{{ "sources." + source.name | translate }}</mat-option>
+				@for (source of availableSources; track source) {
+					<mat-option [value]="source.name">{{ "sources." + source.name | translate }}</mat-option>
+				}
 			</mat-select>
 		</mat-form-field>
 
 		<mat-form-field appearance="outline">
 			<mat-label>{{ "admin.workspaces.hypotheticalQuestions" | translate }}</mat-label>
 			<mat-chip-grid #chipGrid>
-				<mat-chip-row *ngFor="let question of hypotheticalQuestions" (removed)="removeQuestion(question)">
-					{{ question }}
-					<button matChipRemove [attr.aria-label]="'admin.actions.remove' | translate">
-						<mat-icon svgIcon="cancel"></mat-icon>
-					</button>
-				</mat-chip-row>
+				@for (question of hypotheticalQuestions; track question) {
+					<mat-chip-row (removed)="removeQuestion(question)">
+						{{ question }}
+						<button matChipRemove [attr.aria-label]="'admin.actions.remove' | translate">
+							<mat-icon svgIcon="xmark"></mat-icon>
+						</button>
+					</mat-chip-row>
+				}
 				<input
 					[placeholder]="'admin.workspaces.hypotheticalQuestions.placeholder' | translate"
 					[matChipInputFor]="chipGrid"

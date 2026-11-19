@@ -1,4 +1,6 @@
 <div class="typing-output">
 	{{ displayedText }}
-	<span *ngIf="!typingCompleted">●</span>
+	@if (!typingCompleted) {
+		<span>●</span>
+	}
 </div>

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {UserFormFields} from '../../model/user';
 import {MatDialogRef} from '@angular/material/dialog';
@@ -7,7 +7,9 @@ import {LEGAL_CONFIDENTIALITY_TEXT, LEGAL_GCU_TEXT} from '../../constants/legal-
 @Component({
 	selector: 'zco-sign-up',
 	templateUrl: './sign-up.component.html',
-	styleUrl: './sign-up.component.scss'
+	styleUrl: './sign-up.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class SignUpComponent implements OnInit {
 	FORM_FIELDS = UserFormFields;

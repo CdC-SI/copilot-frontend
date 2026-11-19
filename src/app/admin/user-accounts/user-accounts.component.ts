@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {IUser, IUserAction, Role, UserStatus} from '../../shared/model/user';
 import {Observable, Subject, catchError, finalize, map, merge, of, startWith, switchMap} from 'rxjs';
@@ -11,7 +11,9 @@ import {MatPaginator} from '@angular/material/paginator';
 @Component({
 	selector: 'zco-user-accounts',
 	templateUrl: './user-accounts.component.html',
-	styleUrl: './user-accounts.component.scss'
+	styleUrl: './user-accounts.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class UserAccountsComponent implements AfterViewInit {
 	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internalUser', 'actions'];

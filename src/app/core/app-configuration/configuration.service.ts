@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
-import {EnvironmentConfig, EnvironmentService} from 'zas-design-system';
+import {EnvironmentConfig, EnvironmentService} from '@zas-design-system/zas-design-system';
 import {firstValueFrom, map, mergeMap, switchMap} from 'rxjs';
 import {MOCK_USER_TOKEN} from './token';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';

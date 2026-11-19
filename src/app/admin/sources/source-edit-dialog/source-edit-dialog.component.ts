@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MatChipInputEvent} from '@angular/material/chips';
@@ -14,7 +14,9 @@ export type SourceEditDialogResult = {name: string; request: CreateSourceRequest
 @Component({
 	selector: 'zco-source-edit-dialog',
 	templateUrl: './source-edit-dialog.component.html',
-	styleUrl: './source-edit-dialog.component.scss'
+	styleUrl: './source-edit-dialog.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class SourceEditDialogComponent {
 	readonly isEdit: boolean;

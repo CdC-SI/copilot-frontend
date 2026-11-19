@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
 import {MessageSource} from '../../model/chat-history';
 import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../services/feedback.service';
@@ -11,7 +11,9 @@ type FeedbackVote = 'upvote' | 'downvote';
 @Component({
 	selector: 'zco-source-list',
 	templateUrl: './source-list.component.html',
-	styleUrl: './source-list.component.scss'
+	styleUrl: './source-list.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class SourceListComponent implements OnChanges {
 	@Input() message!: ChatMessage;
@@ -66,7 +68,7 @@ export class SourceListComponent implements OnChanges {
 		try {
 			const {hostname, pathname} = new URL(link);
 			return hostname.replace(/^www\./, '') + pathname;
-		} catch (_) {
+		} catch {
 			return link;
 		}
 	}

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 
@@ -13,6 +13,7 @@ export enum ToolsComponentType {
 	selector: 'zco-tools-home',
 	templateUrl: './tools-home.component.html',
 	standalone: false,
+	changeDetection: ChangeDetectionStrategy.Eager,
 	styleUrl: './tools-home.component.scss'
 })
 export class ToolsHomeComponent implements OnInit {

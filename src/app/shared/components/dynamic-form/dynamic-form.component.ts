@@ -6,7 +6,8 @@ import {FormDef} from '../../model/form-definition';
 	selector: 'zco-dynamic-form',
 	templateUrl: './dynamic-form.component.html',
 	styleUrl: './dynamic-form.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	standalone: false
 })
 export class DynamicFormComponent {
 	@Input() def!: FormDef;

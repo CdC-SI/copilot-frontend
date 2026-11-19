@@ -1,62 +1,69 @@
 <zco-alert-banner></zco-alert-banner>
-<div class="button-container" *ngIf="!selectedComponent">
-	<button *ngIf="hasTranslatorRole()" class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.DocumentAnalysis)">
-		<mat-icon svgIcon="arrow-right"></mat-icon>
-		{{ "documentAnalysis" | translate }}
-	</button>
+@if (!selectedComponent) {
+	<div class="button-container">
+		@if (hasTranslatorRole()) {
+			<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.DocumentAnalysis)">
+				<mat-icon svgIcon="arrow_right"></mat-icon>
+				{{ "documentAnalysis" | translate }}
+			</button>
+		}
+		@if (hasAdminRole()) {
+			<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.IdentityCheck)">
+				<mat-icon svgIcon="arrow_right"></mat-icon>
+				{{ "identityCheck" | translate }}
+			</button>
+		}
+		@if (hasAdminRole()) {
+			<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.Sumex)">
+				<mat-icon svgIcon="arrow_right"></mat-icon>
+				{{ "Sumex" | translate }}
+			</button>
+		}
+		@if (hasAdminRole()) {
+			<button class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.CareerSummary)">
+				<mat-icon svgIcon="arrow_right"></mat-icon>
+				{{ "careerSummary" | translate }}
+			</button>
+		}
+	</div>
+}
 
-	<button *ngIf="hasAdminRole()" class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.IdentityCheck)">
-		<mat-icon svgIcon="arrow-right"></mat-icon>
-		{{ "identityCheck" | translate }}
-	</button>
-
-	<button *ngIf="hasAdminRole()" class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.Sumex)">
-		<mat-icon svgIcon="arrow-right"></mat-icon>
-		{{ "Sumex" | translate }}
-	</button>
-
-	<button *ngIf="hasAdminRole()" class="fixed-button" mat-button [obButton]="'primary'" (click)="selectComponent(TOOLS_COMPONENT_TYPE.CareerSummary)">
-		<mat-icon svgIcon="arrow-right"></mat-icon>
-		{{ "careerSummary" | translate }}
-	</button>
-</div>
-
-<ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.DocumentAnalysis">
+@if (selectedComponent === TOOLS_COMPONENT_TYPE.DocumentAnalysis) {
 	<zco-document-analysis></zco-document-analysis>
 	<div class="button-container">
 		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
-			<mat-icon svgIcon="arrow-left"></mat-icon>
+			<mat-icon svgIcon="arrow_left"></mat-icon>
 			{{ "back" | translate }}
 		</button>
 	</div>
-</ng-container>
+}
 
-<ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.IdentityCheck">
+@if (selectedComponent === TOOLS_COMPONENT_TYPE.IdentityCheck) {
 	<zco-identity-check></zco-identity-check>
 	<div class="button-container">
 		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
-			<mat-icon svgIcon="arrow-left"></mat-icon>
+			<mat-icon svgIcon="arrow_left"></mat-icon>
 			{{ "back" | translate }}
 		</button>
 	</div>
-</ng-container>
+}
 
-<ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.Sumex">
+@if (selectedComponent === TOOLS_COMPONENT_TYPE.Sumex) {
 	<zco-sumex></zco-sumex>
 	<div class="button-container">
 		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
-			<mat-icon svgIcon="arrow-left"></mat-icon>
+			<mat-icon svgIcon="arrow_left"></mat-icon>
 			{{ "back" | translate }}
 		</button>
 	</div>
-</ng-container>
+}
 
-<ng-container *ngIf="selectedComponent === TOOLS_COMPONENT_TYPE.CareerSummary">
+@if (selectedComponent === TOOLS_COMPONENT_TYPE.CareerSummary) {
 	<zco-career-summary></zco-career-summary>
 	<div class="button-container">
 		<button class="fixed-button" mat-button [obButton]="'secondary'" (click)="closeComponent()">
-			<mat-icon svgIcon="arrow-left"></mat-icon>
+			<mat-icon svgIcon="arrow_left"></mat-icon>
 			{{ "back" | translate }}
 		</button>
 	</div>
-</ng-container>
+}

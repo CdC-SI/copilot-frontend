@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
@@ -14,7 +14,9 @@ import {ReactivateDialogComponent} from './reactivate-dialog/reactivate-dialog.c
 @Component({
 	selector: 'zco-admin-alerts',
 	templateUrl: './alerts.component.html',
-	styleUrl: './alerts.component.scss'
+	styleUrl: './alerts.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class AlertsComponent implements OnInit, OnDestroy {
 	form!: FormGroup;
@@ -145,7 +147,7 @@ export class AlertsComponent implements OnInit, OnDestroy {
 
 	// --- helpers langue/texte ---
 	private baseLang(): 'fr' | 'de' | 'it' {
-		const l = (this.translate.currentLang || '').toLowerCase();
+		const l = (this.translate.getCurrentLang() || '').toLowerCase();
 		if (l.startsWith('fr')) return 'fr';
 		if (l.startsWith('de')) return 'de';
 		if (l.startsWith('it')) return 'it';

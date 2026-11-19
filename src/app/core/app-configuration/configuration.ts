@@ -1,4 +1,4 @@
-import {ObIBanner} from '@oblique/oblique/lib/utilities.model';
+import {ObIBanner} from '@oblique/oblique';
 import {InjectionToken} from '@angular/core';
 
 export interface Configuration {

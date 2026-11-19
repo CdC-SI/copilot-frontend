@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {take} from 'rxjs/operators';
 import {nanoid} from 'nanoid';
-import {AuthenticationDialogComponent, EnvironmentService, LocalStorageService} from 'zas-design-system';
+import {AuthenticationDialogComponent, EnvironmentService} from '@zas-design-system/zas-design-system';
 import {AuthenticationServiceV2} from './auth.service';
 
 /** Accès minimal aux en-têtes, commun à `HttpHeaders` (HttpClient) et `Headers` (fetch). */
@@ -22,7 +22,6 @@ export class GatewayAuthService {
 	constructor(
 		private readonly dialog: MatDialog,
 		private readonly authenticationService: AuthenticationServiceV2,
-		private readonly localStorageService: LocalStorageService,
 		private readonly environmentService: EnvironmentService
 	) {}
 
@@ -40,7 +39,7 @@ export class GatewayAuthService {
 
 	/** Vérifie que la session n'a pas été fermée depuis un autre onglet (l'expiration est aussi contrôlée par la gateway). */
 	checkSession(): void {
-		if (this.authenticationService.jwtToken && !this.localStorageService.isConnected()) {
+		if (this.authenticationService.jwtToken && !this.authenticationService.isConnected()) {
 			this.displayUnauthorized();
 		}
 	}

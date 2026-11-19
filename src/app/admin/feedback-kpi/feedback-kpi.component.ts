@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {FeedbackService, TimeRange} from '../../shared/services/feedback.service';
 import {
 	FEEDBACK_STATUSES,
@@ -31,7 +31,9 @@ const ALL_CATEGORIES: FeedbackCategory[] = ['WRONG_SOURCE', 'WRONG_ANSWER', 'INC
 @Component({
 	selector: 'zco-feedback-kpi',
 	templateUrl: './feedback-kpi.component.html',
-	styleUrl: './feedback-kpi.component.scss'
+	styleUrl: './feedback-kpi.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	range: TimeRange = '30d';
@@ -257,7 +259,7 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 			map.set(s.documentId, row);
 		}
 
-		const rows = Array.from(map.values()).filter(row => this.statusFilter === 'ALL' || row.statusCounts[this.statusFilter as FeedbackStatus] > 0);
+		const rows = Array.from(map.values()).filter(row => this.statusFilter === 'ALL' || row.statusCounts[this.statusFilter] > 0);
 
 		this.sourcesData.data = rows;
 

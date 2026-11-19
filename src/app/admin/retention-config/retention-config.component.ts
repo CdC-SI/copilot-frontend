@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
 import {ObNotificationService} from '@oblique/oblique';
@@ -8,7 +8,9 @@ import {DocumentRetentionConfig} from '../../shared/model/document-retention-con
 @Component({
 	selector: 'zco-retention-config',
 	templateUrl: './retention-config.component.html',
-	styleUrl: './retention-config.component.scss'
+	styleUrl: './retention-config.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class RetentionConfigComponent implements OnInit, OnDestroy {
 	form!: FormGroup;

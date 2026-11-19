@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
 import {ObNotificationService} from '@oblique/oblique';
@@ -10,7 +10,9 @@ import {FeedbackReportConfig} from '../../../shared/model/feedback';
 @Component({
 	selector: 'zco-feedback-report-config',
 	templateUrl: './feedback-report-config.component.html',
-	styleUrl: './feedback-report-config.component.scss'
+	styleUrl: './feedback-report-config.component.scss',
+	changeDetection: ChangeDetectionStrategy.Eager,
+	standalone: false
 })
 export class FeedbackReportConfigComponent implements OnInit, OnDestroy {
 	form!: FormGroup;

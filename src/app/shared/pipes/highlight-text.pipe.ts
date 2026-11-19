@@ -1,7 +1,8 @@
 import {Injectable, Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-	name: 'highlightText'
+	name: 'highlightText',
+	standalone: false
 })
 @Injectable({
 	providedIn: 'root'

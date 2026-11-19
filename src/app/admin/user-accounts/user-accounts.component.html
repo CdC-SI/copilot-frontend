@@ -19,26 +19,27 @@
 	<ng-container matColumnDef="roles">
 		<th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">{{ "user.roles" | translate }}</th>
 		<td mat-cell *matCellDef="let user">
-			<ng-container *ngIf="!isEditingRoles(user.username); else editRoles">
+			@if (!isEditingRoles(user.username)) {
 				{{ user.roles }}
-			</ng-container>
-			<ng-template #editRoles>
+			} @else {
 				<div class="roles-edit-container">
 					<div class="roles-checkboxes">
-						<mat-checkbox *ngFor="let role of availableRoles" [checked]="isRoleSelected(role)" (change)="toggleRole(role)">
-							{{ role }}
-						</mat-checkbox>
+						@for (role of availableRoles; track role) {
+							<mat-checkbox [checked]="isRoleSelected(role)" (change)="toggleRole(role)">
+								{{ role }}
+							</mat-checkbox>
+						}
 					</div>
 					<div class="roles-edit-actions">
 						<button mat-icon-button color="primary" [matTooltip]="'admin.actions.save' | translate" (click)="saveRoles(user.username)">
 							<mat-icon svgIcon="checkmark"></mat-icon>
 						</button>
 						<button mat-icon-button [matTooltip]="'admin.actions.cancel' | translate" (click)="cancelEditingRoles()">
-							<mat-icon svgIcon="cancel"></mat-icon>
+							<mat-icon svgIcon="xmark"></mat-icon>
 						</button>
 					</div>
 				</div>
-			</ng-template>
+			}
 		</td>
 	</ng-container>
 	<ng-container matColumnDef="internalUser">
@@ -48,9 +49,11 @@
 	<ng-container matColumnDef="actions">
 		<th mat-header-cell *matHeaderCellDef scope="col">{{ "user.actions" | translate }}</th>
 		<td mat-cell *matCellDef="let user">
-			<button *ngFor="let action of user.actions" mat-icon-button [matTooltip]="action.tooltip | translate" (click)="onAction(action.id, user)">
-				<mat-icon [svgIcon]="action.icon"></mat-icon>
-			</button>
+			@for (action of user.actions; track action) {
+				<button mat-icon-button [matTooltip]="action.tooltip | translate" (click)="onAction(action.id, user)">
+					<mat-icon [svgIcon]="action.icon"></mat-icon>
+				</button>
+			}
 		</td>
 	</ng-container>
 	<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

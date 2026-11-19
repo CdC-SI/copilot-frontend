@@ -40,7 +40,6 @@
             ],
             "styles": [
               "node_modules/@oblique/oblique/styles/css/oblique-core.css",
-              "node_modules/@oblique/oblique/styles/css/frutiger.css",
               "node_modules/@oblique/oblique/styles/css/oblique-components.css",
               "src/styles/styles.scss"
             ],
@@ -91,7 +90,7 @@
         "test": {
           "builder": "@angular-builders/jest:run",
           "options": {
-            "configPath": "tests/jest.config.js",
+            "config": "tests/jest.config.js",
             "tsConfig": "tsconfig.spec.json"
           }
         },
@@ -110,15 +109,35 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "zco",
-      "style": "scss"
+      "style": "scss",
+      "type": "component"
     },
     "@schematics/angular:directive": {
-      "prefix": "zco"
+      "prefix": "zco",
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
     }
   },
   "cli": {
     "schematicCollections": [
-      "@angular-eslint/schematics"
+      "angular-eslint"
     ],
     "analytics": false
   }

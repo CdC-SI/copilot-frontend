@@ -21,7 +21,7 @@ export class UploadService {
 		const formData = new FormData();
 		formData.append('multipartFile', file, file.name);
 		formData.append('embed', 'true');
-		formData.append('lang', this.translateService.currentLang);
+		formData.append('lang', this.translateService.getCurrentLang());
 		if (conversationId) {
 			formData.append('conversationId', conversationId);
 		}
