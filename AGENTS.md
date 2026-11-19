@@ -9,7 +9,9 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - **Angular 22** (architecture à **NgModules** : `AppModule`, `SharedModule`, `MaterialModule` ;
   composants `standalone: false`, migration standalone prévue en FE1b), **TypeScript 6.0**, **RxJS**,
   Node 22.22+/24.15+ (`engines`). Templates en control flow (`@if`/`@for`/`@switch`) ;
-  `ChangeDetectionStrategy.Eager` explicite (passage OnPush prévu avec FE1b/FE4).
+  `ChangeDetectionStrategy.Eager` explicite (passage OnPush prévu avec FE1b/FE4). Le `router-outlet` est dans
+  `ob-master-layout`, OnPush : `AppComponent.ngDoCheck` le marque à chaque cycle pour que les pages routées se
+  mettent à jour après un timer ou une réponse HTTP (à retirer quand elles seront en signals).
 - UI : **Oblique 16** (`@oblique/oblique`, master layout, inputs en signals) + Angular Material/CDK 22
   + **ZDS 22** (`@zas-design-system/zas-design-system` : environnements, gateway, jeton `blue`).
 - i18n : **ngx-translate 18** (`TranslateService` fourni par `provideObliqueConfiguration`,
