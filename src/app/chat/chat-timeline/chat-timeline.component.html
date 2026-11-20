@@ -40,6 +40,7 @@
 					(regenerate)="store.regenerateLastAnswer()"
 					(editQuestion)="store.editLastQuestion($event)"
 					(stop)="store.stopGeneration()"
+					(toolApproval)="store.decideToolApproval(message, $event)"
 				></zco-chat-message>
 			</div>
 		</div>

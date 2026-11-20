@@ -1,0 +1,96 @@
+@use '@oblique/oblique/styles/scss/core/variables' as *;
+
+.tool-approval {
+	margin: 0.25rem 0 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid $ob-warning;
+	border-left-width: 4px;
+	border-radius: 4px;
+	background: $ob-warning-light;
+	font-size: 0.875rem;
+
+	&.state-approved {
+		border-color: $ob-success;
+		background: $ob-success-light;
+	}
+
+	&.state-rejected,
+	&.state-expired,
+	&.state-unavailable,
+	&.state-cancelled {
+		border-color: $ob-gray-light;
+		background: $ob-gray-extra-light;
+	}
+}
+
+.tool-approval-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	mat-icon {
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+	}
+}
+
+.tool-approval-title {
+	margin: 0;
+	font-size: 0.9375rem;
+}
+
+.tool-approval-countdown {
+	margin-left: auto;
+	color: $ob-warning-dark;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.tool-approval-text {
+	margin: 0.375rem 0;
+}
+
+.tool-approval-args {
+	margin: 0 0 0.5rem;
+	display: grid;
+	gap: 0.125rem;
+}
+
+.tool-approval-arg {
+	display: flex;
+	gap: 0.5rem;
+	min-width: 0;
+
+	dt {
+		flex-shrink: 0;
+		font-weight: 600;
+
+		&::after {
+			content: ' :';
+		}
+	}
+
+	dd {
+		margin: 0;
+		overflow-wrap: anywhere;
+		font-family: monospace;
+	}
+}
+
+.tool-approval-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+
+.tool-approval-sending {
+	margin-right: auto;
+	font-style: italic;
+}
+
+.tool-approval-outcome {
+	margin: 0;
+	font-weight: 600;
+}

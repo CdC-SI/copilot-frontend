@@ -1,4 +1,5 @@
 import {MessageSource} from './chat-history';
+import {ToolStep} from './tool-step';
 
 export interface ChatMessage {
 	/** Identifiant local et stable du message (suivi du rendu, mises à jour immuables). */
@@ -29,6 +30,8 @@ export interface ChatMessage {
 	replaceableId?: string;
 	/** Stop demandé au backend : en attente de `done {interrupted: true}`. */
 	stopping?: boolean;
+	/** Appels d'outils de la génération en cours (non renvoyés par l'historique). */
+	toolSteps?: ToolStep[];
 }
 
 export enum ChatMessageSource {

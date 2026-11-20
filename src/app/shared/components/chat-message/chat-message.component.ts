@@ -11,6 +11,8 @@ import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from
 import {SourceListComponent} from '../source-list/source-list.component';
 import {MessageActionComponent} from '../message-action/message-action.component';
 import {TranslatePipe} from '@ngx-translate/core';
+import {ToolApprovalRequest} from '../../model/tool-step';
+import {ToolStepsComponent} from '../tool-steps/tool-steps.component';
 
 const MIN_EDIT_WIDTH_PX = 240;
 
@@ -31,6 +33,7 @@ const MIN_EDIT_WIDTH_PX = 240;
 		MatExpansionPanelTitle,
 		SourceListComponent,
 		MessageActionComponent,
+		ToolStepsComponent,
 		TranslatePipe
 	]
 })
@@ -46,6 +49,8 @@ export class ChatMessageComponent {
 	@Output() readonly editQuestion = new EventEmitter<string>();
 	/** Arrêt de la génération en cours, demandé depuis la réponse. */
 	@Output() readonly stop = new EventEmitter<void>();
+	/** Décision sur une demande d'approbation d'outil de la réponse. */
+	@Output() readonly toolApproval = new EventEmitter<ToolApprovalRequest>();
 	@ViewChild('editInput') editInput?: ElementRef<HTMLTextAreaElement>;
 	sourcePanelOpen: boolean;
 	editing = false;

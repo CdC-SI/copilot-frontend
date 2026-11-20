@@ -1,0 +1,50 @@
+@let toolLabel = labelKey() | translate: nameParams();
+<section class="tool-approval" [class]="'state-' + state()" [attr.aria-labelledby]="titleId">
+	<div class="tool-approval-header">
+		<mat-icon svgIcon="shield_lock"></mat-icon>
+		<h4 class="tool-approval-title" [id]="titleId">{{ "chat.tools.approval.title" | translate }}</h4>
+		@if (state() === "pending") {
+			<span class="tool-approval-countdown" aria-live="off">{{ "chat.tools.approval.expires-in" | translate: { seconds: secondsLeft() } }}</span>
+		}
+	</div>
+	<p class="tool-approval-text">{{ "chat.tools.approval.text" | translate: { tool: toolLabel } }}</p>
+	@if (args().length) {
+		<dl class="tool-approval-args" [attr.aria-label]="'chat.tools.arguments' | translate">
+			@for (arg of args(); track arg.key) {
+				<div class="tool-approval-arg">
+					<dt>{{ arg.key }}</dt>
+					<dd>{{ arg.value }}</dd>
+				</div>
+			}
+		</dl>
+	}
+	@if (state() === "pending" || state() === "sending") {
+		<div class="tool-approval-actions">
+			@if (state() === "sending") {
+				<span class="tool-approval-sending">{{ "chat.tools.approval.sending" | translate }}</span>
+			}
+			<button
+				type="button"
+				mat-button
+				obButton="secondary"
+				[disabled]="state() === 'sending'"
+				(click)="decide('REJECT')"
+				[attr.aria-label]="'chat.tools.approval.reject.aria' | translate: { tool: toolLabel }"
+			>
+				{{ "chat.tools.approval.reject" | translate }}
+			</button>
+			<button
+				type="button"
+				mat-button
+				obButton="primary"
+				[disabled]="state() === 'sending'"
+				(click)="decide('APPROVE')"
+				[attr.aria-label]="'chat.tools.approval.approve.aria' | translate: { tool: toolLabel }"
+			>
+				{{ "chat.tools.approval.approve" | translate }}
+			</button>
+		</div>
+	} @else {
+		<p class="tool-approval-outcome" role="status">{{ "chat.tools.approval.outcome." + state() | translate }}</p>
+	}
+</section>

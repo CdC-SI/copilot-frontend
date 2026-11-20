@@ -1,0 +1,46 @@
+<div class="tool-steps" role="group" [attr.aria-label]="'chat.tools.steps.aria' | translate">
+	@if (collapsible()) {
+		<button type="button" class="tool-steps-summary" [attr.aria-expanded]="expanded()" (click)="toggle()">
+			@if (pending()) {
+				<mat-progress-spinner class="tool-step-spinner" mode="indeterminate" diameter="12" aria-hidden="true" />
+			} @else {
+				<mat-icon class="tool-step-icon" svgIcon="wrench" aria-hidden="true"></mat-icon>
+			}
+			<span>{{ "chat.tools.summary" | translate: { count: steps().length } }}</span>
+			<mat-icon class="tool-step-icon" [svgIcon]="expanded() ? 'chevron_up_small' : 'chevron_down_small'" aria-hidden="true"></mat-icon>
+		</button>
+	}
+	@if (expanded()) {
+		<ul class="tool-steps-list" [class.nested]="collapsible()">
+			@for (step of steps(); track step.id) {
+				<li
+					class="tool-step"
+					[class]="'tone-' + tone(step)"
+					[attr.data-status]="step.status"
+					[matTooltip]="argumentsText(step)"
+					[matTooltipDisabled]="!argumentsText(step)"
+					[attr.tabindex]="argumentsText(step) ? 0 : null"
+				>
+					@if (step.status === "running") {
+						<mat-progress-spinner class="tool-step-spinner" mode="indeterminate" diameter="12" aria-hidden="true" />
+					} @else {
+						<mat-icon class="tool-step-icon" [svgIcon]="icon(step)" aria-hidden="true"></mat-icon>
+					}
+					<span class="tool-step-name">{{ labelKey(step) | translate: { name: step.name } }}</span>
+					<span class="tool-step-status">{{ statusKey(step) | translate }}</span>
+					@if (duration(step); as time) {
+						<span class="tool-step-meta">{{ time }}</span>
+					}
+					@if (step.documentCount) {
+						<span class="tool-step-meta">{{ documentsKey(step) | translate: { count: step.documentCount } }}</span>
+					}
+				</li>
+			}
+		</ul>
+	}
+	<div aria-live="polite">
+		@for (step of approvals(); track step.id) {
+			<zco-tool-approval-card [step]="step" (decided)="approvalDecided.emit({ stepId: step.id, decision: $event })" />
+		}
+	</div>
+</div>

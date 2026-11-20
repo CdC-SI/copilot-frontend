@@ -1,7 +1,8 @@
 import {TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {ObNotificationService} from '@oblique/oblique';
-import {BehaviorSubject, Subject, of} from 'rxjs';
+import {HttpErrorResponse} from '@angular/common/http';
+import {BehaviorSubject, Subject, of, throwError} from 'rxjs';
 import {ChatTitle, ConversationType} from '../shared/model/chat-history';
 import {ChatMessageSource} from '../shared/model/chat-message';
 import {ChatStreamEvent} from '../shared/model/chat-stream-event';
@@ -22,7 +23,7 @@ describe('ChatStore', () => {
 	let store: ChatStore;
 	let stream: Subject<ChatStreamEvent>;
 	let ragService: {process: jest.Mock};
-	let conversationService: {getConversationTitles: jest.Mock; getConversation: jest.Mock; stopGeneration: jest.Mock};
+	let conversationService: {getConversationTitles: jest.Mock; getConversation: jest.Mock; stopGeneration: jest.Mock; decideToolApproval: jest.Mock};
 	let notif: {success: jest.Mock; warning: jest.Mock; error: jest.Mock};
 
 	const flushFrame = (): void => {
@@ -51,7 +52,8 @@ describe('ChatStore', () => {
 		conversationService = {
 			getConversationTitles: jest.fn(() => of([])),
 			getConversation: jest.fn(),
-			stopGeneration: jest.fn(() => of(undefined))
+			stopGeneration: jest.fn(() => of(undefined)),
+			decideToolApproval: jest.fn(() => of(undefined))
 		};
 		notif = {success: jest.fn(), warning: jest.fn(), error: jest.fn()};
 		TestBed.configureTestingModule({
@@ -172,6 +174,37 @@ describe('ChatStore', () => {
 
 		expect(ragService.process).toHaveBeenLastCalledWith(expect.objectContaining({query: 'Bonsoir', replaceMessageId: 'a1'}));
 		expect(store.messages()[0].message).toBe('Bonsoir');
+	});
+
+	describe('approbation d’un outil', () => {
+		const requestApproval = (): void => {
+			ask('Lis la pièce jointe');
+			emit(
+				{type: 'start', data: {messageId: 'g1'}},
+				{type: 'tool_call', data: {id: 't1', name: 'get_attachment_content', arguments: {}}},
+				{type: 'approval_required', data: {id: 't1', approvalId: 'ap1', name: 'get_attachment_content', arguments: {}, expiresAt: '2030-01-01T00:00:00Z'}}
+			);
+		};
+
+		it('envoie la décision au backend et la mémorise sur l’étape', () => {
+			requestApproval();
+
+			store.decideToolApproval(answer(), {stepId: 't1', decision: 'APPROVE'});
+
+			expect(conversationService.decideToolApproval).toHaveBeenCalledWith(store.currentConversation().conversationId, 'ap1', 'APPROVE');
+			expect(answer().toolSteps[0].approval).toEqual(expect.objectContaining({decision: 'APPROVE', sending: false}));
+			expect(answer().toolSteps[0].status).toBe('awaiting_approval');
+		});
+
+		it('marque la demande comme indisponible si le backend ne la connaît plus (404)', () => {
+			conversationService.decideToolApproval.mockReturnValue(throwError(() => new HttpErrorResponse({status: 404})));
+			requestApproval();
+
+			store.decideToolApproval(answer(), {stepId: 't1', decision: 'REJECT'});
+
+			expect(answer().toolSteps[0].approval).toEqual(expect.objectContaining({sending: false, unavailable: true}));
+			expect(notif.error).not.toHaveBeenCalled();
+		});
 	});
 
 	it('ouvre une conversation de l’historique avec ses messages et son mode', () => {
