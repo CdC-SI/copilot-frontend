@@ -111,6 +111,17 @@ describe('ChatStore', () => {
 		expect(store.currentConversation().title).toBe('Salutations');
 	});
 
+	it('abandonne le flux d’une conversation supprimée pendant la génération', () => {
+		ask('Bonjour');
+		emit({type: 'start', data: {messageId: 'g1'}});
+		expect(stream.observed).toBe(true);
+
+		store.deleteConversation(store.currentConversation());
+
+		expect(stream.observed).toBe(false);
+		expect(store.isGenerating()).toBe(false);
+	});
+
 	it('Stop : demande l’arrêt au backend puis conserve la réponse partielle à la réception de `done`', () => {
 		ask('Bonjour');
 		emit({type: 'start', data: {messageId: 'g1'}}, {type: 'text_delta', data: {text: 'Sal'}});
