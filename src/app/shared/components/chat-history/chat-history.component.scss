@@ -31,15 +31,6 @@
 		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 	}
 
-	// Léger accent ambré pour repérer les conversations "sans Corpus" dans la liste.
-	mat-list-item.llm-only {
-		border-left-color: rgba(217, 119, 6, 0.35);
-	}
-
-	mat-list-item.llm-only.title-selected {
-		border-left-color: #d97706;
-	}
-
 	.history-item {
 		display: flex;
 		align-items: center;
@@ -47,19 +38,6 @@
 		width: 100%;
 		min-width: 0;
 		padding: 4px 0;
-
-		.type-icon {
-			flex: none;
-			width: 16px;
-			height: 16px;
-			font-size: 16px;
-			color: palette.$ob-blue-900;
-			opacity: 0.7;
-		}
-	}
-
-	mat-list-item.llm-only .type-icon {
-		color: #d97706;
 	}
 
 	.history-item-body {

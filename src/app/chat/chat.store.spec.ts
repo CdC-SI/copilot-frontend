@@ -3,7 +3,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {ObNotificationService} from '@oblique/oblique';
 import {HttpErrorResponse} from '@angular/common/http';
 import {BehaviorSubject, Subject, of, throwError} from 'rxjs';
-import {ChatTitle, ConversationType} from '../shared/model/chat-history';
+import {ChatTitle} from '../shared/model/chat-history';
 import {ChatMessageSource} from '../shared/model/chat-message';
 import {ChatStreamEvent} from '../shared/model/chat-stream-event';
 import {UserStatus} from '../shared/model/user';
@@ -82,7 +82,7 @@ describe('ChatStore', () => {
 	it('envoie la question puis affiche la réponse au fil du flux jusqu’à `done`', () => {
 		ask('Bonjour');
 
-		expect(ragService.process).toHaveBeenCalledWith(expect.objectContaining({query: 'Bonjour', ragEnabled: true}));
+		expect(ragService.process).toHaveBeenCalledWith(expect.objectContaining({query: 'Bonjour'}));
 		expect(store.messages().map(message => message.source)).toEqual([ChatMessageSource.USER, ChatMessageSource.LLM]);
 		expect(store.conversationTitles()[0].title).toBe('Bonjour');
 		expect(store.isGenerating()).toBe(true);
@@ -207,8 +207,8 @@ describe('ChatStore', () => {
 		});
 	});
 
-	it('ouvre une conversation de l’historique avec ses messages et son mode', () => {
-		const title: ChatTitle = {conversationId: 'c1', title: 'Capitale', timestamp: new Date(), type: ConversationType.NO_RAG};
+	it('ouvre une conversation de l’historique avec ses messages', () => {
+		const title: ChatTitle = {conversationId: 'c1', title: 'Capitale', timestamp: new Date()};
 		conversationService.getConversationTitles.mockReturnValue(of([title]));
 		conversationService.getConversation.mockReturnValue(
 			of({
@@ -228,7 +228,6 @@ describe('ChatStore', () => {
 		expect(store.currentConversation().conversationId).toBe('c1');
 		expect(store.conversationTitles()[0].selected).toBe(true);
 		expect(store.messages().map(message => message.message)).toEqual(['Capitale ?', 'Paris']);
-		expect(store.isLlmOnlyMode()).toBe(true);
 		expect(store.suggestions().at(-1)).toEqual({text: 'action_suggestions.ii-salary', action: 'ii-salary'});
 		expect(store.replayableTurn()?.answer.id).toBe('a1');
 	});

@@ -33,11 +33,6 @@ export class ChatStore {
 	readonly conversationTitles = computed(() => this.conversations.titles());
 	readonly currentConversation = computed(() => this.conversations.current());
 	readonly messages = computed(() => this.manager.messages(this.currentConversation()?.conversationId ?? null)());
-	/**
-	 * Mode "sans Corpus" (LLM seul). Une fois la conversation persistée côté backend, le type reçu à sa création
-	 * fait foi ; sinon (nouvelle conversation pas encore envoyée), le choix fait via « Nouvelle conversation sans Corpus ».
-	 */
-	readonly isLlmOnlyMode = computed(() => this.conversations.isLlmOnlyMode());
 	readonly isRegistered = computed(() => this.user()?.status === UserStatus.ACTIVE);
 	readonly commandMode = computed(() => this.isCommandMode());
 	readonly activeForm = computed(() => this.form());
@@ -105,9 +100,9 @@ export class ChatStore {
 		this.clearSearch();
 	}
 
-	newChat(ragEnabled = true): void {
+	newChat(): void {
 		this.generation.cancelPending();
-		this.conversations.startNew(ragEnabled);
+		this.conversations.startNew();
 		this.attachmentsStore.reset();
 		this.manager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
@@ -288,7 +283,6 @@ export class ChatStore {
 			conversationId: target.conversationId,
 			language: LANGUAGE_MAP[this.translateService.getCurrentLang()] || Language.DE,
 			workspace,
-			ragEnabled: !this.isLlmOnlyMode(),
 			replaceMessageId
 		};
 		this.generation.start(target, request, {

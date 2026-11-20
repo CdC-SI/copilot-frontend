@@ -30,13 +30,12 @@ export class RagService {
 		this.append(fd, 'language', ragRequest.language);
 		this.append(fd, 'conversationId', ragRequest.conversationId);
 		this.append(fd, 'workspace', ragRequest.workspace);
-		this.append(fd, 'ragEnabled', ragRequest.ragEnabled);
 		this.append(fd, 'replaceMessageId', ragRequest.replaceMessageId);
 
 		return fd;
 	}
 
-	private append(fd: FormData, key: string, value: string | boolean | undefined | null) {
+	private append(fd: FormData, key: string, value: string | undefined | null) {
 		if (value !== undefined && value !== null) {
 			fd.append(key, String(value));
 		}

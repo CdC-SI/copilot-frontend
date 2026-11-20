@@ -2,7 +2,6 @@
 	@for (title of titles; track title.conversationId) {
 		<mat-list-item
 			[class]="title.selected ? 'title-selected' : 'title'"
-			[class.llm-only]="title.type === 'NO_RAG'"
 			role="listitem"
 			[matTooltip]="title.title"
 			matTooltipPosition="right"
@@ -10,7 +9,6 @@
 		>
 			<div class="history-item">
 				@if (editingTitle !== title) {
-					<mat-icon class="type-icon" [svgIcon]="getTypeIcon(title)" [matTooltip]="getTypeLabel(title) | translate" matTooltipPosition="above"></mat-icon>
 					<div class="history-item-body" (click)="titleSelected(title)">
 						<span class="history-item-title">{{ title.title }}</span>
 						<span class="history-item-date">{{ title.timestamp | date: "d MMM, HH:mm" }}</span>
@@ -24,7 +22,6 @@
 						</button>
 					</div>
 				} @else {
-					<mat-icon class="type-icon" [svgIcon]="getTypeIcon(title)"></mat-icon>
 					<input
 						matInput
 						[(ngModel)]="tempTitle"

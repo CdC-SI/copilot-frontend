@@ -3,20 +3,18 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {NgClass} from '@angular/common';
 import {MatMiniFabButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
-import {TranslatePipe} from '@ngx-translate/core';
 import {ChatMessageSource} from '../../shared/model/chat-message';
 import {ChatMessageComponent} from '../../shared/components/chat-message/chat-message.component';
 import {ChatScrollRequest} from '../chat.models';
 import {ChatStore} from '../chat.store';
 
-/** Fil de la conversation : bandeau « LLM seul », messages, état vide et défilement vers la dernière question. */
+/** Fil de la conversation : messages, état vide et défilement vers la dernière question. */
 @Component({
 	selector: 'zco-chat-timeline',
 	templateUrl: './chat-timeline.component.html',
 	styleUrl: './chat-timeline.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	host: {'[class.llm-only-mode]': 'store.isLlmOnlyMode()'},
-	imports: [NgClass, ChatMessageComponent, MatMiniFabButton, MatIcon, TranslatePipe]
+	imports: [NgClass, ChatMessageComponent, MatMiniFabButton, MatIcon]
 })
 export class ChatTimelineComponent implements AfterViewInit, OnDestroy {
 	readonly showScrollToLastMessage = signal(false);

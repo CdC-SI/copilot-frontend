@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, inject} from '@angular/core';
 import {ConversationService} from '../../services/conversation.service';
-import {ChatTitle, ConversationType} from '../../model/chat-history';
+import {ChatTitle} from '../../model/chat-history';
 import {MatList, MatListItem} from '@angular/material/list';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatIcon} from '@angular/material/icon';
@@ -29,16 +29,6 @@ export class ChatHistoryComponent {
 	@Input() titles!: ChatTitle[] | null;
 	private readonly conversationService = inject(ConversationService);
 	private readonly cdr = inject(ChangeDetectorRef);
-
-	/** Icône représentant le type de conversation : Corpus documentaire (book) ou LLM seul (lightning). */
-	getTypeIcon(title: ChatTitle): string {
-		return title.type === ConversationType.NO_RAG ? 'lightning' : 'book';
-	}
-
-	/** Libellé accessible/tooltip associé à l'icône de type de conversation. */
-	getTypeLabel(title: ChatTitle): string {
-		return title.type === ConversationType.NO_RAG ? 'chat.new-conversation-llm-only.short-tooltip' : 'chat.new-conversation.short-tooltip';
-	}
 
 	titleSelected(title: ChatTitle): void {
 		this.conversationSelected.emit(title);

@@ -1,22 +1,10 @@
 import {UploadErrorCode} from './upload-error';
 
-/**
- * Type de conversation renvoyé par le backend :
- * - COMPLETE : conversation standard, l'assistant peut rechercher dans le Corpus documentaire.
- * - NO_RAG   : conversation "sans Corpus", l'assistant répond uniquement en mode LLM (+ pièces jointes).
- * Ce type est figé à la création de la conversation et reste valable pour tous les échanges qui suivent.
- */
-export enum ConversationType {
-	COMPLETE = 'COMPLETE',
-	NO_RAG = 'NO_RAG'
-}
-
 export interface ChatTitle {
 	title: string;
 	conversationId: string;
 	timestamp: Date;
 	selected?: boolean;
-	type?: ConversationType;
 	/** Conversation créée localement dont le titre n'a pas encore été généré par le backend. */
 	provisional?: boolean;
 }

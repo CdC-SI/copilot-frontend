@@ -1,6 +1,6 @@
 import {Injectable, computed, inject, signal} from '@angular/core';
 import {v4 as uuidv4} from 'uuid';
-import {ChatTitle, ConversationType} from '../shared/model/chat-history';
+import {ChatTitle} from '../shared/model/chat-history';
 import {ConversationService} from '../shared/services/conversation.service';
 import {ChatConversationManagerService} from './services';
 
@@ -12,17 +12,8 @@ import {ChatConversationManagerService} from './services';
 export class ChatConversationsStore {
 	readonly titles = computed(() => this.titleList());
 	readonly current = computed(() => this.currentTitle());
-	/**
-	 * Mode "LLM seul" choisi pour une conversation qui n'existe pas encore côté backend (avant le premier échange).
-	 * Une fois la conversation créée, c'est son type qui fait foi : le mode est figé pour toute la conversation.
-	 */
-	readonly isLlmOnlyMode = computed(() => {
-		const type = this.currentTitle()?.type;
-		return type ? type === ConversationType.NO_RAG : !this.ragEnabled();
-	});
 	private readonly titleList = signal<ChatTitle[]>([]);
 	private readonly currentTitle = signal<ChatTitle | null>(null);
-	private readonly ragEnabled = signal(true);
 	private readonly conversationService = inject(ConversationService);
 	private readonly manager = inject(ChatConversationManagerService);
 
@@ -30,10 +21,9 @@ export class ChatConversationsStore {
 		this.conversationService.getConversationTitles().subscribe(conversations => this.setSorted(conversations));
 	}
 
-	startNew(ragEnabled: boolean): void {
+	startNew(): void {
 		this.markSelected(null);
 		this.currentTitle.set(null);
-		this.ragEnabled.set(ragEnabled);
 	}
 
 	markSelected(conversationId: string | null): void {
@@ -47,8 +37,6 @@ export class ChatConversationsStore {
 
 	open(chatTitle: ChatTitle): void {
 		this.currentTitle.set(this.findTitle(chatTitle.conversationId) ?? chatTitle);
-		// Le type ("COMPLETE"/"NO_RAG") est fourni par le backend avec le titre de la conversation.
-		this.ragEnabled.set(chatTitle.type !== ConversationType.NO_RAG);
 	}
 
 	/** Retire une conversation de l'historique ; renvoie `true` si c'était la conversation courante. */
@@ -56,7 +44,6 @@ export class ChatConversationsStore {
 		this.titleList.update(titles => titles.filter(title => title.conversationId !== conversationId));
 		if (this.currentTitle()?.conversationId !== conversationId) return false;
 		this.currentTitle.set(null);
-		this.ragEnabled.set(true);
 		return true;
 	}
 
@@ -79,7 +66,6 @@ export class ChatConversationsStore {
 			title,
 			timestamp: new Date(),
 			selected: true,
-			type: this.ragEnabled() ? ConversationType.COMPLETE : ConversationType.NO_RAG,
 			provisional: true
 		};
 		this.currentTitle.set(created);
@@ -125,10 +111,7 @@ export class ChatConversationsStore {
 		const conversationId = this.currentTitle()?.conversationId;
 		if (!this.findTitle(conversationId)) return;
 		this.markSelected(conversationId);
-		const current = this.findTitle(conversationId);
-		this.currentTitle.set(current);
-		// Le type de conversation fait foi une fois renvoyé par le backend.
-		if (current.type) this.ragEnabled.set(current.type !== ConversationType.NO_RAG);
+		this.currentTitle.set(this.findTitle(conversationId));
 	}
 
 	private findTitle(conversationId: string | undefined): ChatTitle | undefined {
