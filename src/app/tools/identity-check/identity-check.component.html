@@ -51,7 +51,7 @@
 			</div>
 
 			<div class="status-container" [hidden]="identityCheckStatus?.state !== 'error'">
-				<mat-icon svgIcon="alert" class="status-error"></mat-icon>
+				<mat-icon svgIcon="exclamation_circle" class="status-error"></mat-icon>
 				<div class="status-details">
 					<span class="status-text">{{ "identity-check.error" | translate }}</span>
 					@if (identityCheckStatus?.timestamp) {

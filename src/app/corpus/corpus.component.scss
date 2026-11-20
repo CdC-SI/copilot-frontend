@@ -173,6 +173,9 @@
 						right: 0;
 
 						mat-chip {
+							// Oblique 16 force un libellé blanc (--mat-chip-label-text-color) : reprendre la couleur du statut.
+							--mat-chip-label-text-color: currentColor;
+							--mat-chip-with-icon-icon-color: currentColor;
 							font-size: 12px;
 							font-weight: 500;
 							min-height: 28px;
@@ -203,6 +206,8 @@
 						gap: var(--corpus-spacing-sm);
 
 						mat-chip {
+							--mat-chip-label-text-color: currentColor;
+							--mat-chip-with-icon-icon-color: currentColor;
 							font-size: 12px;
 							font-weight: 500;
 							min-height: 24px;
@@ -359,6 +364,8 @@
 				gap: var(--corpus-spacing-sm);
 
 				mat-chip {
+					--mat-chip-label-text-color: currentColor;
+					--mat-chip-with-icon-icon-color: currentColor;
 					font-size: 12px;
 					font-weight: 500;
 					min-height: 24px;
@@ -517,6 +524,8 @@
 					right: 0;
 
 					mat-chip {
+						--mat-chip-label-text-color: currentColor;
+						--mat-chip-with-icon-icon-color: currentColor;
 						font-size: 12px;
 						font-weight: 500;
 						min-height: 28px;

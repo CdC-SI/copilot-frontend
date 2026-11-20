@@ -1,15 +1,15 @@
 @if (authenticatedAsExpert()) {
 	<mat-icon [matTooltip]="'edit.answer' | translate" [svgIcon]="'pencil'" (click)="openFaqItemDialog()"></mat-icon>
 }
-<mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs-up'" (click)="openFeedbackDialog(true)"></mat-icon>
-<mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs-down'" (click)="openFeedbackDialog(false)"></mat-icon>
+<mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs_up'" (click)="openFeedbackDialog(true)"></mat-icon>
+<mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs_down'" (click)="openFeedbackDialog(false)"></mat-icon>
 <mat-icon
 	[ngClass]="message.beingSpoken ? 'being-spoken' : ''"
 	[matTooltip]="'read.aloud' | translate"
-	[svgIcon]="message.beingSpoken ? 'audio-mute' : 'audio'"
+	[svgIcon]="message.beingSpoken ? 'volume_muted' : 'volume_high'"
 	(click)="speak()"
 ></mat-icon>
-<mat-icon [matTooltip]="'copy.answer' | translate" [svgIcon]="'duplicate'" (click)="copyAnswer()"></mat-icon>
+<mat-icon [matTooltip]="'copy.answer' | translate" [svgIcon]="'copy'" (click)="copyAnswer()"></mat-icon>
 @if (regenerable) {
 	<mat-icon
 		role="button"
