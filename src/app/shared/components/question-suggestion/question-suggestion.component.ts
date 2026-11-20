@@ -1,12 +1,12 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal} from '@angular/core';
 
 @Component({
 	selector: 'zco-question-suggestion',
 	templateUrl: './question-suggestion.component.html',
 	styleUrl: './question-suggestion.component.scss',
-	changeDetection: ChangeDetectionStrategy.Eager
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QuestionSuggestionComponent implements OnInit {
+export class QuestionSuggestionComponent implements OnInit, OnDestroy {
 	sentences: string[] = [
 		'Jusqu’à quand dois-je payer des cotisations AVS ?',
 		'Comment l’âge de la retraite des femmes est-il relevé ?',
@@ -25,38 +25,43 @@ export class QuestionSuggestionComponent implements OnInit {
 	];
 
 	currentSentence: string = '';
-	displayedText: string = '';
+	readonly displayedText = signal('');
 	speed: number = 50;
 	index: number = 0;
-	typingCompleted: boolean = false;
+	readonly typingCompleted = signal(false);
+	private timeoutId?: ReturnType<typeof setTimeout>;
 
 	ngOnInit(): void {
 		this.showRandomSentence();
 	}
 
+	ngOnDestroy(): void {
+		clearTimeout(this.timeoutId);
+	}
+
 	showRandomSentence(): void {
 		const randomIndex = Math.floor(Math.random() * this.sentences.length);
 		this.currentSentence = this.sentences[randomIndex];
-		this.displayedText = '';
+		this.displayedText.set('');
 		this.index = 0;
-		this.typingCompleted = false;
+		this.typingCompleted.set(false);
 		this.typeEffect();
 	}
 
 	typeEffect(): void {
 		if (this.index < this.currentSentence.length) {
-			this.displayedText += this.currentSentence.charAt(this.index);
+			this.displayedText.update(text => text + this.currentSentence.charAt(this.index));
 			this.index++;
-			setTimeout(() => this.typeEffect(), this.speed); // Continue typing
+			this.timeoutId = setTimeout(() => this.typeEffect(), this.speed); // Continue typing
 		} else {
-			this.typingCompleted = true;
-			setTimeout(() => this.clearAndShowNextSentence(), 2000);
+			this.typingCompleted.set(true);
+			this.timeoutId = setTimeout(() => this.clearAndShowNextSentence(), 2000);
 		}
 	}
 
 	clearAndShowNextSentence(): void {
-		this.typingCompleted = false;
-		this.displayedText = '';
+		this.typingCompleted.set(false);
+		this.displayedText.set('');
 		this.showRandomSentence();
 	}
 }

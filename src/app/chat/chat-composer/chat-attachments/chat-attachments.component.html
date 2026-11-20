@@ -1,0 +1,57 @@
+@if (store.attachments().length) {
+	<div class="attachments-container">
+		<mat-chip-listbox>
+			@for (attachment of store.attachments(); track attachment.file ?? attachment.id) {
+				<mat-chip
+					[class.uploading]="attachment.isUploading"
+					[class.failed]="attachment.status === 'FAILED'"
+					[class.downloadable]="attachment.status === 'PROCESSED'"
+					(click)="download(attachment)"
+					(keydown.enter)="download(attachment)"
+					(keydown.space)="download(attachment)"
+				>
+					@if (attachment.isUploading) {
+						<div class="loading-stripes"></div>
+					}
+					<span class="attachment-content">
+						<span class="attachment-name">
+							{{ attachment.fileName }}
+							@if (attachment.status === "PROCESSED" && attachment.fileSize) {
+								<span class="attachment-size"> ({{ attachment.fileSize / 1000 | number: "1.0-0" }} Ko) </span>
+							}
+						</span>
+						@if (attachment.isUploading) {
+							<span class="upload-status">{{ "attachment.uploading" | translate }}</span>
+						}
+						@if (attachment.status === "FAILED") {
+							<span class="upload-status failed-status" [title]="failureKey(attachment) | translate" role="alert">{{
+								failureKey(attachment) | translate
+							}}</span>
+						}
+					</span>
+					@if (canRetry(attachment)) {
+						<button
+							mat-button
+							(click)="$event.stopPropagation(); store.retryAttachment(attachment)"
+							[attr.aria-label]="'attachment.retry' | translate"
+							class="retry-button"
+						>
+							{{ "attachment.retry" | translate }}
+						</button>
+					}
+					@if (!attachment.isUploading) {
+						<button matChipRemove (click)="$event.stopPropagation(); store.removeAttachment(attachment.id)" aria-label="Remove attachment">
+							<mat-icon svgIcon="xmark"></mat-icon>
+						</button>
+					}
+				</mat-chip>
+			}
+		</mat-chip-listbox>
+		@if (store.attachmentsPollingTimedOut()) {
+			<div class="polling-timeout-banner">
+				<span>{{ "attachment.process.timeout" | translate }}</span>
+				<button mat-button (click)="store.refreshAttachmentsStatus()">{{ "attachment.refresh" | translate }}</button>
+			</div>
+		}
+	</div>
+}

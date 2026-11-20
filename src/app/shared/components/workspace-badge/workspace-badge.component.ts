@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output, inject} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
 import {WorkspaceDto} from '../../model/workspace';
@@ -19,7 +19,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 	selector: 'zco-workspace-badge',
 	templateUrl: './workspace-badge.component.html',
 	styleUrl: './workspace-badge.component.scss',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [MatTooltip, MatIcon, MatMenuTrigger, MatMenu, MatProgressSpinner, MatMenuItem, TranslatePipe]
 })
 export class WorkspaceBadgeComponent {
@@ -33,6 +33,7 @@ export class WorkspaceBadgeComponent {
 	private readonly workspaceService = inject(WorkspaceService);
 	private readonly dialog = inject(MatDialog);
 	private readonly notif = inject(ObNotificationService);
+	private readonly cdr = inject(ChangeDetectorRef);
 
 	openContent(): void {
 		this.dialog.open(WorkspaceContentDialogComponent, {
@@ -51,9 +52,11 @@ export class WorkspaceBadgeComponent {
 				this.availableWorkspaces = workspaces;
 				this.workspacesLoaded = true;
 				this.isLoadingWorkspaces = false;
+				this.cdr.markForCheck();
 			},
 			error: () => {
 				this.isLoadingWorkspaces = false;
+				this.cdr.markForCheck();
 				this.notif.error('corpus.workspaces.load.error');
 			}
 		});

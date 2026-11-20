@@ -11,7 +11,7 @@ describe('ChatMessageComponent (modification de la question)', () => {
 
 	beforeEach(() => {
 		component = createComponent(320);
-		component.message = {message: 'Question initiale', source: ChatMessageSource.USER, timestamp: new Date()};
+		component.message = {clientId: 'c1', message: 'Question initiale', source: ChatMessageSource.USER, timestamp: new Date()};
 		component.replayable = true;
 		emitted = [];
 		component.editQuestion.subscribe(q => emitted.push(q));
@@ -26,14 +26,14 @@ describe('ChatMessageComponent (modification de la question)', () => {
 
 	it('impose une largeur minimale pour une question courte', () => {
 		component = createComponent(40);
-		component.message = {message: 'Oui', source: ChatMessageSource.USER, timestamp: new Date()};
+		component.message = {clientId: 'c1', message: 'Oui', source: ChatMessageSource.USER, timestamp: new Date()};
 		component.replayable = true;
 		component.startEdit();
 		expect(component.editWidth).toBe(240);
 	});
 
 	it('expose la génération en cours et la barre d’actions selon l’état de la réponse', () => {
-		component.message = {message: '', source: ChatMessageSource.LLM, timestamp: new Date(), isCompleted: false};
+		component.message = {clientId: 'c1', message: '', source: ChatMessageSource.LLM, timestamp: new Date(), isCompleted: false};
 		expect(component.isGenerating).toBe(true);
 		expect(component.showActions).toBe(false);
 

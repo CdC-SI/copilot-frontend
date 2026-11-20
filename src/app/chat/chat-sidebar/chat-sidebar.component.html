@@ -1,0 +1,70 @@
+<mat-card class="history-card">
+	<mat-card-header class="flex-row aic jcsb">
+		<mat-card-title class="mt16">{{ "chat_history" | translate }}</mat-card-title>
+		<div class="flex-row aic history-actions">
+			<button mat-icon-button [obButton]="'primary'" (click)="store.newChat()" [matTooltip]="'chat.new-conversation.short-tooltip' | translate">
+				<mat-icon svgIcon="book"></mat-icon>
+			</button>
+			<button mat-icon-button [obButton]="'secondary'" (click)="store.newChat(false)" [matTooltip]="'chat.new-conversation-llm-only.short-tooltip' | translate">
+				<mat-icon svgIcon="lightning"></mat-icon>
+			</button>
+			<button
+				mat-icon-button
+				class="modes-help-trigger"
+				[matMenuTriggerFor]="modesHelpMenu"
+				[matTooltip]="'chat.modes-help.trigger' | translate"
+				[attr.aria-label]="'chat.modes-help.trigger' | translate"
+			>
+				<mat-icon svgIcon="question_circle"></mat-icon>
+			</button>
+		</div>
+	</mat-card-header>
+	<mat-card-content>
+		@if (store.isRegistered()) {
+			<zco-chat-history
+				[titles]="store.conversationTitles()"
+				(conversationSelected)="store.selectConversation($event)"
+				(conversationDeleted)="store.deleteConversation($event)"
+				(conversationRenamed)="store.renameConversation($event)"
+			></zco-chat-history>
+		}
+	</mat-card-content>
+</mat-card>
+
+<mat-menu #modesHelpMenu="matMenu" class="modes-help-menu" xPosition="before" yPosition="below">
+	<div class="modes-help-panel" (click)="$event.stopPropagation()">
+		<h3 class="modes-help-title">{{ "chat.modes-help.title" | translate }}</h3>
+
+		<div class="modes-help-section standard">
+			<div class="modes-help-section-header">
+				<mat-icon svgIcon="book"></mat-icon>
+				<span class="modes-help-section-title">{{ "chat.modes-help.standard.title" | translate }}</span>
+			</div>
+			<p class="modes-help-section-text">{{ "chat.modes-help.standard.text" | translate }}</p>
+			<ul class="modes-help-list">
+				<li>{{ "chat.modes-help.standard.point1" | translate }}</li>
+				<li>{{ "chat.modes-help.standard.point2" | translate }}</li>
+				<li>{{ "chat.modes-help.standard.point3" | translate }}</li>
+			</ul>
+			<p class="modes-help-caveat">{{ "chat.modes-help.standard.caveat" | translate }}</p>
+		</div>
+
+		<div class="modes-help-section llm-only">
+			<div class="modes-help-section-header">
+				<mat-icon svgIcon="lightning"></mat-icon>
+				<span class="modes-help-section-title">{{ "chat.modes-help.llm-only.title" | translate }}</span>
+			</div>
+			<p class="modes-help-section-text">{{ "chat.modes-help.llm-only.text" | translate }}</p>
+			<ul class="modes-help-list">
+				<li>{{ "chat.modes-help.llm-only.point1" | translate }}</li>
+				<li>{{ "chat.modes-help.llm-only.point2" | translate }}</li>
+				<li>{{ "chat.modes-help.llm-only.point3" | translate }}</li>
+			</ul>
+		</div>
+
+		<p class="modes-help-footer">
+			<mat-icon svgIcon="lock"></mat-icon>
+			{{ "chat.modes-help.footer" | translate }}
+		</p>
+	</div>
+</mat-menu>

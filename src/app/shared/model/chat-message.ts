@@ -1,13 +1,14 @@
 import {MessageSource} from './chat-history';
 
 export interface ChatMessage {
+	/** Identifiant local et stable du message (suivi du rendu, mises à jour immuables). */
+	clientId: string;
 	id?: string;
 	faqItemId?: number;
 	message?: string;
 	source: ChatMessageSource;
 	timestamp: Date;
 	url?: string;
-	beingSpoken?: boolean;
 	isCompleted?: boolean;
 	lang?: string;
 	inError?: boolean;

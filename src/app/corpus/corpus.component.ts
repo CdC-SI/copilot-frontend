@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject} from '@angular/core';
-import {Observable, Subject, forkJoin, of, timer} from 'rxjs';
-import {catchError, finalize, map, switchMap, takeUntil, takeWhile} from 'rxjs/operators';
+import {Observable, Subject, Subscription, forkJoin, of} from 'rxjs';
+import {catchError, finalize, map, takeUntil} from 'rxjs/operators';
 import {ObButtonDirective, ObEUploadEventType, ObFileUploadComponent, ObIUploadEvent, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {MatDialog} from '@angular/material/dialog';
 import {IDocument} from '../shared/model/document';
@@ -12,6 +12,7 @@ import {RequestSourceDialogComponent} from './request-source-dialog/request-sour
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {UserStatus} from '../shared/model/user';
 import {uploadErrorKey, uploadErrorNotification} from '../shared/utils/upload-error.utils';
+import {pollUntil} from '../shared/utils/poll-until';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {MatIcon} from '@angular/material/icon';
 import {MatButton, MatIconButton} from '@angular/material/button';
@@ -73,6 +74,7 @@ export class CorpusComponent implements OnInit, OnDestroy {
 	readonly SourceRequestStatus = SourceRequestStatus;
 
 	private readonly destroy$ = new Subject<void>();
+	private autoRefresh?: Subscription;
 	private readonly uploadService = inject(UploadService);
 	private readonly notifService = inject(ObNotificationService);
 	private readonly sourceRequestService = inject(SourceRequestService);
@@ -348,12 +350,14 @@ export class CorpusComponent implements OnInit, OnDestroy {
 	}
 
 	private startAutoRefresh(): void {
-		timer(AUTO_REFRESH_INTERVAL_MS, AUTO_REFRESH_INTERVAL_MS)
-			.pipe(
-				takeUntil(this.destroy$),
-				takeWhile(() => this.hasPendingDocuments()),
-				switchMap(() => this.uploadService.getUserDocuments())
-			)
+		this.autoRefresh?.unsubscribe();
+		this.autoRefresh = pollUntil(() => this.uploadService.getUserDocuments(), {
+			intervalMs: AUTO_REFRESH_INTERVAL_MS,
+			initialDelayMs: AUTO_REFRESH_INTERVAL_MS,
+			continueWhile: () => this.hasPendingDocuments(),
+			isDone: docs => !docs.some(doc => doc.status === 'PENDING')
+		})
+			.pipe(takeUntil(this.destroy$))
 			.subscribe({
 				next: (docs: IPersonalDocument[]) => {
 					this.userDocuments = docs;

@@ -1,0 +1,54 @@
+@if (store.isLlmOnlyMode()) {
+	<div class="llm-only-banner">
+		<mat-icon svgIcon="lightning"></mat-icon>
+		<div class="llm-only-banner-text">
+			<strong>{{ "chat.llm-only-mode.banner.title" | translate }}</strong>
+			<span>{{ "chat.llm-only-mode.banner.text" | translate }}</span>
+		</div>
+	</div>
+}
+<div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
+	@if (store.messages().length <= 0) {
+		<div class="logo">
+			<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+		</div>
+	}
+	<div class="message-spacer"></div>
+	@for (message of store.messages(); track message.clientId; let last = $last; let i = $index) {
+		<div
+			class="message"
+			#messageEl
+			[class.in-progress]="!!message.status && !message.isCompleted"
+			[class.assistant]="message.source !== ChatMessageSource.USER"
+			[class.user]="message.source === ChatMessageSource.USER"
+		>
+			<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
+				<img
+					[hidden]="message.source === ChatMessageSource.USER"
+					[ngClass]="last && !message.isCompleted ? 'blink' : ''"
+					class="mr16 ia-avatar"
+					src="./assets/images/copilot_logo.png"
+					alt="copilot-logo"
+				/>
+				<zco-chat-message
+					[conversationId]="store.currentConversation()?.conversationId ?? null"
+					[message]="message"
+					[previousMessage]="i > 0 ? store.messages()[i - 1] : null"
+					(feedback)="store.sendFeedback($event)"
+					(workspaceChange)="store.changeWorkspace($event)"
+					[replayable]="store.isReplayable(message)"
+					(regenerate)="store.regenerateLastAnswer()"
+					(editQuestion)="store.editLastQuestion($event)"
+					(stop)="store.stopGeneration()"
+				></zco-chat-message>
+			</div>
+		</div>
+	}
+	<div class="scroll-anchor"></div>
+	<div class="message-bottom-spacer"></div>
+</div>
+@if (showScrollToLastMessage()) {
+	<button class="scroll-to-bottom" mat-mini-fab (click)="scrollToLastUserMessage()">
+		<mat-icon svgIcon="arrow_down"></mat-icon>
+	</button>
+}

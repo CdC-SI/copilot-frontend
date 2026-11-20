@@ -1,5 +1,5 @@
 <mat-list role="list" class="history-list">
-	@for (title of titles; track title) {
+	@for (title of titles; track title.conversationId) {
 		<mat-list-item
 			[class]="title.selected ? 'title-selected' : 'title'"
 			[class.llm-only]="title.type === 'NO_RAG'"

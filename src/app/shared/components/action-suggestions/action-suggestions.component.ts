@@ -7,7 +7,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 	selector: 'zco-action-suggestions',
 	templateUrl: './action-suggestions.component.html',
 	styleUrls: ['./action-suggestions.component.scss'],
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [MatButton, ObIconButtonDirective, ObButtonDirective, TranslatePipe]
 })
 export class ActionSuggestionsComponent {
