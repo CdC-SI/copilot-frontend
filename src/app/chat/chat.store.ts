@@ -129,6 +129,7 @@ export class ChatStore {
 
 	/** Conversation supprimée côté backend (depuis l'historique). */
 	deleteConversation(conversation: ChatTitle): void {
+		this.generation.cancelConversation(conversation.conversationId);
 		if (this.conversations.remove(conversation.conversationId)) {
 			this.manager.initNewChat();
 			this.suggestionService.clearSpecificSuggestions();

@@ -69,6 +69,8 @@ export class ChatAttachmentsStore implements OnDestroy {
 			next: event => {
 				if (event.type !== HttpEventType.Response) return;
 				const conversationId = resolveConversation(event.body.conversationAttachments.conversationId);
+				// Réponse tardive : les fichiers ne sont plus affichés (changement de conversation), le suivi courant est conservé.
+				if (!this.isDisplayed(files)) return;
 				this.applyUploadResponse(event.body, files);
 				this.followProcessing(conversationId, event.body.status);
 			},
@@ -85,7 +87,7 @@ export class ChatAttachmentsStore implements OnDestroy {
 		this.patchByFile(file, {status: 'PENDING', isUploading: true});
 		this.conversationService.uploadAttachments(conversation, file).subscribe({
 			next: event => {
-				if (event.type !== HttpEventType.Response) return;
+				if (event.type !== HttpEventType.Response || !this.isDisplayed([file])) return;
 				this.applyUploadResponse(event.body, [file]);
 				this.followProcessing(conversation.conversationId, event.body.status);
 			},
@@ -122,6 +124,10 @@ export class ChatAttachmentsStore implements OnDestroy {
 	refresh(conversationId: string | undefined): void {
 		if (!conversationId) return;
 		this.startPolling(conversationId);
+	}
+
+	private isDisplayed(files: File[]): boolean {
+		return this.items().some(attachment => !!attachment.file && files.includes(attachment.file));
 	}
 
 	private hasPending(): boolean {

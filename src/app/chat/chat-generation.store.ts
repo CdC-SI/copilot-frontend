@@ -117,7 +117,17 @@ export class ChatGenerationStore implements OnDestroy {
 	cancelPending(): void {
 		this.streams.forEach(({batcher}, target) => {
 			batcher.flush();
-			if (this.answerOf(target)?.isCompleted === false) this.abort(target);
+			// Réponse absente (conversation retirée du cache) : rien ne garantit qu'elle soit terminée.
+			if (!this.answerOf(target)?.isCompleted) this.abort(target);
+		});
+	}
+
+	/** Conversation supprimée : ses flux sont abandonnés, génération du titre comprise. */
+	cancelConversation(conversationId: string): void {
+		this.streams.forEach((stream, target) => {
+			if (target.conversationId !== conversationId) return;
+			stream.subscription.unsubscribe();
+			this.removeStream(target);
 		});
 	}
 
