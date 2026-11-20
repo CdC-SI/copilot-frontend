@@ -86,6 +86,9 @@
 	}
 
 	button {
+		// Material 22 dimensionne le bouton et le SVG via ces jetons (24px par défaut : icône rognée).
+		--mat-icon-button-state-layer-size: 24px;
+		--mat-icon-button-icon-size: 16px;
 		opacity: 0;
 		transition: opacity 0.2s;
 		flex-shrink: 0;
