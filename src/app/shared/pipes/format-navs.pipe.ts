@@ -1,9 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
-@Pipe({
-	name: 'formatNavs',
-	standalone: false
-})
+@Pipe({name: 'formatNavs'})
 export class FormatNavsPipe implements PipeTransform {
 	transform(value: string | null | undefined): string {
 		if (!value) {

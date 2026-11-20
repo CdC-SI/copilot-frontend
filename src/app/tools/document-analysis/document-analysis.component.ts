@@ -1,21 +1,69 @@
-import {ChangeDetectionStrategy, Component, HostListener, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {MatChipEditedEvent, MatChipInputEvent} from '@angular/material/chips';
+import {ChangeDetectionStrategy, Component, HostListener, OnInit, TemplateRef, ViewChild, inject} from '@angular/core';
+import {
+	ObButtonDirective,
+	ObEUploadEventType,
+	ObFileUploadComponent,
+	ObIUploadEvent,
+	ObIconButtonDirective,
+	ObMatErrorDirective,
+	ObNotificationService
+} from '@oblique/oblique';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatChip, MatChipEditedEvent, MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRemove, MatChipRow} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Subscription} from 'rxjs';
-import {MatDialog} from '@angular/material/dialog';
+import {MatDialog, MatDialogActions, MatDialogClose, MatDialogContent} from '@angular/material/dialog';
 import {VisionService} from '../../shared/services/vision.service';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 import {jsPDF} from 'jspdf';
 import {StructuredFields, ZasDocumentType} from '../../shared/model/vision';
+import {MatIcon} from '@angular/material/icon';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
+import {MatButton} from '@angular/material/button';
+import {FilePreviewComponent} from '../../shared/components/file-preview/file-preview.component';
+import {MatInput} from '@angular/material/input';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
+import {MarkdownComponent} from 'ngx-markdown';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-document-analysis',
 	templateUrl: './document-analysis.component.html',
 	styleUrl: './document-analysis.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatIcon,
+		MatFormField,
+		MatLabel,
+		MatSelect,
+		FormsModule,
+		ReactiveFormsModule,
+		MatOption,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		ObFileUploadComponent,
+		FilePreviewComponent,
+		MatChip,
+		MatInput,
+		MatError,
+		ObMatErrorDirective,
+		MatTabGroup,
+		MatTab,
+		MarkdownComponent,
+		CdkScrollable,
+		MatDialogContent,
+		MatChipGrid,
+		MatChipRow,
+		MatChipRemove,
+		MatChipInput,
+		MatDialogActions,
+		MatDialogClose,
+		TranslatePipe
+	]
 })
 export class DocumentAnalysisComponent implements OnInit {
 	@ViewChild('translateDialog') translateDialog!: TemplateRef<unknown>;
@@ -38,14 +86,11 @@ export class DocumentAnalysisComponent implements OnInit {
 	translationTargetLang: string | null = null;
 
 	private readonly acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly visionService: VisionService,
-		private readonly notif: ObNotificationService,
-		private readonly dialogService: MatDialog,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly fb = inject(FormBuilder);
+	private readonly visionService = inject(VisionService);
+	private readonly notif = inject(ObNotificationService);
+	private readonly dialogService = inject(MatDialog);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	ngOnInit() {
 		this.buildForm();

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {FaqItemsService} from '../../shared/services/faq-items.service';
 import {Command, CommandService} from '../../shared/services/command.service';
@@ -10,10 +10,8 @@ export type AutocompleteType = IQuestion | Command;
 	providedIn: 'root'
 })
 export class ChatAutocompleteService {
-	constructor(
-		private readonly faqItemsService: FaqItemsService,
-		private readonly commandService: CommandService
-	) {}
+	private readonly faqItemsService = inject(FaqItemsService);
+	private readonly commandService = inject(CommandService);
 
 	getOptionService(isCommandMode: boolean, hasCurrentConversation: boolean): (text: string) => Observable<AutocompleteType[]> {
 		if (isCommandMode) {

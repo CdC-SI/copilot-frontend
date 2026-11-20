@@ -1,10 +1,13 @@
-import {ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, inject} from '@angular/core';
 import {MessageSource} from '../../model/chat-history';
 import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../services/feedback.service';
 import {AuthenticationServiceV2} from '../../services/auth.service';
 import {ChatMessage} from '../../model/chat-message';
 import {FeedbackCategory} from '../../model/feedback';
+import {SourceComponent} from './source/source.component';
+import {FormsModule} from '@angular/forms';
+import {TranslatePipe} from '@ngx-translate/core';
 
 type FeedbackVote = 'upvote' | 'downvote';
 
@@ -13,7 +16,7 @@ type FeedbackVote = 'upvote' | 'downvote';
 	templateUrl: './source-list.component.html',
 	styleUrl: './source-list.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [SourceComponent, FormsModule, TranslatePipe]
 })
 export class SourceListComponent implements OnChanges {
 	@Input() message!: ChatMessage;
@@ -40,13 +43,10 @@ export class SourceListComponent implements OnChanges {
 	@ViewChild('feedbackDialog') feedbackDialog?: ElementRef<HTMLDialogElement>;
 	@ViewChild('commentInput') commentInput?: ElementRef<HTMLTextAreaElement>;
 
-	private feedbackLoaded = false; // avoid redundant calls
-
-	constructor(
-		private readonly notifService: ObNotificationService,
-		private readonly feedbackService: FeedbackService,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private feedbackLoaded = false;
+	private readonly notifService = inject(ObNotificationService);
+	private readonly feedbackService = inject(FeedbackService);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	ngOnChanges(changes: SimpleChanges): void {
 		// When the container expands for the first time, fetch existing feedbacks

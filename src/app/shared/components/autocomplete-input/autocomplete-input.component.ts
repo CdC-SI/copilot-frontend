@@ -9,12 +9,22 @@ import {
 	OnDestroy,
 	OnInit,
 	Output,
-	ViewChild
+	ViewChild,
+	inject
 } from '@angular/core';
 import {Observable, Subject, debounceTime, of} from 'rxjs';
-import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, Validators} from '@angular/forms';
+import {ControlValueAccessor, FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, Validators} from '@angular/forms';
 import {HighlightTextPipe} from '../../pipes/highlight-text.pipe';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+import {MatFormField, MatLabel, MatPrefix} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {MatIconButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
+import {MatOption} from '@angular/material/core';
+import {AsyncPipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'ut-autocomplete-input',
@@ -26,9 +36,26 @@ import {CdkTextareaAutosize} from '@angular/cdk/text-field';
 			provide: NG_VALUE_ACCESSOR,
 			useExisting: AutocompleteInputComponent,
 			multi: true
-		}
+		},
+		HighlightTextPipe
 	],
-	standalone: false
+	imports: [
+		MatFormField,
+		MatLabel,
+		MatInput,
+		CdkTextareaAutosize,
+		FormsModule,
+		MatAutocompleteTrigger,
+		ReactiveFormsModule,
+		MatIconButton,
+		MatPrefix,
+		MatTooltip,
+		MatIcon,
+		MatAutocomplete,
+		MatOption,
+		AsyncPipe,
+		TranslatePipe
+	]
 })
 export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccessor, OnDestroy, AfterViewInit {
 	@Input() i18nLabel: string;
@@ -53,11 +80,8 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 	_onTouched: () => void;
 	_onChange: (p: T | string | null) => void;
 	selected = false;
-
-	constructor(
-		private readonly highlightTextPipe: HighlightTextPipe,
-		private readonly cdr: ChangeDetectorRef
-	) {}
+	private readonly highlightTextPipe = inject(HighlightTextPipe);
+	private readonly cdr = inject(ChangeDetectorRef);
 
 	ngOnInit(): void {
 		this.buildForm();

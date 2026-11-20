@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -11,11 +11,9 @@ import {IPersonalDocument} from '../model/personal-document';
 	providedIn: 'root'
 })
 export class UploadService {
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient,
-		private readonly translateService: TranslateService
-	) {}
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
+	private readonly translateService = inject(TranslateService);
 
 	uploadPersonalPdf(file: File, conversationId?: string) {
 		const formData = new FormData();

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {DynamicFormService} from '../../shared/services/dynamic-form.service';
@@ -15,12 +15,10 @@ export interface ActionSuggestion {
 	providedIn: 'root'
 })
 export class ChatSuggestionService {
-	private specificSuggestions: ActionSuggestion[] = [];
+	private readonly translateService = inject(TranslateService);
+	private readonly dfs = inject(DynamicFormService);
 
-	constructor(
-		private readonly translateService: TranslateService,
-		private readonly dfs: DynamicFormService
-	) {}
+	private specificSuggestions: ActionSuggestion[] = [];
 
 	getDefaultSuggestions(): ActionSuggestion[] {
 		return DEFAULT_CHAT_SUGGESTIONS;

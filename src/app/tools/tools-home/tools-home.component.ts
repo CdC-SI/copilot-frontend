@@ -1,6 +1,15 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, inject} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
+import {AlertBannerComponent} from '../../shared/components/alert-banner/alert-banner.component';
+import {MatButton} from '@angular/material/button';
+import {ObButtonDirective, ObIconButtonDirective} from '@oblique/oblique';
+import {MatIcon} from '@angular/material/icon';
+import {DocumentAnalysisComponent} from '../document-analysis/document-analysis.component';
+import {IdentityCheckComponent} from '../identity-check/identity-check.component';
+import {SumexComponent} from '../sumex/sumex.component';
+import {CareerSummaryComponent} from '../career-summary/career-summary.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 export enum ToolsComponentType {
 	DocumentAnalysis = 'document-analysis',
@@ -12,18 +21,26 @@ export enum ToolsComponentType {
 @Component({
 	selector: 'zco-tools-home',
 	templateUrl: './tools-home.component.html',
-	standalone: false,
 	changeDetection: ChangeDetectionStrategy.Eager,
-	styleUrl: './tools-home.component.scss'
+	styleUrl: './tools-home.component.scss',
+	imports: [
+		AlertBannerComponent,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatIcon,
+		DocumentAnalysisComponent,
+		IdentityCheckComponent,
+		SumexComponent,
+		CareerSummaryComponent,
+		TranslatePipe
+	]
 })
 export class ToolsHomeComponent implements OnInit {
 	TOOLS_COMPONENT_TYPE = ToolsComponentType;
 	selectedComponent: ToolsComponentType | null = null;
-
-	constructor(
-		private readonly route: ActivatedRoute,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly route = inject(ActivatedRoute);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	ngOnInit() {
 		this.route.queryParams.subscribe(params => {

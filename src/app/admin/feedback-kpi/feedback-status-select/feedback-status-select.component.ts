@@ -1,12 +1,16 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 import {FEEDBACK_STATUSES, FeedbackStatus} from '../../../shared/model/feedback';
+import {MatSelect, MatSelectTrigger} from '@angular/material/select';
+import {NgClass} from '@angular/common';
+import {MatOption} from '@angular/material/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-feedback-status-select',
 	templateUrl: './feedback-status-select.component.html',
 	styleUrl: './feedback-status-select.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [MatSelect, NgClass, MatSelectTrigger, MatOption, TranslatePipe]
 })
 export class FeedbackStatusSelectComponent {
 	@Input() status: FeedbackStatus = 'NEW';

@@ -1,13 +1,21 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject} from '@angular/core';
 import {ConversationService} from '../../services/conversation.service';
 import {ChatTitle, ConversationType} from '../../model/chat-history';
+import {MatList, MatListItem} from '@angular/material/list';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
+import {MatIconButton} from '@angular/material/button';
+import {MatInput} from '@angular/material/input';
+import {FormsModule} from '@angular/forms';
+import {DatePipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-chat-history',
 	templateUrl: './chat-history.component.html',
 	styleUrl: './chat-history.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [MatList, MatListItem, MatTooltip, MatIcon, MatIconButton, MatInput, FormsModule, DatePipe, TranslatePipe]
 })
 export class ChatHistoryComponent {
 	selected: ChatTitle;
@@ -17,7 +25,7 @@ export class ChatHistoryComponent {
 	@Output() readonly conversationSelected = new EventEmitter<ChatTitle>();
 	@Output() readonly conversationDeleted = new EventEmitter<ChatTitle>();
 	@Input() titles!: ChatTitle[] | null;
-	constructor(private readonly conversationService: ConversationService) {}
+	private readonly conversationService = inject(ConversationService);
 
 	/** Icône représentant le type de conversation : Corpus documentaire (book) ou LLM seul (lightning). */
 	getTypeIcon(title: ChatTitle): string {

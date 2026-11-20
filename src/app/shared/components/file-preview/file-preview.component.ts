@@ -1,9 +1,8 @@
-import {ChangeDetectionStrategy, Component, Input, OnChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnChanges, inject} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
 
 @Component({
 	selector: 'app-file-preview',
-	standalone: false,
 	templateUrl: './file-preview.component.html',
 	changeDetection: ChangeDetectionStrategy.Eager,
 	styleUrl: './file-preview.component.scss'
@@ -13,8 +12,7 @@ export class FilePreviewComponent implements OnChanges {
 
 	previewUrl: SafeResourceUrl | null = null;
 	isImage: boolean = false;
-
-	constructor(private readonly sanitizer: DomSanitizer) {}
+	private readonly sanitizer = inject(DomSanitizer);
 
 	ngOnChanges(): void {
 		if (!this.file) return;

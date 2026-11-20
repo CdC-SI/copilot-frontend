@@ -1,17 +1,44 @@
-import {ChangeDetectionStrategy, Component, ElementRef, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, OnInit, TemplateRef, ViewChild, inject} from '@angular/core';
 import {IdentityCheckService} from '../../shared/services/identity-check.service';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatDialog, MatDialogActions, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
 import {VisionService} from '../../shared/services/vision.service';
 import {IdentityCheckStartRequest, IdentityCheckStatus} from '../../shared/model/identity-check';
+import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
+import {MatIcon} from '@angular/material/icon';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {ObButtonDirective, ObIconButtonDirective} from '@oblique/oblique';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {DatePipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-identity-check',
 	templateUrl: './identity-check.component.html',
 	styleUrls: ['./identity-check.component.scss'],
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatCard,
+		MatCardHeader,
+		MatCardTitle,
+		MatCardContent,
+		MatIcon,
+		MatIconButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatButton,
+		MatDialogTitle,
+		FormsModule,
+		ReactiveFormsModule,
+		MatFormField,
+		MatLabel,
+		MatInput,
+		MatDialogActions,
+		DatePipe,
+		TranslatePipe
+	]
 })
 export class IdentityCheckComponent implements OnInit {
 	@ViewChild('video') videoElement!: ElementRef<HTMLVideoElement>;
@@ -21,14 +48,13 @@ export class IdentityCheckComponent implements OnInit {
 	identityCheckStatus: IdentityCheckStatus | null = null;
 	form: FormGroup;
 	dialogRef!: MatDialogRef<unknown>;
+	private readonly authenticateService = inject(IdentityCheckService);
+	private readonly authService = inject(AuthenticationServiceV2);
+	private readonly fb = inject(FormBuilder);
+	private readonly dialog = inject(MatDialog);
+	private readonly visionService = inject(VisionService);
 
-	constructor(
-		private readonly authenticateService: IdentityCheckService,
-		private readonly authService: AuthenticationServiceV2,
-		private readonly fb: FormBuilder,
-		private readonly dialog: MatDialog,
-		private readonly visionService: VisionService
-	) {
+	constructor() {
 		this.form = this.fb.group({
 			email: ['', [Validators.required, Validators.email]],
 			mobilePhone: ['', [Validators.required]],

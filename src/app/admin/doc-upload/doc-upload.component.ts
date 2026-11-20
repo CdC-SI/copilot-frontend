@@ -1,23 +1,24 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {IDocument} from '../../shared/model/document';
-import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
+import {ObButtonDirective, ObEUploadEventType, ObFileUploadComponent, ObIUploadEvent, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {UploadService} from '../../shared/services/upload.service';
 import {uploadErrorNotification} from '../../shared/utils/upload-error.utils';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {DecimalPipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-doc-upload',
 	templateUrl: './doc-upload.component.html',
 	styleUrl: './doc-upload.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [ObFileUploadComponent, MatIconButton, ObIconButtonDirective, ObButtonDirective, MatIcon, MatButton, DecimalPipe, TranslatePipe]
 })
 export class DocUploadComponent {
 	documentsToUpload: IDocument[] = [];
-
-	constructor(
-		private readonly uploadService: UploadService,
-		private readonly notifService: ObNotificationService
-	) {}
+	private readonly uploadService = inject(UploadService);
+	private readonly notifService = inject(ObNotificationService);
 
 	uploadAdminDocument(event: ObIUploadEvent) {
 		if (event.type === ObEUploadEventType.CHOSEN) {

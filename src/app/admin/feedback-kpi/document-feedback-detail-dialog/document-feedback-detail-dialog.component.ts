@@ -1,25 +1,51 @@
-import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {FeedbackStatus, IDocumentFeedbackDetail, ISourceFeedback} from '../../../shared/model/feedback';
 import {UploadService} from '../../../shared/services/upload.service';
-import {ObNotificationService} from '@oblique/oblique';
+import {ObButtonDirective, ObExternalLinkDirective, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../../shared/services/feedback.service';
 import {openOrDownloadBlob} from '../../../shared/utils/file-download.utils';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatAccordion, MatExpansionPanel, MatExpansionPanelDescription, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
+import {FeedbackStatusSelectComponent} from '../feedback-status-select/feedback-status-select.component';
+import {MarkdownComponent} from 'ngx-markdown';
+import {DatePipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-document-feedback-detail-dialog',
 	templateUrl: './document-feedback-detail-dialog.component.html',
 	styleUrl: './document-feedback-detail-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatDialogTitle,
+		CdkScrollable,
+		MatDialogContent,
+		ObExternalLinkDirective,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatIcon,
+		MatAccordion,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
+		MatExpansionPanelDescription,
+		FeedbackStatusSelectComponent,
+		MarkdownComponent,
+		MatDialogActions,
+		MatDialogClose,
+		DatePipe,
+		TranslatePipe
+	]
 })
 export class DocumentFeedbackDetailDialogComponent {
-	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: IDocumentFeedbackDetail,
-		private readonly uploadService: UploadService,
-		private readonly notifService: ObNotificationService,
-		private readonly feedbackService: FeedbackService
-	) {}
+	data = inject<IDocumentFeedbackDetail>(MAT_DIALOG_DATA);
+	private readonly uploadService = inject(UploadService);
+	private readonly notifService = inject(ObNotificationService);
+	private readonly feedbackService = inject(FeedbackService);
 
 	downloadFile() {
 		this.uploadService.downloadSourceDocument(this.data.documentTitle).subscribe({

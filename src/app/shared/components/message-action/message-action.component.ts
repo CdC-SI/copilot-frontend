@@ -1,21 +1,46 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, ViewChild, inject} from '@angular/core';
 import {SpeechService} from '../../services/speech.service';
-import {TranslateService} from '@ngx-translate/core';
-import {FormControl, Validators} from '@angular/forms';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {IFaqItem} from '../../model/faq';
-import {MatDialog} from '@angular/material/dialog';
-import {ObNotificationService} from '@oblique/oblique';
+import {MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
+import {ObButtonDirective, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {ChatMessage} from '../../model/chat-message';
 import {FaqItemsService} from '../../services/faq-items.service';
 import {ANSWER_FEEDBACK_CATEGORIES, Feedback, FeedbackCategory} from '../../model/feedback';
 import {AuthenticationServiceV2} from '../../services/auth.service';
+import {MatIcon} from '@angular/material/icon';
+import {MatTooltip} from '@angular/material/tooltip';
+import {NgClass} from '@angular/common';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {FaqItemEditComponent} from '../faq-item-edit/faq-item-edit.component';
+import {MatButton} from '@angular/material/button';
+import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 
 @Component({
 	selector: 'zco-message-action',
 	templateUrl: './message-action.component.html',
 	styleUrl: './message-action.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatIcon,
+		MatTooltip,
+		NgClass,
+		MatDialogTitle,
+		CdkScrollable,
+		MatDialogContent,
+		FormsModule,
+		FaqItemEditComponent,
+		ReactiveFormsModule,
+		MatDialogActions,
+		MatButton,
+		MatDialogClose,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatRadioGroup,
+		MatRadioButton,
+		TranslatePipe
+	]
 })
 export class MessageActionComponent {
 	@Input() message: ChatMessage;
@@ -33,15 +58,12 @@ export class MessageActionComponent {
 	categoryFrmCtrl = new FormControl<FeedbackCategory>(null);
 	isNegativeFeedback = false;
 	readonly answerFeedbackCategories = ANSWER_FEEDBACK_CATEGORIES;
-
-	constructor(
-		private readonly speechService: SpeechService,
-		private readonly translateService: TranslateService,
-		private readonly dialog: MatDialog,
-		private readonly faqItemsService: FaqItemsService,
-		private readonly notif: ObNotificationService,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly speechService = inject(SpeechService);
+	private readonly translateService = inject(TranslateService);
+	private readonly dialog = inject(MatDialog);
+	private readonly faqItemsService = inject(FaqItemsService);
+	private readonly notif = inject(ObNotificationService);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	speak = (): void => {
 		speechSynthesis.cancel();

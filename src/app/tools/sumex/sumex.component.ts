@@ -1,26 +1,63 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
+import {ChangeDetectionStrategy, Component, OnInit, inject} from '@angular/core';
+import {FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+	ObButtonDirective,
+	ObColumnLayoutComponent,
+	ObEUploadEventType,
+	ObErrorMessagesDirective,
+	ObFileUploadComponent,
+	ObIUploadEvent,
+	ObIconButtonDirective,
+	ObMatErrorDirective,
+	ObNotificationService
+} from '@oblique/oblique';
 import {VisionService} from '../../shared/services/vision.service';
 import {MedicalService, SumexInvoice} from '../../shared/model/vision';
+import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {FilePreviewComponent} from '../../shared/components/file-preview/file-preview.component';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
 
 @Component({
 	selector: 'zco-sumex',
 	templateUrl: './sumex.component.html',
 	styleUrl: './sumex.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		ObColumnLayoutComponent,
+		MatCard,
+		MatCardHeader,
+		MatCardTitle,
+		MatIconButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatIcon,
+		MatCardContent,
+		ObFileUploadComponent,
+		FilePreviewComponent,
+		FormsModule,
+		ReactiveFormsModule,
+		MatTabGroup,
+		MatTab,
+		MatFormField,
+		ObErrorMessagesDirective,
+		MatLabel,
+		MatInput,
+		MatError,
+		ObMatErrorDirective,
+		MatButton
+	]
 })
 export class SumexComponent implements OnInit {
 	invoiceForm: FormGroup = new FormGroup({});
 	documentFrmGrp: FormGroup = new FormGroup({});
 	isLoading = false;
-
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly visionService: VisionService,
-		private readonly notifService: ObNotificationService
-	) {}
+	private readonly fb = inject(FormBuilder);
+	private readonly visionService = inject(VisionService);
+	private readonly notifService = inject(ObNotificationService);
 
 	ngOnInit(): void {
 		this.buildInvoiceForm();

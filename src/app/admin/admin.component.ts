@@ -1,5 +1,12 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
-import {MatExpansionPanel} from '@angular/material/expansion';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild, inject} from '@angular/core';
+import {
+	MatAccordion,
+	MatExpansionPanel,
+	MatExpansionPanelContent,
+	MatExpansionPanelDescription,
+	MatExpansionPanelHeader,
+	MatExpansionPanelTitle
+} from '@angular/material/expansion';
 import {FeedbackKpiComponent} from './feedback-kpi/feedback-kpi.component';
 import {UserAccountsComponent} from './user-accounts/user-accounts.component';
 import {AlertsComponent} from './alerts/alerts.component';
@@ -8,13 +15,35 @@ import {WorkspacesComponent} from './workspaces/workspaces.component';
 import {RetentionConfigComponent} from './retention-config/retention-config.component';
 import {FeedbackService} from '../shared/services/feedback.service';
 import {FeedbackReportConfigComponent} from './feedback-kpi/feedback-report-config/feedback-report-config.component';
+import {FaqEditComponent} from './faq-edit/faq-edit.component';
+import {DocUploadComponent} from './doc-upload/doc-upload.component';
+import {AsyncPipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-admin',
 	templateUrl: './admin.component.html',
 	styleUrl: './admin.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatAccordion,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
+		MatExpansionPanelDescription,
+		MatExpansionPanelContent,
+		UserAccountsComponent,
+		FeedbackKpiComponent,
+		FeedbackReportConfigComponent,
+		AlertsComponent,
+		FaqEditComponent,
+		DocUploadComponent,
+		RetentionConfigComponent,
+		SourcesComponent,
+		WorkspacesComponent,
+		AsyncPipe,
+		TranslatePipe
+	]
 })
 export class AdminComponent implements OnInit {
 	@ViewChild('feedbackKpiComponent') feedbackKpi?: FeedbackKpiComponent;
@@ -26,9 +55,8 @@ export class AdminComponent implements OnInit {
 	@ViewChild('feedbackReportConfigComponent') feedbackReportConfigComponent?: FeedbackReportConfigComponent;
 	@ViewChild('sourcesPanel') sourcesPanel?: MatExpansionPanel;
 
-	readonly newFeedbackCount$ = this.feedbackService.newFeedbackCount$;
-
-	constructor(private readonly feedbackService: FeedbackService) {}
+	readonly newFeedbackCount$ = inject(FeedbackService).newFeedbackCount$;
+	private readonly feedbackService = inject(FeedbackService);
 
 	ngOnInit(): void {
 		this.feedbackService.refreshNewFeedbackCount();

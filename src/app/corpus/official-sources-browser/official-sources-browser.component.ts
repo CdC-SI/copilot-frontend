@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject} from '@angular/core';
 import {Subject, forkJoin} from 'rxjs';
 import {finalize, takeUntil} from 'rxjs/operators';
 import {ObNotificationService} from '@oblique/oblique';
@@ -6,13 +6,28 @@ import {SourceDto} from '../../shared/model/source';
 import {WorkspaceDto} from '../../shared/model/workspace';
 import {SourceService} from '../../shared/services/source.service';
 import {WorkspaceService} from '../../shared/services/workspace.service';
+import {MatIcon} from '@angular/material/icon';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatAccordion, MatExpansionPanel, MatExpansionPanelDescription, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
+import {NgTemplateOutlet} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-official-sources-browser',
 	templateUrl: './official-sources-browser.component.html',
 	styleUrl: './official-sources-browser.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatIcon,
+		MatProgressSpinner,
+		MatAccordion,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
+		MatExpansionPanelDescription,
+		NgTemplateOutlet,
+		TranslatePipe
+	]
 })
 export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 	workspaces: WorkspaceDto[] = [];
@@ -27,12 +42,9 @@ export class OfficialSourcesBrowserComponent implements OnInit, OnDestroy {
 	private readonly contentsCache = new Map<string, SourceDto>();
 	private readonly loadingContentFor = new Set<string>();
 	private readonly destroy$ = new Subject<void>();
-
-	constructor(
-		private readonly workspaceService: WorkspaceService,
-		private readonly sourceService: SourceService,
-		private readonly notif: ObNotificationService
-	) {}
+	private readonly workspaceService = inject(WorkspaceService);
+	private readonly sourceService = inject(SourceService);
+	private readonly notif = inject(ObNotificationService);
 
 	ngOnInit(): void {
 		this.load();

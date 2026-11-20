@@ -1,19 +1,55 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, ViewChild} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
+import {AfterViewInit, ChangeDetectionStrategy, Component, ViewChild, inject} from '@angular/core';
+import {
+	MatCell,
+	MatCellDef,
+	MatColumnDef,
+	MatHeaderCell,
+	MatHeaderCellDef,
+	MatHeaderRow,
+	MatHeaderRowDef,
+	MatRow,
+	MatRowDef,
+	MatTable,
+	MatTableDataSource
+} from '@angular/material/table';
 import {IUser, IUserAction, Role, UserStatus} from '../../shared/model/user';
 import {Observable, Subject, catchError, finalize, map, merge, of, startWith, switchMap} from 'rxjs';
 import {UserService} from '../../shared/services/user.service';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 import {IPage} from '../../shared/model/page';
-import {MatSort} from '@angular/material/sort';
+import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {MatIconButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-user-accounts',
 	templateUrl: './user-accounts.component.html',
 	styleUrl: './user-accounts.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatTable,
+		MatSort,
+		MatColumnDef,
+		MatHeaderCellDef,
+		MatHeaderCell,
+		MatSortHeader,
+		MatCellDef,
+		MatCell,
+		MatCheckbox,
+		MatIconButton,
+		MatTooltip,
+		MatIcon,
+		MatHeaderRowDef,
+		MatHeaderRow,
+		MatRowDef,
+		MatRow,
+		MatPaginator,
+		TranslatePipe
+	]
 })
 export class UserAccountsComponent implements AfterViewInit {
 	displayedColumns: string[] = ['firstName', 'lastName', 'status', 'roles', 'internalUser', 'actions'];
@@ -52,11 +88,8 @@ export class UserAccountsComponent implements AfterViewInit {
 	};
 
 	private readonly refresh$ = new Subject<void>();
-
-	constructor(
-		private readonly userService: UserService,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly userService = inject(UserService);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	ngAfterViewInit(): void {
 		this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));

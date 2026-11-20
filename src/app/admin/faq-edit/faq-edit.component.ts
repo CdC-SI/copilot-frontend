@@ -1,26 +1,40 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, inject} from '@angular/core';
 import {ConfirmDialogComponent} from '../../shared/components/confirm-dialog/confirm-dialog.component';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {FaqItemsService} from '../../shared/services/faq-items.service';
 import {MatDialog} from '@angular/material/dialog';
-import {ObNotificationService} from '@oblique/oblique';
+import {ObButtonDirective, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
+import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
+import {FaqItemEditComponent} from '../../shared/components/faq-item-edit/faq-item-edit.component';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-faq-edit',
 	templateUrl: './faq-edit.component.html',
 	styleUrl: './faq-edit.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		FormsModule,
+		ReactiveFormsModule,
+		MatCard,
+		MatCardContent,
+		FaqItemEditComponent,
+		MatCardActions,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatIcon,
+		TranslatePipe
+	]
 })
 export class FaqEditComponent implements OnInit {
 	addFaqItemFormGrp: FormGroup;
-
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly faqItemsService: FaqItemsService,
-		private readonly dialog: MatDialog,
-		private readonly notifService: ObNotificationService
-	) {}
+	private readonly fb = inject(FormBuilder);
+	private readonly faqItemsService = inject(FaqItemsService);
+	private readonly dialog = inject(MatDialog);
+	private readonly notifService = inject(ObNotificationService);
 
 	ngOnInit(): void {
 		this.addFaqItemFormGrp = this.fb.group({

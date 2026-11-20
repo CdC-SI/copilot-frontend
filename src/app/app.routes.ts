@@ -1,5 +1,4 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
+import {Routes} from '@angular/router';
 import {ChatComponent} from './chat/chat.component';
 import {AdminComponent} from './admin/admin.component';
 import {TipsComponent} from './tips/tips.component';
@@ -8,7 +7,7 @@ import {ToolsHomeComponent} from './tools/tools-home/tools-home.component';
 import {CorpusComponent} from './corpus/corpus.component';
 import {UserGuard} from './shared/services/user.guard';
 
-const routes: Routes = [
+export const routes: Routes = [
 	{path: '', redirectTo: 'chat', pathMatch: 'full'},
 	{path: 'chat', component: ChatComponent},
 	{path: 'corpus', component: CorpusComponent, canActivate: [UserGuard]},
@@ -16,9 +15,3 @@ const routes: Routes = [
 	{path: 'tips', component: TipsComponent},
 	{path: 'tools', component: ToolsHomeComponent}
 ];
-
-@NgModule({
-	imports: [RouterModule.forRoot(routes)],
-	exports: [RouterModule]
-})
-export class AppRoutingModule {}

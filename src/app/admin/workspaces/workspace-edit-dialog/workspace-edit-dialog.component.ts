@@ -1,11 +1,20 @@
-import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {MatChipInputEvent} from '@angular/material/chips';
+import {ChangeDetectionStrategy, Component, OnInit, inject} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
+import {MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRemove, MatChipRow} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {CreateWorkspaceRequest, UpdateWorkspaceRequest, WorkspaceDto} from '../../../shared/model/workspace';
 import {SourceService} from '../../../shared/services/source.service';
 import {SourceDto} from '../../../shared/model/source';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {ObButtonDirective, ObIconButtonDirective, ObMatErrorDirective} from '@oblique/oblique';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
+import {MatIcon} from '@angular/material/icon';
+import {MatButton} from '@angular/material/button';
+import {TranslatePipe} from '@ngx-translate/core';
 
 export interface WorkspaceEditDialogData {
 	workspace?: WorkspaceDto;
@@ -18,21 +27,46 @@ export type WorkspaceEditDialogResult = {name: string; request: CreateWorkspaceR
 	templateUrl: './workspace-edit-dialog.component.html',
 	styleUrl: './workspace-edit-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatDialogTitle,
+		CdkScrollable,
+		MatDialogContent,
+		FormsModule,
+		ReactiveFormsModule,
+		MatFormField,
+		MatLabel,
+		MatInput,
+		MatError,
+		ObMatErrorDirective,
+		MatSelect,
+		MatOption,
+		MatChipGrid,
+		MatChipRow,
+		MatChipRemove,
+		MatIcon,
+		MatChipInput,
+		MatDialogActions,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		TranslatePipe
+	]
 })
 export class WorkspaceEditDialogComponent implements OnInit {
+	data = inject<WorkspaceEditDialogData>(MAT_DIALOG_DATA);
+
 	readonly isEdit: boolean;
 	readonly separatorKeyCodes = [ENTER, COMMA];
 	form: FormGroup;
 	hypotheticalQuestions: string[];
 	availableSources: SourceDto[] = [];
+	private readonly fb = inject(FormBuilder);
+	private readonly sourceService = inject(SourceService);
+	private readonly ref = inject<MatDialogRef<WorkspaceEditDialogComponent, WorkspaceEditDialogResult>>(MatDialogRef);
 
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly sourceService: SourceService,
-		private readonly ref: MatDialogRef<WorkspaceEditDialogComponent, WorkspaceEditDialogResult>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkspaceEditDialogData
-	) {
+	constructor() {
+		const data = this.data;
+
 		this.isEdit = !!data?.workspace;
 		this.hypotheticalQuestions = [...(data?.workspace?.hypotheticalQuestions ?? [])];
 

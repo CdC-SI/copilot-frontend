@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {SettingsService} from './settings.service';
 import {SettingsType} from '../model/settings';
@@ -14,12 +14,12 @@ export interface Command {
 	providedIn: 'root'
 })
 export class CommandService {
+	private readonly settingsService = inject(SettingsService);
+	private readonly authService = inject(AuthenticationServiceV2);
+
 	private AUTHORIZED_COMMANDS: Command[] = [];
 
-	constructor(
-		private readonly settingsService: SettingsService,
-		private readonly authService: AuthenticationServiceV2
-	) {
+	constructor() {
 		this.authService.$authenticatedUser.subscribe(user => {
 			if (user) {
 				this.settingsService.getSettings(SettingsType.AUTHORIZED_COMMANDS).subscribe(commands => {

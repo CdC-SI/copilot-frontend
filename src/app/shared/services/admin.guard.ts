@@ -7,10 +7,9 @@ import {UserStatus} from '../model/user';
 	providedIn: 'root'
 })
 class PermissionService {
-	constructor(
-		private readonly router: Router,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly router = inject(Router);
+	private readonly authService = inject(AuthenticationServiceV2);
+
 	canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
 		if (
 			(state.url.startsWith('/admin') || state.url.startsWith('/tips')) &&

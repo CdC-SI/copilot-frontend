@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
@@ -6,12 +6,10 @@ import {CreateWorkspaceRequest, UpdateWorkspaceRequest, WorkspaceDto} from '../m
 
 @Injectable({providedIn: 'root'})
 export class WorkspaceService {
-	private readonly WORKSPACES_URL = '/workspaces';
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly WORKSPACES_URL = '/workspaces';
 
 	/** GET /api/workspaces */
 	getAll(): Observable<WorkspaceDto[]> {

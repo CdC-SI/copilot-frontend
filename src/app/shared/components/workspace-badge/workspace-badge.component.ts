@@ -1,9 +1,14 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ObNotificationService} from '@oblique/oblique';
 import {WorkspaceDto} from '../../model/workspace';
 import {WorkspaceService} from '../../services/workspace.service';
 import {WorkspaceContentDialogComponent} from '../workspace-content-dialog/workspace-content-dialog.component';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {TranslatePipe} from '@ngx-translate/core';
 
 /**
  * Petit badge affiché sous une question pour indiquer le workspace (corpus documentaire) utilisé
@@ -15,7 +20,7 @@ import {WorkspaceContentDialogComponent} from '../workspace-content-dialog/works
 	templateUrl: './workspace-badge.component.html',
 	styleUrl: './workspace-badge.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [MatTooltip, MatIcon, MatMenuTrigger, MatMenu, MatProgressSpinner, MatMenuItem, TranslatePipe]
 })
 export class WorkspaceBadgeComponent {
 	@Input() workspaceName: string;
@@ -25,12 +30,9 @@ export class WorkspaceBadgeComponent {
 	availableWorkspaces: WorkspaceDto[] = [];
 	isLoadingWorkspaces = false;
 	private workspacesLoaded = false;
-
-	constructor(
-		private readonly workspaceService: WorkspaceService,
-		private readonly dialog: MatDialog,
-		private readonly notif: ObNotificationService
-	) {}
+	private readonly workspaceService = inject(WorkspaceService);
+	private readonly dialog = inject(MatDialog);
+	private readonly notif = inject(ObNotificationService);
 
 	openContent(): void {
 		this.dialog.open(WorkspaceContentDialogComponent, {

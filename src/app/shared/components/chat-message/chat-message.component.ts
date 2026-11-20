@@ -1,6 +1,16 @@
-import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild, inject} from '@angular/core';
 import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 import {Feedback} from '../../model/feedback';
+import {MarkdownComponent} from 'ngx-markdown';
+import {WorkspaceBadgeComponent} from '../workspace-badge/workspace-badge.component';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
+import {FormsModule} from '@angular/forms';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+import {MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
+import {SourceListComponent} from '../source-list/source-list.component';
+import {MessageActionComponent} from '../message-action/message-action.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 const MIN_EDIT_WIDTH_PX = 240;
 
@@ -9,7 +19,20 @@ const MIN_EDIT_WIDTH_PX = 240;
 	templateUrl: './chat-message.component.html',
 	styleUrl: './chat-message.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MarkdownComponent,
+		WorkspaceBadgeComponent,
+		MatTooltip,
+		MatIcon,
+		FormsModule,
+		CdkTextareaAutosize,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
+		SourceListComponent,
+		MessageActionComponent,
+		TranslatePipe
+	]
 })
 export class ChatMessageComponent {
 	@Input() previousMessage: ChatMessage;
@@ -30,8 +53,7 @@ export class ChatMessageComponent {
 	/** Largeur de la bulle figée pendant l'édition (px). */
 	editWidth?: number;
 	protected readonly ChatMessageSource = ChatMessageSource;
-
-	constructor(private readonly host: ElementRef<HTMLElement>) {}
+	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
 	/** Réponse en cours de génération. */
 	get isGenerating(): boolean {

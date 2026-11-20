@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
@@ -6,12 +6,10 @@ import {CatalogImportReport} from '../model/catalog';
 
 @Injectable({providedIn: 'root'})
 export class CatalogService {
-	private readonly CATALOG_URL = '/admin/catalog';
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly CATALOG_URL = '/admin/catalog';
 
 	/** POST /api/admin/catalog/import : crée ou met à jour les sources et workspaces décrits dans le fichier YAML. */
 	import(file: File): Observable<CatalogImportReport> {

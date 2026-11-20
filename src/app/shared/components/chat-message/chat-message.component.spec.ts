@@ -1,13 +1,16 @@
-import {ElementRef} from '@angular/core';
+import {ElementRef, Injector, runInInjectionContext} from '@angular/core';
 import {ChatMessageComponent} from './chat-message.component';
 import {ChatMessageSource} from '../../model/chat-message';
+
+const createComponent = (offsetWidth: number): ChatMessageComponent =>
+	runInInjectionContext(Injector.create({providers: [{provide: ElementRef, useValue: {nativeElement: {offsetWidth}}}]}), () => new ChatMessageComponent());
 
 describe('ChatMessageComponent (modification de la question)', () => {
 	let component: ChatMessageComponent;
 	let emitted: string[];
 
 	beforeEach(() => {
-		component = new ChatMessageComponent({nativeElement: {offsetWidth: 320}} as ElementRef<HTMLElement>);
+		component = createComponent(320);
 		component.message = {message: 'Question initiale', source: ChatMessageSource.USER, timestamp: new Date()};
 		component.replayable = true;
 		emitted = [];
@@ -22,7 +25,7 @@ describe('ChatMessageComponent (modification de la question)', () => {
 	});
 
 	it('impose une largeur minimale pour une question courte', () => {
-		component = new ChatMessageComponent({nativeElement: {offsetWidth: 40}} as ElementRef<HTMLElement>);
+		component = createComponent(40);
 		component.message = {message: 'Oui', source: ChatMessageSource.USER, timestamp: new Date()};
 		component.replayable = true;
 		component.startEdit();

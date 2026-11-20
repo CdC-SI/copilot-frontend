@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {ChatRequest} from '../model/rag';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable, filter, map} from 'rxjs';
@@ -9,10 +9,8 @@ import {ChatStreamEvent, toChatStreamEvent} from '../model/chat-stream-event';
 	providedIn: 'root'
 })
 export class RagService {
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly sseClient: SseClientService
-	) {}
+	private readonly config = inject(ConfigurationService);
+	private readonly sseClient = inject(SseClientService);
 
 	/** Flux des événements typés de la réponse ; se désabonner annule la génération côté client. */
 	process(ragRequest: ChatRequest): Observable<ChatStreamEvent> {

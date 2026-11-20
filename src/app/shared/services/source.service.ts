@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
@@ -6,12 +6,10 @@ import {CreateSourceRequest, SourceDto, UpdateSourceRequest} from '../model/sour
 
 @Injectable({providedIn: 'root'})
 export class SourceService {
-	private readonly SOURCES_URL = '/sources';
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly SOURCES_URL = '/sources';
 
 	/** GET /api/sources */
 	getAll(): Observable<SourceDto[]> {

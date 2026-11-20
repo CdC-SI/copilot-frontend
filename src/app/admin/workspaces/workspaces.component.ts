@@ -1,19 +1,58 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {MatTableDataSource} from '@angular/material/table';
+import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, inject} from '@angular/core';
+import {
+	MatCell,
+	MatCellDef,
+	MatColumnDef,
+	MatHeaderCell,
+	MatHeaderCellDef,
+	MatHeaderRow,
+	MatHeaderRowDef,
+	MatRow,
+	MatRowDef,
+	MatTable,
+	MatTableDataSource
+} from '@angular/material/table';
 import {MatDialog} from '@angular/material/dialog';
-import {ObNotificationService} from '@oblique/oblique';
+import {ObButtonDirective, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {CreateWorkspaceRequest, WorkspaceDto} from '../../shared/model/workspace';
 import {WorkspaceService} from '../../shared/services/workspace.service';
 import {WorkspaceEditDialogComponent, WorkspaceEditDialogResult} from './workspace-edit-dialog/workspace-edit-dialog.component';
 import {ConfirmDialogComponent} from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import {CatalogImportDialogComponent, CatalogImportDialogResult} from '../catalog-import-dialog/catalog-import-dialog.component';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatChip, MatChipSet} from '@angular/material/chips';
+import {DatePipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-workspaces',
 	templateUrl: './workspaces.component.html',
 	styleUrl: './workspaces.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatIcon,
+		MatTable,
+		MatColumnDef,
+		MatHeaderCellDef,
+		MatHeaderCell,
+		MatCellDef,
+		MatCell,
+		MatIconButton,
+		MatTooltip,
+		MatChipSet,
+		MatChip,
+		MatHeaderRowDef,
+		MatHeaderRow,
+		MatRowDef,
+		MatRow,
+		DatePipe,
+		TranslatePipe
+	]
 })
 export class WorkspacesComponent implements OnInit {
 	displayedColumns: string[] = ['name', 'description', 'sources', 'updatedAt', 'actions'];
@@ -22,12 +61,9 @@ export class WorkspacesComponent implements OnInit {
 
 	/** Émis quand l'utilisateur clique sur une source dans le détail d'un workspace, pour la mettre en évidence dans l'onglet Sources. */
 	@Output() readonly sourceSelected = new EventEmitter<string>();
-
-	constructor(
-		private readonly workspaceService: WorkspaceService,
-		private readonly dialog: MatDialog,
-		private readonly notif: ObNotificationService
-	) {}
+	private readonly workspaceService = inject(WorkspaceService);
+	private readonly dialog = inject(MatDialog);
+	private readonly notif = inject(ObNotificationService);
 
 	ngOnInit(): void {
 		this.reload();
