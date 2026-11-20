@@ -119,7 +119,7 @@ export class ChatStore {
 			this.attachmentsStore.load(chatTitle.conversationId, conversation.attachments);
 			this.manager.setConversationMessages(chatTitle.conversationId, messages);
 			this.suggestionService.setSpecificSuggestionsFromMessages(messages);
-			this.scrollRequests.next('last-user');
+			this.scrollRequests.next('opened');
 		});
 	}
 
