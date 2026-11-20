@@ -65,7 +65,10 @@ describe('ToolApprovalCardComponent', () => {
 		[{approval: {approvalId: 'ap1', expiresAt: '2030-01-01T00:00:30Z', unavailable: true}}, 'unavailable'],
 		[{status: 'ok'}, 'approved'],
 		[{status: 'expired'}, 'expired'],
-		[{status: 'cancelled'}, 'cancelled']
+		[{status: 'cancelled'}, 'cancelled'],
+		[{status: 'expired', approval: {approvalId: 'ap1', expiresAt: '2030-01-01T00:00:30Z', decision: 'APPROVE', sending: true}}, 'expired'],
+		[{status: 'rejected', approval: {approvalId: 'ap1', expiresAt: '2030-01-01T00:00:30Z', unavailable: true}}, 'rejected'],
+		[{status: 'ok', approval: {approvalId: 'ap1', expiresAt: '2030-01-01T00:00:30Z', decision: 'APPROVE', sending: true}}, 'approved']
 	] as [Partial<ToolStep>, string][])('affiche l’état final %j → %s', (patch, state) => {
 		expect(create(step(patch)).componentInstance.state()).toBe(state);
 	});

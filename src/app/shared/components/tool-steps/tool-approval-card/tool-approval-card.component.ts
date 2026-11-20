@@ -3,7 +3,7 @@ import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {TranslatePipe} from '@ngx-translate/core';
 import {ObButtonDirective} from '@oblique/oblique';
-import {ToolApprovalDecision, ToolStep, formatToolArguments, toolLabelKey} from '../../../model/tool-step';
+import {ToolApprovalDecision, ToolStep, formatToolArguments, isToolStepPending, toolLabelKey} from '../../../model/tool-step';
 
 export type ToolApprovalState = 'pending' | 'sending' | 'approved' | 'rejected' | 'expired' | 'unavailable' | 'cancelled';
 
@@ -26,12 +26,14 @@ export class ToolApprovalCardComponent {
 	readonly args = computed(() => formatToolArguments(this.step().arguments));
 	readonly secondsLeft = computed(() => Math.max(0, Math.ceil((Date.parse(this.step().approval?.expiresAt) - this.now()) / 1000)));
 	readonly state = computed<ToolApprovalState>(() => {
-		const {status, approval} = this.step();
+		const step = this.step();
+		const {status, approval} = step;
+		// Le résultat final du serveur (`tool_result`) prime sur l'état local de la décision.
+		if (status === 'expired' || status === 'cancelled' || status === 'rejected') return status;
+		if (!isToolStepPending(step)) return 'approved';
 		if (approval?.sending) return 'sending';
 		if (approval?.unavailable) return 'unavailable';
-		if (status === 'expired' || status === 'cancelled' || status === 'rejected') return status;
 		if (approval?.decision) return approval.decision === 'APPROVE' ? 'approved' : 'rejected';
-		if (status !== 'awaiting_approval') return 'approved';
 		return this.secondsLeft() > 0 ? 'pending' : 'expired';
 	});
 	private readonly now = signal(Date.now());
