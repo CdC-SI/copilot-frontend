@@ -1,10 +1,12 @@
 import {Injectable, OnDestroy, computed, inject, signal} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {ObNotificationService} from '@oblique/oblique';
+import {HttpErrorResponse} from '@angular/common/http';
 import {EMPTY, Subscription, merge, switchMap, timeout, timer} from 'rxjs';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {ChatRequest} from '../shared/model/rag';
 import {ChatStreamEvent} from '../shared/model/chat-stream-event';
+import {ToolApproval, ToolApprovalDecision, cancelPendingToolSteps} from '../shared/model/tool-step';
 import {ConversationService} from '../shared/services/conversation.service';
 import {RagService} from '../shared/services/rag.service';
 import {StreamHttpError} from '../shared/services/sse-client.service';
@@ -121,6 +123,35 @@ export class ChatGenerationStore implements OnDestroy {
 		});
 	}
 
+	/**
+	 * Décision de l'utilisateur sur un outil suspendu (`approval_required`). L'étape reste en attente jusqu'au
+	 * `tool_result` ; un 404 signifie que la demande a expiré, a été annulée ou déjà tranchée.
+	 */
+	decideToolApproval(conversationId: string, answerId: string, stepId: string, decision: ToolApprovalDecision): void {
+		const approvalId = this.manager.find(conversationId, answerId)?.toolSteps?.find(step => step.id === stepId)?.approval?.approvalId;
+		if (!approvalId) return;
+		const patch = (changes: Partial<ToolApproval>) => this.patchApproval(conversationId, answerId, stepId, changes);
+		patch({decision, sending: true});
+		this.conversationService.decideToolApproval(conversationId, approvalId, decision).subscribe({
+			next: () => patch({sending: false}),
+			error: (err: unknown) => {
+				if (err instanceof HttpErrorResponse && err.status === 404) {
+					patch({sending: false, unavailable: true});
+				} else {
+					patch({sending: false, decision: undefined});
+					this.notif.error('chat.tools.approval.error');
+				}
+			}
+		});
+	}
+
+	private patchApproval(conversationId: string, answerId: string, stepId: string, changes: Partial<ToolApproval>): void {
+		const answer = this.manager.find(conversationId, answerId);
+		if (!answer?.toolSteps) return;
+		const toolSteps = answer.toolSteps.map(step => (step.id === stepId && step.approval ? {...step, approval: {...step.approval, ...changes}} : step));
+		this.manager.replaceMessage(conversationId, answerId, {...answer, toolSteps});
+	}
+
 	private answerOf(target: StreamingTarget): ChatMessage | undefined {
 		return this.manager.find(target.conversationId, target.answerId);
 	}
@@ -210,7 +241,8 @@ export class ChatGenerationStore implements OnDestroy {
 			timestamp: new Date(),
 			isCompleted: true,
 			inError: true,
-			sources: []
+			sources: [],
+			toolSteps: cancelPendingToolSteps(answer.toolSteps)
 		};
 	}
 }

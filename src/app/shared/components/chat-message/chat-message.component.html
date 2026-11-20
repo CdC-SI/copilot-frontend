@@ -75,6 +75,9 @@
 					</button>
 				</div>
 			}
+			@if (message.toolSteps?.length) {
+				<zco-tool-steps [steps]="message.toolSteps" [generating]="isGenerating" (approvalDecided)="toolApproval.emit($event)" />
+			}
 			<markdown class="markdown-content" [data]="message.message"></markdown>
 			@if (hasMultipleSources) {
 				<mat-expansion-panel class="sources-panel" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">

@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {HttpClient, HttpEvent} from '@angular/common/http';
 import {AttachmentUploadResponse, ChatTitle, Conversation} from '../model/chat-history';
 import {ChatMessage} from '../model/chat-message';
+import {ToolApprovalDecision} from '../model/tool-step';
 
 @Injectable({
 	providedIn: 'root'
@@ -31,6 +32,11 @@ export class ConversationService {
 	/** Arrête une génération en cours (202) ; 404 si elle est inconnue ou déjà terminée. */
 	stopGeneration(conversationId: string, messageId: string): Observable<void> {
 		return this.http.post<void>(this.config.backendApi(`/conversations/${conversationId}/generations/${messageId}/stop`), null);
+	}
+
+	/** Décision sur un appel d'outil soumis à approbation (204) ; 404 si la demande est expirée, annulée ou déjà tranchée. */
+	decideToolApproval(conversationId: string, approvalId: string, decision: ToolApprovalDecision): Observable<void> {
+		return this.http.post<void>(this.config.backendApi(`/conversations/${conversationId}/approvals/${approvalId}`), {decision});
 	}
 
 	deleteConversation(id: string) {

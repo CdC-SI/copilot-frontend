@@ -10,6 +10,7 @@ import {Attachment, ChatTitle} from '../shared/model/chat-history';
 import {ChatMessage, ChatMessageSource} from '../shared/model/chat-message';
 import {Feedback} from '../shared/model/feedback';
 import {FormDef} from '../shared/model/form-definition';
+import {ToolApprovalRequest} from '../shared/model/tool-step';
 import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {ConversationService} from '../shared/services/conversation.service';
@@ -145,6 +146,10 @@ export class ChatStore {
 		this.generation.stop();
 	}
 
+	decideToolApproval(answer: ChatMessage, {stepId, decision}: ToolApprovalRequest): void {
+		this.generation.decideToolApproval(this.currentConversation()?.conversationId, answer.clientId, stepId, decision);
+	}
+
 	isReplayable(message: ChatMessage): boolean {
 		const turn = this.replayableTurn();
 		return !!turn && (message.clientId === turn.question.clientId || message.clientId === turn.answer.clientId);
@@ -169,9 +174,8 @@ export class ChatStore {
 	}
 
 	sendFeedback(feedback: Feedback): void {
-		this.feedbackService.sendAnswerFeedback({conversationId: this.currentConversation().conversationId, ...feedback}).subscribe(() => {
-			this.notif.success('feedback.success');
-		});
+		const conversationId = this.currentConversation().conversationId;
+		this.feedbackService.sendAnswerFeedback({conversationId, ...feedback}).subscribe(() => this.notif.success('feedback.success'));
 	}
 
 	handleSuggestionAction(action: string): void {
