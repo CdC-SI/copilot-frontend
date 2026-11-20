@@ -15,6 +15,7 @@ import {RagService} from '../shared/services/rag.service';
 import {StreamHttpError} from '../shared/services/sse-client.service';
 import {ChatAttachmentsStore} from './chat-attachments.store';
 import {ChatConversationsStore} from './chat-conversations.store';
+import {ChatScrollRequest} from './chat.models';
 import {ChatGenerationStore, STOP_TIMEOUT_MS} from './chat-generation.store';
 import {ChatStore} from './chat.store';
 import {ChatAutocompleteService} from './services';
@@ -80,7 +81,12 @@ describe('ChatStore', () => {
 	});
 
 	it('envoie la question puis affiche la réponse au fil du flux jusqu’à `done`', () => {
+		const scrolls: ChatScrollRequest[] = [];
+		store.scrollRequests.subscribe(request => scrolls.push(request));
 		ask('Bonjour');
+
+		// Question envoyée : le tour est épinglé en haut du fil.
+		expect(scrolls).toContain('last-user');
 
 		expect(ragService.process).toHaveBeenCalledWith(expect.objectContaining({query: 'Bonjour'}));
 		expect(store.messages().map(message => message.source)).toEqual([ChatMessageSource.USER, ChatMessageSource.LLM]);
@@ -221,8 +227,13 @@ describe('ChatStore', () => {
 		);
 		store.newChat();
 		TestBed.inject(ChatConversationsStore).loadTitles();
+		const scrolls: ChatScrollRequest[] = [];
+		store.scrollRequests.subscribe(request => scrolls.push(request));
 
 		store.selectConversation(title);
+
+		// Conversation ouverte depuis l'historique : pas d'espace épinglé sous le dernier tour.
+		expect(scrolls).toEqual(['opened']);
 
 		expect(conversationService.getConversation).toHaveBeenCalledWith('c1');
 		expect(store.currentConversation().conversationId).toBe('c1');

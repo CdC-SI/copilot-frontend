@@ -526,6 +526,7 @@
   "chat.ai-disclaimer": "ZIA kann Fehler machen. Es wird empfohlen, wichtige Informationen zu überprüfen.",
   "chat.composer.placeholder": "Stellen Sie eine Frage oder beschreiben Sie Ihr Anliegen…",
   "chat.composer.send": "Senden",
+  "chat.scroll-to-last-question": "Zur letzten Frage",
   "chat.new-conversation.short-tooltip": "Neue Unterhaltung",
   "chat.history.rename": "Unterhaltung umbenennen",
   "chat.history.delete": "Unterhaltung löschen",
