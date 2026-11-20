@@ -68,9 +68,9 @@ export class ChatAttachmentsStore implements OnDestroy {
 		this.conversationService.uploadAttachments(conversation, ...files).subscribe({
 			next: event => {
 				if (event.type !== HttpEventType.Response) return;
-				const conversationId = resolveConversation(event.body.conversationAttachments.conversationId);
-				// Réponse tardive : les fichiers ne sont plus affichés (changement de conversation), le suivi courant est conservé.
+				// Réponse tardive : les fichiers ne sont plus affichés (changement de conversation), la conversation et le suivi courants sont conservés.
 				if (!this.isDisplayed(files)) return;
+				const conversationId = resolveConversation(event.body.conversationAttachments.conversationId);
 				this.applyUploadResponse(event.body, files);
 				this.followProcessing(conversationId, event.body.status);
 			},
