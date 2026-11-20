@@ -8,21 +8,39 @@
 		width: 90%;
 	}
 
-	.question-container {
-		background-color: palette.$ob-secondary-50;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
+	// Carte de saisie alignée sur la colonne des messages (60 % de la largeur, cf. .message-container).
+	.composer {
 		flex-shrink: 0;
 		width: 60%;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 6px 8px;
+		background-color: palette.$ob-white;
+		border: 1px solid palette.$ob-secondary-100;
+		border-radius: 24px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+		transition:
+			border-color 0.15s ease,
+			box-shadow 0.15s ease;
 
-		button {
-			margin: 0 4px 20px;
+		&:focus-within {
+			border-color: palette.$ob-secondary-300;
+			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 		}
+	}
 
-		ut-autocomplete-input {
-			width: 50vw;
-		}
+	.composer-row {
+		display: flex;
+		align-items: flex-end;
+		gap: 4px;
+	}
+
+	.composer-action {
+		flex: none;
+		// Centré sur la ligne de 40px du champ (bouton de 36px).
+		margin: 0 2px 2px 0;
+		border-radius: 50%;
 	}
 
 	.ai-disclaimer {

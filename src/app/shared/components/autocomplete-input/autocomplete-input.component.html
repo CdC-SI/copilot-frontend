@@ -1,30 +1,39 @@
-<mat-form-field>
-	<mat-label>{{ i18nLabel | translate }}</mat-label>
+<div class="input-row" matAutocompleteOrigin #origin="matAutocompleteOrigin">
+	<button
+		mat-icon-button
+		type="button"
+		class="attach-button"
+		[attr.aria-label]="'add.attachment' | translate"
+		[matTooltip]="'add.attachment' | translate"
+		(click)="file.click()"
+	>
+		<mat-icon svgIcon="file_add"></mat-icon>
+	</button>
 	<textarea
 		#itemFilterInput
+		class="input-textarea"
 		[formControl]="formControl"
-		matInput
+		[placeholder]="i18nLabel | translate"
+		[attr.aria-label]="i18nLabel | translate"
 		[matAutocomplete]="autoInput"
+		[matAutocompleteConnectedTo]="origin"
 		cdkTextareaAutosize
 		[cdkAutosizeMinRows]="1"
-		[cdkAutosizeMaxRows]="6"
+		[cdkAutosizeMaxRows]="8"
 		(keydown)="onKeydown($event)"
 		rows="1"
 	></textarea>
-	<button mat-icon-button matPrefix type="button" aria-label="Add attachments" (click)="file.click()" [matTooltip]="'add.attachment' | translate">
-		<mat-icon svgIcon="file_add"></mat-icon>
-	</button>
-	<input #file type="file" multiple hidden (change)="onFilesChange($event)" />
+</div>
+<input #file type="file" multiple hidden (change)="onFilesChange($event)" />
 
-	<mat-autocomplete
-		autoSelectActiveOption="true"
-		autoActiveFirstOption="false"
-		#autoInput="matAutocomplete"
-		(optionSelected)="fireOptionSelected($event.option.value)"
-		[displayWith]="getProposalLabelFn()"
-	>
-		@for (option of options | async; track option) {
-			<mat-option [value]="option" [innerHTML]="getOptionLabel(option)"></mat-option>
-		}
-	</mat-autocomplete>
-</mat-form-field>
+<mat-autocomplete
+	autoSelectActiveOption="true"
+	autoActiveFirstOption="false"
+	#autoInput="matAutocomplete"
+	(optionSelected)="fireOptionSelected($event.option.value)"
+	[displayWith]="getProposalLabelFn()"
+>
+	@for (option of options | async; track option) {
+		<mat-option [value]="option" [innerHTML]="getOptionLabel(option)"></mat-option>
+	}
+</mat-autocomplete>

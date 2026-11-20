@@ -1,15 +1,45 @@
+@use '@oblique/oblique/styles/scss/core/palette';
+
+// Champ de saisie sans mat-form-field : bouton pièces jointes et texte alignés sur une même ligne de 40px.
 :host {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
+	flex: 1;
+	min-width: 0;
+	display: block;
 }
 
-mat-form-field {
-  width: 100%;
+.input-row {
+	display: flex;
+	align-items: flex-end;
+	gap: 4px;
 }
 
-textarea {
-  resize: none;
-  overflow-y: auto;
-  line-height: 1.5;
+.attach-button {
+	flex: none;
+	color: palette.$ob-secondary-500;
+}
+
+.input-textarea {
+	flex: 1;
+	min-width: 0;
+	box-sizing: content-box;
+	margin: 0;
+	padding: 8px 4px;
+	border: none;
+	outline: none;
+	background: transparent;
+	resize: none;
+	overflow-y: auto;
+	font: inherit;
+	font-size: 1rem;
+	line-height: 24px;
+	color: inherit;
+
+	&::placeholder {
+		color: palette.$ob-secondary-300;
+	}
+
+	&:disabled {
+		color: palette.$ob-secondary-300;
+		cursor: not-allowed;
+	}
 }
