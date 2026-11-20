@@ -65,8 +65,9 @@ export class ChatTimelineComponent implements AfterViewInit, OnDestroy {
 		this.layoutObserver?.disconnect();
 	}
 
-	/** Exemple de l'état vide : pré-remplit la saisie sans l'envoyer. */
+	/** Exemple de l'état vide : pré-remplit la saisie sans l'envoyer (un formulaire dynamique ouvert la masquerait). */
 	useExample(text: string): void {
+		this.store.closeForm();
 		this.store.searchCtrl.setValue(text);
 		this.store.focusRequests.next();
 	}

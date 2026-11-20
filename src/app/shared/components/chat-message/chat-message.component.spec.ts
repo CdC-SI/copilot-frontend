@@ -45,6 +45,15 @@ describe('ChatMessageComponent (modification de la question)', () => {
 		expect(component.showActions).toBe(true);
 	});
 
+	it('n’anime le statut d’avancement que pendant la génération', () => {
+		component.message = {clientId: 'c1', message: 'Recherche…', status: 'searching', source: ChatMessageSource.LLM, timestamp: new Date(), isCompleted: false};
+		expect(component.showsProgressStatus).toBe(true);
+
+		// Flux interrompu en erreur : le statut est conservé mais la réponse est terminée.
+		Object.assign(component.message, {isCompleted: true, inError: true});
+		expect(component.showsProgressStatus).toBe(false);
+	});
+
 	it('émet la question modifiée, sans espaces superflus', () => {
 		component.startEdit();
 		component.editedQuestion = '  Nouvelle question  ';

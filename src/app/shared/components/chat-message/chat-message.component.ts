@@ -65,6 +65,11 @@ export class ChatMessageComponent {
 		return this.message.source !== ChatMessageSource.USER && !this.message.isCompleted;
 	}
 
+	/** Statut d'avancement animé : seulement pendant la génération (une erreur finale garde son statut, figée). */
+	get showsProgressStatus(): boolean {
+		return this.isGenerating && !!this.message.status;
+	}
+
 	/** Barre d'actions (feedback, copier, régénérer) : réponse terminée et enregistrée. */
 	get showActions(): boolean {
 		return !!this.message.isCompleted && !this.message.inError && !(this.message.interrupted && !this.message.id);

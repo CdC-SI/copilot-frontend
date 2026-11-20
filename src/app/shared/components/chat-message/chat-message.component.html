@@ -80,7 +80,7 @@
 			}
 			<markdown
 				class="markdown-content"
-				[class.status-label]="!!message.status"
+				[class.status-label]="showsProgressStatus"
 				[class.streaming]="isGenerating && !message.status && !!message.message"
 				[data]="message.message"
 			></markdown>
