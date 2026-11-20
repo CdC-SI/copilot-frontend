@@ -1,28 +1,29 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject} from '@angular/core';
 import {AlertsService} from '../../services/alert.service';
 import {Alert} from '../../model/alerts';
 import {Subject, takeUntil} from 'rxjs';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {UserStatus} from '../../model/user';
 import {AuthenticationServiceV2} from '../../services/auth.service';
+import {NgClass} from '@angular/common';
+import {MatIcon} from '@angular/material/icon';
+import {MatIconButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
 
 @Component({
 	selector: 'zco-alert-banner',
 	templateUrl: './alert-banner.component.html',
 	styleUrls: ['./alert-banner.component.scss'],
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [NgClass, MatIcon, MatIconButton, MatTooltip, TranslatePipe]
 })
 export class AlertBannerComponent implements OnInit, OnDestroy {
 	alerts: Alert[] = [];
 	private readonly destroy$ = new Subject<void>();
 	private readonly DISMISSED_ALERTS_KEY = 'dismissedAlerts';
-
-	constructor(
-		private readonly authService: AuthenticationServiceV2,
-		private readonly alertService: AlertsService,
-		private readonly translate: TranslateService
-	) {}
+	private readonly authService = inject(AuthenticationServiceV2);
+	private readonly alertService = inject(AlertsService);
+	private readonly translate = inject(TranslateService);
 
 	ngOnInit(): void {
 		this.authService.$authenticatedUser.subscribe(user => {

@@ -6,8 +6,8 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 
 ## Stack
 
-- **Angular 22** (architecture à **NgModules** : `AppModule`, `SharedModule`, `MaterialModule` ;
-  composants `standalone: false`, migration standalone prévue en FE1b), **TypeScript 6.0**, **RxJS**,
+- **Angular 22** (composants **standalone**, sans NgModule : `bootstrapApplication` dans `main.ts`, providers dans
+  `app.config.ts` dont `provideZoneChangeDetection()`, routes dans `app.routes.ts`), **TypeScript 6.0**, **RxJS**,
   Node 22.22+/24.15+ (`engines`). Templates en control flow (`@if`/`@for`/`@switch`) ;
   `ChangeDetectionStrategy.Eager` explicite (passage OnPush prévu avec FE1b/FE4). Le `router-outlet` est dans
   `ob-master-layout`, OnPush : `AppComponent.ngDoCheck` le marque à chaque cycle pour que les pages routées se
@@ -15,8 +15,11 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - UI : **Oblique 16** (`@oblique/oblique`, master layout, inputs en signals) + Angular Material/CDK 22
   + **ZDS 22** (`@zas-design-system/zas-design-system` : environnements, gateway, jeton `blue`).
 - i18n : **ngx-translate 18** (`TranslateService` fourni par `provideObliqueConfiguration`,
-  `TranslatePipe` exporté par `SharedModule`, `getCurrentLang()`), fichiers `src/assets/i18n/{fr,de,it}.json`.
+  `TranslatePipe` importé par chaque composant, `getCurrentLang()`), fichiers `src/assets/i18n/{fr,de,it}.json`.
 - Tests : **Jest 30** via `@angular-builders/jest` (`tests/` : `jest.config.js`, `setupJest.ts`, mocks).
+  Les paquets publiés en ESM seul (`.js`) importés par les composants doivent figurer dans
+  `transformIgnorePatterns` (`jest.config.js`). Instancier une classe qui utilise `inject()` hors TestBed :
+  `runInInjectionContext(Injector.create({providers: [...]}), () => new Classe())`.
 - Lint/format : ESLint 10 en flat config (`eslint.config.mjs`, paquets `angular-eslint` et
   `typescript-eslint`) + Prettier (`.prettierrc`).
 - `package.json` : `allowScripts` liste les paquets autorisés à exécuter un script d'installation,
@@ -39,16 +42,17 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
   (stream processor, conversation manager, suggestions, autocomplete).
 - `corpus/`, `tools/<outil>/`, `admin/<écran>/`, `tips/`.
 - `shared/` : `components`, `services` (API, auth…), `interceptors`, `model`, `pipes`, `utils`,
-  `constants`, `material`.
+  `constants`.
 - Les appels API passent par `ConfigurationService.backendApi(subPath)`.
 
 ## Conventions de code
 
 - Style Prettier : **tabulations**, guillemets simples, point-virgule, pas d'espace dans les accolades
   (`{a}`), pas de virgule finale, `arrowParens: avoid`.
-- Injection par constructeur avec `private readonly`. Services `providedIn: 'root'`.
-- Nouveaux composants : rester cohérent avec les NgModules existants tant que la migration standalone
-  (FE1b) n'est pas faite ; utiliser le control flow (`@if`/`@for`), pas `*ngIf`/`*ngFor`.
+- Injection avec `inject()` (`private readonly x = inject(X)`, déclaré après les champs publics : règle
+  `member-ordering`), pas de paramètres de constructeur (`prefer-inject`). Services `providedIn: 'root'`.
+- Composants standalone (`prefer-standalone`) : importer dans `imports` exactement ce que le template utilise
+  (pas de module « fourre-tout ») ; utiliser le control flow (`@if`/`@for`), pas `*ngIf`/`*ngFor`.
 - Tout texte visible passe par ngx-translate : ajouter la clé dans **fr, de et it** (y compris
   `aria-label`).
 - Éviter `any` ; typer les modèles dans `shared/model`.

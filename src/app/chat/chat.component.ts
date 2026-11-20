@@ -10,10 +10,11 @@ import {
 	QueryList,
 	TemplateRef,
 	ViewChild,
-	ViewChildren
+	ViewChildren,
+	inject
 } from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
-import {FormControl, FormGroup} from '@angular/forms';
+import {MatDialog, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {IQuestion, Language} from '../shared/model/answer';
 import {RagService} from '../shared/services/rag.service';
 import {StreamHttpError} from '../shared/services/sse-client.service';
@@ -26,10 +27,10 @@ import {SpeechService} from '../shared/services/speech.service';
 import {Attachment, AttachmentDTO, AttachmentStatus, AttachmentUploadResponse, ChatTitle, ConversationType} from '../shared/model/chat-history';
 import {extractUploadErrorCode, isRetryableUploadError, uploadErrorKey, uploadErrorNotification} from '../shared/utils/upload-error.utils';
 import {ConversationService} from '../shared/services/conversation.service';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {Feedback} from '../shared/model/feedback';
 import {FeedbackService} from '../shared/services/feedback.service';
-import {ObNotificationService} from '@oblique/oblique';
+import {ObButtonDirective, ObColumnLayoutComponent, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {FormDef} from '../shared/model/form-definition';
@@ -46,6 +47,21 @@ import {
 } from './services';
 import {EMPTY, Subject, Subscription, merge, switchMap, take, takeUntil, takeWhile, timeout, timer} from 'rxjs';
 import {v4 as uuidv4} from 'uuid';
+import {AlertBannerComponent} from '../shared/components/alert-banner/alert-banner.component';
+import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
+import {MatButton, MatIconButton, MatMiniFabButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
+import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
+import {ChatHistoryComponent} from '../shared/components/chat-history/chat-history.component';
+import {DecimalPipe, NgClass} from '@angular/common';
+import {ChatMessageComponent} from '../shared/components/chat-message/chat-message.component';
+import {DynamicFormComponent} from '../shared/components/dynamic-form/dynamic-form.component';
+import {QuestionSuggestionComponent} from '../shared/components/question-suggestion/question-suggestion.component';
+import {ActionSuggestionsComponent} from '../shared/components/action-suggestions/action-suggestions.component';
+import {AutocompleteInputComponent} from '../shared/components/autocomplete-input/autocomplete-input.component';
+import {MatChip, MatChipListbox, MatChipRemove} from '@angular/material/chips';
+import {CdkScrollable} from '@angular/cdk/scrolling';
 
 const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
 const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
@@ -79,7 +95,40 @@ interface StreamingTarget {
 	templateUrl: './chat.component.html',
 	styleUrls: ['./chat.component.scss'],
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		AlertBannerComponent,
+		ObColumnLayoutComponent,
+		MatCard,
+		MatCardHeader,
+		MatCardTitle,
+		MatIconButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatTooltip,
+		MatIcon,
+		MatMenuTrigger,
+		MatCardContent,
+		ChatHistoryComponent,
+		MatMenu,
+		NgClass,
+		ChatMessageComponent,
+		MatMiniFabButton,
+		DynamicFormComponent,
+		QuestionSuggestionComponent,
+		ActionSuggestionsComponent,
+		FormsModule,
+		AutocompleteInputComponent,
+		ReactiveFormsModule,
+		MatChipListbox,
+		MatChip,
+		MatButton,
+		MatChipRemove,
+		MatDialogTitle,
+		CdkScrollable,
+		MatDialogContent,
+		DecimalPipe,
+		TranslatePipe
+	]
 })
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	Object = Object;
@@ -116,6 +165,21 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	private readonly activeStreams = new Map<StreamingTarget, ActiveStream>();
 	private pollingStop$ = new Subject<void>();
 	private pollingCancelled = false;
+	private readonly ragService = inject(RagService);
+	private readonly cdr = inject(ChangeDetectorRef);
+	private readonly speechService = inject(SpeechService);
+	private readonly authService = inject(AuthenticationServiceV2);
+	private readonly conversationService = inject(ConversationService);
+	private readonly translateService = inject(TranslateService);
+	private readonly feedbackService = inject(FeedbackService);
+	private readonly notif = inject(ObNotificationService);
+	private readonly dfs = inject(DynamicFormService);
+	private readonly streamProcessor = inject(ChatStreamProcessorService);
+	private readonly conversationManager = inject(ChatConversationManagerService);
+	private readonly suggestionService = inject(ChatSuggestionService);
+	private readonly autocompleteService = inject(ChatAutocompleteService);
+	private readonly authDialogService = inject(UserAuthDialogService);
+	private readonly dialog = inject(MatDialog);
 
 	get messages(): ChatMessage[] {
 		return this.conversationManager.getMessages(this.currentConversationTitle?.conversationId);
@@ -128,24 +192,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 	get specificSuggestions() {
 		return this.suggestionService.getSpecificSuggestions();
 	}
-
-	constructor(
-		private readonly ragService: RagService,
-		private readonly cdr: ChangeDetectorRef,
-		private readonly speechService: SpeechService,
-		private readonly authService: AuthenticationServiceV2,
-		private readonly conversationService: ConversationService,
-		private readonly translateService: TranslateService,
-		private readonly feedbackService: FeedbackService,
-		private readonly notif: ObNotificationService,
-		private readonly dfs: DynamicFormService,
-		private readonly streamProcessor: ChatStreamProcessorService,
-		private readonly conversationManager: ChatConversationManagerService,
-		private readonly suggestionService: ChatSuggestionService,
-		private readonly autocompleteService: ChatAutocompleteService,
-		private readonly authDialogService: UserAuthDialogService,
-		private readonly dialog: MatDialog
-	) {}
 
 	/**
 	 * Indique si la conversation courante est en mode "sans Corpus" (LLM seul). Une fois la conversation

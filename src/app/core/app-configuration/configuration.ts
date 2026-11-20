@@ -9,7 +9,7 @@ export interface Configuration {
 	apiUrl?: string;
 }
 
-export const ZCO_CONFIGURATIONS_TOKEN = new InjectionToken('zco-configuration');
+export const ZCO_CONFIGURATIONS_TOKEN = new InjectionToken<Configuration[]>('zco-configuration');
 
 export const ZCO_CONFIGURATIONS: Configuration[] = [
 	{

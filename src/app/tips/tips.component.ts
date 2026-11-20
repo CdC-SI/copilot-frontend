@@ -1,4 +1,7 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {MatIcon} from '@angular/material/icon';
+import {MatCard, MatCardContent} from '@angular/material/card';
+import {TranslatePipe} from '@ngx-translate/core';
 
 /** A help illustration (example image). */
 interface HelpImage {
@@ -28,7 +31,7 @@ interface HelpDocument {
 	templateUrl: './tips.component.html',
 	styleUrls: ['./tips.component.scss'],
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [MatIcon, MatCard, MatCardContent, TranslatePipe]
 })
 export class TipsComponent {
 	images: HelpImage[] = [

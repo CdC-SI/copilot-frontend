@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, map} from 'rxjs';
 import {Alert, AlertView, CreateAlertDTO, UpdateAlertDTO} from '../model/alerts';
@@ -6,10 +6,8 @@ import {ConfigurationService} from '../../core/app-configuration/configuration.s
 
 @Injectable({providedIn: 'root'})
 export class AlertsService {
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
 	/** GET /api/alerts/all - l’ensemble des alertes pour gestion Admin */
 	getAlerts(): Observable<AlertView[]> {

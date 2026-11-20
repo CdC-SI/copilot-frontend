@@ -1,10 +1,17 @@
-import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA} from '@angular/material/dialog';
-import {ObNotificationService} from '@oblique/oblique';
+import {ChangeDetectionStrategy, Component, OnInit, inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
+import {ObButtonDirective, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {WorkspaceDto} from '../../model/workspace';
 import {SourceDto} from '../../model/source';
 import {WorkspaceService} from '../../services/workspace.service';
 import {SourceService} from '../../services/source.service';
+import {MatIcon} from '@angular/material/icon';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatButton} from '@angular/material/button';
+import {TranslatePipe} from '@ngx-translate/core';
 
 export interface WorkspaceContentDialogData {
 	workspaceName: string;
@@ -20,21 +27,36 @@ export interface WorkspaceContentDialogData {
 	templateUrl: './workspace-content-dialog.component.html',
 	styleUrl: './workspace-content-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatDialogTitle,
+		MatIcon,
+		CdkScrollable,
+		MatDialogContent,
+		MatProgressSpinner,
+		MatAccordion,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
+		MatTooltip,
+		MatDialogActions,
+		MatButton,
+		MatDialogClose,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		TranslatePipe
+	]
 })
 export class WorkspaceContentDialogComponent implements OnInit {
+	data = inject<WorkspaceContentDialogData>(MAT_DIALOG_DATA);
+
 	workspace: WorkspaceDto | null = null;
 	isLoading = false;
 
 	private readonly contentsCache = new Map<string, SourceDto>();
 	private readonly loadingContentFor = new Set<string>();
-
-	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: WorkspaceContentDialogData,
-		private readonly workspaceService: WorkspaceService,
-		private readonly sourceService: SourceService,
-		private readonly notif: ObNotificationService
-	) {}
+	private readonly workspaceService = inject(WorkspaceService);
+	private readonly sourceService = inject(SourceService);
+	private readonly notif = inject(ObNotificationService);
 
 	ngOnInit(): void {
 		this.isLoading = true;

@@ -1,17 +1,42 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, OnInit, inject} from '@angular/core';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {UserFormFields} from '../../model/user';
 import {MatDialogRef} from '@angular/material/dialog';
 import {AuthenticationServiceV2} from '../../services/auth.service';
 import {LEGAL_CONFIDENTIALITY_TEXT, LEGAL_GCU_TEXT} from '../../constants/legal-texts.constants';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {ObButtonDirective, ObErrorMessagesDirective, ObIconButtonDirective} from '@oblique/oblique';
+import {MatInput} from '@angular/material/input';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
+import {TranslatePipe} from '@ngx-translate/core';
 @Component({
 	selector: 'zco-sign-up',
 	templateUrl: './sign-up.component.html',
 	styleUrl: './sign-up.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		FormsModule,
+		ReactiveFormsModule,
+		MatFormField,
+		ObErrorMessagesDirective,
+		MatLabel,
+		MatInput,
+		MatCheckbox,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatIcon,
+		MatTabGroup,
+		MatTab,
+		TranslatePipe
+	]
 })
 export class SignUpComponent implements OnInit {
+	dialogRef = inject<MatDialogRef<SignUpComponent>>(MatDialogRef);
+
 	FORM_FIELDS = UserFormFields;
 	userFrmGrp: FormGroup;
 	userIsFromZas: boolean = true;
@@ -37,11 +62,8 @@ export class SignUpComponent implements OnInit {
 	// Reuse texts from the shared legal document dialog
 	confidentialityText = LEGAL_CONFIDENTIALITY_TEXT;
 	gcuText = LEGAL_GCU_TEXT;
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly authService: AuthenticationServiceV2,
-		public dialogRef: MatDialogRef<SignUpComponent>
-	) {}
+	private readonly fb = inject(FormBuilder);
+	private readonly authService = inject(AuthenticationServiceV2);
 	ngOnInit() {
 		this.buildForm();
 	}

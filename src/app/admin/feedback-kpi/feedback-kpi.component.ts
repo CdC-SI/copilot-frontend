@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, inject} from '@angular/core';
 import {FeedbackService, TimeRange} from '../../shared/services/feedback.service';
 import {
 	FEEDBACK_STATUSES,
@@ -9,17 +9,40 @@ import {
 	IMessageFeedback,
 	ISourceFeedback
 } from '../../shared/model/feedback';
-import {MatTableDataSource} from '@angular/material/table';
+import {
+	MatCell,
+	MatCellDef,
+	MatColumnDef,
+	MatHeaderCell,
+	MatHeaderCellDef,
+	MatHeaderRow,
+	MatHeaderRowDef,
+	MatRow,
+	MatRowDef,
+	MatTable,
+	MatTableDataSource
+} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
-import {MatSort} from '@angular/material/sort';
+import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {MatDialog} from '@angular/material/dialog';
 import {BehaviorSubject, Subject, combineLatest} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {FeedbackDetailDialogComponent} from './feedback-detail-dialog/feedback-detail-dialog.component';
 import {ChartConfiguration, Chart as ChartJS, registerables} from 'chart.js';
 import {DocumentFeedbackDetailDialogComponent} from './document-feedback-detail-dialog/document-feedback-detail-dialog.component';
-import {ObNotificationService} from '@oblique/oblique';
-import {TranslateService} from '@ngx-translate/core';
+import {ObButtonDirective, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {MatButtonToggle, MatButtonToggleGroup} from '@angular/material/button-toggle';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
+import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
+import {BaseChartDirective} from 'ng2-charts';
+import {MatIconButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatIcon} from '@angular/material/icon';
+import {FeedbackStatusSelectComponent} from './feedback-status-select/feedback-status-select.component';
+import {DatePipe, PercentPipe} from '@angular/common';
 
 ChartJS.register(...registerables);
 
@@ -33,7 +56,40 @@ const ALL_CATEGORIES: FeedbackCategory[] = ['WRONG_SOURCE', 'WRONG_ANSWER', 'INC
 	templateUrl: './feedback-kpi.component.html',
 	styleUrl: './feedback-kpi.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatButtonToggleGroup,
+		MatButtonToggle,
+		MatFormField,
+		MatLabel,
+		MatSelect,
+		MatOption,
+		MatCard,
+		MatCardTitle,
+		MatCardContent,
+		BaseChartDirective,
+		MatTable,
+		MatSort,
+		MatColumnDef,
+		MatHeaderCellDef,
+		MatHeaderCell,
+		MatCellDef,
+		MatCell,
+		MatSortHeader,
+		MatIconButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatTooltip,
+		MatIcon,
+		MatHeaderRowDef,
+		MatHeaderRow,
+		MatRowDef,
+		MatRow,
+		MatPaginator,
+		FeedbackStatusSelectComponent,
+		PercentPipe,
+		DatePipe,
+		TranslatePipe
+	]
 })
 export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	range: TimeRange = '30d';
@@ -81,13 +137,10 @@ export class FeedbackKpiComponent implements OnInit, OnDestroy {
 	// Unfiltered data for the selected range, used to compute filters/breakdowns client-side
 	private rawMessages: IMessageFeedback[] = [];
 	private rawSources: ISourceFeedback[] = [];
-
-	constructor(
-		private readonly feedback: FeedbackService,
-		private readonly dialog: MatDialog,
-		private readonly notif: ObNotificationService,
-		private readonly translate: TranslateService
-	) {}
+	private readonly feedback = inject(FeedbackService);
+	private readonly dialog = inject(MatDialog);
+	private readonly notif = inject(ObNotificationService);
+	private readonly translate = inject(TranslateService);
 
 	ngOnInit(): void {
 		this.rangeSubject$.pipe(takeUntil(this.destroy$)).subscribe(range => {

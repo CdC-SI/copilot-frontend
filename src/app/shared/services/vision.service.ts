@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
@@ -8,14 +8,12 @@ import {StructuredFields, SumexInvoice, ZasDocumentType} from '../model/vision';
 	providedIn: 'root'
 })
 export class VisionService {
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
+
 	private readonly OCR_URL = '/visualize/structure';
 	private readonly CLASSIFY_URL = '/visualize/classify';
 	private readonly TRANSLATE_URL = '/visualize/translate';
-
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
 
 	ocrFile(file: File, fields: string): Observable<StructuredFields> {
 		const formData: FormData = new FormData();

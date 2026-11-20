@@ -1,13 +1,29 @@
-import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, inject} from '@angular/core';
 import {FaqItemFields, IFaqItem} from '../../model/faq';
-import {ControlValueAccessor, FormBuilder, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator, Validators} from '@angular/forms';
+import {
+	ControlValueAccessor,
+	FormBuilder,
+	FormGroup,
+	FormsModule,
+	NG_VALIDATORS,
+	NG_VALUE_ACCESSOR,
+	ReactiveFormsModule,
+	ValidationErrors,
+	Validator,
+	Validators
+} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
-import {TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {SettingsService} from '../../services/settings.service';
 import {SettingsType} from '../../model/settings';
 import {SettingsEventService} from '../../services/settings-event.service';
 import {AuthenticationServiceV2} from '../../services/auth.service';
 import {UserStatus} from '../../model/user';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {ObErrorMessagesDirective, ObMatErrorDirective} from '@oblique/oblique';
+import {MatInput} from '@angular/material/input';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
 
 @Component({
 	selector: 'zco-faq-item-edit',
@@ -26,7 +42,19 @@ import {UserStatus} from '../../model/user';
 		}
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	standalone: false
+	imports: [
+		FormsModule,
+		ReactiveFormsModule,
+		MatFormField,
+		ObErrorMessagesDirective,
+		MatLabel,
+		MatInput,
+		ObMatErrorDirective,
+		MatError,
+		MatSelect,
+		MatOption,
+		TranslatePipe
+	]
 })
 export class FaqItemEditComponent implements ControlValueAccessor, Validator, OnInit, OnDestroy {
 	readonly FORM_FIELDS = FaqItemFields;
@@ -36,14 +64,11 @@ export class FaqItemEditComponent implements ControlValueAccessor, Validator, On
 	languages = ['de', 'fr', 'it', 'en'];
 	@Input() editMode: boolean;
 	TAGS: string[] = [];
-
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly translateService: TranslateService,
-		private readonly settingsService: SettingsService,
-		private readonly settingsEventService: SettingsEventService,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly fb = inject(FormBuilder);
+	private readonly translateService = inject(TranslateService);
+	private readonly settingsService = inject(SettingsService);
+	private readonly settingsEventService = inject(SettingsEventService);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	ngOnInit(): void {
 		this.faqItemFrmGrp = this.fb.group({

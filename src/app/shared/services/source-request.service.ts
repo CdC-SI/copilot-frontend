@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
@@ -8,12 +8,10 @@ import {ISourceRequest} from '../model/source-request';
 	providedIn: 'root'
 })
 export class SourceRequestService {
-	private readonly SOURCE_REQUESTS_URL = '/source-requests';
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly SOURCE_REQUESTS_URL = '/source-requests';
 
 	getMyRequests(): Observable<ISourceRequest[]> {
 		return this.http.get<ISourceRequest[]>(this.config.backendApi(`${this.SOURCE_REQUESTS_URL}/my`));

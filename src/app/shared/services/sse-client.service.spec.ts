@@ -1,4 +1,5 @@
 import {TextDecoder as NodeTextDecoder, TextEncoder as NodeTextEncoder} from 'util';
+import {Injector, runInInjectionContext} from '@angular/core';
 import {SseClientService, StreamHttpError} from './sse-client.service';
 import {GatewayAuthService} from './gateway-auth.service';
 import {SseEvent} from '../utils/sse-parser';
@@ -50,7 +51,7 @@ describe('SseClientService', () => {
 			refreshToken: jest.fn(),
 			displayUnauthorized: jest.fn()
 		};
-		client = new SseClientService(gateway as unknown as GatewayAuthService);
+		client = runInInjectionContext(Injector.create({providers: [{provide: GatewayAuthService, useValue: gateway}]}), () => new SseClientService());
 		fetchMock = jest.fn();
 		Object.assign(globalThis, {fetch: fetchMock});
 	});

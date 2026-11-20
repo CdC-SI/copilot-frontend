@@ -39,9 +39,9 @@ export default defineConfig([
 				}
 			],
 			'@angular-eslint/no-pipe-impure': 'error',
-			'@angular-eslint/prefer-inject': 'off',
+			'@angular-eslint/prefer-inject': 'error',
 			'@angular-eslint/prefer-on-push-component-change-detection': 'off',
-			'@angular-eslint/prefer-standalone': 'off',
+			'@angular-eslint/prefer-standalone': 'error',
 			'@angular-eslint/prefer-output-readonly': 'error',
 			'@angular-eslint/relative-url-prefix': 'error',
 			'@angular-eslint/use-component-selector': 'error',

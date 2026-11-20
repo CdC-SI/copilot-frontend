@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject} from '@angular/core';
 import {Observable, Subject, forkJoin, of, timer} from 'rxjs';
 import {catchError, finalize, map, switchMap, takeUntil, takeWhile} from 'rxjs/operators';
-import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
+import {ObButtonDirective, ObEUploadEventType, ObFileUploadComponent, ObIUploadEvent, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {MatDialog} from '@angular/material/dialog';
 import {IDocument} from '../shared/model/document';
 import {IPersonalDocument} from '../shared/model/personal-document';
@@ -12,6 +12,16 @@ import {RequestSourceDialogComponent} from './request-source-dialog/request-sour
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {UserStatus} from '../shared/model/user';
 import {uploadErrorKey, uploadErrorNotification} from '../shared/utils/upload-error.utils';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
+import {MatIcon} from '@angular/material/icon';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatCard, MatCardActions, MatCardAvatar, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
+import {MatChip} from '@angular/material/chips';
+import {MatTooltip} from '@angular/material/tooltip';
+import {OfficialSourcesBrowserComponent} from './official-sources-browser/official-sources-browser.component';
+import {DatePipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 const BYTES_TO_KB = 1024;
 const AUTO_REFRESH_INTERVAL_MS = 30_000;
@@ -26,7 +36,29 @@ interface UploadResult {
 	templateUrl: './corpus.component.html',
 	styleUrl: './corpus.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatTabGroup,
+		MatTab,
+		ObFileUploadComponent,
+		MatIcon,
+		MatIconButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatButton,
+		MatProgressSpinner,
+		MatCard,
+		MatCardHeader,
+		MatCardAvatar,
+		MatCardTitle,
+		MatCardSubtitle,
+		MatChip,
+		MatCardContent,
+		MatCardActions,
+		MatTooltip,
+		OfficialSourcesBrowserComponent,
+		DatePipe,
+		TranslatePipe
+	]
 })
 export class CorpusComponent implements OnInit, OnDestroy {
 	documentsToUpload: IDocument[] = [];
@@ -41,14 +73,11 @@ export class CorpusComponent implements OnInit, OnDestroy {
 	readonly SourceRequestStatus = SourceRequestStatus;
 
 	private readonly destroy$ = new Subject<void>();
-
-	constructor(
-		private readonly uploadService: UploadService,
-		private readonly notifService: ObNotificationService,
-		private readonly sourceRequestService: SourceRequestService,
-		private readonly dialog: MatDialog,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly uploadService = inject(UploadService);
+	private readonly notifService = inject(ObNotificationService);
+	private readonly sourceRequestService = inject(SourceRequestService);
+	private readonly dialog = inject(MatDialog);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	ngOnInit(): void {
 		/*

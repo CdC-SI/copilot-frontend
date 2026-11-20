@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {Observable, Subscriber} from 'rxjs';
 import {GatewayAuthService} from './gateway-auth.service';
 import {SseEvent, SseParser} from '../utils/sse-parser';
@@ -22,7 +22,7 @@ export class StreamHttpError extends Error {
  */
 @Injectable({providedIn: 'root'})
 export class SseClientService {
-	constructor(private readonly gatewayAuth: GatewayAuthService) {}
+	private readonly gatewayAuth = inject(GatewayAuthService);
 
 	post(url: string, body: FormData): Observable<SseEvent> {
 		return new Observable<SseEvent>(subscriber => {

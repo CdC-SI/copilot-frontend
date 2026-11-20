@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {Configuration, ZCO_CONFIGURATIONS_TOKEN} from './configuration';
 import {ObHttpApiInterceptorConfig, ObMasterLayoutConfig, WINDOW} from '@oblique/oblique';
 import {NavigationEnd, Router} from '@angular/router';
@@ -13,17 +13,16 @@ import {HttpClient} from '@angular/common/http';
 	providedIn: 'root'
 })
 export class ConfigurationService {
+	private readonly configurations = inject(ZCO_CONFIGURATIONS_TOKEN);
+	private readonly window = inject<Window>(WINDOW);
+	private readonly masterLayoutConfig = inject(ObMasterLayoutConfig);
+	private readonly router = inject(Router);
+	private readonly interceptorConfig = inject(ObHttpApiInterceptorConfig);
+	private readonly authenticationService = inject(AuthenticationServiceV2);
+	private readonly environmentService = inject(EnvironmentService);
+	private readonly http = inject(HttpClient);
+
 	private envConfiguration: Configuration;
-	constructor(
-		@Inject(ZCO_CONFIGURATIONS_TOKEN) private readonly configurations: Configuration[],
-		@Inject(WINDOW) private readonly window: Window,
-		private readonly masterLayoutConfig: ObMasterLayoutConfig,
-		private readonly router: Router,
-		private readonly interceptorConfig: ObHttpApiInterceptorConfig,
-		private readonly authenticationService: AuthenticationServiceV2,
-		private readonly environmentService: EnvironmentService,
-		private readonly http: HttpClient
-	) {}
 
 	preInitialize() {
 		this.loadConfigurationForEnv();

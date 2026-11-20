@@ -1,11 +1,19 @@
 import {ChangeDetectionStrategy, Component, DestroyRef, inject} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {HttpErrorResponse} from '@angular/common/http';
-import {MatDialogRef} from '@angular/material/dialog';
-import {ObEUploadEventType, ObIUploadEvent, ObNotificationService} from '@oblique/oblique';
+import {MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
+import {ObButtonDirective, ObEUploadEventType, ObFileUploadComponent, ObIUploadEvent, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
 import {filter} from 'rxjs/operators';
 import {CatalogService} from '../../shared/services/catalog.service';
 import {CatalogImportError, CatalogImportReport, CatalogItemReport} from '../../shared/model/catalog';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {MatIcon} from '@angular/material/icon';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatTooltip} from '@angular/material/tooltip';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {MatChip, MatChipSet} from '@angular/material/chips';
+import {DecimalPipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 export interface CatalogImportDialogResult {
 	/** Vrai si au moins un import a été appliqué : la liste appelante doit être rechargée. */
@@ -17,7 +25,24 @@ export interface CatalogImportDialogResult {
 	templateUrl: './catalog-import-dialog.component.html',
 	styleUrl: './catalog-import-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatDialogTitle,
+		CdkScrollable,
+		MatDialogContent,
+		ObFileUploadComponent,
+		MatIcon,
+		MatIconButton,
+		MatTooltip,
+		MatProgressBar,
+		MatChipSet,
+		MatChip,
+		MatDialogActions,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		DecimalPipe,
+		TranslatePipe
+	]
 })
 export class CatalogImportDialogComponent {
 	readonly maxFileSizeMb = 1;
@@ -37,12 +62,13 @@ export class CatalogImportDialogComponent {
 	report: CatalogImportReport | null = null;
 	errors: string[] = [];
 	private imported = false;
+	private readonly catalogService = inject(CatalogService);
+	private readonly notif = inject(ObNotificationService);
+	private readonly ref = inject<MatDialogRef<CatalogImportDialogComponent, CatalogImportDialogResult>>(MatDialogRef);
 
-	constructor(
-		private readonly catalogService: CatalogService,
-		private readonly notif: ObNotificationService,
-		private readonly ref: MatDialogRef<CatalogImportDialogComponent, CatalogImportDialogResult>
-	) {
+	constructor() {
+		const ref = this.ref;
+
 		// La fermeture (backdrop / Échap) doit toujours renvoyer le résultat pour déclencher le rechargement.
 		ref.disableClose = true;
 		const destroyRef = inject(DestroyRef);

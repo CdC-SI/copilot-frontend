@@ -1,4 +1,4 @@
-import {Injectable, TemplateRef} from '@angular/core';
+import {Injectable, TemplateRef, inject} from '@angular/core';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {AuthenticationServiceV2} from '../../shared/services/auth.service';
 import {UserStatus} from '../../shared/model/user';
@@ -7,10 +7,8 @@ import {UserStatus} from '../../shared/model/user';
 	providedIn: 'root'
 })
 export class UserAuthDialogService {
-	constructor(
-		private readonly authService: AuthenticationServiceV2,
-		private readonly dialog: MatDialog
-	) {}
+	private readonly authService = inject(AuthenticationServiceV2);
+	private readonly dialog = inject(MatDialog);
 
 	isRegistered(): boolean {
 		return this.authService.isRegistered();

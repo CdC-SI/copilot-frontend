@@ -1,4 +1,4 @@
-import {DOCUMENT, Inject, Injectable} from '@angular/core';
+import {DOCUMENT, Injectable, inject} from '@angular/core';
 import {ObNotificationService, WINDOW} from '@oblique/oblique';
 import {LocationStrategy} from '@angular/common';
 import {EnvironmentService, LocalStorageService} from '@zas-design-system/zas-design-system';
@@ -14,16 +14,15 @@ export class AuthenticationServiceV2 {
 	/** Indicateur partagé entre onglets pour détecter une déconnexion faite dans un autre onglet. */
 	private static readonly CONNECTED_KEY = 'zia-connected';
 	private _jwtToken: string | null = null;
+	private readonly localStorageService = inject(LocalStorageService);
+	private readonly locationStrategy = inject(LocationStrategy);
+	private readonly environmentService = inject(EnvironmentService);
+	private readonly http = inject(HttpClient);
+	private readonly notification = inject(ObNotificationService);
+	private readonly window = inject<Window>(WINDOW);
+	private readonly document = inject<Document>(DOCUMENT);
 
-	constructor(
-		private readonly localStorageService: LocalStorageService,
-		private readonly locationStrategy: LocationStrategy,
-		private readonly environmentService: EnvironmentService,
-		private readonly http: HttpClient,
-		private readonly notification: ObNotificationService,
-		@Inject(WINDOW) private readonly window: Window,
-		@Inject(DOCUMENT) private readonly document: Document
-	) {
+	constructor() {
 		this.localStorageService.initData();
 	}
 

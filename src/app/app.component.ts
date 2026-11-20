@@ -1,20 +1,49 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, Injector, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, Injector, OnInit, TemplateRef, ViewChild, inject} from '@angular/core';
+import {MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {UserService} from './shared/services/user.service';
-import {ObINavigationLink, ObMasterLayoutComponent, ObNotificationService} from '@oblique/oblique';
+import {
+	ObButtonDirective,
+	ObExternalLinkDirective,
+	ObINavigationLink,
+	ObIconButtonDirective,
+	ObMasterLayoutComponent,
+	ObMasterLayoutModule,
+	ObNotificationService,
+	ObOffCanvasContainerDirective
+} from '@oblique/oblique';
 import {SettingsService} from './shared/services/settings.service';
 import {SettingsType} from './shared/model/settings';
 import {IUser, UserStatus} from './shared/model/user';
 import {SignUpComponent} from './shared/components/sign-up/sign-up.component';
 import {AuthenticationServiceV2} from './shared/services/auth.service';
 import {LegalDocumentDialogComponent} from './shared/components/legal-document-dialog/legal-document-dialog.component';
+import {MatIcon} from '@angular/material/icon';
+import {MatTooltip} from '@angular/material/tooltip';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {MatButton} from '@angular/material/button';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-root',
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.css',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		ObMasterLayoutModule,
+		ObOffCanvasContainerDirective,
+		MatIcon,
+		MatTooltip,
+		ObExternalLinkDirective,
+		MatDialogTitle,
+		CdkScrollable,
+		MatDialogContent,
+		MatDialogActions,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatDialogClose,
+		TranslatePipe
+	]
 })
 export class AppComponent implements OnInit, DoCheck {
 	navigationGuest: ObINavigationLink[] = [{url: '/chat', label: 'chat'}];
@@ -41,14 +70,11 @@ export class AppComponent implements OnInit, DoCheck {
 	@ViewChild('johnDoeInfoDialog') johnDoeInfoDialog: TemplateRef<any>;
 	@ViewChild(ObMasterLayoutComponent, {read: Injector, static: true}) private readonly masterLayoutInjector?: Injector;
 	private masterLayout?: ChangeDetectorRef;
-
-	constructor(
-		private readonly dialog: MatDialog,
-		private readonly userService: UserService,
-		private readonly settingsService: SettingsService,
-		private readonly notif: ObNotificationService,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly dialog = inject(MatDialog);
+	private readonly userService = inject(UserService);
+	private readonly settingsService = inject(SettingsService);
+	private readonly notif = inject(ObNotificationService);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	/**
 	 * Le `<router-outlet>` est dans `ObMasterLayoutComponent`, OnPush depuis Oblique 16 : sans ce marquage, les pages

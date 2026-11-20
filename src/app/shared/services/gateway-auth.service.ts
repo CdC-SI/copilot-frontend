@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {take} from 'rxjs/operators';
 import {nanoid} from 'nanoid';
@@ -18,12 +18,9 @@ export interface HeaderReader {
 export class GatewayAuthService {
 	static readonly TOKEN_HEADER = 'blue';
 	static readonly CORRELATION_HEADER = 'X-Correlation-Id';
-
-	constructor(
-		private readonly dialog: MatDialog,
-		private readonly authenticationService: AuthenticationServiceV2,
-		private readonly environmentService: EnvironmentService
-	) {}
+	private readonly dialog = inject(MatDialog);
+	private readonly authenticationService = inject(AuthenticationServiceV2);
+	private readonly environmentService = inject(EnvironmentService);
 
 	isLocalhost(): boolean {
 		return this.environmentService.getIsLocalhostEnvironment();

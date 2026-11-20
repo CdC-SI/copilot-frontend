@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {HttpClient} from '@angular/common/http';
 import {SettingsType} from '../model/settings';
@@ -7,10 +7,8 @@ import {SettingsType} from '../model/settings';
 	providedIn: 'root'
 })
 export class SettingsService {
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
 	public getSettings(type: SettingsType) {
 		return this.http.get<string[]>(this.config.backendApi(`/settings?type=${type}`));

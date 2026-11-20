@@ -1,4 +1,4 @@
-import {ErrorHandler, Injectable, Injector, NgZone} from '@angular/core';
+import {ErrorHandler, Injectable, Injector, NgZone, inject} from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ObNotificationService} from '@oblique/oblique';
 
@@ -8,10 +8,8 @@ import {ObNotificationService} from '@oblique/oblique';
  */
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
-	constructor(
-		private readonly injector: Injector,
-		private readonly zone: NgZone
-	) {}
+	private readonly injector = inject(Injector);
+	private readonly zone = inject(NgZone);
 
 	handleError(error: unknown): void {
 		console.error(error);

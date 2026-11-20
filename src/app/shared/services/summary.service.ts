@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
@@ -8,12 +8,10 @@ import {SummaryDetailResponse, SummaryTaskCreatedResponse, SummaryTaskResponse} 
 	providedIn: 'root'
 })
 export class SummaryService {
-	private readonly SUMMARIES_URL = '/summaries';
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly SUMMARIES_URL = '/summaries';
 
 	createSummary(navs: string): Observable<SummaryTaskCreatedResponse> {
 		return this.http.post<SummaryTaskCreatedResponse>(this.config.backendApi(`${this.SUMMARIES_URL}/${navs}`), {});

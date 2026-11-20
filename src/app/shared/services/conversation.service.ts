@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpEvent} from '@angular/common/http';
@@ -9,10 +9,8 @@ import {ChatMessage} from '../model/chat-message';
 	providedIn: 'root'
 })
 export class ConversationService {
-	constructor(
-		private readonly config: ConfigurationService,
-		private readonly http: HttpClient
-	) {}
+	private readonly config = inject(ConfigurationService);
+	private readonly http = inject(HttpClient);
 
 	getConversationTitles(): Observable<ChatTitle[]> {
 		return this.http.get<ChatTitle[]>(this.config.backendApi('/conversations/titles'));

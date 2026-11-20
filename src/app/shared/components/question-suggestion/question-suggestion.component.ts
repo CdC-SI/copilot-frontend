@@ -4,8 +4,7 @@ import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 	selector: 'zco-question-suggestion',
 	templateUrl: './question-suggestion.component.html',
 	styleUrl: './question-suggestion.component.scss',
-	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	changeDetection: ChangeDetectionStrategy.Eager
 })
 export class QuestionSuggestionComponent implements OnInit {
 	sentences: string[] = [

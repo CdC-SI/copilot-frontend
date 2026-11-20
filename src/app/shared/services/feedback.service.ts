@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {
@@ -22,11 +22,8 @@ export type TimeRange = '7d' | '30d' | '90d' | 'all';
 export class FeedbackService {
 	/** Number of NEW feedbacks (messages + sources), across all time ranges. Used for the admin panel badge. */
 	public readonly newFeedbackCount$ = new BehaviorSubject<number>(0);
-
-	constructor(
-		private readonly http: HttpClient,
-		private readonly config: ConfigurationService
-	) {}
+	private readonly http = inject(HttpClient);
+	private readonly config = inject(ConfigurationService);
 
 	stats(range: TimeRange = '30d'): Observable<IFeedbackStats> {
 		const params = new HttpParams().set('range', range);
@@ -55,17 +52,12 @@ export class FeedbackService {
 	}
 
 	public updateSourceFeedbackStatus(id: number, status: FeedbackStatus): Observable<ISourceFeedback> {
-		return this.http
-			.patch<ISourceFeedback>(this.config.backendApi(`/feedback/sources/${id}/status`), {status})
-			.pipe(tap(() => this.refreshNewFeedbackCount()));
+		return this.http.patch<ISourceFeedback>(this.config.backendApi(`/feedback/sources/${id}/status`), {status}).pipe(tap(() => this.refreshNewFeedbackCount()));
 	}
 
 	/** Refreshes the NEW feedback counter (messages + sources) used for the admin panel badge. */
 	public refreshNewFeedbackCount(): void {
-		forkJoin([
-			this.listMessageFeedback('all', false, 'NEW'),
-			this.listSourceFeedback('all', 'NEW')
-		]).subscribe({
+		forkJoin([this.listMessageFeedback('all', false, 'NEW'), this.listSourceFeedback('all', 'NEW')]).subscribe({
 			next: ([messages, sources]) => this.newFeedbackCount$.next(messages.length + sources.length),
 			error: () => {
 				/* non-blocking: keep the previous count on failure */

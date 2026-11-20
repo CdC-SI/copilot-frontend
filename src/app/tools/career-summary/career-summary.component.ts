@@ -1,15 +1,58 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, FormGroupDirective, Validators} from '@angular/forms';
-import {ObNotificationService} from '@oblique/oblique';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild, inject} from '@angular/core';
+import {FormBuilder, FormGroup, FormGroupDirective, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ObButtonDirective, ObIconButtonDirective, ObMatErrorDirective, ObNotificationService} from '@oblique/oblique';
 import {SummaryService} from '../../shared/services/summary.service';
 import {SummaryDetailResponse, SummaryTaskResponse, SummaryTaskStatus} from '../../shared/model/summary';
+import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
+import {MarkdownComponent} from 'ngx-markdown';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatError, MatFormField, MatHint, MatLabel, MatSuffix} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatList, MatListItem} from '@angular/material/list';
+import {DatePipe} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
+import {FormatNavsPipe} from '../../shared/pipes/format-navs.pipe';
 
 @Component({
 	selector: 'zco-career-summary',
 	templateUrl: './career-summary.component.html',
 	styleUrl: './career-summary.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatCard,
+		MatCardHeader,
+		MatCardTitle,
+		MatCardSubtitle,
+		MatCardContent,
+		MarkdownComponent,
+		MatCardActions,
+		MatButton,
+		MatIcon,
+		FormsModule,
+		ReactiveFormsModule,
+		MatFormField,
+		MatLabel,
+		MatInput,
+		MatHint,
+		MatError,
+		ObMatErrorDirective,
+		MatIconButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatSuffix,
+		MatSelect,
+		MatOption,
+		MatProgressSpinner,
+		MatList,
+		MatListItem,
+		DatePipe,
+		TranslatePipe,
+		FormatNavsPipe
+	]
 })
 export class CareerSummaryComponent implements OnInit {
 	@ViewChild(FormGroupDirective) formDirective: FormGroupDirective;
@@ -23,12 +66,11 @@ export class CareerSummaryComponent implements OnInit {
 	SummaryTaskStatus = SummaryTaskStatus;
 	navsFilter = '';
 	sortOrder: 'asc' | 'desc' = 'desc';
+	private readonly fb = inject(FormBuilder);
+	private readonly summaryService = inject(SummaryService);
+	private readonly notif = inject(ObNotificationService);
 
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly summaryService: SummaryService,
-		private readonly notif: ObNotificationService
-	) {
+	constructor() {
 		this.navsForm = this.fb.group({
 			navs: ['', [Validators.required, Validators.pattern(/^\d{3}\.?\d{4}\.?\d{4}\.?\d{2}$/)]]
 		});

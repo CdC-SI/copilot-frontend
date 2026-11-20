@@ -1,18 +1,47 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Subject, takeUntil} from 'rxjs';
-import {ObNotificationService} from '@oblique/oblique';
+import {ObButtonDirective, ObIconButtonDirective, ObMatErrorDirective, ObNotificationService} from '@oblique/oblique';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {MatChipEditedEvent, MatChipInputEvent} from '@angular/material/chips';
+import {MatChipEditedEvent, MatChipGrid, MatChipInput, MatChipInputEvent, MatChipRemove, MatChipRow} from '@angular/material/chips';
 import {FeedbackService} from '../../../shared/services/feedback.service';
 import {FeedbackReportConfig} from '../../../shared/model/feedback';
+import {MatCard} from '@angular/material/card';
+import {MatIcon} from '@angular/material/icon';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatSlideToggle} from '@angular/material/slide-toggle';
+import {MatError, MatFormField, MatHint, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatButton} from '@angular/material/button';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-feedback-report-config',
 	templateUrl: './feedback-report-config.component.html',
 	styleUrl: './feedback-report-config.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatCard,
+		MatIcon,
+		MatProgressSpinner,
+		FormsModule,
+		ReactiveFormsModule,
+		MatSlideToggle,
+		MatFormField,
+		MatLabel,
+		MatInput,
+		MatHint,
+		MatError,
+		ObMatErrorDirective,
+		MatChipGrid,
+		MatChipRow,
+		MatChipRemove,
+		MatChipInput,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		TranslatePipe
+	]
 })
 export class FeedbackReportConfigComponent implements OnInit, OnDestroy {
 	form!: FormGroup;
@@ -23,12 +52,9 @@ export class FeedbackReportConfigComponent implements OnInit, OnDestroy {
 	readonly separatorKeysCodes: readonly number[] = [ENTER, COMMA];
 
 	private readonly destroy$ = new Subject<void>();
-
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly feedbackService: FeedbackService,
-		private readonly notif: ObNotificationService
-	) {}
+	private readonly fb = inject(FormBuilder);
+	private readonly feedbackService = inject(FeedbackService);
+	private readonly notif = inject(ObNotificationService);
 
 	ngOnInit(): void {
 		this.form = this.fb.group({

@@ -1,23 +1,21 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, inject} from '@angular/core';
 import {MessageSource} from '../../../model/chat-history';
-import {ObNotificationService} from '@oblique/oblique';
+import {ObExternalLinkDirective, ObNotificationService} from '@oblique/oblique';
 import {UploadService} from '../../../services/upload.service';
 import {openOrDownloadBlob} from '../../../utils/file-download.utils';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
 	selector: 'zco-source',
 	templateUrl: './source.component.html',
 	styleUrl: './source.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [ObExternalLinkDirective, TranslatePipe]
 })
 export class SourceComponent {
 	@Input() source: MessageSource;
-
-	constructor(
-		private readonly notifService: ObNotificationService,
-		private readonly uploadService: UploadService
-	) {}
+	private readonly notifService = inject(ObNotificationService);
+	private readonly uploadService = inject(UploadService);
 
 	isFile(s: MessageSource): boolean {
 		return s.type === 'FILE';

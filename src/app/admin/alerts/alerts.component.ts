@@ -1,22 +1,89 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {MatTableDataSource} from '@angular/material/table';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, inject} from '@angular/core';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+	MatCell,
+	MatCellDef,
+	MatColumnDef,
+	MatHeaderCell,
+	MatHeaderCellDef,
+	MatHeaderRow,
+	MatHeaderRowDef,
+	MatRow,
+	MatRowDef,
+	MatTable,
+	MatTableDataSource
+} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {Subject, takeUntil} from 'rxjs';
 import {AlertsService, toLocalDateTimeString} from '../../shared/services/alert.service';
 import {AlertLevel, AlertView, CreateAlertDTO} from '../../shared/model/alerts';
-import {ObNotificationService} from '@oblique/oblique';
-import {LangChangeEvent, TranslateService} from '@ngx-translate/core';
+import {ObButtonDirective, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
+import {LangChangeEvent, TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ReactivateDialogComponent} from './reactivate-dialog/reactivate-dialog.component';
+import {MatCard, MatCardContent, MatCardTitle} from '@angular/material/card';
+import {MatFormField, MatHint, MatLabel, MatSuffix} from '@angular/material/form-field';
+import {MatSelect} from '@angular/material/select';
+import {MatOption} from '@angular/material/core';
+import {MatInput} from '@angular/material/input';
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
+import {MatAccordion, MatExpansionPanel, MatExpansionPanelDescription, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatChip, MatChipSet} from '@angular/material/chips';
+import {MatIcon} from '@angular/material/icon';
+import {MatTooltip} from '@angular/material/tooltip';
+import {DatePipe} from '@angular/common';
 
 @Component({
 	selector: 'zco-admin-alerts',
 	templateUrl: './alerts.component.html',
 	styleUrl: './alerts.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatCard,
+		MatCardTitle,
+		MatCardContent,
+		FormsModule,
+		ReactiveFormsModule,
+		MatFormField,
+		MatLabel,
+		MatSelect,
+		MatOption,
+		MatInput,
+		MatDatepickerInput,
+		MatDatepickerToggle,
+		MatSuffix,
+		MatDatepicker,
+		MatHint,
+		MatAccordion,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
+		MatExpansionPanelDescription,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		MatTable,
+		MatSort,
+		MatColumnDef,
+		MatHeaderCellDef,
+		MatHeaderCell,
+		MatCellDef,
+		MatCell,
+		MatChipSet,
+		MatChip,
+		MatIconButton,
+		MatIcon,
+		MatTooltip,
+		MatHeaderRowDef,
+		MatHeaderRow,
+		MatRowDef,
+		MatRow,
+		MatPaginator,
+		DatePipe,
+		TranslatePipe
+	]
 })
 export class AlertsComponent implements OnInit, OnDestroy {
 	form!: FormGroup;
@@ -32,15 +99,12 @@ export class AlertsComponent implements OnInit, OnDestroy {
 
 	@ViewChild('expiredSort') expiredSort!: MatSort;
 	private readonly destroy$ = new Subject<void>();
-
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly alertService: AlertsService,
-		private readonly notif: ObNotificationService,
-		private readonly translate: TranslateService,
-		private readonly cdr: ChangeDetectorRef,
-		private readonly dialog: MatDialog
-	) {}
+	private readonly fb = inject(FormBuilder);
+	private readonly alertService = inject(AlertsService);
+	private readonly notif = inject(ObNotificationService);
+	private readonly translate = inject(TranslateService);
+	private readonly cdr = inject(ChangeDetectorRef);
+	private readonly dialog = inject(MatDialog);
 
 	ngOnInit(): void {
 		this.form = this.fb.group({

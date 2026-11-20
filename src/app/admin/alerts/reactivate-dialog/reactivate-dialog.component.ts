@@ -1,6 +1,13 @@
-import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle} from '@angular/material/dialog';
+import {CdkScrollable} from '@angular/cdk/scrolling';
+import {MatError, MatFormField, MatLabel, MatSuffix} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from '@angular/material/datepicker';
+import {ObButtonDirective, ObIconButtonDirective, ObMatErrorDirective} from '@oblique/oblique';
+import {MatButton} from '@angular/material/button';
+import {TranslatePipe} from '@ngx-translate/core';
 
 type DialogData = {current?: string | null}; // LocalDateTime string "YYYY-MM-DDTHH:mm:ss" (sans fuseau)
 
@@ -9,16 +16,38 @@ type DialogData = {current?: string | null}; // LocalDateTime string "YYYY-MM-DD
 	templateUrl: './reactivate-dialog.component.html',
 	styleUrl: './reactivate-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	standalone: false
+	imports: [
+		MatDialogTitle,
+		CdkScrollable,
+		MatDialogContent,
+		FormsModule,
+		ReactiveFormsModule,
+		MatFormField,
+		MatLabel,
+		MatInput,
+		MatDatepickerInput,
+		MatDatepickerToggle,
+		MatSuffix,
+		MatDatepicker,
+		MatError,
+		ObMatErrorDirective,
+		MatDialogActions,
+		MatButton,
+		ObIconButtonDirective,
+		ObButtonDirective,
+		TranslatePipe
+	]
 })
 export class ReactivateDialogComponent {
-	form: FormGroup;
+	data = inject<DialogData>(MAT_DIALOG_DATA);
 
-	constructor(
-		private readonly fb: FormBuilder,
-		private readonly ref: MatDialogRef<ReactivateDialogComponent, string | null>,
-		@Inject(MAT_DIALOG_DATA) public data: DialogData
-	) {
+	form: FormGroup;
+	private readonly fb = inject(FormBuilder);
+	private readonly ref = inject<MatDialogRef<ReactivateDialogComponent, string | null>>(MatDialogRef);
+
+	constructor() {
+		const data = this.data;
+
 		const now = new Date();
 		const parsed = parseLocalDateTime(data?.current || undefined);
 		const base = parsed && parsed.getTime() > now.getTime() ? parsed : addHours(now, 2);

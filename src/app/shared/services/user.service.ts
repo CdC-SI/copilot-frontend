@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ConfigurationService} from '../../core/app-configuration/configuration.service';
 import {Observable} from 'rxjs';
@@ -14,11 +14,9 @@ export interface UserRegistrationResponse {
 	providedIn: 'root'
 })
 export class UserService {
-	constructor(
-		private readonly http: HttpClient,
-		private readonly config: ConfigurationService,
-		private readonly authService: AuthenticationServiceV2
-	) {}
+	private readonly http = inject(HttpClient);
+	private readonly config = inject(ConfigurationService);
+	private readonly authService = inject(AuthenticationServiceV2);
 
 	createAccount(user: IUser): Observable<UserRegistrationResponse> {
 		return this.http.post<UserRegistrationResponse>(this.config.backendApi('/users'), user);
