@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, inject} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, inject} from '@angular/core';
 import {MessageSource} from '../../model/chat-history';
 import {ObNotificationService} from '@oblique/oblique';
 import {FeedbackService} from '../../services/feedback.service';
@@ -15,7 +15,7 @@ type FeedbackVote = 'upvote' | 'downvote';
 	selector: 'zco-source-list',
 	templateUrl: './source-list.component.html',
 	styleUrl: './source-list.component.scss',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [SourceComponent, FormsModule, TranslatePipe]
 })
 export class SourceListComponent implements OnChanges {
@@ -47,6 +47,7 @@ export class SourceListComponent implements OnChanges {
 	private readonly notifService = inject(ObNotificationService);
 	private readonly feedbackService = inject(FeedbackService);
 	private readonly authService = inject(AuthenticationServiceV2);
+	private readonly cdr = inject(ChangeDetectorRef);
 
 	ngOnChanges(changes: SimpleChanges): void {
 		// When the container expands for the first time, fetch existing feedbacks
@@ -135,19 +136,12 @@ export class SourceListComponent implements OnChanges {
 				category: this.selectedCategory ?? undefined
 			})
 			.subscribe({
-				next: () => {
-					// Update local state immediately
-					this.feedbackById.set(documentId, this.selectedVote);
-					if (this.comment) this.feedbackComments.set(documentId, this.comment);
-					if (this.selectedCategory) this.feedbackCategories.set(documentId, this.selectedCategory);
-					else this.feedbackCategories.delete(documentId);
-					this.applyFeedbackToSources();
-					this.notifService.success('feedback.success');
-					this.closeFeedback();
-				},
+				next: () => this.onFeedbackSaved(documentId),
+
 				error: () => {
 					this.notifService.error('feedback.error');
 					this.isSubmitting = false;
+					this.cdr.markForCheck();
 				}
 			});
 	}
@@ -157,6 +151,18 @@ export class SourceListComponent implements OnChanges {
 	}
 
 	/* ---------------------- Existing feedbacks ---------------------- */
+
+	private onFeedbackSaved(documentId: string): void {
+		// Update local state immediately
+		this.feedbackById.set(documentId, this.selectedVote);
+		if (this.comment) this.feedbackComments.set(documentId, this.comment);
+		if (this.selectedCategory) this.feedbackCategories.set(documentId, this.selectedCategory);
+		else this.feedbackCategories.delete(documentId);
+		this.applyFeedbackToSources();
+		this.notifService.success('feedback.success');
+		this.closeFeedback();
+		this.cdr.markForCheck();
+	}
 
 	private loadExistingFeedbacks(): void {
 		if (!this.authenticatedAsExpert() || !this.conversationId || !this.message.id) return;
@@ -173,6 +179,7 @@ export class SourceListComponent implements OnChanges {
 				}
 				this.applyFeedbackToSources();
 				this.feedbackLoaded = true;
+				this.cdr.markForCheck();
 			},
 			error: () => {
 				// Non-blocking: user can still vote; we just couldn’t pre-fill

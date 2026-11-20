@@ -1,4 +1,4 @@
-import {ChatStreamProcessorService} from './chat-stream-processor.service';
+import {ChatStreamProcessorService, StreamProcessingResult} from './chat-stream-processor.service';
 import {ChatMessage} from '../../shared/model/chat-message';
 import {ChatStreamEvent} from '../../shared/model/chat-stream-event';
 
@@ -6,7 +6,13 @@ describe('ChatStreamProcessorService', () => {
 	let processor: ChatStreamProcessorService;
 	let message: ChatMessage;
 
-	const feed = (...events: ChatStreamEvent[]) => events.map(event => processor.processEvent(event, message));
+	/** Applique chaque événement dans son propre lot (une frame) et conserve la dernière version du message. */
+	const feed = (...events: ChatStreamEvent[]): StreamProcessingResult[] =>
+		events.map(event => {
+			const result = processor.apply(message, [event]);
+			message = result.message;
+			return result;
+		});
 	const text = (value: string): ChatStreamEvent => ({type: 'text_delta', data: {text: value}});
 	const status = (code: string, label: string): ChatStreamEvent => ({type: 'status', data: {code, label}});
 
@@ -81,7 +87,7 @@ describe('ChatStreamProcessorService', () => {
 
 	it('interrupt conserve la réponse partielle et la marque interrompue', () => {
 		feed(text('Début de réponse'));
-		processor.interrupt(message);
+		message = processor.interrupt(message);
 		expect(message.message).toBe('Début de réponse');
 		expect(message.isCompleted).toBe(true);
 		expect(message.interrupted).toBe(true);
@@ -89,9 +95,34 @@ describe('ChatStreamProcessorService', () => {
 
 	it('interrupt efface le texte de statut si la réponse n’a pas commencé', () => {
 		feed(status('retrieval', 'Recherche…'));
-		processor.interrupt(message);
+		message = processor.interrupt(message);
 		expect(message.message).toBe('');
 		expect(message.status).toBeUndefined();
 		expect(message.interrupted).toBe(true);
+	});
+
+	it('applique un lot d’événements en une seule nouvelle version, sans modifier le message reçu', () => {
+		const original: ChatMessage = {clientId: 'a', message: '', sources: []} as ChatMessage;
+		const result = processor.apply(original, [
+			text('Bon'),
+			text('jour'),
+			{type: 'source', data: {documentId: '1', type: 'URL', link: 'http://a'}},
+			{type: 'done', data: {messageId: 'm-1', interrupted: false}}
+		]);
+
+		expect(result.message).not.toBe(original);
+		expect(result.message.sources).not.toBe(original.sources);
+		expect(result.message).toMatchObject({clientId: 'a', message: 'Bonjour', id: 'm-1', isCompleted: true});
+		expect(result.message.sources).toHaveLength(1);
+		expect(result.completed).toBe(true);
+		expect(original).toEqual({clientId: 'a', message: '', sources: []});
+	});
+
+	it('interrupt renvoie une nouvelle version du message', () => {
+		const original = {clientId: 'a', message: 'Partiel', stopping: true} as ChatMessage;
+		const interrupted = processor.interrupt(original);
+		expect(interrupted).not.toBe(original);
+		expect(original.stopping).toBe(true);
+		expect(original.interrupted).toBeUndefined();
 	});
 });

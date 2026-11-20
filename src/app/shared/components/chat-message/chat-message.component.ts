@@ -18,7 +18,7 @@ const MIN_EDIT_WIDTH_PX = 240;
 	selector: 'zco-chat-message',
 	templateUrl: './chat-message.component.html',
 	styleUrl: './chat-message.component.scss',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		MarkdownComponent,
 		WorkspaceBadgeComponent,

@@ -4,9 +4,9 @@
 <mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs_up'" (click)="openFeedbackDialog(true)"></mat-icon>
 <mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs_down'" (click)="openFeedbackDialog(false)"></mat-icon>
 <mat-icon
-	[ngClass]="message.beingSpoken ? 'being-spoken' : ''"
+	[ngClass]="beingSpoken() ? 'being-spoken' : ''"
 	[matTooltip]="'read.aloud' | translate"
-	[svgIcon]="message.beingSpoken ? 'volume_muted' : 'volume_high'"
+	[svgIcon]="beingSpoken() ? 'volume_muted' : 'volume_high'"
 	(click)="speak()"
 ></mat-icon>
 <mat-icon [matTooltip]="'copy.answer' | translate" [svgIcon]="'copy'" (click)="copyAnswer()"></mat-icon>

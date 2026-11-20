@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, ViewChild, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output, TemplateRef, ViewChild, inject, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SpeechService} from '../../services/speech.service';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -21,7 +22,7 @@ import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 	selector: 'zco-message-action',
 	templateUrl: './message-action.component.html',
 	styleUrl: './message-action.component.scss',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		MatIcon,
 		MatTooltip,
@@ -58,6 +59,8 @@ export class MessageActionComponent {
 	categoryFrmCtrl = new FormControl<FeedbackCategory>(null);
 	isNegativeFeedback = false;
 	readonly answerFeedbackCategories = ANSWER_FEEDBACK_CATEGORIES;
+	/** Lecture à voix haute en cours pour ce message. */
+	readonly beingSpoken = signal(false);
 	private readonly speechService = inject(SpeechService);
 	private readonly translateService = inject(TranslateService);
 	private readonly dialog = inject(MatDialog);
@@ -65,15 +68,20 @@ export class MessageActionComponent {
 	private readonly notif = inject(ObNotificationService);
 	private readonly authService = inject(AuthenticationServiceV2);
 
+	constructor() {
+		// Une autre lecture démarre : celle-ci est interrompue.
+		this.speechService.speechStartEvent.pipe(takeUntilDestroyed()).subscribe(() => this.beingSpoken.set(false));
+	}
+
 	speak = (): void => {
 		speechSynthesis.cancel();
-		if (this.message.beingSpoken) {
-			this.message.beingSpoken = false;
+		if (this.beingSpoken()) {
+			this.beingSpoken.set(false);
 			return;
 		}
 
 		this.speechService.speechStartEvent.next(true);
-		this.message.beingSpoken = true;
+		this.beingSpoken.set(true);
 		this.speakMessage(this.message);
 	};
 	speakMessage = (message: ChatMessage): void => {
@@ -82,7 +90,7 @@ export class MessageActionComponent {
 		speech.rate = 1.5;
 		speech.pitch = 1;
 		speech.voice = this.speechService.getVoice(message.lang || this.translateService.getCurrentLang());
-		speech.onend = () => (this.message.beingSpoken = false);
+		speech.onend = () => this.beingSpoken.set(false);
 		speechSynthesis.speak(speech);
 	};
 

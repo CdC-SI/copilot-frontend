@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject} from '@angular/core';
 import {AlertsService} from '../../services/alert.service';
 import {Alert} from '../../model/alerts';
 import {Subject, takeUntil} from 'rxjs';
@@ -24,6 +24,7 @@ export class AlertBannerComponent implements OnInit, OnDestroy {
 	private readonly authService = inject(AuthenticationServiceV2);
 	private readonly alertService = inject(AlertsService);
 	private readonly translate = inject(TranslateService);
+	private readonly cdr = inject(ChangeDetectorRef);
 
 	ngOnInit(): void {
 		this.authService.$authenticatedUser.subscribe(user => {
@@ -46,6 +47,8 @@ export class AlertBannerComponent implements OnInit, OnDestroy {
 				next: alerts => {
 					const dismissedIds = this.getDismissedAlertIds();
 					this.alerts = alerts.filter(alert => !dismissedIds.includes(alert.id));
+					// Le bandeau peut être hébergé par un composant OnPush (chat).
+					this.cdr.markForCheck();
 				},
 				error: err => {
 					console.error('Failed to load active alerts', err);

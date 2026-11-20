@@ -1,6 +1,6 @@
 <div class="typing-output">
-	{{ displayedText }}
-	@if (!typingCompleted) {
+	{{ displayedText() }}
+	@if (!typingCompleted()) {
 		<span>●</span>
 	}
 </div>

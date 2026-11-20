@@ -9,7 +9,8 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - **Angular 22** (composants **standalone**, sans NgModule : `bootstrapApplication` dans `main.ts`, providers dans
   `app.config.ts` dont `provideZoneChangeDetection()`, routes dans `app.routes.ts`), **TypeScript 6.0**, **RxJS**,
   Node 22.22+/24.15+ (`engines`). Templates en control flow (`@if`/`@for`/`@switch`) ;
-  `ChangeDetectionStrategy.Eager` explicite (passage OnPush prévu avec FE1b/FE4). Le `router-outlet` est dans
+  OnPush + signals pour le chat (page, sous-composants, composants partagés du chat) ; `ChangeDetectionStrategy.Eager`
+  explicite ailleurs (corpus, admin, outils, aide). Le `router-outlet` est dans
   `ob-master-layout`, OnPush : `AppComponent.ngDoCheck` le marque à chaque cycle pour que les pages routées se
   mettent à jour après un timer ou une réponse HTTP (à retirer quand elles seront en signals).
 - UI : **Oblique 16** (`@oblique/oblique`, master layout, inputs en signals) + Angular Material/CDK 22
@@ -38,8 +39,10 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 
 - `core/app-configuration/` : configuration par environnement (détection via l'URL), gateway,
   authentification. `token.ts` contient un jeton mock **local** : ne jamais committer de modification.
-- `chat/` : `chat.component` (gros composant, découpage prévu — FE4) et `chat/services/`
-  (stream processor, conversation manager, suggestions, autocomplete).
+- `chat/` : `chat.component` (conteneur fin), sous-composants `chat-sidebar`, `chat-timeline`, `chat-composer`
+  (+ `chat-attachments`) ; état dans `ChatStore` (façade signals, fournie par la page) et ses stores
+  (conversations, génération, pièces jointes) ; `chat/services/` (stream processor, conversation manager, suggestions,
+  autocomplete). Les messages sont immuables (remplacés, identifiés par `clientId`). Polling : `shared/utils/poll-until.ts`.
 - `corpus/`, `tools/<outil>/`, `admin/<écran>/`, `tips/`.
 - `shared/` : `components`, `services` (API, auth…), `interceptors`, `model`, `pipes`, `utils`,
   `constants`.

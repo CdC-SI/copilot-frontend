@@ -1,4 +1,4 @@
-import {Injectable, inject} from '@angular/core';
+import {Injectable, computed, inject, signal} from '@angular/core';
 import {FormGroup} from '@angular/forms';
 import {TranslateService} from '@ngx-translate/core';
 import {DynamicFormService} from '../../shared/services/dynamic-form.service';
@@ -15,37 +15,36 @@ export interface ActionSuggestion {
 	providedIn: 'root'
 })
 export class ChatSuggestionService {
+	/** Suggestions par défaut suivies des suggestions propres à la dernière réponse. */
+	readonly suggestions = computed(() => [...this.getDefaultSuggestions(), ...this.specificSuggestions()]);
+	private readonly specificSuggestions = signal<ActionSuggestion[]>([]);
 	private readonly translateService = inject(TranslateService);
 	private readonly dfs = inject(DynamicFormService);
-
-	private specificSuggestions: ActionSuggestion[] = [];
 
 	getDefaultSuggestions(): ActionSuggestion[] {
 		return DEFAULT_CHAT_SUGGESTIONS;
 	}
 
 	getSpecificSuggestions(): ActionSuggestion[] {
-		return this.specificSuggestions;
+		return this.specificSuggestions();
 	}
 
 	addSpecificSuggestion(action: string): void {
-		this.specificSuggestions.push({
-			text: `action_suggestions.${action}`,
-			action
-		});
+		this.specificSuggestions.update(suggestions => [...suggestions, {text: `action_suggestions.${action}`, action}]);
 	}
 
 	clearSpecificSuggestions(): void {
-		this.specificSuggestions = [];
+		this.specificSuggestions.set([]);
 	}
 
 	setSpecificSuggestionsFromMessages(messages: ChatMessage[]): void {
 		const lastMessage = messages.at(-1);
-		this.specificSuggestions =
+		this.specificSuggestions.set(
 			lastMessage?.suggestions?.map(suggestion => ({
 				text: `action_suggestions.${suggestion}`,
 				action: suggestion
-			})) || [];
+			})) || []
+		);
 	}
 
 	handleSuggestionAction(

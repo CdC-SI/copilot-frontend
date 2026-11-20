@@ -3,6 +3,8 @@ import {ChatMessage} from '../../shared/model/chat-message';
 import {ChatStreamEvent} from '../../shared/model/chat-stream-event';
 
 export interface StreamProcessingResult {
+	/** Nouvelle version du message, après application des événements (le message reçu n'est pas modifié). */
+	message: ChatMessage;
 	/** `done` reçu : la réponse est terminée et enregistrée côté backend. */
 	completed: boolean;
 	/** `error` reçu : la génération a échoué, rien n'a été enregistré. */
@@ -10,13 +12,32 @@ export interface StreamProcessingResult {
 	newSuggestions: string[];
 }
 
-/** Applique les événements typés du flux de réponse (T1) au message de l'assistant. */
+/**
+ * Applique les événements typés du flux de réponse (T1) au message de l'assistant. Les mises à jour sont
+ * immuables : un lot d'événements (une frame) produit une seule nouvelle version du message.
+ */
 @Injectable({
 	providedIn: 'root'
 })
 export class ChatStreamProcessorService {
-	processEvent(event: ChatStreamEvent, message: ChatMessage): StreamProcessingResult {
-		const result: StreamProcessingResult = {completed: false, failed: false, newSuggestions: []};
+	apply(message: ChatMessage, events: ChatStreamEvent[]): StreamProcessingResult {
+		const result: StreamProcessingResult = {message: {...message, sources: [...(message.sources ?? [])]}, completed: false, failed: false, newSuggestions: []};
+		events.forEach(event => this.processEvent(event, result));
+		return result;
+	}
+
+	/** Arrêt de la génération : la réponse partielle est conservée, le statut effacé. */
+	interrupt(message: ChatMessage): ChatMessage {
+		const next = {...message};
+		this.clearStatus(next);
+		next.stopping = undefined;
+		next.isCompleted = true;
+		next.interrupted = true;
+		return next;
+	}
+
+	private processEvent(event: ChatStreamEvent, result: StreamProcessingResult): void {
+		const message = result.message;
 		switch (event.type) {
 			case 'start':
 				message.generationId = event.data.messageId;
@@ -29,7 +50,7 @@ export class ChatStreamProcessorService {
 				message.message = (message.message ?? '') + event.data.text;
 				break;
 			case 'source':
-				(message.sources ??= []).push(event.data);
+				message.sources.push(event.data);
 				break;
 			case 'suggestion':
 				result.newSuggestions.push(event.data.text);
@@ -46,15 +67,6 @@ export class ChatStreamProcessorService {
 				result.failed = true;
 				break;
 		}
-		return result;
-	}
-
-	/** Arrêt de la génération : la réponse partielle est conservée, le statut effacé. */
-	interrupt(message: ChatMessage): void {
-		this.clearStatus(message);
-		message.stopping = undefined;
-		message.isCompleted = true;
-		message.interrupted = true;
 	}
 
 	/** Le statut s'affiche à la place du contenu tant que la réponse n'a pas commencé. */

@@ -9,7 +9,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 	selector: 'zco-source',
 	templateUrl: './source.component.html',
 	styleUrl: './source.component.scss',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [ObExternalLinkDirective, TranslatePipe]
 })
 export class SourceComponent {
