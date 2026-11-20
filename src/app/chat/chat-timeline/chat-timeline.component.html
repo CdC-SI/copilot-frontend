@@ -1,12 +1,3 @@
-@if (store.isLlmOnlyMode()) {
-	<div class="llm-only-banner">
-		<mat-icon svgIcon="lightning"></mat-icon>
-		<div class="llm-only-banner-text">
-			<strong>{{ "chat.llm-only-mode.banner.title" | translate }}</strong>
-			<span>{{ "chat.llm-only-mode.banner.text" | translate }}</span>
-		</div>
-	</div>
-}
 <div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
 	@if (store.messages().length <= 0) {
 		<div class="logo">

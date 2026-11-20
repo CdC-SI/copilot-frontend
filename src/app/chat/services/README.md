@@ -21,7 +21,7 @@ générations non terminées sont annulées à sa destruction (`ngOnDestroy`). L
 (`ChatConversationManagerService`) et les suggestions restent au niveau `root`, comme avant.
 
 - **`ChatStore`** : façade utilisée par les composants. Signals en lecture seule (`messages`, `conversationTitles`,
-  `currentConversation`, `isLlmOnlyMode`, `isGenerating`, `isStopping`, `attachments`, `replayableTurn`…) et méthodes
+  `currentConversation`, `isGenerating`, `isStopping`, `attachments`, `replayableTurn`…) et méthodes
   explicites (`send`, `newChat`, `selectConversation`, `stopGeneration`, `regenerateLastAnswer`, `editLastQuestion`,
   `addAttachments`…). Les demandes de défilement passent par `scrollRequests`.
 - **`ChatConversationsStore`** : titres de l'historique (triés, jamais modifiés en place), conversation courante,
