@@ -1,19 +1,30 @@
 <div class="timeline">
 	<div #messageContainer class="message-container" (scroll)="updateScrollButtonVisibility()">
 		@if (store.messages().length <= 0) {
-			<div class="logo">
-				<img src="./assets/images/copilot_logo.png" alt="copilot-logo" />
+			<div class="empty-state">
+				<img class="empty-logo" src="./assets/images/copilot_logo.png" alt="" />
+				<h2 class="empty-greeting">
+					@if (store.userFirstName(); as name) {
+						{{ "chat.empty.greeting" | translate: { name: name } }}
+					} @else {
+						{{ "chat.empty.greeting.anonymous" | translate }}
+					}
+				</h2>
+				<p class="empty-subtitle">{{ "chat.empty.subtitle" | translate }}</p>
+				<ul class="empty-examples" [attr.aria-label]="'chat.empty.examples.label' | translate">
+					@for (key of exampleKeys; track key) {
+						@let example = key | translate;
+						<li>
+							<button type="button" class="example-chip" (click)="useExample(example)">{{ example }}</button>
+						</li>
+					}
+				</ul>
 			</div>
+		} @else {
+			<div class="message-spacer"></div>
 		}
-		<div class="message-spacer"></div>
 		@for (message of store.messages(); track message.clientId; let last = $last; let i = $index) {
-			<div
-				class="message"
-				#messageEl
-				[class.in-progress]="!!message.status && !message.isCompleted"
-				[class.assistant]="message.source !== ChatMessageSource.USER"
-				[class.user]="message.source === ChatMessageSource.USER"
-			>
+			<div class="message" #messageEl [class.assistant]="message.source !== ChatMessageSource.USER" [class.user]="message.source === ChatMessageSource.USER">
 				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">
 					<img
 						[hidden]="message.source === ChatMessageSource.USER"

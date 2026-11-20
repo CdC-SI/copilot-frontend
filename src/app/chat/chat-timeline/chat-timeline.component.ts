@@ -36,6 +36,8 @@ export class ChatTimelineComponent implements AfterViewInit, OnDestroy {
 	 * la question en haut du fil, 0 si le tour remplit le fil ou si la conversation vient d'être ouverte.
 	 */
 	readonly bottomSpacerHeight = signal(0);
+	/** Exemples de l'état vide : ils pré-remplissent la saisie. */
+	readonly exampleKeys = ['chat.empty.example.1', 'chat.empty.example.2', 'chat.empty.example.3', 'chat.empty.example.4'];
 	protected readonly store = inject(ChatStore);
 	protected readonly ChatMessageSource = ChatMessageSource;
 	private readonly messageContainer = viewChild<ElementRef<HTMLElement>>('messageContainer');
@@ -61,6 +63,13 @@ export class ChatTimelineComponent implements AfterViewInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.layoutObserver?.disconnect();
+	}
+
+	/** Exemple de l'état vide : pré-remplit la saisie sans l'envoyer (un formulaire dynamique ouvert la masquerait). */
+	useExample(text: string): void {
+		this.store.closeForm();
+		this.store.searchCtrl.setValue(text);
+		this.store.focusRequests.next();
 	}
 
 	updateScrollButtonVisibility(): void {

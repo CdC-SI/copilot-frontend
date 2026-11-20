@@ -1,6 +1,19 @@
 @use "@oblique/oblique/styles/scss/core/palette";
 
 :host {
+	.history-group {
+		margin: 12px 8px 0;
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		color: palette.$ob-secondary-600;
+
+		&:first-of-type {
+			margin-top: 4px;
+		}
+	}
+
 	.history-list {
 		display: flex;
 		flex-direction: column;

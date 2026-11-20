@@ -107,6 +107,50 @@ a {
 	resize: none;
 }
 
+// Statut d'avancement (« Recherche… ») affiché tant que la réponse n'a pas commencé.
+.status-label {
+	color: $ob-gray-dark;
+	animation: status-pulse 1.6s ease-in-out infinite;
+}
+
+// Curseur à la fin du texte pendant le streaming.
+.streaming ::ng-deep > :last-child:not(ul, ol)::after,
+.streaming ::ng-deep > :is(ul, ol):last-child > li:last-child::after {
+	content: '';
+	display: inline-block;
+	width: 0.5em;
+	height: 1em;
+	margin-left: 2px;
+	vertical-align: text-bottom;
+	background: currentColor;
+	opacity: 0.6;
+	animation: cursor-blink 1s steps(1) infinite;
+}
+
+@keyframes status-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.55;
+	}
+}
+
+@keyframes cursor-blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.status-label,
+	.streaming ::ng-deep > :last-child:not(ul, ol)::after,
+	.streaming ::ng-deep > :is(ul, ol):last-child > li:last-child::after {
+		animation: none;
+	}
+}
+
 // Au-dessus de la réponse : le bouton ne se déplace pas pendant le streaming.
 .stop-inline {
 	padding: 0 10px 0 2px;
