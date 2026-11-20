@@ -20,8 +20,9 @@
 					}
 				</ul>
 			</div>
+		} @else {
+			<div class="message-spacer"></div>
 		}
-		<div class="message-spacer"></div>
 		@for (message of store.messages(); track message.clientId; let last = $last; let i = $index) {
 			<div class="message" #messageEl [class.assistant]="message.source !== ChatMessageSource.USER" [class.user]="message.source === ChatMessageSource.USER">
 				<div class="flex-row" [ngClass]="message.source === ChatMessageSource.USER ? 'my-message' : 'ia-message'">

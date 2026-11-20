@@ -74,13 +74,14 @@
 		flex-shrink: 0;
 	}
 
-	// État vide : accueil et exemples cliquables, centrés dans le fil.
+	// État vide : accueil et exemples cliquables, centrés dans le fil (marges auto) ; s'il est plus haut que le fil,
+	// il reste dans le flux et défile au lieu d'être rogné.
 	.empty-state {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		width: min(640px, 90%);
+		margin: auto 0;
+		flex-shrink: 0;
+		width: 100%;
+		max-width: 640px;
+		padding: 16px 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
