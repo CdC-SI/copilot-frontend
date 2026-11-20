@@ -14,42 +14,52 @@
 	<zco-action-suggestions [suggestions]="store.suggestions()" (actionSelected)="store.handleSuggestionAction($event)"> </zco-action-suggestions>
 }
 @if (!store.activeForm()) {
-	<form class="question-container" ngForm>
-		<ut-autocomplete-input
-			class="mr8"
-			[required]="false"
-			[i18nLabel]="'enter.message'"
-			[optionLabelFn]="searchOptionLabelFn"
-			[inputLabelFn]="searchOptionLabelFn"
-			[optionService]="store.optionService()"
-			[minLength]="0"
-			[formControl]="store.searchCtrl"
-			(optionSelected)="store.selectOption($event)"
-			(inputChange)="store.setCommandMode($event)"
-			(attachmentsSelected)="store.addAttachments($event)"
-			(submitMessage)="store.send()"
-		/>
-		@if (store.isGenerating()) {
-			<button
-				type="button"
-				mat-icon-button
-				[obButton]="'primary'"
-				(click)="store.stopGeneration()"
-				[disabled]="store.isStopping()"
-				[attr.aria-label]="(store.isStopping() ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
-				[matTooltip]="(store.isStopping() ? 'chat.generation.stopping' : 'chat.generation.stop.shortcut') | translate"
-			>
-				<mat-icon svgIcon="stop-gesture"></mat-icon>
-			</button>
-		} @else {
-			<button type="submit" mat-icon-button [obButton]="'primary'" (click)="store.send()" [disabled]="!store.canSend()">
-				<mat-icon svgIcon="send"></mat-icon>
-			</button>
-		}
-		<button type="button" mat-icon-button (click)="store.clearSearch()" [obButton]="'secondary'">
-			<mat-icon svgIcon="delete"></mat-icon>
-		</button>
+	<form class="composer" ngForm>
+		<zco-chat-attachments></zco-chat-attachments>
+		<div class="composer-row">
+			<ut-autocomplete-input
+				[required]="false"
+				[i18nLabel]="'chat.composer.placeholder'"
+				[optionLabelFn]="searchOptionLabelFn"
+				[inputLabelFn]="searchOptionLabelFn"
+				[optionService]="store.optionService()"
+				[minLength]="0"
+				[formControl]="store.searchCtrl"
+				(optionSelected)="store.selectOption($event)"
+				(inputChange)="store.setCommandMode($event)"
+				(attachmentsSelected)="store.addAttachments($event)"
+				(submitMessage)="store.send()"
+			/>
+			@if (store.isGenerating()) {
+				<button
+					type="button"
+					class="composer-action"
+					mat-icon-button
+					[obButton]="'primary'"
+					(click)="store.stopGeneration()"
+					[disabled]="store.isStopping()"
+					[attr.aria-label]="(store.isStopping() ? 'chat.generation.stopping' : 'chat.generation.stop') | translate"
+					[matTooltip]="(store.isStopping() ? 'chat.generation.stopping' : 'chat.generation.stop.shortcut') | translate"
+				>
+					<mat-icon svgIcon="stop-gesture"></mat-icon>
+				</button>
+			} @else {
+				<button
+					type="submit"
+					class="composer-action"
+					mat-icon-button
+					[obButton]="'primary'"
+					(click)="store.send()"
+					[disabled]="!store.canSend()"
+					[attr.aria-label]="'chat.composer.send' | translate"
+					[matTooltip]="'chat.composer.send' | translate"
+				>
+					<mat-icon svgIcon="send"></mat-icon>
+				</button>
+			}
+		</div>
 	</form>
+} @else {
+	<zco-chat-attachments></zco-chat-attachments>
 }
-<zco-chat-attachments></zco-chat-attachments>
 <p class="ai-disclaimer">{{ "chat.ai-disclaimer" | translate }}</p>

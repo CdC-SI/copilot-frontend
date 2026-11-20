@@ -16,9 +16,7 @@ import {Observable, Subject, debounceTime, of} from 'rxjs';
 import {ControlValueAccessor, FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, Validators} from '@angular/forms';
 import {HighlightTextPipe} from '../../pipes/highlight-text.pipe';
 import {CdkTextareaAutosize} from '@angular/cdk/text-field';
-import {MatFormField, MatLabel, MatPrefix} from '@angular/material/form-field';
-import {MatInput} from '@angular/material/input';
-import {MatAutocomplete, MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {MatAutocomplete, MatAutocompleteOrigin, MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {MatIconButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatIcon} from '@angular/material/icon';
@@ -40,15 +38,12 @@ import {TranslatePipe} from '@ngx-translate/core';
 		HighlightTextPipe
 	],
 	imports: [
-		MatFormField,
-		MatLabel,
-		MatInput,
 		CdkTextareaAutosize,
 		FormsModule,
 		MatAutocompleteTrigger,
+		MatAutocompleteOrigin,
 		ReactiveFormsModule,
 		MatIconButton,
-		MatPrefix,
 		MatTooltip,
 		MatIcon,
 		MatAutocomplete,
