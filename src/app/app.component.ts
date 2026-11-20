@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, Injector, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {UserService} from './shared/services/user.service';
-import {ObINavigationLink, ObNotificationService} from '@oblique/oblique';
+import {ObINavigationLink, ObMasterLayoutComponent, ObNotificationService} from '@oblique/oblique';
 import {SettingsService} from './shared/services/settings.service';
 import {SettingsType} from './shared/model/settings';
 import {IUser, UserStatus} from './shared/model/user';
@@ -16,7 +16,7 @@ import {LegalDocumentDialogComponent} from './shared/components/legal-document-d
 	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: false
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, DoCheck {
 	navigationGuest: ObINavigationLink[] = [{url: '/chat', label: 'chat'}];
 	navigationUser: ObINavigationLink[] = [
 		{url: '/chat', label: 'chat'},
@@ -39,6 +39,8 @@ export class AppComponent implements OnInit {
 	projectVersion: string;
 	@ViewChild('userNotRegisteredDialog') userNotRegisteredDialog: TemplateRef<any>;
 	@ViewChild('johnDoeInfoDialog') johnDoeInfoDialog: TemplateRef<any>;
+	@ViewChild(ObMasterLayoutComponent, {read: Injector, static: true}) private readonly masterLayoutInjector?: Injector;
+	private masterLayout?: ChangeDetectorRef;
 
 	constructor(
 		private readonly dialog: MatDialog,
@@ -47,6 +49,16 @@ export class AppComponent implements OnInit {
 		private readonly notif: ObNotificationService,
 		private readonly authService: AuthenticationServiceV2
 	) {}
+
+	/**
+	 * Le `<router-outlet>` est dans `ObMasterLayoutComponent`, OnPush depuis Oblique 16 : sans ce marquage, les pages
+	 * routées (`Eager`) ne sont vérifiées qu'après un événement DOM interne, pas après un timer ou une réponse HTTP.
+	 * À retirer quand les pages notifieront elles-mêmes leurs changements (signals, FE1b/FE4).
+	 */
+	ngDoCheck() {
+		this.masterLayout ??= this.masterLayoutInjector?.get(ChangeDetectorRef);
+		this.masterLayout?.markForCheck();
+	}
 
 	ngOnInit() {
 		this.authService.$authenticatedUser.subscribe(user => {
