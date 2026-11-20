@@ -9,6 +9,7 @@ import {MatInput} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
 import {DatePipe} from '@angular/common';
 import {TranslatePipe} from '@ngx-translate/core';
+import {ChatHistoryGroup, groupTitlesByPeriod} from './chat-history-groups';
 
 @Component({
 	selector: 'zco-chat-history',
@@ -26,7 +27,11 @@ export class ChatHistoryComponent {
 	@Output() readonly conversationDeleted = new EventEmitter<ChatTitle>();
 	/** Conversation renommée côté backend. */
 	@Output() readonly conversationRenamed = new EventEmitter<{conversationId: string; title: string}>();
-	@Input() titles!: ChatTitle[] | null;
+	/** Conversations regroupées par période (aujourd'hui, hier, 7 derniers jours, plus ancien). */
+	groups: ChatHistoryGroup[] = [];
+	@Input() set titles(titles: ChatTitle[] | null) {
+		this.groups = groupTitlesByPeriod(titles);
+	}
 	private readonly conversationService = inject(ConversationService);
 	private readonly cdr = inject(ChangeDetectorRef);
 

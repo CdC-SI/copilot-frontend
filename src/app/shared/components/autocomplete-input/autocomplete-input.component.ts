@@ -143,6 +143,10 @@ export class AutocompleteInputComponent<T> implements OnInit, ControlValueAccess
 		};
 	}
 
+	focus(): void {
+		this.itemFilterInput.nativeElement.focus();
+	}
+
 	onKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();

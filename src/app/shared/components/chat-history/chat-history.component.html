@@ -1,38 +1,43 @@
-<mat-list role="list" class="history-list">
-	@for (title of titles; track title.conversationId) {
-		<mat-list-item
-			[class]="title.selected ? 'title-selected' : 'title'"
-			role="listitem"
-			[matTooltip]="title.title"
-			matTooltipPosition="right"
-			[matTooltipShowDelay]="400"
-		>
-			<div class="history-item">
-				@if (editingTitle !== title) {
-					<div class="history-item-body" (click)="titleSelected(title)">
-						<span class="history-item-title">{{ title.title }}</span>
-						<span class="history-item-date">{{ title.timestamp | date: "d MMM, HH:mm" }}</span>
-					</div>
-					<div class="actions">
-						<button mat-icon-button (click)="startRename(title, $event)" [attr.aria-label]="'chat.history.rename' | translate">
-							<mat-icon svgIcon="pencil"></mat-icon>
-						</button>
-						<button mat-icon-button (click)="deleteTitle(title); $event.stopPropagation()" [attr.aria-label]="'chat.history.delete' | translate">
-							<mat-icon svgIcon="delete"></mat-icon>
-						</button>
-					</div>
-				} @else {
-					<input
-						matInput
-						[(ngModel)]="tempTitle"
-						(focusout)="cancelRename()"
-						(keyup.enter)="saveRename(title)"
-						(keyup.escape)="cancelRename()"
-						(click)="$event.stopPropagation()"
-						#titleInput
-					/>
-				}
-			</div>
-		</mat-list-item>
-	}
-</mat-list>
+@for (group of groups; track group.period) {
+	<h3 class="history-group" [id]="'history-group-' + group.period">{{ "chat.history.period." + group.period | translate }}</h3>
+	<mat-list role="list" class="history-list" [attr.aria-labelledby]="'history-group-' + group.period">
+		@for (title of group.titles; track title.conversationId) {
+			<mat-list-item
+				[class]="title.selected ? 'title-selected' : 'title'"
+				role="listitem"
+				[matTooltip]="title.title"
+				matTooltipPosition="right"
+				[matTooltipShowDelay]="400"
+			>
+				<div class="history-item">
+					@if (editingTitle !== title) {
+						<div class="history-item-body" (click)="titleSelected(title)">
+							<span class="history-item-title">{{ title.title }}</span>
+							<span class="history-item-date">{{
+								title.timestamp | date: (group.period === "today" || group.period === "yesterday" ? "HH:mm" : "d MMM, HH:mm")
+							}}</span>
+						</div>
+						<div class="actions">
+							<button mat-icon-button (click)="startRename(title, $event)" [attr.aria-label]="'chat.history.rename' | translate">
+								<mat-icon svgIcon="pencil"></mat-icon>
+							</button>
+							<button mat-icon-button (click)="deleteTitle(title); $event.stopPropagation()" [attr.aria-label]="'chat.history.delete' | translate">
+								<mat-icon svgIcon="delete"></mat-icon>
+							</button>
+						</div>
+					} @else {
+						<input
+							matInput
+							[(ngModel)]="tempTitle"
+							(focusout)="cancelRename()"
+							(keyup.enter)="saveRename(title)"
+							(keyup.escape)="cancelRename()"
+							(click)="$event.stopPropagation()"
+							#titleInput
+						/>
+					}
+				</div>
+			</mat-list-item>
+		}
+	</mat-list>
+}

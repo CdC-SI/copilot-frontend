@@ -50,6 +50,9 @@ export class ChatStore {
 		return isTurn && answer.isCompleted && !this.isGenerating() ? {question, answer} : null;
 	});
 	readonly scrollRequests = new Subject<ChatScrollRequest>();
+	/** Demandes de focus sur la saisie (nouvelle conversation, conversation ouverte, exemple choisi). */
+	readonly focusRequests = new Subject<void>();
+	readonly userFirstName = computed(() => this.user()?.firstName?.trim() || null);
 	private readonly isCommandMode = signal(false);
 	private readonly form = signal<{def: FormDef; group: FormGroup} | undefined>(undefined);
 	private readonly searchValue = toSignal(this.searchCtrl.valueChanges, {initialValue: this.searchCtrl.value});
@@ -107,6 +110,7 @@ export class ChatStore {
 		this.manager.initNewChat();
 		this.suggestionService.clearSpecificSuggestions();
 		this.scrollRequests.next('reset');
+		this.focusRequests.next();
 	}
 
 	selectConversation(chatTitle: ChatTitle): void {
@@ -120,6 +124,7 @@ export class ChatStore {
 			this.manager.setConversationMessages(chatTitle.conversationId, messages);
 			this.suggestionService.setSpecificSuggestionsFromMessages(messages);
 			this.scrollRequests.next('opened');
+			this.focusRequests.next();
 		});
 	}
 

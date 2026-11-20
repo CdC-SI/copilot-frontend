@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, afterNextRender, effect, inject, viewChild} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -8,7 +9,6 @@ import {ObButtonDirective, ObIconButtonDirective} from '@oblique/oblique';
 import {ActionSuggestionsComponent} from '../../shared/components/action-suggestions/action-suggestions.component';
 import {AutocompleteInputComponent} from '../../shared/components/autocomplete-input/autocomplete-input.component';
 import {DynamicFormComponent} from '../../shared/components/dynamic-form/dynamic-form.component';
-import {QuestionSuggestionComponent} from '../../shared/components/question-suggestion/question-suggestion.component';
 import {AutocompleteType} from '../services';
 import {ChatStore} from '../chat.store';
 import {ChatAttachmentsComponent} from './chat-attachments/chat-attachments.component';
@@ -21,7 +21,6 @@ import {ChatAttachmentsComponent} from './chat-attachments/chat-attachments.comp
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		DynamicFormComponent,
-		QuestionSuggestionComponent,
 		ActionSuggestionsComponent,
 		FormsModule,
 		ReactiveFormsModule,
@@ -37,5 +36,28 @@ import {ChatAttachmentsComponent} from './chat-attachments/chat-attachments.comp
 })
 export class ChatComposerComponent {
 	protected readonly store = inject(ChatStore);
+	private readonly input = viewChild(AutocompleteInputComponent);
+	private wasGenerating = false;
+
+	constructor() {
+		afterNextRender(() => this.focusInput());
+		this.store.focusRequests.pipe(takeUntilDestroyed()).subscribe(() => this.focusInput());
+		// Fin de la réponse : la saisie, réactivée, reprend le focus.
+		effect(() => {
+			const generating = this.store.isGenerating();
+			if (this.wasGenerating && !generating) this.focusInput();
+			this.wasGenerating = generating;
+		});
+	}
+
 	readonly searchOptionLabelFn = (option: AutocompleteType): string => this.store.optionLabel(option);
+
+	/** Donne le focus à la saisie, sauf si l'utilisateur est en train d'écrire dans un autre champ. */
+	private focusInput(): void {
+		setTimeout(() => {
+			const active = document.activeElement;
+			if (active instanceof HTMLElement && active.matches('input, textarea, select, [contenteditable="true"]')) return;
+			this.input()?.focus();
+		});
+	}
 }

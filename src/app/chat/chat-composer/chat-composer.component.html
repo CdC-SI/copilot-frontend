@@ -7,9 +7,6 @@
 		(closeForm)="store.closeForm()"
 	></zco-dynamic-form>
 }
-@if (store.messages().length <= 0) {
-	<zco-question-suggestion></zco-question-suggestion>
-}
 @if (store.isRegistered() && !store.activeForm()) {
 	<zco-action-suggestions [suggestions]="store.suggestions()" (actionSelected)="store.handleSuggestionAction($event)"> </zco-action-suggestions>
 }
