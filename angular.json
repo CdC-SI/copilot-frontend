@@ -30,6 +30,9 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
+            "externalDependencies": [
+              "marked-katex-extension"
+            ],
             "assets": [
               {
                 "glob": "**/*",
