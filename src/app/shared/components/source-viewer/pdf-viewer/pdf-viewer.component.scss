@@ -1,0 +1,130 @@
+@use "@oblique/oblique/styles/scss/core/palette";
+
+:host {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.pdf-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 8px;
+	border-bottom: 1px solid palette.$ob-secondary-100;
+}
+
+.pdf-toolbar-spacer {
+	flex: 1;
+}
+
+.pdf-page-number {
+	min-width: 7em;
+	text-align: center;
+	font-size: 0.875rem;
+}
+
+.pdf-status {
+	margin: 8px 16px;
+	font-size: 0.875rem;
+
+	&.error {
+		color: palette.$ob-red-700;
+	}
+
+	&.hint {
+		color: palette.$ob-secondary-500;
+		font-style: italic;
+	}
+}
+
+.pdf-scroll {
+	flex: 1 1 auto;
+	overflow: auto;
+	padding: 16px;
+	background: palette.$ob-secondary-50;
+}
+
+.pdf-page-view {
+	position: relative;
+	margin: 0 auto;
+	background: white;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+	--scale-round-x: 1px;
+	--scale-round-y: 1px;
+
+	&.hidden {
+		visibility: hidden;
+	}
+
+	canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+}
+
+// Couche texte de pdf.js (extrait de pdfjs-dist/web/pdf_viewer.css) : texte transparent superposé au rendu.
+.textLayer {
+	position: absolute;
+	text-align: initial;
+	inset: 0;
+	overflow: clip;
+	opacity: 1;
+	line-height: 1;
+	letter-spacing: normal;
+	word-spacing: normal;
+	text-size-adjust: none;
+	forced-color-adjust: none;
+	transform-origin: 0 0;
+	caret-color: CanvasText;
+	z-index: 0;
+	--min-font-size: 1;
+	--text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+	--min-font-size-inv: calc(1 / var(--min-font-size));
+
+	::ng-deep {
+		:is(span, br) {
+			color: transparent;
+			position: absolute;
+			white-space: pre;
+			cursor: text;
+			transform-origin: 0% 0%;
+		}
+
+		> :not(.markedContent),
+		.markedContent span:not(.markedContent) {
+			z-index: 1;
+			--font-height: 0;
+			font-size: calc(var(--text-scale-factor) * var(--font-height));
+			--scale-x: 1;
+			--rotate: 0deg;
+			transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+		}
+
+		.markedContent {
+			display: contents;
+		}
+
+		.highlight {
+			margin: -1px;
+			padding: 1px;
+			border-radius: 2px;
+			background-color: rgb(255 214 0 / 45%);
+		}
+
+		::selection {
+			background: rgb(0 0 255 / 25%);
+			color: transparent;
+		}
+
+		.endOfContent {
+			display: block;
+			position: absolute;
+			inset: 100% 0 0;
+			z-index: 0;
+			cursor: default;
+			user-select: none;
+		}
+	}
+}

@@ -14,6 +14,8 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {ToolApprovalRequest} from '../../model/tool-step';
 import {ToolStepsComponent} from '../tool-steps/tool-steps.component';
 import {CitationsDirective} from '../citations/citations.directive';
+import {SourceViewerStore} from '../source-viewer/source-viewer.store';
+import {sortSourcesByCitation} from '../../utils/citations';
 
 const MIN_EDIT_WIDTH_PX = 240;
 
@@ -63,6 +65,9 @@ export class ChatMessageComponent {
 	editWidth?: number;
 	protected readonly ChatMessageSource = ChatMessageSource;
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+	private readonly viewer = inject(SourceViewerStore, {optional: true});
+	/** Citation dont la carte doit recevoir le focus (clic sur une pastille, sans panneau des sources). */
+	private pendingFocusCitation?: number;
 
 	/** Réponse en cours de génération. */
 	get isGenerating(): boolean {
@@ -110,15 +115,37 @@ export class ChatMessageComponent {
 		this.submitEdit();
 	}
 
-	/** Clic sur une pastille de citation : ouvre la liste des sources et y amène la source citée. */
+	/**
+	 * Clic sur une pastille de citation : ouvre la source dans le panneau quand la page en a un, et met en évidence
+	 * sa carte dans la liste des sources (focus sur la carte seulement sans panneau, qui prend lui-même le focus).
+	 */
 	showCitedSource(n: number): void {
 		this.sourcePanelOpen = true;
 		this.highlightedCitation = n;
+		const sources = sortSourcesByCitation(this.message?.sources ?? []);
+		const cited = sources.find(s => s.citation === n);
+		const inViewer = !!this.viewer && SourceViewerStore.canOpen(cited);
+		if (inViewer && cited) this.viewer?.open(cited, sources);
+		this.pendingFocusCitation = inViewer ? undefined : n;
 		setTimeout(() => {
-			const card = this.host.nativeElement.querySelector<HTMLElement>(`[data-citation-source="${n}"]`);
-			card?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-			card?.focus({preventScroll: true});
+			this.citedSourceCard(n)?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+			this.focusPendingCitation();
 		});
+	}
+
+	/**
+	 * Donne le focus à la carte de la source citée. Tant que la liste des sources se déplie, son contenu est masqué
+	 * et ne peut pas recevoir le focus : nouvel essai à la fin du dépliement (`afterExpand`).
+	 */
+	focusPendingCitation(): void {
+		if (this.pendingFocusCitation === undefined) return;
+		const card = this.citedSourceCard(this.pendingFocusCitation);
+		card?.focus({preventScroll: true});
+		if (card && document.activeElement === card) this.pendingFocusCitation = undefined;
+	}
+
+	private citedSourceCard(n: number): HTMLElement | null {
+		return this.host.nativeElement.querySelector<HTMLElement>(`[data-citation-source="${n}"]`);
 	}
 
 	/**

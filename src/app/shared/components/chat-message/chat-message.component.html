@@ -87,7 +87,13 @@
 				(citationSelected)="showCitedSource($event)"
 			></markdown>
 			@if (hasMultipleSources) {
-				<mat-expansion-panel class="sources-panel" [expanded]="sourcePanelOpen" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">
+				<mat-expansion-panel
+					class="sources-panel"
+					[expanded]="sourcePanelOpen"
+					(opened)="sourcePanelOpen = true"
+					(closed)="sourcePanelOpen = false"
+					(afterExpand)="focusPendingCitation()"
+				>
 					<mat-expansion-panel-header>
 						<mat-panel-title> Sources ({{ sourcesCount }}) </mat-panel-title>
 					</mat-expansion-panel-header>

@@ -15,6 +15,11 @@ export function openOrDownloadBlob(blob: Blob, filename: string): void {
 		return;
 	}
 
+	downloadBlob(blob, filename);
+}
+
+/** Enregistre le fichier sous son nom d'origine (téléchargement du navigateur). */
+export function downloadBlob(blob: Blob, filename: string): void {
 	const url = window.URL.createObjectURL(blob);
 	const link = document.createElement('a');
 	link.href = url;

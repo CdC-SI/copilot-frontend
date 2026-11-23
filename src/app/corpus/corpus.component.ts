@@ -23,6 +23,8 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {OfficialSourcesBrowserComponent} from './official-sources-browser/official-sources-browser.component';
 import {DatePipe} from '@angular/common';
 import {TranslatePipe} from '@ngx-translate/core';
+import {SourceViewerStore} from '../shared/components/source-viewer/source-viewer.store';
+import {SourceViewerPanelComponent} from '../shared/components/source-viewer/source-viewer-panel.component';
 
 const BYTES_TO_KB = 1024;
 const AUTO_REFRESH_INTERVAL_MS = 30_000;
@@ -37,6 +39,7 @@ interface UploadResult {
 	templateUrl: './corpus.component.html',
 	styleUrl: './corpus.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
+	providers: [SourceViewerStore],
 	imports: [
 		MatTabGroup,
 		MatTab,
@@ -57,6 +60,7 @@ interface UploadResult {
 		MatCardActions,
 		MatTooltip,
 		OfficialSourcesBrowserComponent,
+		SourceViewerPanelComponent,
 		DatePipe,
 		TranslatePipe
 	]
@@ -72,6 +76,7 @@ export class CorpusComponent implements OnInit, OnDestroy {
 	showUploadInfo = false;
 
 	readonly SourceRequestStatus = SourceRequestStatus;
+	protected readonly viewer = inject(SourceViewerStore);
 
 	private readonly destroy$ = new Subject<void>();
 	private autoRefresh?: Subscription;
@@ -140,6 +145,15 @@ export class CorpusComponent implements OnInit, OnDestroy {
 			});
 	}
 
+	/** Les PDF personnels s'ouvrent dans le panneau des sources (visionneuse) ; les autres formats se téléchargent. */
+	canOpenDocument(doc: IPersonalDocument): boolean {
+		return doc.title.toLowerCase().endsWith('.pdf');
+	}
+
+	openDocument(doc: IPersonalDocument): void {
+		this.viewer.openFile(doc.title, () => this.uploadService.downloadSourceDocument(doc.title));
+	}
+
 	downloadDocument(doc: IPersonalDocument): void {
 		this.uploadService
 			.downloadSourceDocument(doc.title)
@@ -156,6 +170,7 @@ export class CorpusComponent implements OnInit, OnDestroy {
 			.pipe(takeUntil(this.destroy$))
 			.subscribe({
 				next: () => {
+					this.closeViewerOn(doc);
 					this.notifService.success('personal.documents.delete.success');
 					this.loadUserDocuments();
 				},
@@ -325,6 +340,12 @@ export class CorpusComponent implements OnInit, OnDestroy {
 
 	private handleUploadError(result: UploadResult): void {
 		this.notifService.error(uploadErrorNotification(result.error, 'personal.documents.upload.error', result.doc.fileName));
+	}
+
+	/** Ferme le panneau s'il affiche le document (supprimé). */
+	private closeViewerOn(doc: IPersonalDocument): void {
+		const target = this.viewer.target();
+		if (target?.kind === 'file' && target.title === doc.title) this.viewer.close();
 	}
 
 	private saveFile(blob: Blob, filename: string): void {

@@ -13,6 +13,8 @@ const channel = process.env['E2E_CHANNEL'] ?? 'msedge';
 export default defineConfig({
 	testDir: './e2e',
 	fullyParallel: true,
+	// `ng serve` compile à la demande : trop de pages simultanées sur un serveur froid font échouer les navigations.
+	workers: 3,
 	forbidOnly: !!process.env['CI'],
 	retries: process.env['CI'] ? 1 : 0,
 	reporter: [['list'], ['html', {open: 'never'}]],
