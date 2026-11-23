@@ -167,3 +167,32 @@ a {
 		height: 20px;
 	}
 }
+
+// Pastilles de citation créées dans le rendu Markdown (CitationsDirective, F2c).
+.markdown-content ::ng-deep .citation-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.15rem;
+	height: 1.15rem;
+	margin: 0 0.1rem;
+	padding: 0 0.3rem;
+	border: none;
+	border-radius: 0.6rem;
+	background: $ob-secondary-100;
+	color: $ob-secondary-700;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	line-height: 1;
+	vertical-align: super;
+	cursor: pointer;
+
+	&:hover {
+		background: $ob-secondary-200;
+	}
+
+	&:focus-visible {
+		outline: 2px solid $ob-primary;
+		outline-offset: 1px;
+	}
+}

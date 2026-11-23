@@ -13,6 +13,11 @@ export type ChatStreamEvent =
 	| {type: 'status'; data: {code: string; label: string}}
 	| {type: 'text_delta'; data: {text: string}}
 	| {type: 'source'; data: MessageSource}
+	/**
+	 * Première citation d'une source (F2a), émise avant le `text_delta` qui contient son marqueur `[^n]`. La source
+	 * porte déjà `citation: n` ; les `source` de fin de réponse la répètent (avec les sources non citées).
+	 */
+	| {type: 'citation'; data: {n: number; source: MessageSource}}
 	| {type: 'suggestion'; data: {text: string}}
 	| {type: 'workspace'; data: {name: string}}
 	/** Appel d'outil annoncé avant son exécution ; toujours suivi d'un `tool_result` de même `id` (sauf interruption). */
@@ -30,6 +35,7 @@ const EVENT_TYPES: ReadonlySet<string> = new Set<ChatStreamEventType>([
 	'status',
 	'text_delta',
 	'source',
+	'citation',
 	'suggestion',
 	'workspace',
 	'tool_call',

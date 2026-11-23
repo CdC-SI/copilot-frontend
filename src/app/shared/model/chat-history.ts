@@ -43,6 +43,8 @@ export interface MessageSource {
 	documentId?: string;
 	questionId?: string;
 	answerId?: string;
+	/** Numéro de citation dans la réponse (`[^n]`, F2a) ; absent si la source n'est pas citée. */
+	citation?: number;
 }
 
 export type AttachmentStatus = 'PENDING' | 'PROCESSED' | 'FAILED';

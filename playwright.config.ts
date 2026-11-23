@@ -22,7 +22,10 @@ export default defineConfig({
 		baseURL: `http://localhost:${port}`,
 		locale: 'fr-CH',
 		trace: 'retain-on-failure',
-		screenshot: 'only-on-failure'
+		screenshot: 'only-on-failure',
+		// Tout le trafic est local (application et backend simulé) : sans proxy, le proxy système du poste pouvant
+		// ne pas exclure localhost (pages bloquées au chargement).
+		launchOptions: {args: ['--no-proxy-server']}
 	},
 	projects: [
 		{

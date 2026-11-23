@@ -49,6 +49,16 @@ describe('ChatStreamProcessorService', () => {
 		expect(message.message).toBe('Début');
 	});
 
+	it('une citation ajoute la source numérotée, que la liste de fin de réponse remplace par numéro', () => {
+		feed(streamEvents.citation(1, {documentId: 'c1', link: 'a.pdf'}), text('Réponse [^1]'));
+		expect(message.sources).toEqual([expect.objectContaining({documentId: 'c1', citation: 1})]);
+
+		feed(streamEvents.source({documentId: 'c1', link: 'a.pdf', pageNumber: '4', citation: 1}), streamEvents.source({documentId: 'c2', link: 'b.pdf'}));
+		expect(message.sources).toEqual([expect.objectContaining({documentId: 'c1', pageNumber: '4', citation: 1}), expect.objectContaining({documentId: 'c2'})]);
+		expect(message.sources?.[1].citation).toBeUndefined();
+		expect(message.message).toBe('Réponse [^1]');
+	});
+
 	it('ajoute les sources, le workspace et remonte les suggestions', () => {
 		const [, , suggestion] = feed(
 			{type: 'source', data: {documentId: '1', type: 'URL', link: 'http://a', pageNumber: '2'}},

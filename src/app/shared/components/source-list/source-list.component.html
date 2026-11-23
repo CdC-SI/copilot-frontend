@@ -1,7 +1,12 @@
 @if (message.sources?.length) {
 	<section class="source-list">
-		@for (source of message.sources; track source) {
-			<article class="source-card">
+		@for (source of orderedSources; track source.documentId + "|" + source.citation) {
+			<article
+				class="source-card"
+				tabindex="-1"
+				[attr.data-citation-source]="source.citation"
+				[class.highlighted]="!!source.citation && source.citation === highlightedCitation"
+			>
 				<zco-source [source]="source"></zco-source>
 				@if (authenticatedAsExpert()) {
 					<div class="source-actions">

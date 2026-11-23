@@ -13,6 +13,7 @@ import {MessageActionComponent} from '../message-action/message-action.component
 import {TranslatePipe} from '@ngx-translate/core';
 import {ToolApprovalRequest} from '../../model/tool-step';
 import {ToolStepsComponent} from '../tool-steps/tool-steps.component';
+import {CitationsDirective} from '../citations/citations.directive';
 
 const MIN_EDIT_WIDTH_PX = 240;
 
@@ -34,6 +35,7 @@ const MIN_EDIT_WIDTH_PX = 240;
 		SourceListComponent,
 		MessageActionComponent,
 		ToolStepsComponent,
+		CitationsDirective,
 		TranslatePipe
 	]
 })
@@ -53,6 +55,8 @@ export class ChatMessageComponent {
 	@Output() readonly toolApproval = new EventEmitter<ToolApprovalRequest>();
 	@ViewChild('editInput') editInput?: ElementRef<HTMLTextAreaElement>;
 	sourcePanelOpen: boolean;
+	/** Source mise en évidence dans la liste après un clic sur sa pastille de citation. */
+	highlightedCitation?: number;
 	editing = false;
 	editedQuestion = '';
 	/** Largeur de la bulle figée pendant l'édition (px). */
@@ -104,6 +108,17 @@ export class ChatMessageComponent {
 		if ((event as KeyboardEvent).shiftKey) return;
 		event.preventDefault();
 		this.submitEdit();
+	}
+
+	/** Clic sur une pastille de citation : ouvre la liste des sources et y amène la source citée. */
+	showCitedSource(n: number): void {
+		this.sourcePanelOpen = true;
+		this.highlightedCitation = n;
+		setTimeout(() => {
+			const card = this.host.nativeElement.querySelector<HTMLElement>(`[data-citation-source="${n}"]`);
+			card?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+			card?.focus({preventScroll: true});
+		});
 	}
 
 	/**

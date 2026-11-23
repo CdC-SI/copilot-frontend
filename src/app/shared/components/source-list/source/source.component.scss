@@ -54,3 +54,18 @@
 	padding: 0;
 	list-style: none;
 }
+
+/* Numéro de citation de la source dans la réponse (F2c). */
+.source-citation {
+	flex: 0 0 auto;
+	min-width: 1.5rem;
+	height: 1.5rem;
+	padding: 0 .4rem;
+	border-radius: .75rem;
+	background: #dfe4e9;
+	color: #263645;
+	font-size: .8125rem;
+	font-weight: 600;
+	line-height: 1.5rem;
+	text-align: center;
+}

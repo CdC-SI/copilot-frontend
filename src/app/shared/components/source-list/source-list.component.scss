@@ -25,6 +25,14 @@
 .source-card:hover {
 	box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
 }
+/* Source amenée par un clic sur sa pastille de citation (F2c). */
+.source-card.highlighted {
+	border-color: #263645;
+	box-shadow: 0 0 0 2px rgba(38, 54, 69, .25);
+}
+.source-card:focus {
+	outline: none;
+}
 
 /* --- Actions --- */
 .source-actions {
