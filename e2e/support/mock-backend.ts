@@ -35,6 +35,29 @@ export class MockBackend {
 		return this;
 	}
 
+	/**
+	 * Réponse SSE pilotée par le test, envoyée en plusieurs étapes (vérifier l'affichage avant la fin du flux).
+	 * À appeler avant la navigation : `fetch` est remplacé dans la page pour `POST /conversations` (une réponse
+	 * `page.route` est toujours livrée en une fois).
+	 */
+	async manualStream(): Promise<ManualStream> {
+		await this.page.addInitScript(() => {
+			const w = window as unknown as {__e2eStreams: ReadableStreamDefaultController<Uint8Array>[]};
+			w.__e2eStreams = [];
+			const originalFetch = window.fetch.bind(window);
+			window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+				// Pas de référence à Request : le nom est lié à l'import Playwright lors de la transpilation.
+				const url = new URL(typeof input === 'object' && 'url' in input ? input.url : String(input), location.href);
+				if (init?.method !== 'POST' || !url.pathname.endsWith('/zia/api/conversations')) {
+					return originalFetch(input, init);
+				}
+				const body = new ReadableStream<Uint8Array>({start: controller => void w.__e2eStreams.push(controller)});
+				return Promise.resolve(new Response(body, {status: 200, headers: {'Content-Type': 'text/event-stream'}}));
+			};
+		});
+		return new ManualStream(this.page);
+	}
+
 	async install(): Promise<void> {
 		// Playwright : la dernière route déclarée est prioritaire ; le filet générique est donc déclaré en premier.
 		await this.page.route(`${API}**`, route => this.fallback(route));
@@ -70,6 +93,27 @@ export class MockBackend {
 		const request = route.request();
 		this.unexpected.push(`${request.method()} ${new URL(request.url()).pathname}`);
 		return request.method() === 'GET' ? route.fulfill({json: []}) : route.fulfill({status: 204});
+	}
+}
+
+/** Flux SSE ouvert par la page (`MockBackend.manualStream`), alimenté étape par étape. */
+export class ManualStream {
+	constructor(private readonly page: Page) {}
+
+	/** Envoie des événements sur le dernier flux ouvert (attend qu'une question ait été posée). */
+	async send(...events: ChatStreamEvent[]): Promise<void> {
+		await this.page.waitForFunction(() => (window as unknown as {__e2eStreams: unknown[]}).__e2eStreams.length > 0);
+		await this.page.evaluate(sse => {
+			const streams = (window as unknown as {__e2eStreams: ReadableStreamDefaultController<Uint8Array>[]}).__e2eStreams;
+			streams[streams.length - 1].enqueue(new TextEncoder().encode(sse));
+		}, toSse(events));
+	}
+
+	async close(): Promise<void> {
+		await this.page.evaluate(() => {
+			const streams = (window as unknown as {__e2eStreams: ReadableStreamDefaultController<Uint8Array>[]}).__e2eStreams;
+			streams[streams.length - 1].close();
+		});
 	}
 }
 

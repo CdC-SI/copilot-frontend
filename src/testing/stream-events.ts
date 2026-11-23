@@ -41,7 +41,8 @@ export interface AnswerTurnOptions {
  * `chunks` : texte déjà découpé, ou texte unique découpé par mots (simule le streaming).
  */
 export function answerTurn(chunks: string | string[], options: AnswerTurnOptions = {}): ChatStreamEvent[] {
-	const parts = Array.isArray(chunks) ? chunks : (chunks.match(/\S+\s*/g) ?? []);
+	// Découpage par mots, espaces conservés (y compris en tête) : la concaténation des morceaux redonne le texte.
+	const parts = Array.isArray(chunks) ? chunks : (chunks.match(/^\s+|\S+\s*/g) ?? []);
 	return [
 		streamEvents.start(options.generationId ?? 'g1', options.conversationId),
 		...parts.map(part => streamEvents.text(part)),

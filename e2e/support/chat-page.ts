@@ -4,6 +4,8 @@ import {Locator, Page} from '@playwright/test';
 export class ChatPage {
 	readonly composer: Locator;
 	readonly sendButton: Locator;
+	/** Bouton « Arrêter la génération » du composeur, visible pendant la génération. */
+	readonly stopButton: Locator;
 	readonly sidebar: Locator;
 	/** Fil des messages (questions et réponses). */
 	readonly timeline: Locator;
@@ -11,6 +13,7 @@ export class ChatPage {
 	constructor(private readonly page: Page) {
 		this.composer = page.getByRole('combobox', {name: /Posez une question/});
 		this.sendButton = page.getByRole('button', {name: 'Envoyer'});
+		this.stopButton = page.getByRole('button', {name: 'Arrêter la génération'});
 		this.sidebar = page.getByRole('complementary', {name: 'Colonne gauche'});
 		this.timeline = page.locator('zco-chat-timeline');
 	}
