@@ -21,6 +21,19 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
   Les paquets publiés en ESM seul (`.js`) importés par les composants doivent figurer dans
   `transformIgnorePatterns` (`jest.config.js`). Instancier une classe qui utilise `inject()` hors TestBed :
   `runInInjectionContext(Injector.create({providers: [...]}), () => new Classe())`.
+- Couverture : calculée sur tout `src/app` (`collectCoverageFrom`, y compris les fichiers sans test), rapport
+  `coverage/` (html, lcov, `coverage-summary.json`). Seuils **à cliquet** par dossier (`coverageThreshold` dans
+  `jest.config.js`) : relevés au niveau atteint quand une PR l'améliore, jamais baissés. Un dossier listé est
+  exclu du seuil `global`.
+- Utilitaires de test partagés dans `src/testing/` (hors couverture) : `stream-events.ts` (fabriques
+  d'événements du flux, `answerTurn`, `toSse`), `fixtures.ts` (utilisateur, titres, conversations) — sans
+  dépendance Angular, importables par Jest et Playwright — et `angular.ts` (stubs `TranslateService`,
+  notifications Oblique). Les réutiliser plutôt que redéfinir des mocks locaux.
+- e2e : **Playwright** (`playwright.config.ts`, dossier `e2e/`, hors Jest). `ng serve` est lancé sur le port 4300
+  (réutilisé s'il tourne déjà) et le backend est simulé par `page.route` (`e2e/support/mock-backend.ts` :
+  utilisateur, historique, réponses SSE scriptées ; requête non prévue → réponse vide notée dans `unexpected`).
+  Page objet `e2e/support/chat-page.ts` ; sélecteurs par rôle et libellé accessibles (fr). Navigateur : Edge du
+  poste (`channel: 'msedge'`, téléchargement des navigateurs Playwright bloqué) ; `E2E_CHANNEL=chromium` sinon.
 - Lint/format : ESLint 10 en flat config (`eslint.config.mjs`, paquets `angular-eslint` et
   `typescript-eslint`) + Prettier (`.prettierrc`).
 - `package.json` : `allowScripts` liste les paquets autorisés à exécuter un script d'installation,
@@ -30,7 +43,9 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 
 - Dev : `npm run start:dev` (proxy `/zia/api/**` → `http://localhost:8080`, voir `proxy.conf.json`).
 - Build : `npm run build` ; production : `npm run build:prod`.
-- Tests : `npm test` (Jest) ; un fichier : `npx ng test --test-path-patterns=<motif>`.
+- Tests : `npm test` (Jest, avec couverture) ; un fichier : `npx ng test --test-path-patterns=<motif>`.
+- e2e : `npm run e2e` (Playwright) ; un parcours : `npm run e2e -- --grep <motif>` ; rapport :
+  `npx playwright show-report`.
 - Lint : `npm run lint` ; correction auto : `npm run format`.
 - Après une modification : au minimum `npm run build` (ou les diagnostics IDE), plus `npm run lint`
   sur les fichiers touchés, avant de conclure.
@@ -59,7 +74,8 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - Tout texte visible passe par ngx-translate : ajouter la clé dans **fr, de et it** (y compris
   `aria-label`).
 - Éviter `any` ; typer les modèles dans `shared/model`.
-- Ajouter des tests Jest (`*.spec.ts` à côté du fichier) pour la logique de service/utilitaire modifiée.
+- Ajouter des tests Jest (`*.spec.ts` à côté du fichier) pour la logique de service/utilitaire modifiée ;
+  un parcours utilisateur nouveau ou modifié s'accompagne d'un scénario e2e.
 
 ## Git
 

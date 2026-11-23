@@ -42,3 +42,9 @@ testem.log
 Thumbs.db
 
 .nx
+
+# Playwright
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache

@@ -2,6 +2,7 @@ import {ChatStreamProcessorService, StreamProcessingResult} from './chat-stream-
 import {ChatMessage} from '../../shared/model/chat-message';
 import {ChatStreamEvent} from '../../shared/model/chat-stream-event';
 import {ToolResultStatus} from '../../shared/model/tool-step';
+import {streamEvents} from '../../../testing/stream-events';
 
 describe('ChatStreamProcessorService', () => {
 	let processor: ChatStreamProcessorService;
@@ -14,8 +15,7 @@ describe('ChatStreamProcessorService', () => {
 			message = result.message;
 			return result;
 		});
-	const text = (value: string): ChatStreamEvent => ({type: 'text_delta', data: {text: value}});
-	const status = (code: string, label: string): ChatStreamEvent => ({type: 'status', data: {code, label}});
+	const {text, status} = streamEvents;
 
 	beforeEach(() => {
 		processor = new ChatStreamProcessorService();
