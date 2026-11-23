@@ -62,6 +62,11 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - `shared/` : `components`, `services` (API, auth…), `interceptors`, `model`, `pipes`, `utils`,
   `constants`.
 - Les appels API passent par `ConfigurationService.backendApi(subPath)`.
+- Citations (F2c) : le texte des réponses contient le marqueur canonique `[^n]` (numéro de la source affichée,
+  événement SSE `citation {n, source}` puis `source` avec `citation`). Helpers dans `shared/utils/citations.ts`
+  (traitement hors code, retrait, conversion pour la copie) ; pastilles posées après le rendu Markdown par la
+  directive `markdown[zcoCitations]` (`shared/components/citations/`). Toute sortie texte d'une réponse (copie,
+  lecture vocale, FAQ…) doit convertir ou retirer les marqueurs.
 
 ## Conventions de code
 

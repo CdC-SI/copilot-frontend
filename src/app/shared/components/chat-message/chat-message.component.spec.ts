@@ -105,3 +105,25 @@ describe('ChatMessageComponent (modification de la question)', () => {
 		expect(component.editing).toBe(true);
 	});
 });
+
+describe('ChatMessageComponent (citations)', () => {
+	it('un clic sur une pastille ouvre les sources et met la source citée en évidence', () => {
+		jest.useFakeTimers();
+		const card = {scrollIntoView: jest.fn(), focus: jest.fn()};
+		const querySelector = jest.fn().mockReturnValue(card);
+		const component = runInInjectionContext(
+			Injector.create({providers: [{provide: ElementRef, useValue: {nativeElement: {querySelector}}}]}),
+			() => new ChatMessageComponent()
+		);
+
+		component.showCitedSource(2);
+		expect(component.sourcePanelOpen).toBe(true);
+		expect(component.highlightedCitation).toBe(2);
+
+		jest.runAllTimers();
+		expect(querySelector).toHaveBeenCalledWith('[data-citation-source="2"]');
+		expect(card.focus).toHaveBeenCalledWith({preventScroll: true});
+		expect(card.scrollIntoView).toHaveBeenCalled();
+		jest.useRealTimers();
+	});
+});

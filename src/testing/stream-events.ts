@@ -11,6 +11,8 @@ export const streamEvents = {
 	status: (code: string, label = code): ChatStreamEvent => ({type: 'status', data: {code, label}}),
 	text: (text: string): ChatStreamEvent => ({type: 'text_delta', data: {text}}),
 	source: (source: Partial<MessageSource> = {}): ChatStreamEvent => ({type: 'source', data: aSource(source)}),
+	/** Première citation `[^n]` d'une source (à émettre avant le texte qui porte le marqueur). */
+	citation: (n: number, source: Partial<MessageSource> = {}): ChatStreamEvent => ({type: 'citation', data: {n, source: aSource({...source, citation: n})}}),
 	suggestion: (text: string): ChatStreamEvent => ({type: 'suggestion', data: {text}}),
 	workspace: (name: string): ChatStreamEvent => ({type: 'workspace', data: {name}}),
 	toolCall: (id: string, name: string, args: Record<string, unknown> = {}): ChatStreamEvent => ({type: 'tool_call', data: {id, name, arguments: args}}),

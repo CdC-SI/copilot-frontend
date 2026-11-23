@@ -8,6 +8,7 @@ import {FeedbackCategory} from '../../model/feedback';
 import {SourceComponent} from './source/source.component';
 import {FormsModule} from '@angular/forms';
 import {TranslatePipe} from '@ngx-translate/core';
+import {sortSourcesByCitation} from '../../utils/citations';
 
 type FeedbackVote = 'upvote' | 'downvote';
 
@@ -23,6 +24,8 @@ export class SourceListComponent implements OnChanges {
 	@Input() question?: string;
 	@Input() conversationId!: string;
 	@Input() expanded = false;
+	/** Numéro de la source citée à mettre en évidence (clic sur sa pastille). */
+	@Input() highlightedCitation?: number;
 
 	// dialog state
 	selectedSource: MessageSource | null = null;
@@ -59,6 +62,16 @@ export class SourceListComponent implements OnChanges {
 		if (changes['sources'] && this.feedbackLoaded) {
 			this.applyFeedbackToSources();
 		}
+	}
+
+	/** Sources citées d'abord, dans l'ordre de leur numéro, puis les autres. */
+	get orderedSources(): MessageSource[] {
+		return sortSourcesByCitation(this.message.sources ?? []);
+	}
+
+	/** Clé de suivi unique : numéro de citation, sinon position parmi les sources non citées (anciens historiques). */
+	sourceKey(source: MessageSource, index: number): string {
+		return source.citation ? `c${source.citation}` : `u${index}|${source.documentId ?? ''}`;
 	}
 
 	/** Convenience helpers */

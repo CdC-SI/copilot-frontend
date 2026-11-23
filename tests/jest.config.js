@@ -12,8 +12,8 @@ module.exports = {
 	// sont exclus du calcul de « global » (reste de l'application : corpus, admin, outils…).
 	coverageThreshold: {
 		global: {statements: 0, branches: 0, functions: 0, lines: 0},
-		'./src/app/chat/': {statements: 54, branches: 37, functions: 51, lines: 56},
-		'./src/app/shared/': {statements: 34, branches: 32, functions: 19, lines: 33}
+		'./src/app/chat/': {statements: 54, branches: 38, functions: 51, lines: 56},
+		'./src/app/shared/': {statements: 41, branches: 40, functions: 26, lines: 40}
 	},
 	// Paquets publiés en ESM uniquement (.js), importés par les composants standalone : à transpiler pour Jest.
 	transformIgnorePatterns: ['node_modules/(?!(.*\\.mjs$|marked/|nanoid/))']

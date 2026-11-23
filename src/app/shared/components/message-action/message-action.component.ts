@@ -17,6 +17,7 @@ import {CdkScrollable} from '@angular/cdk/scrolling';
 import {FaqItemEditComponent} from '../faq-item-edit/faq-item-edit.component';
 import {MatButton} from '@angular/material/button';
 import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
+import {citationsToText, stripCitations} from '../../utils/citations';
 
 @Component({
 	selector: 'zco-message-action',
@@ -86,7 +87,7 @@ export class MessageActionComponent {
 	};
 	speakMessage = (message: ChatMessage): void => {
 		const speech = new SpeechSynthesisUtterance();
-		speech.text = message.message;
+		speech.text = stripCitations(message.message);
 		speech.rate = 1.5;
 		speech.pitch = 1;
 		speech.voice = this.speechService.getVoice(message.lang || this.translateService.getCurrentLang());
@@ -110,7 +111,7 @@ export class MessageActionComponent {
 		this.faqItemFrmCtrl.patchValue({
 			id: this.previousMessage.faqItemId,
 			text: this.previousMessage.message,
-			answer: this.message.message,
+			answer: stripCitations(this.message.message),
 			url: this.message.url,
 			language: this.translateService.getCurrentLang()
 		});
@@ -136,9 +137,15 @@ export class MessageActionComponent {
 			return;
 		}
 		void navigator.clipboard
-			.writeText(this.message.message)
+			.writeText(this.answerAsText())
 			.then(() => this.notif.success('copilot.answer.copied'))
 			.catch(() => this.notif.error('i18n.oblique.http.error.general'));
+	}
+
+	/** Réponse copiée : citations `[n]` et liste des sources citées en fin de texte. */
+	private answerAsText(): string {
+		const t = (key: string): string => this.translateService.instant(key);
+		return citationsToText(this.message.message, this.message.sources, t('chat.answer.copy.sources'), t('sourceList.meta.page'));
 	}
 
 	private giveFeedback(comment: string, isPositive: boolean) {

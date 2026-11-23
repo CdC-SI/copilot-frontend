@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {ChatMessage} from '../../shared/model/chat-message';
 import {ChatStreamEvent} from '../../shared/model/chat-stream-event';
 import {ToolStep, cancelPendingToolSteps} from '../../shared/model/tool-step';
+import {upsertSource} from '../../shared/utils/citations';
 
 export interface StreamProcessingResult {
 	/** Nouvelle version du message, après application des événements (le message reçu n'est pas modifié). */
@@ -53,7 +54,8 @@ export class ChatStreamProcessorService {
 				message.message = (message.message ?? '') + event.data.text;
 				break;
 			case 'source':
-				message.sources.push(event.data);
+			case 'citation':
+				message.sources = upsertSource(message.sources, event.type === 'source' ? event.data : {...event.data.source, citation: event.data.n});
 				break;
 			case 'suggestion':
 				result.newSuggestions.push(event.data.text);

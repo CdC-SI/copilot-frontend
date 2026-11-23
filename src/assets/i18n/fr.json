@@ -148,6 +148,7 @@
   "document.title": "Document",
   "sourceList.meta.section": "Section",
   "sourceList.meta.page": "Page",
+  "sourceList.citation": "Source citée n° {{n}}",
   "sourceList.meta.version": "Version",
   "sourceList.actions.upvote.title": "Marquer comme utile",
   "sourceList.actions.upvote.aria": "Marquer la source comme utile",
@@ -199,6 +200,10 @@
 
 
   "chat.answer.interrupted": "Réponse interrompue",
+  "chat.answer.copy.sources": "Sources :",
+  "chat.citation.label": "Source {{n}} : {{label}}",
+  "chat.citation.unknown": "Source {{n}}",
+  "chat.citation.hint": "Cliquer pour afficher la source",
 
 
   "chat.answer.regenerate": "Régénérer la réponse",

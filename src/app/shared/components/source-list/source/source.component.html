@@ -1,4 +1,7 @@
 <header class="source-header">
+	@if (source.citation) {
+		<span class="source-citation" [attr.aria-label]="'sourceList.citation' | translate: { n: source.citation }">{{ source.citation }}</span>
+	}
 	@if (isFile(source)) {
 		<span class="source-icon file"></span>
 	}

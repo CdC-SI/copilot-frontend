@@ -83,9 +83,11 @@
 				[class.status-label]="showsProgressStatus"
 				[class.streaming]="isGenerating && !message.status && !!message.message"
 				[data]="message.message"
+				[zcoCitations]="message.sources"
+				(citationSelected)="showCitedSource($event)"
 			></markdown>
 			@if (hasMultipleSources) {
-				<mat-expansion-panel class="sources-panel" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">
+				<mat-expansion-panel class="sources-panel" [expanded]="sourcePanelOpen" (opened)="sourcePanelOpen = true" (closed)="sourcePanelOpen = false">
 					<mat-expansion-panel-header>
 						<mat-panel-title> Sources ({{ sourcesCount }}) </mat-panel-title>
 					</mat-expansion-panel-header>
@@ -94,6 +96,7 @@
 						[question]="previousMessage?.message"
 						[conversationId]="conversationId"
 						[expanded]="sourcePanelOpen"
+						[highlightedCitation]="highlightedCitation"
 					></zco-source-list>
 				</mat-expansion-panel>
 			}
