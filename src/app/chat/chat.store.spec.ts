@@ -1,12 +1,9 @@
 import {TestBed} from '@angular/core/testing';
-import {TranslateService} from '@ngx-translate/core';
-import {ObNotificationService} from '@oblique/oblique';
 import {HttpErrorResponse} from '@angular/common/http';
 import {BehaviorSubject, Subject, of, throwError} from 'rxjs';
 import {ChatTitle} from '../shared/model/chat-history';
 import {ChatMessageSource} from '../shared/model/chat-message';
 import {ChatStreamEvent} from '../shared/model/chat-stream-event';
-import {UserStatus} from '../shared/model/user';
 import {AuthenticationServiceV2} from '../shared/services/auth.service';
 import {ConversationService} from '../shared/services/conversation.service';
 import {DynamicFormService} from '../shared/services/dynamic-form.service';
@@ -19,13 +16,16 @@ import {ChatScrollRequest} from './chat.models';
 import {ChatGenerationStore, STOP_TIMEOUT_MS} from './chat-generation.store';
 import {ChatStore} from './chat.store';
 import {ChatAutocompleteService} from './services';
+import {NotificationMock, notificationMock, provideNotificationMock, provideTranslateStub} from '../../testing/angular';
+import {aUser} from '../../testing/fixtures';
+import {answerTurn} from '../../testing/stream-events';
 
 describe('ChatStore', () => {
 	let store: ChatStore;
 	let stream: Subject<ChatStreamEvent>;
 	let ragService: {process: jest.Mock};
 	let conversationService: {getConversationTitles: jest.Mock; getConversation: jest.Mock; stopGeneration: jest.Mock; decideToolApproval: jest.Mock};
-	let notif: {success: jest.Mock; warning: jest.Mock; error: jest.Mock};
+	let notif: NotificationMock;
 
 	const flushFrame = (): void => {
 		jest.advanceTimersByTime(20);
@@ -43,7 +43,7 @@ describe('ChatStore', () => {
 
 	const completeTurn = (): void => {
 		ask('Bonjour');
-		emit({type: 'start', data: {messageId: 'g1'}}, {type: 'text_delta', data: {text: 'Salut'}}, {type: 'done', data: {messageId: 'a1', interrupted: false}});
+		emit(...answerTurn('Salut'));
 		stream.complete();
 	};
 
@@ -56,7 +56,7 @@ describe('ChatStore', () => {
 			stopGeneration: jest.fn(() => of(undefined)),
 			decideToolApproval: jest.fn(() => of(undefined))
 		};
-		notif = {success: jest.fn(), warning: jest.fn(), error: jest.fn()};
+		notif = notificationMock();
 		TestBed.configureTestingModule({
 			providers: [
 				ChatStore,
@@ -65,9 +65,9 @@ describe('ChatStore', () => {
 				ChatAttachmentsStore,
 				{provide: RagService, useValue: ragService},
 				{provide: ConversationService, useValue: conversationService},
-				{provide: AuthenticationServiceV2, useValue: {$authenticatedUser: new BehaviorSubject({status: UserStatus.ACTIVE})}},
-				{provide: TranslateService, useValue: {instant: (key: string) => key, getCurrentLang: () => 'fr'}},
-				{provide: ObNotificationService, useValue: notif},
+				{provide: AuthenticationServiceV2, useValue: {$authenticatedUser: new BehaviorSubject(aUser())}},
+				provideTranslateStub(),
+				provideNotificationMock(notif),
 				{provide: FeedbackService, useValue: {}},
 				{provide: DynamicFormService, useValue: {}},
 				{provide: ChatAutocompleteService, useValue: {getOptionService: jest.fn(), getOptionLabel: jest.fn(), isCommand: jest.fn()}}
