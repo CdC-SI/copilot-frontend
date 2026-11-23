@@ -14,6 +14,8 @@ interface SourceViewerState {
 	/** Sources parcourues par précédent / suivant (celles de la réponse, citées d'abord). */
 	sources: MessageSource[];
 	index: number;
+	/** Réponse d'origine (`clientId` du message) : ses sources mises à jour (streaming) sont reprises. */
+	owner?: string;
 }
 
 /**
@@ -36,23 +38,40 @@ export class SourceViewerStore {
 		return !!source?.documentId;
 	}
 
-	/** Ouvre une source ; `sources` (sources de la même réponse) alimente la navigation précédent / suivant. */
-	open(source: MessageSource, sources: MessageSource[] = [source]): void {
+	/**
+	 * Ouvre une source ; `sources` (sources de la même réponse) alimente la navigation précédent / suivant et
+	 * `owner` identifie la réponse pour suivre ses sources (`syncSources`).
+	 */
+	open(source: MessageSource, sources: MessageSource[] = [source], owner?: string): void {
 		if (!SourceViewerStore.canOpen(source)) return;
 		const navigable = sources.filter(s => SourceViewerStore.canOpen(s));
 		let index = navigable.indexOf(source);
-		if (index < 0) index = navigable.findIndex(s => s.documentId === source.documentId && s.citation === source.citation);
+		if (index < 0) index = navigable.findIndex(s => sameSource(s, source));
 		this.rememberFocus();
 		this.state.set(
 			index < 0
-				? {target: {kind: 'source', source}, sources: [source], index: 0}
-				: {target: {kind: 'source', source: navigable[index]}, sources: navigable, index}
+				? {target: {kind: 'source', source}, sources: [source], index: 0, owner}
+				: {target: {kind: 'source', source: navigable[index]}, sources: navigable, index, owner}
 		);
 	}
 
 	openFile(title: string, load: () => Observable<Blob>): void {
 		this.rememberFocus();
 		this.state.set({target: {kind: 'file', title, load}, sources: [], index: 0});
+	}
+
+	/**
+	 * Sources à jour de la réponse `owner` (nouvelles citations pendant le streaming) : la navigation les reprend,
+	 * la source affichée reste la même (pas de rechargement).
+	 */
+	syncSources(owner: string, sources: MessageSource[]): void {
+		const state = this.state();
+		if (state.target?.kind !== 'source' || state.owner !== owner) return;
+		const navigable = sources.filter(s => SourceViewerStore.canOpen(s));
+		const current = state.target.source;
+		const index = navigable.findIndex(s => sameSource(s, current));
+		if (index < 0 || (navigable.length === state.sources.length && navigable.every((s, i) => s === state.sources[i]))) return;
+		this.state.set({...state, sources: navigable, index});
 	}
 
 	previous(): void {
@@ -75,12 +94,17 @@ export class SourceViewerStore {
 		const {sources, index} = this.state();
 		const next = index + step;
 		if (next < 0 || next >= sources.length) return;
-		this.state.set({target: {kind: 'source', source: sources[next]}, sources, index: next});
+		this.state.update(state => ({...state, target: {kind: 'source', source: sources[next]}, index: next}));
 	}
 
+	/** Déclencheur de chaque ouverture (pastille, bouton) ; précédent / suivant ne le modifient pas. */
 	private rememberFocus(): void {
-		if (this.isOpen()) return;
 		const active = document.activeElement;
 		this.returnFocus = active instanceof HTMLElement && active !== document.body ? active : undefined;
 	}
+}
+
+/** Même source : même chunk et même numéro de citation (objets recréés par le streaming). */
+function sameSource(a: MessageSource, b: MessageSource): boolean {
+	return a.documentId === b.documentId && a.citation === b.citation;
 }

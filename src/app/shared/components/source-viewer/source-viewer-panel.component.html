@@ -146,6 +146,7 @@
 						}
 						@case ("error") {
 							<p class="viewer-status viewer-error">{{ "sourceViewer.pdf.error" | translate }}</p>
+							<button mat-button type="button" class="viewer-retry" (click)="retry()">{{ "sourceViewer.retry" | translate }}</button>
 						}
 						@case ("ready") {
 							<zco-pdf-viewer class="viewer-pdf" [data]="content().pdf!" [page]="page()" [highlight]="view.excerpt" />

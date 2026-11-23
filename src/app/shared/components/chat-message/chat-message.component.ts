@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject} from '@angular/core';
 import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 import {Feedback} from '../../model/feedback';
 import {MarkdownComponent} from 'ngx-markdown';
@@ -41,7 +41,7 @@ const MIN_EDIT_WIDTH_PX = 240;
 		TranslatePipe
 	]
 })
-export class ChatMessageComponent {
+export class ChatMessageComponent implements OnChanges {
 	@Input() previousMessage: ChatMessage;
 	@Input() message: ChatMessage;
 	@Input() conversationId: string;
@@ -68,6 +68,11 @@ export class ChatMessageComponent {
 	private readonly viewer = inject(SourceViewerStore, {optional: true});
 	/** Citation dont la carte doit recevoir le focus (clic sur une pastille, sans panneau des sources). */
 	private pendingFocusCitation?: number;
+
+	ngOnChanges(changes: SimpleChanges): void {
+		// Message remplacé (streaming) : le panneau ouvert sur cette réponse reprend ses nouvelles sources.
+		if (changes['message'] && this.message) this.viewer?.syncSources(this.message.clientId, sortSourcesByCitation(this.message.sources ?? []));
+	}
 
 	/** Réponse en cours de génération. */
 	get isGenerating(): boolean {
@@ -125,7 +130,7 @@ export class ChatMessageComponent {
 		const sources = sortSourcesByCitation(this.message?.sources ?? []);
 		const cited = sources.find(s => s.citation === n);
 		const inViewer = !!this.viewer && SourceViewerStore.canOpen(cited);
-		if (inViewer && cited) this.viewer?.open(cited, sources);
+		if (inViewer && cited) this.viewer?.open(cited, sources, this.message?.clientId);
 		this.pendingFocusCitation = inViewer ? undefined : n;
 		setTimeout(() => {
 			this.citedSourceCard(n)?.scrollIntoView({block: 'nearest', behavior: 'smooth'});

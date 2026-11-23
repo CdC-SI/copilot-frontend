@@ -17,6 +17,8 @@ export class SourceComponent {
 	@Input() source: MessageSource;
 	/** Sources de la réponse (ordre affiché) : navigation précédent / suivant du panneau. */
 	@Input() sources: MessageSource[] = [];
+	/** Réponse d'origine (`clientId`) : le panneau suit ses sources mises à jour. */
+	@Input() owner?: string;
 	/** Source actuellement affichée dans le panneau. */
 	readonly viewerTarget = computed(() => {
 		const target = this.viewer?.target();
@@ -63,7 +65,7 @@ export class SourceComponent {
 	}
 
 	openInViewer(source: MessageSource): void {
-		this.viewer?.open(source, this.sources.length ? this.sources : [source]);
+		this.viewer?.open(source, this.sources.length ? this.sources : [source], this.owner);
 	}
 
 	label(source: MessageSource): string {

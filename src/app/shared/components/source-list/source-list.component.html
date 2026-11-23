@@ -7,7 +7,7 @@
 				[attr.data-citation-source]="source.citation"
 				[class.highlighted]="!!source.citation && source.citation === highlightedCitation"
 			>
-				<zco-source [source]="source" [sources]="orderedSources"></zco-source>
+				<zco-source [source]="source" [sources]="orderedSources" [owner]="message.clientId"></zco-source>
 				@if (authenticatedAsExpert()) {
 					<div class="source-actions">
 						<button

@@ -1,5 +1,8 @@
 import {ChangeDetectionStrategy, Component, HostListener, TemplateRef, ViewChild, computed, effect, inject, signal, untracked} from '@angular/core';
 import {MatDialog, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
+import {BreakpointObserver} from '@angular/cdk/layout';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs';
 import {MatIcon} from '@angular/material/icon';
 import {CdkScrollable} from '@angular/cdk/scrolling';
 import {TranslatePipe} from '@ngx-translate/core';
@@ -15,6 +18,8 @@ import {ChatTimelineComponent} from './chat-timeline/chat-timeline.component';
 import {ChatComposerComponent} from './chat-composer/chat-composer.component';
 import {SourceViewerStore} from '../shared/components/source-viewer/source-viewer.store';
 import {SourceViewerPanelComponent} from '../shared/components/source-viewer/source-viewer-panel.component';
+
+const VIEWER_OVERLAY_QUERY = '(max-width: 1100px)';
 
 /**
  * Page de chat : mise en page (fil et panneau des sources), dépôt/collage de pièces jointes, raccourci Échap et
@@ -49,9 +54,18 @@ export class ChatComponent {
 
 	protected readonly store = inject(ChatStore);
 	protected readonly viewer = inject(SourceViewerStore);
+	/** Panneau des sources ouvert en surcouche : fil inerte, focus confiné au panneau. */
+	protected readonly viewerOverlay = computed(() => this.viewer.isOpen() && this.narrow());
 	private readonly authDialogService = inject(UserAuthDialogService);
 	private readonly dialog = inject(MatDialog);
 	private readonly conversationId = computed(() => this.store.currentConversation()?.conversationId ?? null);
+	/** Écran étroit : le panneau des sources recouvre le fil (même seuil que `chat.component.scss`). */
+	private readonly narrow = toSignal(
+		inject(BreakpointObserver)
+			.observe(VIEWER_OVERLAY_QUERY)
+			.pipe(map(state => state.matches)),
+		{initialValue: false}
+	);
 
 	constructor() {
 		// Les sources affichées appartiennent à la conversation : le panneau se ferme quand on en change.

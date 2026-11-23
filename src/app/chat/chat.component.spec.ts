@@ -1,6 +1,8 @@
 import {signal} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
+import {BreakpointObserver, BreakpointState} from '@angular/cdk/layout';
 import {MatDialog} from '@angular/material/dialog';
+import {BehaviorSubject} from 'rxjs';
 import {aSource} from '../../testing/stream-events';
 import {SourceViewerStore} from '../shared/components/source-viewer/source-viewer.store';
 import {UserAuthDialogService} from './services';
@@ -12,6 +14,7 @@ describe('ChatComponent', () => {
 	let component: ChatComponent;
 	let viewer: SourceViewerStore;
 	let dialog: {openDialogs: unknown[]};
+	let narrowScreen: BehaviorSubject<BreakpointState>;
 	let chatStore: {
 		currentConversation: ReturnType<typeof signal<{conversationId: string} | null>>;
 		isGenerating: ReturnType<typeof signal<boolean>>;
@@ -32,11 +35,13 @@ describe('ChatComponent', () => {
 			addAttachments: jest.fn()
 		};
 		dialog = {openDialogs: []};
+		narrowScreen = new BehaviorSubject<BreakpointState>({matches: false, breakpoints: {}});
 		TestBed.configureTestingModule({
 			providers: [
 				SourceViewerStore,
 				{provide: ChatStore, useValue: chatStore},
 				{provide: MatDialog, useValue: dialog},
+				{provide: BreakpointObserver, useValue: {observe: () => narrowScreen}},
 				{provide: UserAuthDialogService, useValue: {}}
 			]
 		});
@@ -123,5 +128,17 @@ describe('ChatComponent', () => {
 		expect(chatStore.addAttachments).toHaveBeenCalledWith(dropped);
 		component.onDrop(dragEvent());
 		expect(chatStore.addAttachments).toHaveBeenCalledTimes(1);
+	});
+
+	it('place le panneau des sources en surcouche sur écran étroit seulement', () => {
+		const overlay = (): boolean => (component as unknown as {viewerOverlay: () => boolean}).viewerOverlay();
+		viewer.open(aSource({documentId: 'doc-1'}));
+		expect(overlay()).toBe(false);
+
+		narrowScreen.next({matches: true, breakpoints: {}});
+		expect(overlay()).toBe(true);
+
+		viewer.close();
+		expect(overlay()).toBe(false);
 	});
 });

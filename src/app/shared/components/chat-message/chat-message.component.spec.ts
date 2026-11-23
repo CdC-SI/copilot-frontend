@@ -1,4 +1,4 @@
-import {ElementRef, Injector, runInInjectionContext} from '@angular/core';
+import {ElementRef, Injector, SimpleChange, runInInjectionContext} from '@angular/core';
 import {ChatMessageComponent} from './chat-message.component';
 import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
 import {MessageSource} from '../../model/chat-history';
@@ -145,11 +145,11 @@ describe('ChatMessageComponent (citations)', () => {
 		);
 		const first = {type: 'FILE', link: 'a.pdf', documentId: 'chunk-a', citation: 1} as MessageSource;
 		const second = {type: 'URL', link: 'https://example.ch', documentId: 'chunk-b', citation: 2} as MessageSource;
-		component.message = {source: ChatMessageSource.LLM, sources: [second, first]} as ChatMessage;
+		component.message = {clientId: 'm-1', source: ChatMessageSource.LLM, sources: [second, first]} as ChatMessage;
 
 		component.showCitedSource(2);
 
-		expect(open).toHaveBeenCalledWith(second, [first, second]);
+		expect(open).toHaveBeenCalledWith(second, [first, second], 'm-1');
 		expect(viewer.target()).toEqual({kind: 'source', source: second});
 		jest.runAllTimers();
 		expect(card.scrollIntoView).toHaveBeenCalled();
@@ -206,5 +206,29 @@ describe('ChatMessageComponent (citations)', () => {
 		expect(focus).toHaveBeenCalledTimes(2);
 		card.remove();
 		jest.useRealTimers();
+	});
+
+	it('transmet au panneau les sources mises à jour de la réponse qui l’a ouvert', () => {
+		const viewer = new SourceViewerStore();
+		const component = runInInjectionContext(
+			Injector.create({
+				providers: [
+					{provide: ElementRef, useValue: {nativeElement: {querySelector: (): null => null}}},
+					{provide: SourceViewerStore, useValue: viewer}
+				]
+			}),
+			() => new ChatMessageComponent()
+		);
+		const first = {type: 'FILE', link: 'a.pdf', documentId: 'chunk-a', citation: 1} as MessageSource;
+		const second = {type: 'FILE', link: 'b.pdf', documentId: 'chunk-b', citation: 2} as MessageSource;
+		component.message = {clientId: 'm-1', source: ChatMessageSource.LLM, sources: [first]} as ChatMessage;
+		component.showCitedSource(1);
+		expect(viewer.position().total).toBe(1);
+
+		component.message = {clientId: 'm-1', source: ChatMessageSource.LLM, sources: [second, first]} as ChatMessage;
+		component.ngOnChanges({message: new SimpleChange(undefined, component.message, false)});
+
+		expect(viewer.position()).toEqual({current: 1, total: 2});
+		expect(viewer.hasNext()).toBe(true);
 	});
 });

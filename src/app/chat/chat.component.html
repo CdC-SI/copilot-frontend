@@ -5,6 +5,7 @@
 	<div column-main-content class="chat-main" [class.viewer-open]="viewer.isOpen()">
 		<div
 			class="chat-container"
+			[attr.inert]="viewerOverlay() ? '' : null"
 			[class.drag-over]="isDragOver()"
 			(paste)="onPaste($event)"
 			(dragover)="onDragOver($event)"
@@ -21,7 +22,7 @@
 			<zco-chat-composer></zco-chat-composer>
 		</div>
 		@if (viewer.isOpen()) {
-			<zco-source-viewer-panel class="chat-source-viewer"></zco-source-viewer-panel>
+			<zco-source-viewer-panel class="chat-source-viewer" [overlay]="viewerOverlay()"></zco-source-viewer-panel>
 		}
 	</div>
 </ob-column-layout>

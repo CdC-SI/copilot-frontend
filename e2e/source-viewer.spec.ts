@@ -101,4 +101,25 @@ test.describe('Panneau des sources', () => {
 		await viewer.getByRole('button', {name: 'Fermer le panneau des sources'}).click();
 		await expect(viewer).toBeHidden();
 	});
+
+	test('sur écran étroit, le panneau recouvre le fil et garde le focus', async ({page}) => {
+		await page.setViewportSize({width: 1000, height: 800});
+		const chat = new ChatPage(page);
+		await chat.open();
+		await chat.ask('Quel est le délai ?');
+
+		await chat.timeline.getByRole('button', {name: /^Source 2 :/}).click();
+
+		const viewer = panel(page);
+		await expect(viewer.getByRole('heading', {level: 2})).toBeFocused();
+		await expect(page.locator('.chat-container')).toHaveAttribute('inert', '');
+		for (let i = 0; i < 6; i++) {
+			await page.keyboard.press('Tab');
+			expect(await viewer.evaluate(element => element.contains(document.activeElement))).toBe(true);
+		}
+
+		await page.keyboard.press('Escape');
+		await expect(viewer).toBeHidden();
+		await expect(page.locator('.chat-container')).not.toHaveAttribute('inert');
+	});
 });

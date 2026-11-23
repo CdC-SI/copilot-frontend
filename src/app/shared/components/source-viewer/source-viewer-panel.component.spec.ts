@@ -284,8 +284,53 @@ describe('SourceViewerPanelComponent', () => {
 		expect(load).toHaveBeenCalledTimes(1);
 		expect(fileDownload.downloadBlob).toHaveBeenCalledWith(expect.any(Blob), 'memo.docx');
 	});
-});
 
+	it('abandonne un nouvel essai quand une autre source est ouverte entre-temps', async () => {
+		const lateRetry = new Subject<SourceView>();
+		sourceService.getView
+			.mockReturnValueOnce(throwError(() => new HttpErrorResponse({status: 503})))
+			.mockReturnValueOnce(lateRetry)
+			.mockReturnValueOnce(of(view({id: 'chunk-2', display: 'EXCERPT', title: 'b.pdf'})));
+		store.open(aSource({documentId: 'chunk-1'}));
+		await settle();
+		query<HTMLButtonElement>('.viewer-retry')?.click();
+
+		store.open(aSource({documentId: 'chunk-2'}));
+		await settle();
+		lateRetry.next(view({display: 'EXCERPT', title: 'a.pdf'}));
+		await settle();
+
+		expect(lateRetry.observed).toBe(false);
+		expect(query('#source-viewer-title')?.textContent).toContain('b.pdf');
+	});
+
+	it('propose de réessayer le chargement du PDF', async () => {
+		sourceService.getView.mockReturnValue(of(view()));
+		sourceService.getFile.mockReturnValueOnce(throwError(() => new HttpErrorResponse({status: 503})));
+		store.open(aSource({documentId: 'chunk-1'}));
+		await settle();
+		expect(text()).toContain('sourceViewer.pdf.error');
+
+		query<HTMLButtonElement>('.viewer-retry')?.click();
+		await settle();
+
+		expect(sourceService.getFile).toHaveBeenCalledTimes(2);
+		expect(pdfViewer()).toBeDefined();
+	});
+
+	it('confine le focus au panneau seulement en surcouche', async () => {
+		sourceService.getView.mockReturnValue(of(view({display: 'EXCERPT'})));
+		store.open(aSource({documentId: 'chunk-1'}));
+		await settle();
+		const anchors = (): number => fixture.debugElement.parent?.nativeElement.querySelectorAll('.cdk-focus-trap-anchor[tabindex="0"]').length ?? 0;
+		expect(anchors()).toBe(0);
+
+		fixture.componentRef.setInput('overlay', true);
+		await settle();
+
+		expect(anchors()).toBe(2);
+	});
+});
 describe('parsePage', () => {
 	it.each([
 		[undefined, 1],

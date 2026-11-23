@@ -1,10 +1,16 @@
 import {Injectable} from '@angular/core';
-import type {PDFDocumentProxy, PDFPageProxy, PageViewport} from 'pdfjs-dist';
+import type {PDFDocumentLoadingTask, PDFDocumentProxy, PDFPageProxy, PageViewport} from 'pdfjs-dist';
 
 type PdfJs = typeof import('pdfjs-dist');
 
 /** Dossier des ressources de pdf.js copiées par le build (`angular.json`, `assets/pdfjs`). */
 const ASSETS = 'assets/pdfjs/';
+
+/** Ouverture d'un PDF (annulable) : `destroy` interrompt le chargement ou libère le document et son worker. */
+export interface PdfLoadingTask {
+	promise: Promise<PDFDocumentProxy>;
+	destroy: () => Promise<void>;
+}
 
 /** Rendu d'une couche texte en cours (annulable). */
 export interface TextLayerTask {
@@ -23,17 +29,21 @@ export class PdfJsService {
 	private module?: Promise<PdfJs>;
 
 	/** Ouvre un PDF ; `data` est transféré au worker (le tableau est vidé). */
-	async open(data: Uint8Array): Promise<PDFDocumentProxy> {
-		const pdfjs = await this.load();
-		const base = new URL(ASSETS, document.baseURI).href;
-		return pdfjs.getDocument({
-			data,
-			cMapUrl: `${base}cmaps/`,
-			standardFontDataUrl: `${base}standard_fonts/`,
-			wasmUrl: `${base}wasm/`,
-			iccUrl: `${base}iccs/`,
-			enableXfa: false
-		}).promise;
+	open(data: Uint8Array): PdfLoadingTask {
+		let task: PDFDocumentLoadingTask | undefined;
+		let destroyed = false;
+		const promise = this.load().then(pdfjs => {
+			if (destroyed) throw abortError();
+			task = this.getDocument(pdfjs, data);
+			return task.promise;
+		});
+		return {
+			promise,
+			destroy: async () => {
+				destroyed = true;
+				await task?.destroy();
+			}
+		};
 	}
 
 	/** Couche texte transparente d'une page (sélection du texte et surlignage du passage cité). */
@@ -61,6 +71,18 @@ export class PdfJsService {
 		return name === 'RenderingCancelledException' || name === 'AbortException';
 	}
 
+	private getDocument(pdfjs: PdfJs, data: Uint8Array): PDFDocumentLoadingTask {
+		const base = new URL(ASSETS, document.baseURI).href;
+		return pdfjs.getDocument({
+			data,
+			cMapUrl: `${base}cmaps/`,
+			standardFontDataUrl: `${base}standard_fonts/`,
+			wasmUrl: `${base}wasm/`,
+			iccUrl: `${base}iccs/`,
+			enableXfa: false
+		});
+	}
+
 	private load(): Promise<PdfJs> {
 		this.module ??= import('pdfjs-dist').then(pdfjs => {
 			pdfjs.GlobalWorkerOptions.workerSrc = new URL(`${ASSETS}pdf.worker.min.mjs`, document.baseURI).href;
@@ -68,4 +90,11 @@ export class PdfJsService {
 		});
 		return this.module;
 	}
+}
+
+/** Ouverture interrompue avant le chargement de pdf.js (même nom que l'annulation de pdf.js). */
+function abortError(): Error {
+	const error = new Error('Chargement du PDF annulé');
+	error.name = 'AbortException';
+	return error;
 }

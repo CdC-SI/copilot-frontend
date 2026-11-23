@@ -3,7 +3,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatIcon} from '@angular/material/icon';
 import {provideTranslateService} from '@ngx-translate/core';
 import type {PDFDocumentProxy, PDFPageProxy} from 'pdfjs-dist';
-import {PdfJsService, TextLayerTask} from './pdf-js.service';
+import {PdfJsService, PdfLoadingTask, TextLayerTask} from './pdf-js.service';
 import {PdfViewerComponent} from './pdf-viewer.component';
 
 @Component({selector: 'mat-icon', template: ''})
@@ -47,9 +47,11 @@ describe('PdfViewerComponent', () => {
 	const fakeDocument = (): PDFDocumentProxy =>
 		({
 			numPages: PAGES.length,
-			getPage,
-			loadingTask: {destroy}
+			getPage
 		}) as unknown as PDFDocumentProxy;
+
+	/** Ouverture simulée : `destroy` est partagé par toutes les tâches (comptage des libérations). */
+	const task = (promise: Promise<PDFDocumentProxy>): PdfLoadingTask => ({promise, destroy});
 
 	const create = async (inputs: {page?: number; highlight?: string} = {}): Promise<void> => {
 		fixture = TestBed.createComponent(PdfViewerComponent);
@@ -65,7 +67,7 @@ describe('PdfViewerComponent', () => {
 		render = jest.fn(() => ({promise: Promise.resolve(), cancel: jest.fn()}));
 		getPage = jest.fn<Promise<PDFPageProxy>, [number]>(async () => Promise.resolve(fakePage()));
 		pdfJs = {
-			open: jest.fn(async () => Promise.resolve(fakeDocument())),
+			open: jest.fn(() => task(Promise.resolve(fakeDocument()))),
 			renderTextLayer: jest.fn((page: PDFPageProxy, container: HTMLElement): TextLayerTask => {
 				const index = getPage.mock.results.length - 1;
 				const pageNumber = getPage.mock.calls[index][0] as number;
@@ -165,8 +167,10 @@ describe('PdfViewerComponent', () => {
 	});
 
 	it('affiche une erreur si le PDF ne peut pas être ouvert', async () => {
-		pdfJs.open.mockRejectedValue(new Error('Invalid PDF structure'));
+		pdfJs.open.mockReturnValue(task(Promise.reject(new Error('Invalid PDF structure'))));
 		await create();
+
+		expect(destroy).toHaveBeenCalledTimes(1);
 
 		expect(component.status()).toBe('error');
 		expect(query('.pdf-status.error')?.getAttribute('role')).toBe('alert');
@@ -185,7 +189,7 @@ describe('PdfViewerComponent', () => {
 	});
 
 	it('affiche le chargement tant que le document n’est pas ouvert', async () => {
-		pdfJs.open.mockReturnValue(new Promise(() => undefined));
+		pdfJs.open.mockReturnValue(task(new Promise(() => undefined)));
 		await create();
 
 		expect(component.status()).toBe('loading');
@@ -208,9 +212,11 @@ describe('PdfViewerComponent', () => {
 	it('abandonne un document ouvert après un changement de données', async () => {
 		let resolveFirst: (pdf: PDFDocumentProxy) => void = () => undefined;
 		pdfJs.open.mockReturnValueOnce(
-			new Promise<PDFDocumentProxy>(resolve => {
-				resolveFirst = resolve;
-			})
+			task(
+				new Promise<PDFDocumentProxy>(resolve => {
+					resolveFirst = resolve;
+				})
+			)
 		);
 		await create();
 
@@ -222,5 +228,53 @@ describe('PdfViewerComponent', () => {
 		expect(destroy).toHaveBeenCalledTimes(1);
 		expect(component.status()).toBe('ready');
 		expect(getPage).toHaveBeenCalledTimes(1);
+	});
+
+	it('interrompt l’ouverture en cours à la destruction', async () => {
+		pdfJs.open.mockReturnValue(task(new Promise(() => undefined)));
+		await create();
+
+		fixture.destroy();
+
+		expect(destroy).toHaveBeenCalledTimes(1);
+	});
+
+	describe('redimensionnement', () => {
+		let resize: () => void = () => undefined;
+		const disconnect = jest.fn();
+
+		beforeEach(() => {
+			(globalThis as {ResizeObserver?: unknown}).ResizeObserver = class {
+				disconnect = disconnect;
+
+				constructor(callback: () => void) {
+					resize = callback;
+				}
+				observe(): void {
+					// Le test déclenche le rappel lui-même.
+				}
+			};
+		});
+
+		afterEach(() => delete (globalThis as {ResizeObserver?: unknown}).ResizeObserver);
+
+		it('réajuste la page à la nouvelle largeur du conteneur, et cesse d’observer à la destruction', async () => {
+			await create();
+			const host = fixture.nativeElement as HTMLElement;
+			const renders = render.mock.calls.length;
+
+			resize();
+			await settle();
+			expect(render.mock.calls.length).toBe(renders);
+
+			Object.defineProperty(host, 'clientWidth', {configurable: true, value: 500});
+			resize();
+			await settle();
+			expect(render.mock.calls.length).toBe(renders + 1);
+			expect(query<HTMLElement>('.pdf-page-view')?.style.width).toBe('468px');
+
+			fixture.destroy();
+			expect(disconnect).toHaveBeenCalled();
+		});
 	});
 });

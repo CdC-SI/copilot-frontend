@@ -5,7 +5,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {TranslatePipe} from '@ngx-translate/core';
 import type {PDFDocumentProxy, RenderTask} from 'pdfjs-dist';
 import {findExcerptItems} from '../../../utils/excerpt-match';
-import {PdfJsService, TextLayerTask} from './pdf-js.service';
+import {PdfJsService, PdfLoadingTask, TextLayerTask} from './pdf-js.service';
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 3;
@@ -45,6 +45,10 @@ export class PdfViewerComponent {
 	private readonly pdfJs = inject(PdfJsService);
 	private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 	private pdf?: PDFDocumentProxy;
+	/** Ouverture en cours ou document ouvert : détruit au remplacement, en cas d'erreur et à la destruction. */
+	private loadingTask?: PdfLoadingTask;
+	/** Largeur de rendu de la page affichée : un redimensionnement du conteneur relance l'ajustement. */
+	private renderedWidth = 0;
 	private renderTask?: RenderTask;
 	private textTask?: TextLayerTask;
 	/** Invalide les chargements et rendus asynchrones devenus obsolètes. */
@@ -59,11 +63,14 @@ export class PdfViewerComponent {
 				void this.load(data, page);
 			});
 		});
+		const resize = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(() => this.onResize());
+		resize?.observe(this.host.nativeElement);
 		inject(DestroyRef).onDestroy(() => {
+			resize?.disconnect();
 			this.loadId++;
 			this.renderId++;
 			this.cancelRendering();
-			void this.pdf?.loadingTask.destroy();
+			this.releaseDocument();
 		});
 	}
 
@@ -108,23 +115,23 @@ export class PdfViewerComponent {
 		const loadId = ++this.loadId;
 		this.renderId++;
 		this.cancelRendering();
-		void this.pdf?.loadingTask.destroy();
-		this.pdf = undefined;
+		this.releaseDocument();
 		this.status.set('loading');
 		this.passageFound.set(null);
+		const task = this.pdfJs.open(data.slice());
+		this.loadingTask = task;
 		try {
-			const pdf = await this.pdfJs.open(data.slice());
-			if (loadId !== this.loadId) {
-				void pdf.loadingTask.destroy();
-				return;
-			}
+			const pdf = await task.promise;
+			if (loadId !== this.loadId) return;
 			this.pdf = pdf;
 			this.pageCount.set(pdf.numPages);
 			this.currentPage.set(Math.min(Math.max(1, Math.trunc(page) || 1), pdf.numPages));
 			this.status.set('ready');
 			await this.render();
 		} catch (error) {
-			if (loadId === this.loadId && !this.pdfJs.isCancellation(error)) this.status.set('error');
+			if (loadId !== this.loadId) return;
+			this.releaseDocument();
+			if (!this.pdfJs.isCancellation(error)) this.status.set('error');
 		}
 	}
 
@@ -136,7 +143,8 @@ export class PdfViewerComponent {
 		try {
 			const page = await pdf.getPage(this.currentPage());
 			if (renderId !== this.renderId) return;
-			const width = (this.host.nativeElement.clientWidth || FALLBACK_WIDTH) - HORIZONTAL_PADDING;
+			this.renderedWidth = this.host.nativeElement.clientWidth;
+			const width = (this.renderedWidth || FALLBACK_WIDTH) - HORIZONTAL_PADDING;
 			const scale = (Math.max(width, 200) / page.getViewport({scale: 1}).width) * this.zoom();
 			const viewport = page.getViewport({scale});
 			const ratio = window.devicePixelRatio || 1;
@@ -175,6 +183,18 @@ export class PdfViewerComponent {
 		indexes.forEach(index => textDivs[index].classList.add('highlight'));
 		this.passageFound.set(indexes.length > 0);
 		if (indexes.length) textDivs[indexes[0]].scrollIntoView?.({block: 'center'});
+	}
+
+	private onResize(): void {
+		const width = this.host.nativeElement.clientWidth;
+		if (!this.pdf || !width || Math.abs(width - this.renderedWidth) < 1) return;
+		void this.render();
+	}
+
+	private releaseDocument(): void {
+		void this.loadingTask?.destroy();
+		this.loadingTask = undefined;
+		this.pdf = undefined;
 	}
 
 	private cancelRendering(): void {

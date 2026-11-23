@@ -71,6 +71,18 @@ describe('SourceComponent', () => {
 			expect(uploadService.downloadSourceDocument).not.toHaveBeenCalled();
 		});
 
+		it('rattache la source ouverte à sa réponse pour suivre ses nouvelles sources', () => {
+			const first = aSource({documentId: 'doc-1', citation: 1});
+			const second = aSource({documentId: 'doc-2', citation: 2});
+			fixture.componentRef.setInput('owner', 'message-1');
+			render(first, [first]);
+			const store = TestBed.inject(SourceViewerStore);
+
+			query<HTMLButtonElement>('button.source-open')?.click();
+			store.syncSources('message-1', [first, second]);
+
+			expect(store.position()).toEqual({current: 1, total: 2});
+		});
 		it('ouvre une source seule quand la liste des sources est vide', () => {
 			const source = aSource({documentId: 'doc-1'});
 			render(source);

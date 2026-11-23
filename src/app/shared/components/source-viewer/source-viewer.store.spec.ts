@@ -103,4 +103,64 @@ describe('SourceViewerStore', () => {
 
 		expect(document.activeElement).toBe(document.body);
 	});
+
+	it('mémorise le déclencheur de chaque ouverture, pas celui de la navigation', () => {
+		const firstPill = document.createElement('button');
+		const secondPill = document.createElement('button');
+		document.body.append(firstPill, secondPill);
+		firstPill.focus();
+		store.open(first, [first, third]);
+		secondPill.focus();
+		store.open(third, [first, third]);
+		firstPill.focus();
+		store.previous();
+
+		store.close();
+		jest.runAllTimers();
+
+		expect(document.activeElement).toBe(secondPill);
+	});
+
+	describe('sources de la réponse mises à jour (streaming)', () => {
+		const second = aSource({documentId: 'chunk-2', citation: 2});
+
+		it('reprend les nouvelles sources de la réponse d’origine sans changer la source affichée', () => {
+			store.open(first, [first], 'message-1');
+			const target = store.target();
+
+			store.syncSources('message-1', [{...first}, unresolvable, second, third]);
+
+			expect(store.target()).toBe(target);
+			expect(store.position()).toEqual({current: 1, total: 3});
+			store.next();
+			expect(store.target()).toEqual({kind: 'source', source: second});
+		});
+
+		it('suit la source affichée si son rang change', () => {
+			store.open(third, [first, third], 'message-1');
+
+			store.syncSources('message-1', [first, second, third]);
+
+			expect(store.position()).toEqual({current: 3, total: 3});
+		});
+
+		it('ignore les autres réponses, une liste inchangée ou sans la source affichée', () => {
+			store.open(first, [first], 'message-1');
+			const before = store.position();
+
+			store.syncSources('message-2', [first, second]);
+			store.syncSources('message-1', [first]);
+			store.syncSources('message-1', [second, third]);
+
+			expect(store.position()).toBe(before);
+		});
+
+		it('ne concerne pas un document du corpus', () => {
+			store.openFile('note.pdf', () => of(new Blob()));
+
+			store.syncSources('message-1', [first]);
+
+			expect(store.target()?.kind).toBe('file');
+		});
+	});
 });

@@ -1,3 +1,4 @@
+import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {NgTemplateOutlet} from '@angular/common';
 import {
 	ChangeDetectionStrategy,
@@ -9,6 +10,7 @@ import {
 	computed,
 	effect,
 	inject,
+	input,
 	signal,
 	viewChild
 } from '@angular/core';
@@ -19,7 +21,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {TranslatePipe} from '@ngx-translate/core';
 import {ObNotificationService} from '@oblique/oblique';
 import {HttpErrorResponse} from '@angular/common/http';
-import {Observable, catchError, concat, from, map, of, startWith, switchMap} from 'rxjs';
+import {Observable, Subject, catchError, concat, from, map, merge, of, startWith, switchMap} from 'rxjs';
 import {SourceView} from '../../model/source-view';
 import {SourceDocumentService} from '../../services/source-document.service';
 import {downloadBlob, openOrDownloadBlob} from '../../utils/file-download.utils';
@@ -41,7 +43,8 @@ const PDF_MIME_TYPE = 'application/pdf';
 /**
  * Panneau latéral des sources : métadonnées, extrait cité et contenu selon le type de source (visionneuse PDF à la
  * page citée avec le passage surligné, téléchargement, page d'origine, lien BPanda). Placé par la page hôte, qui
- * fournit le `SourceViewerStore`.
+ * fournit le `SourceViewerStore`. En surcouche (`overlay`), le focus reste dans le panneau ; la page rend inerte le
+ * contenu recouvert.
  */
 @Component({
 	selector: 'zco-source-viewer-panel',
@@ -49,12 +52,15 @@ const PDF_MIME_TYPE = 'application/pdf';
 	styleUrl: './source-viewer-panel.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [NgTemplateOutlet, PdfViewerComponent, MatButton, MatIconButton, MatIcon, MatTooltip, TranslatePipe],
+	hostDirectives: [CdkTrapFocus],
 	host: {
 		role: 'complementary',
 		'[attr.aria-labelledby]': '"source-viewer-title"'
 	}
 })
 export class SourceViewerPanelComponent {
+	/** Panneau en surcouche du contenu de la page : le focus y est confiné. */
+	readonly overlay = input(false);
 	readonly content = signal<PanelContent>(IDLE);
 	readonly citation = computed(() => {
 		const target = this.store.target();
@@ -76,9 +82,13 @@ export class SourceViewerPanelComponent {
 	private readonly sourceService = inject(SourceDocumentService);
 	private readonly notifService = inject(ObNotificationService);
 	private readonly injector = inject(Injector);
+	private readonly retries = new Subject<void>();
 
 	constructor() {
-		toObservable(this.store.target)
+		const focusTrap = inject(CdkTrapFocus, {self: true});
+		effect(() => (focusTrap.enabled = this.overlay()));
+		// Un seul flux annulable : changement de cible et nouvel essai remplacent le chargement en cours.
+		merge(toObservable(this.store.target), this.retries.pipe(map(() => this.store.target())))
 			.pipe(
 				switchMap(target => (target ? this.load(target) : of(IDLE))),
 				takeUntilDestroyed()
@@ -99,8 +109,7 @@ export class SourceViewerPanelComponent {
 	}
 
 	retry(): void {
-		const target = this.store.target();
-		if (target) this.load(target).subscribe(content => this.content.set(content));
+		this.retries.next();
 	}
 
 	download(): void {

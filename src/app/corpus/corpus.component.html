@@ -1,4 +1,4 @@
-<div class="corpus-container pd5">
+<div class="corpus-container pd5" [attr.inert]="viewer.isOpen() ? '' : null">
 	<h2>{{ "corpus.title" | translate }}</h2>
 	<p class="description">{{ "corpus.description" | translate }}</p>
 
@@ -309,5 +309,5 @@
 </div>
 
 @if (viewer.isOpen()) {
-	<zco-source-viewer-panel class="corpus-source-viewer"></zco-source-viewer-panel>
+	<zco-source-viewer-panel class="corpus-source-viewer" [overlay]="true"></zco-source-viewer-panel>
 }
