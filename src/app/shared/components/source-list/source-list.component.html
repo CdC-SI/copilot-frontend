@@ -1,6 +1,6 @@
 @if (message.sources?.length) {
 	<section class="source-list">
-		@for (source of orderedSources; track source.documentId + "|" + source.citation) {
+		@for (source of orderedSources; track sourceKey(source, $index)) {
 			<article
 				class="source-card"
 				tabindex="-1"

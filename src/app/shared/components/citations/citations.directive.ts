@@ -10,11 +10,14 @@ import {CitationCardComponent} from './citation-card.component';
 
 const PILL_CLASS = 'citation-pill';
 const HAS_MARKER = /\[\^\d{1,3}]/;
+/** Délai avant fermeture de l'aperçu : laisse le temps de passer de la pastille à l'aperçu (et inversement). */
+const CLOSE_DELAY_MS = 200;
 let nextCardId = 0;
 
 /**
  * Citations d'une réponse (F2c) : après chaque rendu du `<markdown>` hôte, les marqueurs `[^n]` du texte (hors code)
- * deviennent des pastilles cliquables `n`. Survol ou focus : aperçu de la source (`CitationCardComponent`) ;
+ * deviennent des pastilles cliquables `n`. Survol ou focus : aperçu de la source (`CitationCardComponent`), conservé
+ * tant que la pastille a le focus ou que la pastille ou l'aperçu est survolé, fermé par Échap ;
  * clic, Entrée ou Espace : `citationSelected` (n).
  *
  * Les pastilles sont créées dans le DOM produit par ngx-markdown (texte inséré via `textContent`, jamais en HTML).
@@ -27,7 +30,7 @@ let nextCardId = 0;
 		'(focusin)': 'onPointer($event, true)',
 		'(focusout)': 'onPointer($event, false)',
 		'(click)': 'onClick($event)',
-		'(keydown.escape)': 'closeCard()'
+		'(document:keydown.escape)': 'closeCard()'
 	}
 })
 export class CitationsDirective {
@@ -41,13 +44,20 @@ export class CitationsDirective {
 	private overlayRef?: OverlayRef;
 	private card?: ComponentRef<CitationCardComponent>;
 	private anchor?: HTMLElement;
+	private hoveredPill?: HTMLElement;
+	private cardHovered = false;
+	private closeTimer?: ReturnType<typeof setTimeout>;
 
 	constructor() {
 		inject(MarkdownComponent)
 			.ready.pipe(takeUntilDestroyed())
 			.subscribe(() => this.hydrate());
+		this.translate.onLangChange.pipe(takeUntilDestroyed()).subscribe(() => this.refresh(this.sources()));
 		effect(() => this.refresh(this.sources()));
-		inject(DestroyRef).onDestroy(() => this.overlayRef?.dispose());
+		inject(DestroyRef).onDestroy(() => {
+			clearTimeout(this.closeTimer);
+			this.overlayRef?.dispose();
+		});
 	}
 
 	/** Remplace les marqueurs du rendu courant par des pastilles. */
@@ -65,8 +75,10 @@ export class CitationsDirective {
 	}
 
 	closeCard(): void {
+		clearTimeout(this.closeTimer);
 		this.anchor?.removeAttribute('aria-describedby');
 		this.anchor = undefined;
+		this.cardHovered = false;
 		this.overlayRef?.detach();
 		this.card = undefined;
 	}
@@ -74,13 +86,16 @@ export class CitationsDirective {
 	protected onPointer(event: Event, entering: boolean): void {
 		const pill = this.pillOf(event.target);
 		if (!pill) return;
+		if (event.type.startsWith('mouse')) {
+			this.hoveredPill = entering ? pill : this.hoveredPill === pill ? undefined : this.hoveredPill;
+		}
 		if (entering) {
 			this.openCard(pill);
 			return;
 		}
 		const next = (event as MouseEvent | FocusEvent).relatedTarget;
 		if (!(next instanceof Node && pill.contains(next))) {
-			this.closeCard();
+			this.scheduleClose();
 		}
 	}
 
@@ -126,9 +141,10 @@ export class CitationsDirective {
 	}
 
 	private openCard(pill: HTMLElement): void {
+		clearTimeout(this.closeTimer);
 		if (this.anchor === pill) return;
 		this.closeCard();
-		this.overlayRef ??= createOverlayRef(this.injector, {scrollStrategy: createCloseScrollStrategy(this.injector)});
+		this.overlayRef ??= this.createOverlay();
 		this.overlayRef.updatePositionStrategy(
 			createFlexibleConnectedPositionStrategy(this.injector, pill).withPositions([
 				{originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', offsetY: -6},
@@ -143,6 +159,30 @@ export class CitationsDirective {
 		this.card.setInput('cardId', cardId);
 		pill.setAttribute('aria-describedby', cardId);
 		this.anchor = pill;
+	}
+
+	private createOverlay(): OverlayRef {
+		const overlayRef = createOverlayRef(this.injector, {scrollStrategy: createCloseScrollStrategy(this.injector)});
+		overlayRef.overlayElement.addEventListener('mouseenter', () => {
+			this.cardHovered = true;
+			clearTimeout(this.closeTimer);
+		});
+		overlayRef.overlayElement.addEventListener('mouseleave', () => {
+			this.cardHovered = false;
+			this.scheduleClose();
+		});
+		return overlayRef;
+	}
+
+	/** Ferme l'aperçu après un délai, sauf si la pastille a le focus ou si la pastille ou l'aperçu est survolé. */
+	private scheduleClose(): void {
+		clearTimeout(this.closeTimer);
+		this.closeTimer = setTimeout(() => {
+			const anchor = this.anchor;
+			if (anchor && this.hoveredPill !== anchor && !this.cardHovered && anchor.ownerDocument.activeElement !== anchor) {
+				this.closeCard();
+			}
+		}, CLOSE_DELAY_MS);
 	}
 
 	private pillOf(target: EventTarget | null): HTMLElement | null {

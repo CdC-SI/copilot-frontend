@@ -69,6 +69,11 @@ export class SourceListComponent implements OnChanges {
 		return sortSourcesByCitation(this.message.sources ?? []);
 	}
 
+	/** Clé de suivi unique : numéro de citation, sinon position parmi les sources non citées (anciens historiques). */
+	sourceKey(source: MessageSource, index: number): string {
+		return source.citation ? `c${source.citation}` : `u${index}|${source.documentId ?? ''}`;
+	}
+
 	/** Convenience helpers */
 	isUrl(s: MessageSource): boolean {
 		return s.type === 'URL';

@@ -13,45 +13,55 @@ const FENCE = /^ {0,3}(`{3,}|~{3,})/;
  */
 export function transformOutsideCode(markdown: string, transform: (text: string) => string): string {
 	let fence: {char: string; length: number} | null = null;
-	return markdown
-		.split(/(?<=\n)/)
-		.map(line => {
-			const opening = FENCE.exec(line)?.[1];
-			if (fence) {
-				if (opening?.startsWith(fence.char) && opening.length >= fence.length && !line.slice(line.indexOf(opening) + opening.length).trim()) {
-					fence = null;
-				}
-				return line;
+	let out = '';
+	// Paragraphe courant (lignes hors bloc délimité) : un code en ligne peut s'étendre sur plusieurs lignes.
+	let paragraph = '';
+	const flush = (): void => {
+		out += transformOutsideInlineCode(paragraph, transform);
+		paragraph = '';
+	};
+	for (const line of markdown.split(/(?<=\n)/)) {
+		const opening = FENCE.exec(line)?.[1];
+		if (fence) {
+			if (opening?.startsWith(fence.char) && opening.length >= fence.length && !line.slice(line.indexOf(opening) + opening.length).trim()) {
+				fence = null;
 			}
-			if (opening) {
-				fence = {char: opening[0], length: opening.length};
-				return line;
-			}
-			return transformOutsideInlineCode(line, transform);
-		})
-		.join('');
+			out += line;
+			continue;
+		}
+		if (opening) {
+			flush();
+			fence = {char: opening[0], length: opening.length};
+			out += line;
+			continue;
+		}
+		paragraph += line;
+		if (!line.trim()) flush();
+	}
+	flush();
+	return out;
 }
 
-function transformOutsideInlineCode(line: string, transform: (text: string) => string): string {
+function transformOutsideInlineCode(text: string, transform: (text: string) => string): string {
 	let out = '';
 	let plainStart = 0;
 	let i = 0;
-	while (i < line.length) {
-		if (line[i] !== '`') {
+	while (i < text.length) {
+		if (text[i] !== '`') {
 			i++;
 			continue;
 		}
-		const run = runEnd(line, i);
-		const close = closingRun(line, run, run - i);
+		const run = runEnd(text, i);
+		const close = closingRun(text, run, run - i);
 		if (close < 0) {
 			i = run;
 			continue;
 		}
-		out += transform(line.slice(plainStart, i)) + line.slice(i, close);
+		out += transform(text.slice(plainStart, i)) + text.slice(i, close);
 		i = close;
 		plainStart = close;
 	}
-	return out + transform(line.slice(plainStart));
+	return out + transform(text.slice(plainStart));
 }
 
 function runEnd(line: string, start: number): number {

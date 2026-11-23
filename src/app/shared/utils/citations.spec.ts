@@ -27,6 +27,11 @@ describe('citations', () => {
 			expect(upper(markdown)).toBe('AVANT\n````js\nx\n```\nencore\n````\nAPRÈS\n~~~\ny\n~~~\nFIN');
 		});
 
+		it('le code en ligne peut couvrir plusieurs lignes d’un paragraphe, mais pas une ligne vide', () => {
+			expect(stripCitations('Avant `code\n[^1]` après [^2].')).toBe('Avant `code\n[^1]` après.');
+			expect(upper('a `b\n\nc` d')).toBe('A `B\n\nC` D');
+		});
+
 		it('une ligne de fermeture suivie de texte ne ferme pas le bloc', () => {
 			expect(upper('```\n``` pas fini\nx\n```\nz')).toBe('```\n``` pas fini\nx\n```\nZ');
 		});

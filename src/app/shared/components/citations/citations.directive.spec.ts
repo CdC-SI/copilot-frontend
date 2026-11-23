@@ -1,6 +1,6 @@
 import {Component, signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {provideTranslateService} from '@ngx-translate/core';
+import {TranslateService, provideTranslateService} from '@ngx-translate/core';
 import {MarkdownComponent, provideMarkdown} from 'ngx-markdown';
 import {MessageSource} from '../../model/chat-history';
 import {aSource} from '../../../../testing/stream-events';
@@ -40,7 +40,10 @@ describe('CitationsDirective', () => {
 		host = fixture.componentInstance;
 	});
 
-	afterEach(() => fixture.destroy());
+	afterEach(() => {
+		fixture.destroy();
+		jest.useRealTimers();
+	});
 
 	it('remplace les marqueurs du texte par des pastilles, sans toucher au code', async () => {
 		await render('Délai de 30 jours [^1][^2].\n\n`[^1]`\n\n```\n[^2]\n```', [aSource({citation: 1, link: 'guide.pdf'})]);
@@ -74,8 +77,9 @@ describe('CitationsDirective', () => {
 		expect(host.selected).toEqual([3]);
 	});
 
-	it('affiche l’aperçu au survol et le ferme à la sortie ou par Échap', async () => {
+	it('affiche l’aperçu au survol et le ferme à la sortie (après un délai) ou par Échap', async () => {
 		await render('Texte [^1]', [aSource({citation: 1, link: 'dossier/guide.pdf', pageNumber: '4', subsection: '2.1'})]);
+		jest.useFakeTimers();
 		const pill = pills()[0];
 
 		pill.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
@@ -85,14 +89,53 @@ describe('CitationsDirective', () => {
 		expect(pill.getAttribute('aria-describedby')).toBe(tooltip()?.id);
 
 		pill.dispatchEvent(new MouseEvent('mouseout', {bubbles: true}));
+		expect(tooltip()).not.toBeNull();
+		jest.advanceTimersByTime(250);
 		expect(tooltip()).toBeNull();
 		expect(pill.hasAttribute('aria-describedby')).toBe(false);
 
-		pill.dispatchEvent(new FocusEvent('focusin', {bubbles: true}));
+		pill.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
 		fixture.detectChanges();
 		expect(tooltip()).not.toBeNull();
-		pill.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
+		document.body.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
 		expect(tooltip()).toBeNull();
+	});
+
+	it('garde l’aperçu ouvert tant qu’il est survolé ou que la pastille a le focus', async () => {
+		await render('Texte [^1]', [aSource({citation: 1})]);
+		jest.useFakeTimers();
+		const pill = pills()[0];
+
+		pill.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+		pill.dispatchEvent(new MouseEvent('mouseout', {bubbles: true}));
+		const pane = document.querySelector<HTMLElement>('.cdk-overlay-pane');
+		pane.dispatchEvent(new MouseEvent('mouseenter'));
+		jest.advanceTimersByTime(250);
+		expect(tooltip()).not.toBeNull();
+
+		pane.dispatchEvent(new MouseEvent('mouseleave'));
+		jest.advanceTimersByTime(250);
+		expect(tooltip()).toBeNull();
+
+		pill.focus();
+		fixture.detectChanges();
+		expect(tooltip()).not.toBeNull();
+		pill.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+		pill.dispatchEvent(new MouseEvent('mouseout', {bubbles: true}));
+		jest.advanceTimersByTime(250);
+		expect(tooltip()).not.toBeNull();
+
+		pill.blur();
+		jest.advanceTimersByTime(250);
+		expect(tooltip()).toBeNull();
+	});
+
+	it('traduit à nouveau les libellés au changement de langue', async () => {
+		await render('Texte [^1]');
+		const translate = TestBed.inject(TranslateService);
+		translate.setTranslation('de', {'chat.citation.unknown': 'Quelle {{n}}'});
+		translate.use('de');
+		expect(pills()[0].getAttribute('aria-label')).toBe('Quelle 1');
 	});
 
 	it('ignore les événements hors pastille', async () => {
