@@ -42,7 +42,11 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
   utilisateur, historique, réponses SSE scriptées ou erreurs HTTP (`reply`, `replyHttpError`), flux piloté étape par
   étape (`manualStream`), arrêt, décisions d'approbation, pièces jointes (envoi retenu par `gate()`, suivi), vues et
   fichiers des sources ; requêtes reçues notées pour les assertions ; requête non prévue → réponse vide notée dans `unexpected`).
-  Page objet `e2e/support/chat-page.ts` ; sélecteurs par rôle et libellé accessibles (fr). Navigateur : Edge du
+  Routes génériques (`mock-rest.ts`) : `on(méthode, chemin, réponse)` (prioritaire sur les routes déjà déclarées), `collection(chemin, clé,
+  éléments)` (ressource REST en mémoire : liste, création, modification, suppression) ; journal `requests` interrogé par
+  `requestsTo(méthode, chemin)`. Renommage et suppression des conversations modifient l'historique simulé.
+  Pages objets `e2e/support/chat-page.ts` (chat, historique), `corpus-page.ts` (+ `PersonalDocuments`, documents
+  personnels simulés), `admin-page.ts` ; sélecteurs par rôle et libellé accessibles (fr). Navigateur : Edge du
   poste (`channel: 'msedge'`, téléchargement des navigateurs Playwright bloqué) ; `E2E_CHANNEL=chromium` sinon.
 - Lint/format : ESLint 10 en flat config (`eslint.config.mjs`, paquets `angular-eslint` et
   `typescript-eslint`) + Prettier (`.prettierrc`).
