@@ -1,5 +1,5 @@
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
-import {Component, output} from '@angular/core';
+import {Component, NgZone, output} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatExpansionPanelHarness} from '@angular/material/expansion/testing';
 import {By} from '@angular/platform-browser';
@@ -135,6 +135,7 @@ describe('AdminComponent', () => {
 
 	it('ouvre la source choisie dans un workspace dans le panneau des sources, même jamais ouvert', async () => {
 		await (await panel('admin.manage.workspaces$')).expand();
+		const zoneRun = jest.spyOn(TestBed.inject(NgZone), 'run');
 
 		// Ordre d'une application avec zone : microtâches de l'événement, puis détection des changements.
 		stub(WorkspacesStubComponent).sourceSelected.emit('avs');
@@ -144,5 +145,7 @@ describe('AdminComponent', () => {
 
 		expect(await (await panel('admin.manage.sources$')).isExpanded()).toBe(true);
 		expect(stub(SourcesStubComponent).expandSourceByName).toHaveBeenCalledWith('avs');
+		// afterNextRender s'exécute hors zone : la requête du détail doit repartir dans la zone (rafraîchissement de la vue).
+		expect(zoneRun).toHaveBeenCalled();
 	});
 });

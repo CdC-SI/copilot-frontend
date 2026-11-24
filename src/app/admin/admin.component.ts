@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Injector, OnInit, ViewChild, afterNextRender, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Injector, NgZone, OnInit, ViewChild, afterNextRender, inject} from '@angular/core';
 import {
 	MatAccordion,
 	MatExpansionPanel,
@@ -58,6 +58,7 @@ export class AdminComponent implements OnInit {
 	readonly newFeedbackCount$ = inject(FeedbackService).newFeedbackCount$;
 	private readonly feedbackService = inject(FeedbackService);
 	private readonly injector = inject(Injector);
+	private readonly zone = inject(NgZone);
 
 	ngOnInit(): void {
 		this.feedbackService.refreshNewFeedbackCount();
@@ -95,6 +96,7 @@ export class AdminComponent implements OnInit {
 	onWorkspaceSourceSelected(name: string) {
 		this.sourcesPanel?.open();
 		// Après le rendu : au premier dépliage, le contenu paresseux du panneau (et donc sourcesComponent) n'existe pas encore.
-		afterNextRender(() => this.sourcesComponent?.expandSourceByName(name), {injector: this.injector});
+		// afterNextRender s'exécute hors zone : on y revient pour que la réponse du détail rafraîchisse la vue.
+		afterNextRender(() => this.zone.run(() => this.sourcesComponent?.expandSourceByName(name)), {injector: this.injector});
 	}
 }
