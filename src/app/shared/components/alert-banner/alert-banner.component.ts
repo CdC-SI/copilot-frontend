@@ -27,7 +27,7 @@ export class AlertBannerComponent implements OnInit, OnDestroy {
 	private readonly cdr = inject(ChangeDetectorRef);
 
 	ngOnInit(): void {
-		this.authService.$authenticatedUser.subscribe(user => {
+		this.authService.$authenticatedUser.pipe(takeUntil(this.destroy$)).subscribe(user => {
 			if (user?.status === UserStatus.ACTIVE) {
 				this.loadActiveAlerts();
 			}

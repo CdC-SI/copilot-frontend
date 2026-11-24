@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Injector, OnInit, ViewChild, afterNextRender, inject} from '@angular/core';
 import {
 	MatAccordion,
 	MatExpansionPanel,
@@ -57,6 +57,7 @@ export class AdminComponent implements OnInit {
 
 	readonly newFeedbackCount$ = inject(FeedbackService).newFeedbackCount$;
 	private readonly feedbackService = inject(FeedbackService);
+	private readonly injector = inject(Injector);
 
 	ngOnInit(): void {
 		this.feedbackService.refreshNewFeedbackCount();
@@ -93,6 +94,7 @@ export class AdminComponent implements OnInit {
 	/** Ouvre le panneau Sources et met en évidence la source sélectionnée depuis le détail d'un workspace. */
 	onWorkspaceSourceSelected(name: string) {
 		this.sourcesPanel?.open();
-		queueMicrotask(() => this.sourcesComponent?.expandSourceByName(name));
+		// Après le rendu : au premier dépliage, le contenu paresseux du panneau (et donc sourcesComponent) n'existe pas encore.
+		afterNextRender(() => this.sourcesComponent?.expandSourceByName(name), {injector: this.injector});
 	}
 }
