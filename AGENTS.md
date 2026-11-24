@@ -31,7 +31,7 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
   notifications Oblique). Les réutiliser plutôt que redéfinir des mocks locaux.
 - e2e : **Playwright** (`playwright.config.ts`, dossier `e2e/`, hors Jest). `ng serve` est lancé sur le port 4300
   (réutilisé s'il tourne déjà) et le backend est simulé par `page.route` (`e2e/support/mock-backend.ts` :
-  utilisateur, historique, réponses SSE scriptées ; requête non prévue → réponse vide notée dans `unexpected`).
+  utilisateur, historique, réponses SSE scriptées, vues et fichiers des sources ; requête non prévue → réponse vide notée dans `unexpected`).
   Page objet `e2e/support/chat-page.ts` ; sélecteurs par rôle et libellé accessibles (fr). Navigateur : Edge du
   poste (`channel: 'msedge'`, téléchargement des navigateurs Playwright bloqué) ; `E2E_CHANNEL=chromium` sinon.
 - Lint/format : ESLint 10 en flat config (`eslint.config.mjs`, paquets `angular-eslint` et
@@ -67,6 +67,13 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
   (traitement hors code, retrait, conversion pour la copie) ; pastilles posées après le rendu Markdown par la
   directive `markdown[zcoCitations]` (`shared/components/citations/`). Toute sortie texte d'une réponse (copie,
   lecture vocale, FAQ…) doit convertir ou retirer les marqueurs.
+- Panneau des sources (F2d) : `shared/components/source-viewer/`. `SourceViewerStore` est fourni par la page hôte
+  (chat, corpus) ; sans lui, les sources gardent le téléchargement et les liens directs. Le panneau charge
+  `GET /api/source-documents/{id}` (`SourceView` : `display` choisi par le backend) puis `/file` pour un PDF.
+  pdf.js (`pdfjs-dist`) n'est chargé qu'à l'ouverture d'un PDF (chunk à la demande, `PdfJsService`) ; worker,
+  CMaps, polices standard, WASM et profils ICC sont copiés dans `assets/pdfjs` par `angular.json` (aucun CDN).
+  Tests : remplacer `PdfJsService` par un faux (jsdom n'a ni canvas ni `Blob.arrayBuffer`) ; le rendu réel
+  est couvert par l'e2e `source-viewer.spec.ts` (PDF généré par `e2e/support/pdf.ts`).
 
 ## Conventions de code
 

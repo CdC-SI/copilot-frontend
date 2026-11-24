@@ -1,4 +1,4 @@
-<div class="corpus-container pd5">
+<div class="corpus-container pd5" [attr.inert]="viewer.isOpen() ? '' : null">
 	<h2>{{ "corpus.title" | translate }}</h2>
 	<p class="description">{{ "corpus.description" | translate }}</p>
 
@@ -130,6 +130,20 @@
 												matTooltip="{{ 'personal.documents.reactivate' | translate }}"
 											>
 												<mat-icon svgIcon="refresh"></mat-icon>
+											</button>
+										}
+										@if (canOpenDocument(doc)) {
+											<button
+												mat-icon-button
+												type="button"
+												class="open-document"
+												[obButton]="'secondary'"
+												(click)="openDocument(doc)"
+												[disabled]="!isDocumentReady(doc)"
+												[attr.aria-label]="'sourceViewer.openDocument' | translate: { title: doc.title }"
+												[matTooltip]="'sourceViewer.open' | translate"
+											>
+												<mat-icon svgIcon="file_pdf"></mat-icon>
 											</button>
 										}
 										<button
@@ -293,3 +307,7 @@
 		</mat-tab>
 	</mat-tab-group>
 </div>
+
+@if (viewer.isOpen()) {
+	<zco-source-viewer-panel class="corpus-source-viewer" [overlay]="true"></zco-source-viewer-panel>
+}

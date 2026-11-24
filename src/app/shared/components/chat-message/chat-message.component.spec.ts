@@ -1,6 +1,8 @@
-import {ElementRef, Injector, runInInjectionContext} from '@angular/core';
+import {ElementRef, Injector, SimpleChange, runInInjectionContext} from '@angular/core';
 import {ChatMessageComponent} from './chat-message.component';
-import {ChatMessageSource} from '../../model/chat-message';
+import {ChatMessage, ChatMessageSource} from '../../model/chat-message';
+import {MessageSource} from '../../model/chat-history';
+import {SourceViewerStore} from '../source-viewer/source-viewer.store';
 
 const createComponent = (offsetWidth: number): ChatMessageComponent =>
 	runInInjectionContext(Injector.create({providers: [{provide: ElementRef, useValue: {nativeElement: {offsetWidth}}}]}), () => new ChatMessageComponent());
@@ -125,5 +127,108 @@ describe('ChatMessageComponent (citations)', () => {
 		expect(card.focus).toHaveBeenCalledWith({preventScroll: true});
 		expect(card.scrollIntoView).toHaveBeenCalled();
 		jest.useRealTimers();
+	});
+
+	it('ouvre la source citée dans le panneau de la page, avec les sources de la réponse dans l’ordre des citations', () => {
+		jest.useFakeTimers();
+		const card = {scrollIntoView: jest.fn(), focus: jest.fn()};
+		const viewer = new SourceViewerStore();
+		const open = jest.spyOn(viewer, 'open');
+		const component = runInInjectionContext(
+			Injector.create({
+				providers: [
+					{provide: ElementRef, useValue: {nativeElement: {querySelector: () => card}}},
+					{provide: SourceViewerStore, useValue: viewer}
+				]
+			}),
+			() => new ChatMessageComponent()
+		);
+		const first = {type: 'FILE', link: 'a.pdf', documentId: 'chunk-a', citation: 1} as MessageSource;
+		const second = {type: 'URL', link: 'https://example.ch', documentId: 'chunk-b', citation: 2} as MessageSource;
+		component.message = {clientId: 'm-1', source: ChatMessageSource.LLM, sources: [second, first]} as ChatMessage;
+
+		component.showCitedSource(2);
+
+		expect(open).toHaveBeenCalledWith(second, [first, second], 'm-1');
+		expect(viewer.target()).toEqual({kind: 'source', source: second});
+		jest.runAllTimers();
+		expect(card.scrollIntoView).toHaveBeenCalled();
+		expect(card.focus).not.toHaveBeenCalled();
+		jest.useRealTimers();
+	});
+
+	it('garde le focus sur la carte si la source citée ne peut pas être résolue', () => {
+		jest.useFakeTimers();
+		const card = {scrollIntoView: jest.fn(), focus: jest.fn()};
+		const viewer = new SourceViewerStore();
+		const component = runInInjectionContext(
+			Injector.create({
+				providers: [
+					{provide: ElementRef, useValue: {nativeElement: {querySelector: () => card}}},
+					{provide: SourceViewerStore, useValue: viewer}
+				]
+			}),
+			() => new ChatMessageComponent()
+		);
+		component.message = {source: ChatMessageSource.LLM, sources: [{type: 'URL', link: 'https://example.ch', citation: 1}]} as ChatMessage;
+
+		component.showCitedSource(1);
+
+		expect(viewer.isOpen()).toBe(false);
+		jest.runAllTimers();
+		expect(card.focus).toHaveBeenCalledWith({preventScroll: true});
+		jest.useRealTimers();
+	});
+
+	it('redonne le focus à la carte à la fin du dépliement de la liste des sources', () => {
+		jest.useFakeTimers();
+		const card = document.createElement('div');
+		card.tabIndex = -1;
+		document.body.append(card);
+		let focusable = false;
+		const focus = jest.spyOn(card, 'focus').mockImplementation(() => {
+			if (focusable) HTMLElement.prototype.focus.call(card);
+		});
+		const component = runInInjectionContext(
+			Injector.create({providers: [{provide: ElementRef, useValue: {nativeElement: {querySelector: () => card}}}]}),
+			() => new ChatMessageComponent()
+		);
+
+		component.showCitedSource(1);
+		jest.runAllTimers();
+		expect(document.activeElement).not.toBe(card);
+
+		focusable = true;
+		component.focusPendingCitation();
+		expect(document.activeElement).toBe(card);
+
+		component.focusPendingCitation();
+		expect(focus).toHaveBeenCalledTimes(2);
+		card.remove();
+		jest.useRealTimers();
+	});
+
+	it('transmet au panneau les sources mises à jour de la réponse qui l’a ouvert', () => {
+		const viewer = new SourceViewerStore();
+		const component = runInInjectionContext(
+			Injector.create({
+				providers: [
+					{provide: ElementRef, useValue: {nativeElement: {querySelector: (): null => null}}},
+					{provide: SourceViewerStore, useValue: viewer}
+				]
+			}),
+			() => new ChatMessageComponent()
+		);
+		const first = {type: 'FILE', link: 'a.pdf', documentId: 'chunk-a', citation: 1} as MessageSource;
+		const second = {type: 'FILE', link: 'b.pdf', documentId: 'chunk-b', citation: 2} as MessageSource;
+		component.message = {clientId: 'm-1', source: ChatMessageSource.LLM, sources: [first]} as ChatMessage;
+		component.showCitedSource(1);
+		expect(viewer.position().total).toBe(1);
+
+		component.message = {clientId: 'm-1', source: ChatMessageSource.LLM, sources: [second, first]} as ChatMessage;
+		component.ngOnChanges({message: new SimpleChange(undefined, component.message, false)});
+
+		expect(viewer.position()).toEqual({current: 1, total: 2});
+		expect(viewer.hasNext()).toBe(true);
 	});
 });

@@ -2,23 +2,28 @@
 <ob-column-layout class="h100" [left]="store.isRegistered() ? 'OPENED' : 'NONE'" right="NONE">
 	<zco-chat-sidebar column-left-content class="h100"></zco-chat-sidebar>
 
-	<div
-		column-main-content
-		class="chat-container"
-		[class.drag-over]="isDragOver()"
-		(paste)="onPaste($event)"
-		(dragover)="onDragOver($event)"
-		(dragleave)="onDragLeave($event)"
-		(drop)="onDrop($event)"
-	>
-		@if (isDragOver()) {
-			<div class="drag-overlay">
-				<mat-icon svgIcon="upload"></mat-icon>
-				<span>{{ "attachment.drop.here" | translate }}</span>
-			</div>
+	<div column-main-content class="chat-main" [class.viewer-open]="viewer.isOpen()">
+		<div
+			class="chat-container"
+			[attr.inert]="viewerOverlay() ? '' : null"
+			[class.drag-over]="isDragOver()"
+			(paste)="onPaste($event)"
+			(dragover)="onDragOver($event)"
+			(dragleave)="onDragLeave($event)"
+			(drop)="onDrop($event)"
+		>
+			@if (isDragOver()) {
+				<div class="drag-overlay">
+					<mat-icon svgIcon="upload"></mat-icon>
+					<span>{{ "attachment.drop.here" | translate }}</span>
+				</div>
+			}
+			<zco-chat-timeline></zco-chat-timeline>
+			<zco-chat-composer></zco-chat-composer>
+		</div>
+		@if (viewer.isOpen()) {
+			<zco-source-viewer-panel class="chat-source-viewer" [overlay]="viewerOverlay()"></zco-source-viewer-panel>
 		}
-		<zco-chat-timeline></zco-chat-timeline>
-		<zco-chat-composer></zco-chat-composer>
 	</div>
 </ob-column-layout>
 

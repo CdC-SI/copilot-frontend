@@ -1,0 +1,63 @@
+<div class="pdf-toolbar" role="toolbar" [attr.aria-label]="'sourceViewer.pdf.toolbar' | translate">
+	<button
+		mat-icon-button
+		type="button"
+		[disabled]="status() !== 'ready' || currentPage() <= 1"
+		(click)="previousPage()"
+		[attr.aria-label]="'sourceViewer.pdf.previousPage' | translate"
+		[matTooltip]="'sourceViewer.pdf.previousPage' | translate"
+	>
+		<mat-icon svgIcon="chevron_left"></mat-icon>
+	</button>
+	<span class="pdf-page-number" aria-live="polite">
+		@if (status() === "ready") {
+			{{ "sourceViewer.pdf.page" | translate: { current: currentPage(), total: pageCount() } }}
+		}
+	</span>
+	<button
+		mat-icon-button
+		type="button"
+		[disabled]="status() !== 'ready' || currentPage() >= pageCount()"
+		(click)="nextPage()"
+		[attr.aria-label]="'sourceViewer.pdf.nextPage' | translate"
+		[matTooltip]="'sourceViewer.pdf.nextPage' | translate"
+	>
+		<mat-icon svgIcon="chevron_right"></mat-icon>
+	</button>
+	<span class="pdf-toolbar-spacer"></span>
+	<button
+		mat-icon-button
+		type="button"
+		[disabled]="status() !== 'ready' || !canZoomOut"
+		(click)="zoomOut()"
+		[attr.aria-label]="'sourceViewer.pdf.zoomOut' | translate"
+		[matTooltip]="'sourceViewer.pdf.zoomOut' | translate"
+	>
+		<mat-icon svgIcon="zoom_out"></mat-icon>
+	</button>
+	<button
+		mat-icon-button
+		type="button"
+		[disabled]="status() !== 'ready' || !canZoomIn"
+		(click)="zoomIn()"
+		[attr.aria-label]="'sourceViewer.pdf.zoomIn' | translate"
+		[matTooltip]="'sourceViewer.pdf.zoomIn' | translate"
+	>
+		<mat-icon svgIcon="zoom_in"></mat-icon>
+	</button>
+</div>
+
+@if (status() === "loading") {
+	<p class="pdf-status" role="status">{{ "sourceViewer.pdf.loading" | translate }}</p>
+} @else if (status() === "error") {
+	<p class="pdf-status error" role="alert">{{ "sourceViewer.pdf.error" | translate }}</p>
+} @else if (passageFound() === false) {
+	<p class="pdf-status hint">{{ "sourceViewer.pdf.notHighlighted" | translate }}</p>
+}
+
+<div class="pdf-scroll">
+	<div #pageView class="pdf-page-view" [class.hidden]="status() !== 'ready'">
+		<canvas #canvas aria-hidden="true"></canvas>
+		<div #textLayer class="textLayer"></div>
+	</div>
+</div>

@@ -6,21 +6,27 @@
 		<span class="source-icon file"></span>
 	}
 	<h3 class="source-title">
-		@if (isUrl(source)) {
-			<a [href]="source.link" target="_blank" rel="noopener noreferrer">
-				{{ extractLabel(source.link) }}
-			</a>
-		}
-		@if (isFile(source)) {
-			<button type="button" (click)="downloadFile(source)">{{ fileName(source.link) }}</button>
-		}
-		@if (isBusinessProcess(source)) {
-			@if (source.link) {
+		@if (opensInViewer(source)) {
+			<button type="button" class="source-open" [class.viewed]="isViewed(source)" [attr.aria-pressed]="isViewed(source)" (click)="openInViewer(source)">
+				{{ label(source) }}
+			</button>
+		} @else {
+			@if (isUrl(source)) {
 				<a [href]="source.link" target="_blank" rel="noopener noreferrer">
-					{{ source.title || source.link }}
+					{{ extractLabel(source.link) }}
 				</a>
-			} @else {
-				{{ source.title }}
+			}
+			@if (isFile(source)) {
+				<button type="button" (click)="downloadFile(source)">{{ fileName(source.link) }}</button>
+			}
+			@if (isBusinessProcess(source)) {
+				@if (source.link) {
+					<a [href]="source.link" target="_blank" rel="noopener noreferrer">
+						{{ source.title || source.link }}
+					</a>
+				} @else {
+					{{ source.title }}
+				}
 			}
 		}
 	</h3>

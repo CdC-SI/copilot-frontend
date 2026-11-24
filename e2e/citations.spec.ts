@@ -5,7 +5,8 @@ import {MessageSource} from '../src/app/shared/model/chat-history';
 
 test.describe('Citations', () => {
 	const guide: Partial<MessageSource> = {documentId: 'chunk-1', type: 'FILE', link: 'directives/guide-avs.pdf', pageNumber: '4', subsection: '2.1 Délais'};
-	const memento: Partial<MessageSource> = {documentId: 'chunk-2', type: 'URL', link: 'https://www.ahv-iv.ch/fr/memento', pageNumber: undefined};
+	// Sans identifiant, la source ne s'ouvre pas dans le panneau : la carte de la liste reçoit le focus.
+	const memento: Partial<MessageSource> = {documentId: undefined, type: 'URL', link: 'https://www.ahv-iv.ch/fr/memento', pageNumber: undefined};
 
 	test.beforeEach(({backend}) => {
 		backend.reply(

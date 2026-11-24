@@ -2,6 +2,7 @@ import {Page, Request, Route, test as base} from '@playwright/test';
 import type {ChatStreamEvent} from '../../src/app/shared/model/chat-stream-event';
 import type {ChatTitle, Conversation} from '../../src/app/shared/model/chat-history';
 import type {IUser} from '../../src/app/shared/model/user';
+import type {SourceView} from '../../src/app/shared/model/source-view';
 import {aUser} from '../../src/testing/fixtures';
 import {toSse} from '../../src/testing/stream-events';
 
@@ -22,6 +23,10 @@ export class MockBackend {
 	user: IUser = aUser();
 	titles: ChatTitle[] = [];
 	readonly conversations = new Map<string, Conversation>();
+	/** Vues des sources (`GET /source-documents/{id}`), par identifiant ; absente : 404. */
+	readonly sourceViews = new Map<string, SourceView>();
+	/** Fichiers des sources (`GET /source-documents/{id}/file`), par identifiant ; absent : 404. */
+	readonly sourceFiles = new Map<string, {body: Buffer; contentType: string}>();
 	/** Réponses SSE des prochaines questions, consommées dans l'ordre. */
 	readonly replies: ChatStreamEvent[][] = [];
 	readonly chatRequests: ChatRequestRecord[] = [];
@@ -65,6 +70,7 @@ export class MockBackend {
 		await this.page.route(`${API}conversations/titles`, route => route.fulfill({json: this.titles}));
 		await this.page.route(/\/zia\/api\/conversations\/(?!titles|attachments|feedbacks)[^/?]+$/, route => this.conversation(route));
 		await this.page.route(`${API}conversations`, route => this.chat(route));
+		await this.page.route(/\/zia\/api\/source-documents\/[^/?]+(\/file)?$/, route => this.sourceDocument(route));
 	}
 
 	private async conversation(route: Route): Promise<void> {
@@ -74,6 +80,18 @@ export class MockBackend {
 		}
 		const conversation = this.conversations.get(id);
 		return conversation ? route.fulfill({json: conversation}) : route.fulfill({status: 404, json: {MESSAGE: 'NOT_FOUND'}});
+	}
+
+	private async sourceDocument(route: Route): Promise<void> {
+		const segments = new URL(route.request().url()).pathname.split('/');
+		const file = segments.at(-1) === 'file';
+		const id = decodeURIComponent(segments.at(file ? -2 : -1) ?? '');
+		if (file) {
+			const content = this.sourceFiles.get(id);
+			return content ? route.fulfill({body: content.body, contentType: content.contentType}) : route.fulfill({status: 404});
+		}
+		const view = this.sourceViews.get(id);
+		return view ? route.fulfill({json: view}) : route.fulfill({status: 404, json: {MESSAGE: 'NOT_FOUND'}});
 	}
 
 	private async chat(route: Route): Promise<void> {

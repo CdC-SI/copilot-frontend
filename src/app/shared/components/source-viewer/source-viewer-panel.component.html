@@ -1,0 +1,171 @@
+<header class="viewer-header">
+	<div class="viewer-heading">
+		@if (citation(); as n) {
+			<span class="viewer-citation" aria-hidden="true">{{ n }}</span>
+		}
+		<h2 id="source-viewer-title" #heading tabindex="-1" class="viewer-title">
+			@if (citation(); as n) {
+				<span class="cdk-visually-hidden">{{ "sourceList.citation" | translate: { n } }}</span>
+			}
+			{{ title() }}
+		</h2>
+	</div>
+	<div class="viewer-nav">
+		@if (store.position().total > 1) {
+			<button
+				mat-icon-button
+				type="button"
+				class="viewer-previous"
+				[disabled]="!store.hasPrevious()"
+				[matTooltip]="'sourceViewer.previous' | translate"
+				[attr.aria-label]="'sourceViewer.previous' | translate"
+				(click)="store.previous()"
+			>
+				<mat-icon svgIcon="arrow_left" />
+			</button>
+			<span class="viewer-position">{{ store.position().current }} / {{ store.position().total }}</span>
+			<button
+				mat-icon-button
+				type="button"
+				class="viewer-next"
+				[disabled]="!store.hasNext()"
+				[matTooltip]="'sourceViewer.next' | translate"
+				[attr.aria-label]="'sourceViewer.next' | translate"
+				(click)="store.next()"
+			>
+				<mat-icon svgIcon="arrow_right" />
+			</button>
+		}
+		<button
+			mat-icon-button
+			type="button"
+			class="viewer-close"
+			[matTooltip]="'sourceViewer.close' | translate"
+			[attr.aria-label]="'sourceViewer.close' | translate"
+			(click)="store.close()"
+		>
+			<mat-icon svgIcon="xmark" />
+		</button>
+	</div>
+</header>
+
+<div class="viewer-body" aria-live="polite">
+	@switch (content().status) {
+		@case ("loading") {
+			<p class="viewer-status">{{ "sourceViewer.loading" | translate }}</p>
+		}
+		@case ("notFound") {
+			<p class="viewer-status viewer-error">{{ "sourceViewer.notFound" | translate }}</p>
+		}
+		@case ("error") {
+			<p class="viewer-status viewer-error">{{ "sourceViewer.error" | translate }}</p>
+			<button mat-button type="button" class="viewer-retry" (click)="retry()">{{ "sourceViewer.retry" | translate }}</button>
+		}
+		@case ("ready") {
+			@if (content().view; as view) {
+				<ul class="viewer-meta">
+					@if (view.subsection) {
+						<li>
+							{{ "sourceList.meta.section" | translate }}:
+							<strong>{{ view.subsection }}</strong>
+						</li>
+					}
+					@if (view.pageNumber) {
+						<li>
+							{{ "sourceList.meta.page" | translate }}:
+							<strong>{{ view.pageNumber }}</strong>
+						</li>
+					}
+					@if (view.version) {
+						<li>
+							{{ "sourceList.meta.version" | translate }}:
+							<strong>{{ view.version | translate }}</strong>
+						</li>
+					}
+					@if (view.state) {
+						<li>
+							{{ "sourceViewer.meta.state" | translate }}:
+							<strong>{{ view.state === "personal.uploads" ? ("sourceViewer.state.personalUploads" | translate) : view.state }}</strong>
+						</li>
+					}
+				</ul>
+
+				<div class="viewer-actions">
+					@switch (view.display) {
+						@case ("PDF") {
+							<button mat-button type="button" class="viewer-download" [disabled]="downloading()" (click)="download()">
+								<mat-icon svgIcon="download" />
+								{{ "sourceViewer.download" | translate }}
+							</button>
+							@if (content().pdf) {
+								<button mat-button type="button" class="viewer-open-tab" (click)="openInNewTab()">
+									<mat-icon svgIcon="link_external" />
+									{{ "sourceViewer.openInNewTab" | translate }}
+								</button>
+							}
+						}
+						@case ("DOWNLOAD") {
+							<button mat-button type="button" class="viewer-download" [disabled]="downloading()" (click)="download()">
+								<mat-icon svgIcon="download" />
+								{{ "sourceViewer.download" | translate }}
+							</button>
+						}
+						@case ("URL") {
+							@if (originalUrl(); as url) {
+								<a mat-button class="viewer-open-original" [href]="url" target="_blank" rel="noopener noreferrer">
+									<mat-icon svgIcon="link_external" />
+									{{ "sourceViewer.openOriginal" | translate }}
+								</a>
+							}
+						}
+						@case ("PROCESS") {
+							@if (view.url) {
+								<a mat-button class="viewer-open-process" [href]="view.url" target="_blank" rel="noopener noreferrer">
+									<mat-icon svgIcon="link_external" />
+									{{ "sourceViewer.openProcess" | translate }}
+								</a>
+							}
+						}
+					}
+				</div>
+
+				@if (view.display === "EXCERPT") {
+					<p class="viewer-note">{{ "sourceViewer.fileUnavailable" | translate }}</p>
+				}
+
+				@if (view.display === "PDF" && content().pdfStatus) {
+					@if (view.excerpt) {
+						<details class="viewer-excerpt-details">
+							<summary>{{ "sourceViewer.excerpt" | translate }}</summary>
+							<ng-container *ngTemplateOutlet="excerpt; context: { $implicit: view }" />
+						</details>
+					}
+					@switch (content().pdfStatus) {
+						@case ("loading") {
+							<p class="viewer-status">{{ "sourceViewer.pdf.loading" | translate }}</p>
+						}
+						@case ("error") {
+							<p class="viewer-status viewer-error">{{ "sourceViewer.pdf.error" | translate }}</p>
+							<button mat-button type="button" class="viewer-retry" (click)="retry()">{{ "sourceViewer.retry" | translate }}</button>
+						}
+						@case ("ready") {
+							<zco-pdf-viewer class="viewer-pdf" [data]="content().pdf!" [page]="page()" [highlight]="view.excerpt" />
+						}
+					}
+				} @else if (view.excerpt) {
+					<section class="viewer-excerpt-section">
+						<h3>{{ "sourceViewer.excerpt" | translate }}</h3>
+						<ng-container *ngTemplateOutlet="excerpt; context: { $implicit: view }" />
+					</section>
+				}
+			}
+		}
+	}
+</div>
+
+<ng-template #excerpt let-view>
+	<blockquote class="viewer-excerpt">{{ view.excerpt }}</blockquote>
+	@if (view.excerptTruncated) {
+		<p class="viewer-note">{{ "sourceViewer.excerptTruncated" | translate }}</p>
+	}
+</ng-template>
