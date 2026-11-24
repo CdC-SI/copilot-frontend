@@ -20,6 +20,14 @@ export const streamEvents = {
 		type: 'tool_result',
 		data: {id, name, status, durationMs: 10, documentCount}
 	}),
+	/** Outil suspendu jusqu'à la décision de l'utilisateur ; expire par défaut dans 5 minutes. */
+	approvalRequired: (
+		id: string,
+		approvalId: string,
+		name: string,
+		args: Record<string, unknown> = {},
+		expiresAt = new Date(Date.now() + 5 * 60_000).toISOString()
+	): ChatStreamEvent => ({type: 'approval_required', data: {id, approvalId, name, arguments: args, expiresAt}}),
 	done: (messageId = 'a1', interrupted = false): ChatStreamEvent => ({type: 'done', data: {messageId, interrupted}}),
 	error: (code: string, message?: string): ChatStreamEvent => ({type: 'error', data: {code, message}})
 };
