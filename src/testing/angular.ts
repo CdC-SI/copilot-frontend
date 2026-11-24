@@ -1,4 +1,7 @@
-import {Provider} from '@angular/core';
+import {EnvironmentProviders, Provider} from '@angular/core';
+import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClientTesting} from '@angular/common/http/testing';
+import {ConfigurationService} from '../app/core/app-configuration/configuration.service';
 import {TranslateService} from '@ngx-translate/core';
 import {ObNotificationService} from '@oblique/oblique';
 
@@ -24,4 +27,15 @@ export function provideTranslateStub(lang = 'fr'): Provider {
 
 export function provideNotificationMock(mock: NotificationMock = notificationMock()): Provider {
 	return {provide: ObNotificationService, useValue: mock};
+}
+
+/** Préfixe des URL d'API renvoyées par `ConfigurationService.backendApi` dans les tests. */
+export const TEST_API = '/zia/api';
+
+/**
+ * `HttpClient` de test (`HttpTestingController`) et `ConfigurationService` réduit à `backendApi`
+ * (préfixe `TEST_API`) : de quoi tester un service d'API sans configuration d'environnement.
+ */
+export function provideApiTesting(): (Provider | EnvironmentProviders)[] {
+	return [provideHttpClient(), provideHttpClientTesting(), {provide: ConfigurationService, useValue: {backendApi: (path: string) => `${TEST_API}${path}`}}];
 }

@@ -63,7 +63,7 @@ export class DynamicFormService {
 							type: 'number',
 							validators: [Validators.min(0)],
 							validationMessage: 'Salaire effectif invalide.',
-							parsePattern: /3\..*\s*:\s*([\d\s'’.,]+)/i
+							parsePattern: /3\..*\s*:\s*([\d'’.,\t\p{Zs}]+)/iu
 						},
 						{
 							key: 'preHealthEffectiveYear',
@@ -100,7 +100,7 @@ export class DynamicFormService {
 							type: 'number',
 							validators: [Validators.min(0)],
 							validationMessage: 'Salaire effectif invalide.',
-							parsePattern: /7\..*\s*:\s*([\d\s'’.,]+)/i
+							parsePattern: /7\..*\s*:\s*([\d'’.,\t\p{Zs}]+)/iu
 						},
 						{
 							key: 'postHealthEffectiveYear',
