@@ -1,4 +1,4 @@
-import type {ChatHistoryMessage, ChatTitle, Conversation} from '../app/shared/model/chat-history';
+import type {AttachmentDTO, AttachmentUploadResponse, ChatHistoryMessage, ChatTitle, Conversation} from '../app/shared/model/chat-history';
 import type {IUser} from '../app/shared/model/user';
 
 /**
@@ -37,4 +37,19 @@ export function aConversation(conversationId = 'c1', question = 'Quel est l’â
 		],
 		attachments: []
 	};
+}
+
+/** Pièce jointe telle que renvoyée par le backend (traitée par défaut). */
+export function anAttachmentDto(attachment: Partial<AttachmentDTO> = {}): AttachmentDTO {
+	return {id: 1, filename: 'contrat.pdf', fileSize: 24_000, status: 'PROCESSED', ...attachment};
+}
+
+/**
+ * Réponse d'envoi ou de suivi des pièces jointes d'une conversation : statut agrégé `PENDING` si une pièce jointe
+ * est en cours de traitement, sinon `FAILED` si l'une a échoué, sinon `PROCESSED`.
+ */
+export function anAttachmentUploadResponse(conversationId: string, attachments: AttachmentDTO[]): AttachmentUploadResponse {
+	const statuses = attachments.map(attachment => attachment.status);
+	const status = statuses.includes('PENDING') ? 'PENDING' : statuses.includes('FAILED') ? 'FAILED' : 'PROCESSED';
+	return {status, message: '', conversationAttachments: {conversationId, attachments}};
 }
