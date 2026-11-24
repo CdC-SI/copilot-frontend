@@ -82,6 +82,22 @@ describe('DynamicFormService', () => {
 		expect(service.parseAssistantMessage(def, 'Aucune information.')).toEqual({});
 	});
 
+	it.each([
+		['espace fine', '85\u2009000'],
+		['espace insécable', '85\u00a0000'],
+		['tabulation', '85\t000'],
+		['espace', '85 000']
+	])('accepte un montant séparé par une %s, sans déborder sur la ligne suivante', (_, amount) => {
+		const {def} = service.buildForm(ActionId.II_CALCUL);
+
+		const values = service.parseAssistantMessage(
+			def,
+			`3. Salaire effectif avant : ${amount}\n4. Année : 2023\n7. Salaire effectif après : ${amount}\n8. Année : 2024`
+		);
+
+		expect(values).toEqual(expect.objectContaining({preHealthEffectiveSalary: 85000, postHealthEffectiveSalary: 85000}));
+	});
+
 	it('accepte une définition sans sections', () => {
 		const def = {actionId: ActionId.II_CALCUL, messageTemplate: '', controls: [{key: 'a', label: 'A', type: 'text' as const, parsePattern: /A\s*:\s*(.+)/}]};
 
