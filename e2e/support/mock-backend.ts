@@ -245,7 +245,7 @@ export class MockBackend {
 
 	private async uploadAttachments(route: Route): Promise<void> {
 		const request = route.request();
-		const body = request.postDataBuffer()?.toString('latin1') ?? '';
+		const body = request.postDataBuffer()?.toString('utf8') ?? '';
 		const files = [...body.matchAll(/filename="([^"]*)"/g)].map(match => match[1]);
 		this.attachmentUploads.push({conversationId: new URL(request.url()).searchParams.get('conversationId') ?? undefined, files});
 		const reply = this.attachmentReplies.shift();

@@ -13,7 +13,7 @@ export interface ApiRequest {
 	/** Chemin après `/zia/api` (ex. `/workspaces/RH`), décodé. */
 	path: string;
 	query: Record<string, string>;
-	/** Corps JSON, texte brut, ou `undefined` (sans corps). Corps multipart : texte brut (latin1). */
+	/** Corps JSON, texte brut, ou `undefined` (sans corps). Corps multipart : texte brut (UTF-8). */
 	body?: unknown;
 }
 
@@ -73,13 +73,13 @@ export function escapeRegExp(text: string): string {
 	return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** Corps d'une requête : JSON si possible, sinon texte (latin1, pour les corps multipart). */
+/** Corps d'une requête : JSON si possible, sinon texte UTF-8 (corps multipart : noms de fichiers en UTF-8). */
 export function requestBody(request: Request): unknown {
 	const buffer = request.postDataBuffer();
 	if (!buffer) return undefined;
-	const text = buffer.toString('latin1');
+	const text = buffer.toString('utf8');
 	try {
-		return JSON.parse(buffer.toString('utf8'));
+		return JSON.parse(text);
 	} catch {
 		return text;
 	}

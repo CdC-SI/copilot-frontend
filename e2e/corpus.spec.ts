@@ -26,21 +26,21 @@ test.describe('Corpus : documents personnels', () => {
 		await corpus.open();
 		await expect(corpus.tabPanel('Mes documents').getByText('Aucun document téléchargé')).toBeVisible();
 
-		await corpus.chooseFiles(aPdf('directive-cotisations.pdf'));
-		await expect(corpus.queuedFile('directive-cotisations.pdf')).toContainText(`directive-cotisations.pdf (${Math.round(pdf.length / 1024)} KB)`);
+		await corpus.chooseFiles(aPdf('directive-révisée.pdf'));
+		await expect(corpus.queuedFile('directive-révisée.pdf')).toContainText(`directive-révisée.pdf (${Math.round(pdf.length / 1024)} KB)`);
 		await corpus.uploadButton.click();
 
 		await expect(page.getByText('Document(s) téléchargé(s) avec succès')).toBeVisible();
 		await expect(page.getByText('Le document est en cours de traitement.', {exact: false})).toBeVisible();
-		await expect(corpus.queuedFile('directive-cotisations.pdf')).toHaveCount(0);
-		const card = corpus.document('directive-cotisations.pdf');
+		await expect(corpus.queuedFile('directive-révisée.pdf')).toHaveCount(0);
+		const card = corpus.document('directive-révisée.pdf');
 		await expect(card).toContainText('En cours de traitement');
 		await expect(corpus.action(card, 'Ouvrir')).toBeDisabled();
 		const [upload] = backend.requestsTo('POST', '/documents/upload');
-		expect(upload.body).toEqual(expect.stringContaining('filename="directive-cotisations.pdf"'));
+		expect(upload.body).toEqual(expect.stringContaining('filename="directive-révisée.pdf"'));
 
 		// Le traitement se termine côté serveur : le rafraîchissement automatique (toutes les 30 s) le reflète.
-		documents.find('directive-cotisations.pdf').status = 'PROCESSED';
+		documents.find('directive-révisée.pdf').status = 'PROCESSED';
 		await page.clock.fastForward(30_000);
 
 		await expect(card).toContainText('Traité');

@@ -45,7 +45,7 @@ export class PersonalDocuments {
 		await backend.on('POST', '/documents/upload', request => {
 			const reply = documents.uploadReplies.shift();
 			if (reply) return reply;
-			const filename = /filename="([^"]+)"/.exec(request.postDataBuffer()?.toString('latin1') ?? '')?.[1] ?? 'document.pdf';
+			const filename = /filename="([^"]+)"/.exec(request.postDataBuffer()?.toString('utf8') ?? '')?.[1] ?? 'document.pdf';
 			documents.items.push(aPersonalDocument({title: filename, status: 'PENDING', timeToLiveInDays: undefined}));
 			return {status: 200};
 		});
