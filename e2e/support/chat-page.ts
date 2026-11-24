@@ -57,6 +57,42 @@ export class ChatPage {
 		await this.sidebar.getByText(title, {exact: true}).click();
 	}
 
+	/** Conversation de l'historique (élément de liste de la colonne gauche). */
+	historyItem(title: string): Locator {
+		return this.sidebar.getByRole('listitem').filter({hasText: title});
+	}
+
+	/** Groupe de l'historique par période (« Aujourd'hui », « Hier », « 7 derniers jours », « Plus ancien »). */
+	historyGroup(period: string): Locator {
+		return this.sidebar.getByRole('list', {name: period, exact: true});
+	}
+
+	/** Saisit un nouveau titre puis valide (`Enter`) ou annule (`Escape`). */
+	async renameConversation(title: string, newTitle: string, key: 'Enter' | 'Escape' = 'Enter'): Promise<void> {
+		const item = this.historyItem(title);
+		await item.hover();
+		await item.getByRole('button', {name: 'Renommer la conversation'}).click();
+		// Champ sans nom accessible ni focus automatique : seul champ d'un élément de l'historique (renommage en cours).
+		const input = this.renameInput;
+		await input.fill(newTitle);
+		await input.press(key);
+	}
+
+	/** Champ de renommage d'une conversation, présent seulement pendant le renommage. */
+	get renameInput(): Locator {
+		return this.sidebar.getByRole('listitem').getByRole('textbox');
+	}
+
+	async deleteConversation(title: string): Promise<void> {
+		const item = this.historyItem(title);
+		await item.hover();
+		await item.getByRole('button', {name: 'Supprimer la conversation'}).click();
+	}
+
+	async newConversation(): Promise<void> {
+		await this.sidebar.getByRole('button', {name: 'Nouvelle conversation'}).click();
+	}
+
 	/** Étapes d'outils d'une réponse (liste, résumé repliable et cartes d'approbation). */
 	toolSteps(answer: Locator): Locator {
 		return answer.getByRole('group', {name: 'Étapes de recherche de l’assistant'});

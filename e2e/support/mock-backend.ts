@@ -6,15 +6,14 @@ import type {SourceView} from '../../src/app/shared/model/source-view';
 import type {ToolApprovalDecision} from '../../src/app/shared/model/tool-step';
 import {aUser} from '../../src/testing/fixtures';
 import {toSse} from '../../src/testing/stream-events';
+import {ApiRequest, MockCollection, MockResponse, escapeRegExp, fulfill, requestBody} from './mock-rest';
+import {ChatRequestRecord, ManualStream} from './manual-stream';
+
+export {ManualStream} from './manual-stream';
+export type {ChatRequestRecord} from './manual-stream';
+export {gate} from './mock-rest';
 
 const API = '**/zia/api/';
-
-/** Question reçue par `POST /conversations` (FormData multipart). */
-export interface ChatRequestRecord {
-	query: string;
-	conversationId?: string;
-	replaceMessageId?: string;
-}
 
 /** Réponse HTTP en erreur à une question (`replyHttpError`), au lieu du flux SSE. */
 interface HttpErrorReply {
@@ -39,13 +38,6 @@ export interface AttachmentUploadReply {
 export interface AttachmentUploadRecord {
 	conversationId?: string;
 	files: string[];
-}
-
-/** Promesse résolue par le test : retient une réponse du backend simulé (état intermédiaire observable). */
-export function gate(): {promise: Promise<void>; open: () => void} {
-	let open!: () => void;
-	const promise = new Promise<void>(resolve => (open = resolve));
-	return {promise, open};
 }
 
 /**
@@ -79,6 +71,8 @@ export class MockBackend {
 	 * est répétée. Le suivi interroge immédiatement après un envoi resté `PENDING`, puis toutes les 15 s.
 	 */
 	readonly attachmentStatuses: AttachmentUploadResponse[] = [];
+	/** Toutes les requêtes `/zia/api/**` émises par la page (prévues ou non), dans l'ordre. */
+	readonly requests: ApiRequest[] = [];
 	readonly unexpected: string[] = [];
 
 	constructor(private readonly page: Page) {}
@@ -93,6 +87,39 @@ export class MockBackend {
 	replyHttpError(status: number, code?: string): this {
 		this.replies.push({status, code});
 		return this;
+	}
+
+	/**
+	 * Route supplémentaire, prioritaire sur les routes déjà déclarées. `url` : chemin après `/zia/api` (exact, query
+	 * ignorée) ou expression régulière sur l'URL complète ; une autre méthode passe aux routes précédentes.
+	 */
+	async on(method: string, url: string | RegExp, respond: (request: Request) => MockResponse | Promise<MockResponse>): Promise<void> {
+		const matcher = typeof url === 'string' ? new RegExp(`/zia/api${escapeRegExp(url)}(\\?.*)?$`) : url;
+		await this.page.route(matcher, async route => {
+			if (route.request().method() !== method) return route.fallback();
+			return fulfill(route, await respond(route.request()));
+		});
+	}
+
+	/**
+	 * Ressource REST en mémoire sous `path` (ex. `/workspaces`), identifiée par `key` ; `create` complète l'élément
+	 * reçu par `POST` (identifiant, dates…).
+	 */
+	async collection<T extends object>(path: string, key: keyof T, items: T[], create: (body: Partial<T>) => T = body => body as T): Promise<MockCollection<T>> {
+		const collection = new MockCollection(items, key, create);
+		await this.page.route(new RegExp(`/zia/api${escapeRegExp(path)}(/[^/?]+)?(\\?.*)?$`), route => {
+			const request = route.request();
+			const pathname = new URL(request.url()).pathname;
+			const rest = pathname.slice(pathname.indexOf('/zia/api') + `/zia/api${path}`.length);
+			const id = rest ? decodeURIComponent(rest.slice(1)) : undefined;
+			return fulfill(route, collection.handle(request.method(), id, (request.postDataJSON() ?? {}) as Partial<T>));
+		});
+		return collection;
+	}
+
+	/** Requêtes reçues pour une méthode et un chemin (exact, ou expression régulière sur le chemin). */
+	requestsTo(method: string, path: string | RegExp): ApiRequest[] {
+		return this.requests.filter(request => request.method === method && (typeof path === 'string' ? request.path === path : path.test(request.path)));
 	}
 
 	/**
@@ -124,10 +151,22 @@ export class MockBackend {
 	}
 
 	async install(): Promise<void> {
+		this.page.on('request', request => {
+			const url = new URL(request.url());
+			const index = url.pathname.indexOf('/zia/api/');
+			if (index < 0) return;
+			this.requests.push({
+				method: request.method(),
+				path: decodeURIComponent(url.pathname.slice(index + '/zia/api'.length)),
+				query: Object.fromEntries(url.searchParams),
+				body: requestBody(request)
+			});
+		});
 		// Playwright : la dernière route déclarée est prioritaire ; le filet générique est donc déclaré en premier.
 		await this.page.route(`${API}**`, route => this.fallback(route));
 		await this.page.route(`${API}users/authenticated`, route => route.fulfill({json: this.user}));
 		await this.page.route(`${API}conversations/titles`, route => route.fulfill({json: this.titles}));
+		await this.page.route(/\/zia\/api\/conversations\/titles\/[^/?]+$/, route => this.renameConversation(route));
 		await this.page.route(/\/zia\/api\/conversations\/(?!titles|attachments|feedbacks)[^/?]+$/, route => this.conversation(route));
 		await this.page.route(`${API}conversations`, route => this.chat(route));
 		await this.page.route(/\/zia\/api\/conversations\/[^/?]+\/generations\/[^/?]+\/stop$/, route => this.stop(route));
@@ -138,13 +177,27 @@ export class MockBackend {
 		await this.page.route(/\/zia\/api\/documents\?/, route => this.document(route));
 	}
 
+	/** `GET` : conversation enregistrée ; `DELETE` : retirée de l'historique (`titles`) ; autres méthodes : 204. */
 	private async conversation(route: Route): Promise<void> {
-		const id = new URL(route.request().url()).pathname.split('/').pop();
+		const id = decodeURIComponent(new URL(route.request().url()).pathname.split('/').pop() ?? '');
+		if (route.request().method() === 'DELETE') {
+			this.titles = this.titles.filter(title => title.conversationId !== id);
+			this.conversations.delete(id);
+		}
 		if (route.request().method() !== 'GET') {
 			return route.fulfill({status: 204});
 		}
 		const conversation = this.conversations.get(id);
 		return conversation ? route.fulfill({json: conversation}) : route.fulfill({status: 404, json: {MESSAGE: 'NOT_FOUND'}});
+	}
+
+	/** `PUT /conversations/titles/{id}` `{newTitle}` : renomme la conversation dans `titles`. */
+	private async renameConversation(route: Route): Promise<void> {
+		if (route.request().method() !== 'PUT') return this.fallback(route);
+		const id = decodeURIComponent(new URL(route.request().url()).pathname.split('/').pop() ?? '');
+		const {newTitle} = route.request().postDataJSON() as {newTitle: string};
+		this.titles = this.titles.map(title => (title.conversationId === id ? {...title, title: newTitle} : title));
+		return route.fulfill({status: 204});
 	}
 
 	private async sourceDocument(route: Route): Promise<void> {
@@ -219,38 +272,6 @@ export class MockBackend {
 		const request = route.request();
 		this.unexpected.push(`${request.method()} ${new URL(request.url()).pathname}`);
 		return request.method() === 'GET' ? route.fulfill({json: []}) : route.fulfill({status: 204});
-	}
-}
-
-/** Flux SSE ouverts par la page (`MockBackend.manualStream`), alimentés étape par étape. */
-export class ManualStream {
-	constructor(private readonly page: Page) {}
-
-	/** Attend que la page ait ouvert `count` flux (une question, une régénération ou une modification chacune). */
-	async opened(count: number): Promise<void> {
-		await this.page.waitForFunction(n => (window as unknown as {__e2eStreams: unknown[]}).__e2eStreams.length >= n, count);
-	}
-
-	/** Envoie des événements sur le dernier flux ouvert (attend qu'une question ait été posée). */
-	async send(...events: ChatStreamEvent[]): Promise<void> {
-		await this.opened(1);
-		await this.page.evaluate(sse => {
-			const streams = (window as unknown as {__e2eStreams: ReadableStreamDefaultController<Uint8Array>[]}).__e2eStreams;
-			streams[streams.length - 1].enqueue(new TextEncoder().encode(sse));
-		}, toSse(events));
-	}
-
-	async close(): Promise<void> {
-		await this.page.evaluate(() => {
-			const streams = (window as unknown as {__e2eStreams: ReadableStreamDefaultController<Uint8Array>[]}).__e2eStreams;
-			streams[streams.length - 1].close();
-		});
-	}
-
-	/** Questions envoyées sur les flux pilotés (champs texte du FormData), dans l'ordre. */
-	async requests(): Promise<ChatRequestRecord[]> {
-		const requests = await this.page.evaluate(() => (window as unknown as {__e2eRequests: Record<string, string>[]}).__e2eRequests);
-		return requests.map(({query, conversationId, replaceMessageId}) => ({query: query ?? '', conversationId, replaceMessageId}));
 	}
 }
 
