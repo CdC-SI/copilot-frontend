@@ -15,7 +15,10 @@ import {ChatConversationsStore} from './chat-conversations.store';
 import {ChatScrollRequest} from './chat.models';
 import {ChatGenerationStore, STOP_TIMEOUT_MS} from './chat-generation.store';
 import {ChatStore} from './chat.store';
-import {ChatAutocompleteService} from './services';
+import {ChatAutocompleteService, ChatSuggestionService} from './services';
+import {IQuestion, Language} from '../shared/model/answer';
+import {IUser, UserStatus} from '../shared/model/user';
+import {FormGroup} from '@angular/forms';
 import {NotificationMock, notificationMock, provideNotificationMock, provideTranslateStub} from '../../testing/angular';
 import {aUser} from '../../testing/fixtures';
 import {answerTurn} from '../../testing/stream-events';
@@ -24,7 +27,18 @@ describe('ChatStore', () => {
 	let store: ChatStore;
 	let stream: Subject<ChatStreamEvent>;
 	let ragService: {process: jest.Mock};
-	let conversationService: {getConversationTitles: jest.Mock; getConversation: jest.Mock; stopGeneration: jest.Mock; decideToolApproval: jest.Mock};
+	let conversationService: {
+		getConversationTitles: jest.Mock;
+		getConversation: jest.Mock;
+		stopGeneration: jest.Mock;
+		decideToolApproval: jest.Mock;
+		init: jest.Mock;
+		update: jest.Mock;
+		uploadAttachments: jest.Mock;
+	};
+	let feedbackService: {sendAnswerFeedback: jest.Mock};
+	let autocompleteService: {getOptionService: jest.Mock; getOptionLabel: jest.Mock; isCommand: jest.Mock};
+	let user$: BehaviorSubject<IUser>;
 	let notif: NotificationMock;
 
 	const flushFrame = (): void => {
@@ -54,8 +68,14 @@ describe('ChatStore', () => {
 			getConversationTitles: jest.fn(() => of([])),
 			getConversation: jest.fn(),
 			stopGeneration: jest.fn(() => of(undefined)),
-			decideToolApproval: jest.fn(() => of(undefined))
+			decideToolApproval: jest.fn(() => of(undefined)),
+			init: jest.fn(() => of({})),
+			update: jest.fn(),
+			uploadAttachments: jest.fn(() => new Subject())
 		};
+		feedbackService = {sendAnswerFeedback: jest.fn(() => of(undefined))};
+		autocompleteService = {getOptionService: jest.fn(() => 'options'), getOptionLabel: jest.fn(() => 'libellé'), isCommand: jest.fn(() => false)};
+		user$ = new BehaviorSubject(aUser());
 		notif = notificationMock();
 		TestBed.configureTestingModule({
 			providers: [
@@ -65,12 +85,12 @@ describe('ChatStore', () => {
 				ChatAttachmentsStore,
 				{provide: RagService, useValue: ragService},
 				{provide: ConversationService, useValue: conversationService},
-				{provide: AuthenticationServiceV2, useValue: {$authenticatedUser: new BehaviorSubject(aUser())}},
+				{provide: AuthenticationServiceV2, useValue: {$authenticatedUser: user$}},
 				provideTranslateStub(),
 				provideNotificationMock(notif),
-				{provide: FeedbackService, useValue: {}},
-				{provide: DynamicFormService, useValue: {}},
-				{provide: ChatAutocompleteService, useValue: {getOptionService: jest.fn(), getOptionLabel: jest.fn(), isCommand: jest.fn()}}
+				{provide: FeedbackService, useValue: feedbackService},
+				{provide: DynamicFormService, useValue: {hydrate: jest.fn(() => 'Message hydraté')}},
+				{provide: ChatAutocompleteService, useValue: autocompleteService}
 			]
 		});
 		store = TestBed.inject(ChatStore);
@@ -241,5 +261,263 @@ describe('ChatStore', () => {
 		expect(store.messages().map(message => message.message)).toEqual(['Capitale ?', 'Paris']);
 		expect(store.suggestions().at(-1)).toEqual({text: 'action_suggestions.ii-salary', action: 'ii-salary'});
 		expect(store.replayableTurn()?.answer.id).toBe('a1');
+	});
+
+	describe('saisie', () => {
+		it('bloque l’envoi sans texte ou pendant l’envoi d’une pièce jointe', () => {
+			expect(store.canSend()).toBe(false);
+			store.searchCtrl.setValue('Question');
+			expect(store.canSend()).toBe(true);
+
+			store.addAttachments([new File(['x'], 'a.pdf')]);
+			expect(store.canSend()).toBe(false);
+		});
+
+		it('désactive la saisie pendant la génération', () => {
+			ask('Bonjour');
+			TestBed.tick();
+			expect(store.searchCtrl.disabled).toBe(true);
+
+			emit({type: 'done', data: {messageId: 'a1', interrupted: false}});
+			TestBed.tick();
+			expect(store.searchCtrl.enabled).toBe(true);
+		});
+
+		it('passe en mode commande sur « / » et en délègue les options', () => {
+			store.setCommandMode('/res');
+			expect(store.commandMode()).toBe(true);
+			expect(store.optionService()).toBe('options');
+			expect(autocompleteService.getOptionService).toHaveBeenLastCalledWith(true, false);
+			expect(store.optionLabel({name: '/resume', description: '', example: ''})).toBe('libellé');
+
+			store.setCommandMode(undefined);
+			expect(store.commandMode()).toBe(false);
+		});
+
+		it('reprend le nom d’une commande choisie', () => {
+			autocompleteService.isCommand.mockReturnValue(true);
+
+			store.selectOption({name: '/resume', description: '', example: ''});
+
+			expect(store.searchCtrl.value).toBe('/resume');
+		});
+
+		it('pose la question avec la langue de l’interface', () => {
+			ask('Bonjour');
+
+			expect(ragService.process).toHaveBeenCalledWith(expect.objectContaining({language: Language.FR}));
+		});
+
+		it('expose le prénom de l’utilisateur', () => {
+			expect(store.userFirstName()).toBe('Ada');
+
+			user$.next(aUser({firstName: '  '}));
+			expect(store.userFirstName()).toBeNull();
+		});
+	});
+
+	describe('question de la FAQ', () => {
+		const faq = {id: 9, text: 'Âge de la retraite ?', answer: {text: '65 ans'}, language: Language.FR, url: 'https://ahv.ch/retraite'} as IQuestion;
+
+		it('affiche la question et la réponse de la FAQ, puis enregistre une nouvelle conversation', () => {
+			conversationService.getConversationTitles.mockReturnValue(of([{conversationId: 'srv', title: 'Retraite', timestamp: new Date()}]));
+
+			store.selectOption(faq);
+
+			expect(ragService.process).not.toHaveBeenCalled();
+			expect(conversationService.init).toHaveBeenCalledWith([
+				expect.objectContaining({source: ChatMessageSource.USER, message: 'Âge de la retraite ?', faqItemId: 9}),
+				expect.objectContaining({source: ChatMessageSource.FAQ, message: '65 ans', sources: [{type: 'URL', link: 'https://ahv.ch/retraite'}]})
+			]);
+			expect(store.currentConversation().conversationId).toBe('srv');
+			expect(store.searchCtrl.value).toBe('');
+		});
+
+		it('ajoute l’échange à la conversation courante', () => {
+			completeTurn();
+
+			store.selectOption({...faq, url: 'reglement.pdf'});
+
+			expect(conversationService.update).toHaveBeenCalledWith(store.currentConversation().conversationId, [
+				expect.objectContaining({source: ChatMessageSource.USER}),
+				expect.objectContaining({source: ChatMessageSource.FAQ, sources: [{type: 'FILE', link: 'reglement.pdf'}]})
+			]);
+		});
+
+		it('n’enregistre rien pour un utilisateur non inscrit', () => {
+			user$.next(aUser({status: UserStatus.GUEST}));
+
+			store.selectOption({...faq, url: undefined});
+
+			expect(store.messages()[1].sources).toEqual([]);
+			expect(conversationService.init).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('conversations', () => {
+		it('repart d’une conversation vierge', () => {
+			completeTurn();
+			const focus = jest.fn();
+			store.focusRequests.subscribe(focus);
+
+			store.newChat();
+
+			expect(store.currentConversation()).toBeNull();
+			expect(store.messages()).toEqual([]);
+			expect(focus).toHaveBeenCalled();
+		});
+
+		it('supprime une autre conversation sans quitter la conversation courante', () => {
+			completeTurn();
+			const current = store.currentConversation();
+
+			store.deleteConversation({conversationId: 'autre', title: 'x', timestamp: new Date()});
+
+			expect(store.currentConversation()).toBe(current);
+			expect(store.messages()).toHaveLength(2);
+		});
+
+		it('renomme une conversation', () => {
+			completeTurn();
+			const conversationId = store.currentConversation().conversationId;
+
+			store.renameConversation({conversationId, title: 'Nouveau titre'});
+
+			expect(store.currentConversation().title).toBe('Nouveau titre');
+		});
+
+		it('repose une question dans le workspace choisi', () => {
+			completeTurn();
+
+			store.changeWorkspace({question: 'Bonjour', workspace: 'AI'});
+			store.changeWorkspace({question: '', workspace: 'AI'});
+
+			expect(ragService.process).toHaveBeenCalledTimes(2);
+			expect(ragService.process).toHaveBeenLastCalledWith(expect.objectContaining({query: 'Bonjour', workspace: 'AI'}));
+			expect(store.messages()).toHaveLength(4);
+		});
+	});
+
+	describe('rejouer le dernier tour', () => {
+		it('n’est possible que pour la dernière paire terminée', () => {
+			ask('Bonjour');
+			const [question] = store.messages();
+			expect(store.isReplayable(question)).toBe(false);
+
+			emit(...answerTurn('Salut'));
+			expect(store.isReplayable(question)).toBe(true);
+			expect(store.isReplayable(answer())).toBe(true);
+		});
+
+		it('ignore une question modifiée vide', () => {
+			completeTurn();
+
+			store.editLastQuestion('   ');
+
+			expect(ragService.process).toHaveBeenCalledTimes(1);
+		});
+
+		it('ne fait rien sans tour rejouable', () => {
+			store.regenerateLastAnswer();
+
+			expect(ragService.process).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('suggestions et formulaire', () => {
+		it('préremplit la saisie avec le préfixe de l’action', () => {
+			jest.spyOn(TestBed.inject(ChatSuggestionService), 'handleSuggestionAction').mockReturnValue({shouldShowForm: false, searchValue: 'Résume : '});
+
+			store.handleSuggestionAction('summary');
+
+			expect(store.searchCtrl.value).toBe('Résume : ');
+			expect(store.activeForm()).toBeUndefined();
+		});
+
+		it('ouvre le formulaire puis envoie le message hydraté', () => {
+			const form = {def: {actionId: 'II_CALCUL'}, group: new FormGroup({})};
+			jest.spyOn(TestBed.inject(ChatSuggestionService), 'handleSuggestionAction').mockReturnValue({
+				shouldShowForm: true,
+				formDef: form.def as never,
+				formGroup: form.group
+			});
+
+			store.handleSuggestionAction('ii-salary');
+			expect(store.activeForm()).toEqual(form);
+
+			store.submitForm();
+
+			expect(store.activeForm()).toBeUndefined();
+			expect(ragService.process).toHaveBeenCalledWith(expect.objectContaining({query: 'Message hydraté'}));
+		});
+
+		it('ferme le formulaire', () => {
+			jest.spyOn(TestBed.inject(ChatSuggestionService), 'handleSuggestionAction').mockReturnValue({
+				shouldShowForm: true,
+				formDef: {} as never,
+				formGroup: new FormGroup({})
+			});
+			store.handleSuggestionAction('ii-salary');
+
+			store.closeForm();
+
+			expect(store.activeForm()).toBeUndefined();
+		});
+
+		it('n’applique rien sans préfixe', () => {
+			jest.spyOn(TestBed.inject(ChatSuggestionService), 'handleSuggestionAction').mockReturnValue({shouldShowForm: false});
+
+			store.handleSuggestionAction('inconnue');
+
+			expect(store.searchCtrl.value).toBeNull();
+		});
+	});
+
+	it('envoie un retour sur la réponse de la conversation courante', () => {
+		completeTurn();
+
+		store.sendFeedback({messageId: 'a1', isPositive: true});
+
+		expect(feedbackService.sendAnswerFeedback).toHaveBeenCalledWith(
+			expect.objectContaining({conversationId: store.currentConversation().conversationId, messageId: 'a1'})
+		);
+		expect(notif.success).toHaveBeenCalledWith('feedback.success');
+	});
+
+	describe('pièces jointes', () => {
+		let attachments: ChatAttachmentsStore;
+
+		beforeEach(() => {
+			attachments = TestBed.inject(ChatAttachmentsStore);
+		});
+
+		it('rattache les fichiers à la conversation créée par le backend', () => {
+			const upload = jest.spyOn(attachments, 'upload').mockImplementation((_, __, resolve) => resolve('srv-1'));
+
+			store.addAttachments([new File(['x'], 'a.pdf')]);
+
+			expect(upload).toHaveBeenCalledWith([expect.any(File)], null, expect.any(Function));
+			expect(store.currentConversation()).toEqual(expect.objectContaining({conversationId: 'srv-1', provisional: true}));
+		});
+
+		it('délègue nouvel essai, suppression, téléchargement et rafraîchissement', () => {
+			completeTurn();
+			const conversation = store.currentConversation();
+			const attachment = {id: 1, fileName: 'a.pdf'};
+			const retry = jest.spyOn(attachments, 'retry').mockImplementation();
+			const remove = jest.spyOn(attachments, 'remove').mockImplementation();
+			const download = jest.spyOn(attachments, 'download').mockImplementation();
+			const refresh = jest.spyOn(attachments, 'refresh').mockImplementation();
+
+			store.retryAttachment(attachment);
+			store.removeAttachment(1);
+			store.downloadAttachment(attachment);
+			store.refreshAttachmentsStatus();
+
+			expect(retry).toHaveBeenCalledWith(attachment, conversation);
+			expect(remove).toHaveBeenCalledWith(1);
+			expect(download).toHaveBeenCalledWith(attachment, conversation.conversationId);
+			expect(refresh).toHaveBeenCalledWith(conversation.conversationId);
+		});
 	});
 });

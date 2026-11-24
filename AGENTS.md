@@ -28,7 +28,9 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - Utilitaires de test partagés dans `src/testing/` (hors couverture) : `stream-events.ts` (fabriques
   d'événements du flux, `answerTurn`, `toSse`), `fixtures.ts` (utilisateur, titres, conversations) — sans
   dépendance Angular, importables par Jest et Playwright — et `angular.ts` (stubs `TranslateService`,
-  notifications Oblique). Les réutiliser plutôt que redéfinir des mocks locaux.
+  notifications Oblique, `provideApiTesting()` : `HttpTestingController` et `backendApi` préfixé par `TEST_API`).
+  Les réutiliser plutôt que redéfinir des mocks locaux. Les services d'API sans logique sont testés ensemble,
+  par table (`shared/services/api-services.spec.ts`) : y ajouter une ligne par nouvelle route.
 - e2e : **Playwright** (`playwright.config.ts`, dossier `e2e/`, hors Jest). `ng serve` est lancé sur le port 4300
   (réutilisé s'il tourne déjà) et le backend est simulé par `page.route` (`e2e/support/mock-backend.ts` :
   utilisateur, historique, réponses SSE scriptées, vues et fichiers des sources ; requête non prévue → réponse vide notée dans `unexpected`).
