@@ -29,6 +29,7 @@
 						<input
 							matInput
 							[(ngModel)]="tempTitle"
+							[attr.aria-label]="'chat.history.rename.label' | translate"
 							(focusout)="cancelRename()"
 							(keyup.enter)="saveRename(title)"
 							(keyup.escape)="cancelRename()"

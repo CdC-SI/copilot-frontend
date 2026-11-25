@@ -27,6 +27,21 @@
 	cursor: pointer;
 }
 
+/* Boutons sans habillage : même rendu que l'icône ou le lien qu'ils contiennent. */
+.icon-status-button,
+.footer-link {
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+}
+
+.icon-status-button {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	cursor: pointer;
+}
+
 .footer-link {
 	cursor: pointer;
 	text-decoration: underline;

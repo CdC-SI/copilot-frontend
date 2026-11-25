@@ -8,7 +8,14 @@
 		<li>
 			<div class="doc-to-upload">
 				{{ doc.fileName }} ({{ doc.fileSize | number: "1.0-0" }} KB)
-				<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)">
+				<button
+					mat-icon-button
+					type="button"
+					[obButton]="'secondary'"
+					(click)="removeDocument(doc)"
+					[attr.aria-label]="'upload.remove' | translate: { name: doc.fileName }"
+					[matTooltip]="'upload.remove' | translate: { name: doc.fileName }"
+				>
 					<mat-icon svgIcon="delete"></mat-icon>
 				</button>
 			</div>

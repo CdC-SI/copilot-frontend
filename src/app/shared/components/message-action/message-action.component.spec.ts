@@ -39,11 +39,12 @@ describe('MessageActionComponent', () => {
 		lang: 'de',
 		sources: [aSource({citation: 1, link: 'avs.pdf', pageNumber: '3'})]
 	};
-	const question: ChatMessage = {clientId: 'q', message: 'Âge de la retraite ?', faqItemId: 7, source: ChatMessageSource.USER, timestamp: new Date()};
+	const question: ChatMessage = {clientId: 'q', message: 'Âge de la retraite ?', faqItemId: 'faq-7', source: ChatMessageSource.USER, timestamp: new Date()};
 	const findIcon = (name: string): HTMLElement =>
 		fixture.debugElement.queryAll(d => d.componentInstance instanceof MatIconStubComponent && d.componentInstance.svgIcon() === name)[0]
 			?.nativeElement as HTMLElement;
-	const icon = findIcon;
+	/** Bouton d'action, par son nom accessible (clé de traduction : aucune traduction chargée). */
+	const button = (label: string): HTMLButtonElement => fixture.nativeElement.querySelector(`button[aria-label="${label}"]`);
 
 	const render = (inputs: Partial<{regenerable: boolean}> = {}): void => {
 		fixture = TestBed.createComponent(MessageActionComponent);
@@ -88,25 +89,45 @@ describe('MessageActionComponent', () => {
 
 	it('propose l’édition de la FAQ aux experts et Régénérer sur la dernière réponse', () => {
 		render();
-		expect(findIcon('pencil')).toBeUndefined();
-		expect(findIcon('refresh')).toBeUndefined();
+		expect(button('edit.answer')).toBeNull();
+		expect(button('chat.answer.regenerate')).toBeNull();
 
 		expert = true;
 		render({regenerable: true});
 
-		expect(findIcon('pencil')).toBeDefined();
-		expect(findIcon('refresh')).toBeDefined();
+		expect(button('edit.answer')).not.toBeNull();
+		expect(button('chat.answer.regenerate')).not.toBeNull();
 	});
 
-	it('Régénérer émet au clic et à la touche Entrée', () => {
+	it('chaque action est un bouton nommé par sa clé traduite, identique à l’infobulle', async () => {
+		expert = true;
+		render({regenerable: true});
+		await fixture.whenStable();
+
+		const buttons = Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>);
+		expect(buttons.map(action => action.getAttribute('aria-label'))).toEqual([
+			'edit.answer',
+			'good.answer',
+			'bad.answer',
+			'read.aloud',
+			'copy.answer',
+			'chat.answer.regenerate'
+		]);
+		// Infobulle = nom accessible : le CDK ne crée alors pas de description, que l'icône d'Oblique transformerait en nom.
+		buttons.forEach(action => {
+			expect(action.type).toBe('button');
+			expect(action.getAttribute('aria-describedby')).toBeNull();
+		});
+	});
+
+	it('Régénérer émet au clic', () => {
 		render({regenerable: true});
 		const regenerate = jest.fn();
 		component.regenerate.subscribe(regenerate);
 
-		findIcon('refresh').click();
-		findIcon('refresh').dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
+		button('chat.answer.regenerate').click();
 
-		expect(regenerate).toHaveBeenCalledTimes(2);
+		expect(regenerate).toHaveBeenCalledTimes(1);
 	});
 
 	describe('avis sur la réponse', () => {
@@ -119,7 +140,7 @@ describe('MessageActionComponent', () => {
 		});
 
 		it('un avis positif émet le commentaire, sans catégorie', () => {
-			icon('thumbs_up').click();
+			button('good.answer').click();
 			component.feedbackFrmCtrl.setValue('Parfait');
 
 			expect(component.feedBackTitle).toBe('feedback.positive');
@@ -137,7 +158,7 @@ describe('MessageActionComponent', () => {
 				return {afterClosed: () => of(true)};
 			});
 
-			icon('thumbs_down').click();
+			button('bad.answer').click();
 
 			expect(component.feedBackTitle).toBe('feedback.negative');
 			expect(component.isNegativeFeedback).toBe(true);
@@ -172,10 +193,10 @@ describe('MessageActionComponent', () => {
 		});
 
 		it('pré-remplit la question et la réponse sans citations, puis enregistre', () => {
-			findIcon('pencil').click();
+			button('edit.answer').click();
 
 			expect(component.faqItemFrmCtrl.value).toEqual({
-				id: 7,
+				id: 'faq-7',
 				text: 'Âge de la retraite ?',
 				answer: 'L’âge de référence est de 65 ans.',
 				url: 'https://example.org',
@@ -201,7 +222,8 @@ describe('MessageActionComponent', () => {
 			const started = jest.fn();
 			speech.speechStartEvent.subscribe(started);
 
-			icon('volume_high').click();
+			expect(button('read.aloud').getAttribute('aria-pressed')).toBe('false');
+			button('read.aloud').click();
 			fixture.detectChanges();
 
 			const utterance = synth.speak.mock.calls[0][0] as SpeechSynthesisUtterance;
@@ -210,7 +232,9 @@ describe('MessageActionComponent', () => {
 			expect(speech.getVoice).toHaveBeenCalledWith('de');
 			expect(started).toHaveBeenCalledWith(true);
 			expect(component.beingSpoken()).toBe(true);
-			expect(findIcon('volume_muted').classList).toContain('being-spoken');
+			expect(findIcon('volume_muted')).toBeDefined();
+			expect(button('read.aloud').classList).toContain('being-spoken');
+			expect(button('read.aloud').getAttribute('aria-pressed')).toBe('true');
 
 			utterance.onend(new Event('end') as SpeechSynthesisEvent);
 			expect(component.beingSpoken()).toBe(false);
@@ -257,7 +281,7 @@ describe('MessageActionComponent', () => {
 		});
 
 		it('copie le texte avec la liste des sources citées', async () => {
-			icon('copy').click();
+			button('copy.answer').click();
 			await Promise.resolve();
 
 			const text = writeText.mock.calls[0][0] as string;

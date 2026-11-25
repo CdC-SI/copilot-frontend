@@ -46,7 +46,14 @@ describe('FaqItemEditComponent', () => {
 		element.dispatchEvent(new Event('input'));
 		fixture.detectChanges();
 	};
-	const anItem = (): IFaqItem => ({id: 7, text: 'Quand ?', answer: 'À 65 ans.', url: 'https://ahv.ch', language: 'fr', tags: ['avs']});
+	const anItem = (): IFaqItem => ({
+		id: '7d3c1f6e-2b4a-4c8e-9f10-5a6b7c8d9e0f',
+		text: 'Quand ?',
+		answer: 'À 65 ans.',
+		url: 'https://ahv.ch',
+		language: 'fr',
+		tags: ['avs']
+	});
 
 	beforeEach(() => {
 		settings = {getSettings: jest.fn(() => of(['lpp', '', 'avs', null]))};

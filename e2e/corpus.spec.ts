@@ -114,24 +114,20 @@ test.describe('Corpus : documents personnels', () => {
 		expect(backend.requestsTo('DELETE', '/documents/user-docs')).toEqual([expect.objectContaining({query: {filename: 'guide-avs.pdf'}})]);
 	});
 
-	// Bug : le bouton d'envoi a un nom accessible anglais codé en dur (« Upload n document(s) ») et un libellé « upload »
-	// non traduit (clé absente des fichiers i18n) ; les boutons « rafraîchir » n'ont aucun nom accessible
-	// (src/app/corpus/corpus.component.html, l. 36, 39, 54 et 242). Les actions des cartes (l. 129-166, 294) ont un
-	// `aria-label` anglais (« Download guide-avs.pdf ») que l'infobulle remplace ou non selon le moment, parfois par la clé
-	// non traduite (« download », « personal.documents.delete », « sourceViewer.open ») : nom non déterministe.
-	test.fixme('les actions du corpus ont des libellés et des noms accessibles traduits', async ({page, backend}) => {
+	test('les actions du corpus ont des libellés et des noms accessibles traduits', async ({page, backend}) => {
 		await PersonalDocuments.install(backend, [aPersonalDocument({title: 'guide-avs.pdf'})]);
 		const corpus = new CorpusPage(page);
 		await corpus.open();
 
-		const documents = corpus.tabPanel('Mes documents');
-		await expect(corpus.uploadButton).toHaveCount(0);
-		await expect(documents.getByRole('button', {name: 'upload', exact: true})).toHaveCount(0);
-		await expect(page.locator('.user-documents-section .section-header button')).toHaveAccessibleName(/\S/);
+		await corpus.chooseFiles(aPdf('memo.pdf'));
+		await expect(corpus.uploadButton).toHaveAccessibleName('Téléverser 1 document(s)');
+		await expect(corpus.uploadButton).toContainText('Téléverser');
+		await expect(page.getByRole('button', {name: 'Retirer memo.pdf'})).toBeVisible();
+		await expect(page.getByRole('button', {name: 'Actualiser mes documents'})).toBeVisible();
 		const card = corpus.document('guide-avs.pdf');
 		await expect(corpus.action(card, 'Ouvrir')).toHaveAccessibleName('Ouvrir guide-avs.pdf');
-		await expect(corpus.action(card, 'Télécharger')).toHaveAccessibleName(/^Télécharger/);
-		await expect(corpus.action(card, 'Supprimer')).toHaveAccessibleName(/^Supprimer/);
+		await expect(corpus.action(card, 'Télécharger')).toHaveAccessibleName('Télécharger guide-avs.pdf');
+		await expect(corpus.action(card, 'Supprimer')).toHaveAccessibleName('Supprimer guide-avs.pdf');
 	});
 });
 

@@ -23,7 +23,7 @@ export interface ChatHistoryMessage {
 	role: string;
 	timestamp: Date;
 	language: string;
-	faqItemId?: number;
+	faqItemId?: string;
 	sources?: MessageSource[];
 	suggestions?: string[];
 	workspace?: string;

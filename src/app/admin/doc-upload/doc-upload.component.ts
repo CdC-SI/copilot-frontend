@@ -1,3 +1,4 @@
+import {MatTooltip} from '@angular/material/tooltip';
 import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {IDocument} from '../../shared/model/document';
 import {ObButtonDirective, ObEUploadEventType, ObFileUploadComponent, ObIUploadEvent, ObIconButtonDirective, ObNotificationService} from '@oblique/oblique';
@@ -13,7 +14,7 @@ import {TranslatePipe} from '@ngx-translate/core';
 	templateUrl: './doc-upload.component.html',
 	styleUrl: './doc-upload.component.scss',
 	changeDetection: ChangeDetectionStrategy.Eager,
-	imports: [ObFileUploadComponent, MatIconButton, ObIconButtonDirective, ObButtonDirective, MatIcon, MatButton, DecimalPipe, TranslatePipe]
+	imports: [ObFileUploadComponent, MatIconButton, ObIconButtonDirective, ObButtonDirective, MatIcon, MatButton, MatTooltip, DecimalPipe, TranslatePipe]
 })
 export class DocUploadComponent {
 	documentsToUpload: IDocument[] = [];

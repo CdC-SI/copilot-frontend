@@ -4,12 +4,22 @@
 		<div>
 			{{ getDisplayName() }}
 			@if (displayIconStatus()) {
-				<mat-icon
-					[svgIcon]="getIconStatus().icon"
-					[class]="'icon-status icon-status-' + getIconStatus().status"
-					[matTooltip]="'copilot.account.status.info.' + getIconStatus().status | translate"
-					(click)="openDialog(getIconStatus().status)"
-				/>
+				@let iconStatus = getIconStatus();
+				@let statusLabel = "copilot.account.status.info." + iconStatus.status | translate;
+				@if (hasStatusDialog(iconStatus.status)) {
+					<button type="button" class="icon-status-button" [matTooltip]="statusLabel" [attr.aria-label]="statusLabel" (click)="openDialog(iconStatus.status)">
+						<mat-icon [svgIcon]="iconStatus.icon" [class]="'icon-status icon-status-' + iconStatus.status" />
+					</button>
+				} @else {
+					<mat-icon
+						[svgIcon]="iconStatus.icon"
+						[class]="'icon-status icon-status-' + iconStatus.status"
+						[matTooltip]="statusLabel"
+						[attr.aria-label]="statusLabel"
+						aria-hidden="false"
+						role="img"
+					/>
+				}
 			}
 		</div>
 	</ng-template>
@@ -20,9 +30,9 @@
 		</p>
 		<p>
 			&copy; 2026 <span> ZAS | </span>
-			<span class="footer-link" (click)="openLegalDocumentDialog('gcu')">{{ "gcu" | translate }}</span>
+			<button type="button" class="footer-link" (click)="openLegalDocumentDialog('gcu')">{{ "gcu" | translate }}</button>
 			<span> | </span>
-			<span class="footer-link" (click)="openLegalDocumentDialog('confidentiality')">{{ "confidentiality" | translate }}</span>
+			<button type="button" class="footer-link" (click)="openLegalDocumentDialog('confidentiality')">{{ "confidentiality" | translate }}</button>
 		</p>
 	</ng-container>
 </ob-master-layout>

@@ -14,7 +14,7 @@ import {ChatSuggestionService} from './chat-suggestion.service';
 import {UserAuthDialogService} from './user-auth-dialog.service';
 
 const command: Command = {name: '/resume', description: 'd', example: 'e'};
-const question = {id: 1, text: 'Âge de la retraite ?', answer: {text: '65 ans'}} as IQuestion;
+const question = {id: 'faq-1', text: 'Âge de la retraite ?', answer: {text: '65 ans'}} as IQuestion;
 
 describe('ChatAutocompleteService', () => {
 	let service: ChatAutocompleteService;

@@ -1,4 +1,18 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DOCUMENT, DestroyRef, EventEmitter, Input, Output, inject} from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	DOCUMENT,
+	DestroyRef,
+	ElementRef,
+	EventEmitter,
+	Injector,
+	Input,
+	Output,
+	afterNextRender,
+	inject,
+	viewChild
+} from '@angular/core';
 import {ConversationService} from '../../services/conversation.service';
 import {ChatTitle} from '../../model/chat-history';
 import {MatList, MatListItem} from '@angular/material/list';
@@ -36,6 +50,8 @@ export class ChatHistoryComponent {
 	private readonly conversationService = inject(ConversationService);
 	private readonly cdr = inject(ChangeDetectorRef);
 	private readonly document = inject(DOCUMENT);
+	private readonly injector = inject(Injector);
+	private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
 	private currentTitles: ChatTitle[] | null = null;
 	private midnightTimer?: ReturnType<typeof setTimeout>;
 
@@ -63,6 +79,8 @@ export class ChatHistoryComponent {
 		event.stopPropagation();
 		this.editingTitle = title;
 		this.tempTitle = title.title;
+		// Le champ remplace le bouton qui avait le focus : il le reprend.
+		afterNextRender(() => this.titleInput()?.nativeElement.focus(), {injector: this.injector});
 	}
 
 	saveRename(title: ChatTitle): void {

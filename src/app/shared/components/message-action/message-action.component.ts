@@ -12,10 +12,9 @@ import {ANSWER_FEEDBACK_CATEGORIES, Feedback, FeedbackCategory} from '../../mode
 import {AuthenticationServiceV2} from '../../services/auth.service';
 import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
-import {NgClass} from '@angular/common';
 import {CdkScrollable} from '@angular/cdk/scrolling';
 import {FaqItemEditComponent} from '../faq-item-edit/faq-item-edit.component';
-import {MatButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 import {citationsToText, stripCitations} from '../../utils/citations';
 
@@ -27,7 +26,6 @@ import {citationsToText, stripCitations} from '../../utils/citations';
 	imports: [
 		MatIcon,
 		MatTooltip,
-		NgClass,
 		MatDialogTitle,
 		CdkScrollable,
 		MatDialogContent,
@@ -36,6 +34,7 @@ import {citationsToText, stripCitations} from '../../utils/citations';
 		ReactiveFormsModule,
 		MatDialogActions,
 		MatButton,
+		MatIconButton,
 		MatDialogClose,
 		ObIconButtonDirective,
 		ObButtonDirective,

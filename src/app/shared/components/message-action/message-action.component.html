@@ -1,27 +1,69 @@
 @if (authenticatedAsExpert()) {
-	<mat-icon [matTooltip]="'edit.answer' | translate" [svgIcon]="'pencil'" (click)="openFaqItemDialog()"></mat-icon>
+	<button
+		mat-icon-button
+		type="button"
+		class="message-action"
+		[matTooltip]="'edit.answer' | translate"
+		[attr.aria-label]="'edit.answer' | translate"
+		(click)="openFaqItemDialog()"
+	>
+		<mat-icon svgIcon="pencil"></mat-icon>
+	</button>
 }
-<mat-icon [matTooltip]="'good.answer' | translate" [svgIcon]="'thumbs_up'" (click)="openFeedbackDialog(true)"></mat-icon>
-<mat-icon [matTooltip]="'bad.answer' | translate" [svgIcon]="'thumbs_down'" (click)="openFeedbackDialog(false)"></mat-icon>
-<mat-icon
-	[ngClass]="beingSpoken() ? 'being-spoken' : ''"
+<button
+	mat-icon-button
+	type="button"
+	class="message-action"
+	[matTooltip]="'good.answer' | translate"
+	[attr.aria-label]="'good.answer' | translate"
+	(click)="openFeedbackDialog(true)"
+>
+	<mat-icon svgIcon="thumbs_up"></mat-icon>
+</button>
+<button
+	mat-icon-button
+	type="button"
+	class="message-action"
+	[matTooltip]="'bad.answer' | translate"
+	[attr.aria-label]="'bad.answer' | translate"
+	(click)="openFeedbackDialog(false)"
+>
+	<mat-icon svgIcon="thumbs_down"></mat-icon>
+</button>
+<button
+	mat-icon-button
+	type="button"
+	class="message-action"
+	[class.being-spoken]="beingSpoken()"
 	[matTooltip]="'read.aloud' | translate"
-	[svgIcon]="beingSpoken() ? 'volume_muted' : 'volume_high'"
+	[attr.aria-label]="'read.aloud' | translate"
+	[attr.aria-pressed]="beingSpoken()"
 	(click)="speak()"
-></mat-icon>
-<mat-icon [matTooltip]="'copy.answer' | translate" [svgIcon]="'copy'" (click)="copyAnswer()"></mat-icon>
+>
+	<mat-icon [svgIcon]="beingSpoken() ? 'volume_muted' : 'volume_high'"></mat-icon>
+</button>
+<button
+	mat-icon-button
+	type="button"
+	class="message-action"
+	[matTooltip]="'copy.answer' | translate"
+	[attr.aria-label]="'copy.answer' | translate"
+	(click)="copyAnswer()"
+>
+	<mat-icon svgIcon="copy"></mat-icon>
+</button>
 @if (regenerable) {
-	<mat-icon
-		role="button"
-		tabindex="0"
+	<button
+		mat-icon-button
+		type="button"
+		class="message-action"
 		[matTooltip]="'chat.answer.regenerate' | translate"
 		[attr.aria-label]="'chat.answer.regenerate' | translate"
-		svgIcon="refresh"
 		(click)="regenerate.emit()"
-		(keydown.enter)="regenerate.emit()"
-	></mat-icon>
+	>
+		<mat-icon svgIcon="refresh"></mat-icon>
+	</button>
 }
-
 <ng-template #addFaqItemDialog>
 	<h4 mat-dialog-title>{{ "edit.question.answer" | translate }}</h4>
 	<div mat-dialog-content class="mt16" ngForm>

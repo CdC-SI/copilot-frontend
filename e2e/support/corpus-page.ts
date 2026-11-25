@@ -57,16 +57,15 @@ export class PersonalDocuments {
 	}
 }
 
-/** Infobulle (fr) → icône des actions des cartes du corpus. */
-const ACTION_ICONS = {Ouvrir: 'file_pdf', Télécharger: 'download', Supprimer: 'delete', Réactiver: 'refresh', 'Supprimer la demande': 'delete'};
+/** Verbe (fr) des actions des cartes du corpus ; leur nom accessible est « <verbe> <titre> ». */
+type CardAction = 'Ouvrir' | 'Télécharger' | 'Supprimer' | 'Réactiver' | 'Supprimer la demande';
 
 /** Page « Corpus documentaire » (`/corpus`) : documents personnels, sources officielles et demandes de sources. */
 export class CorpusPage {
 	readonly uploadButton: Locator;
 
 	constructor(private readonly page: Page) {
-		// Nom accessible en anglais, codé en dur dans le gabarit (« Upload n document(s) ») : voir `corpus.spec.ts`.
-		this.uploadButton = this.tabPanel('Mes documents').getByRole('button', {name: /^Upload \d+ document\(s\)$/});
+		this.uploadButton = this.tabPanel('Mes documents').getByRole('button', {name: /^Téléverser \d+ document\(s\)$/});
 	}
 
 	async open(): Promise<void> {
@@ -97,18 +96,14 @@ export class CorpusPage {
 		return this.page.locator('mat-card').filter({has: this.page.getByText(title, {exact: true})});
 	}
 
-	/**
-	 * Bouton d'action d'une carte (document ou demande), désigné par son infobulle et localisé par son icône : son nom
-	 * accessible n'est pas fiable (`aria-label` anglais codé en dur, remplacé selon le moment par l'infobulle, traduite ou
-	 * non ; voir `corpus.spec.ts`).
-	 */
-	action(card: Locator, tooltip: keyof typeof ACTION_ICONS): Locator {
-		return card.getByRole('button').filter({has: this.page.locator(`mat-icon[svgicon="${ACTION_ICONS[tooltip]}"]`)});
+	/** Bouton d'action d'une carte (document ou demande), par son nom accessible « <verbe> <titre> ». */
+	action(card: Locator, verb: CardAction): Locator {
+		return card.getByRole('button', {name: new RegExp(`^${verb} `)});
 	}
 
-	/** Recharge la liste des documents (bouton icône sans nom accessible : localisé par sa section). */
+	/** Recharge la liste des documents. */
 	async refreshDocuments(): Promise<void> {
-		await this.page.locator('.user-documents-section .section-header button').click();
+		await this.page.getByRole('button', {name: 'Actualiser mes documents'}).click();
 	}
 
 	/** Panneau d'un workspace ou d'une source dans l'onglet « Sources officielles » (en-tête d'accordéon). */

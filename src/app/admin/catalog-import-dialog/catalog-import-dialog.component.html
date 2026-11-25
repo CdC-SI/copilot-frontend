@@ -23,7 +23,14 @@
 		<div class="selected-file">
 			<mat-icon svgIcon="file"></mat-icon>
 			<span>{{ file.name }} ({{ file.size / 1024 | number: "1.0-1" }} KB)</span>
-			<button mat-icon-button type="button" [disabled]="importing" [matTooltip]="'admin.actions.remove' | translate" (click)="removeFile()">
+			<button
+				mat-icon-button
+				type="button"
+				[disabled]="importing"
+				[attr.aria-label]="'admin.actions.remove' | translate"
+				[matTooltip]="'admin.actions.remove' | translate"
+				(click)="removeFile()"
+			>
 				<mat-icon svgIcon="delete"></mat-icon>
 			</button>
 		</div>

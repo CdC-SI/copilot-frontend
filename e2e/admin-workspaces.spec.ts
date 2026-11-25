@@ -93,7 +93,7 @@ test.describe('Administration des workspaces', () => {
 	});
 
 	test('modifie un workspace existant (le nom n’est pas modifiable)', async ({page, backend}) => {
-		await admin.rowAction(admin.row(table, 'Cotisations'), 'pencil').click();
+		await admin.rowAction(admin.row(table, 'Cotisations'), 'Modifier').click();
 		const dialog = admin.dialog('Modifier le workspace');
 		await expect(dialog.getByRole('textbox', {name: 'Nom'})).toHaveValue('Cotisations');
 		await expect(dialog.getByRole('textbox', {name: 'Nom'})).toBeDisabled();
@@ -116,14 +116,14 @@ test.describe('Administration des workspaces', () => {
 		const row = admin.row(table, 'Cotisations');
 		const confirmation = admin.dialog('Supprimer le workspace');
 
-		await admin.rowAction(row, 'delete').click();
+		await admin.rowAction(row, 'Supprimer').click();
 		await expect(confirmation).toContainText('Voulez-vous vraiment supprimer ce workspace ? Cette action est irréversible.');
 		await confirmation.getByRole('button', {name: 'Retour'}).click();
 		await expect(confirmation).toBeHidden();
 		await expect(row).toBeVisible();
 		expect(backend.requestsTo('DELETE', /^\/workspaces\//)).toEqual([]);
 
-		await admin.rowAction(row, 'delete').click();
+		await admin.rowAction(row, 'Supprimer').click();
 		await confirmation.getByRole('button', {name: 'Confirmer'}).click();
 
 		await expect(page.getByText('Workspace supprimé avec succès')).toBeVisible();
@@ -132,12 +132,10 @@ test.describe('Administration des workspaces', () => {
 		expect(backend.requestsTo('DELETE', /^\/workspaces\//).map(request => request.path)).toEqual(['/workspaces/Cotisations']);
 	});
 
-	// Bug : les boutons « Modifier » et « Supprimer » de chaque ligne n'ont qu'une infobulle (`matTooltip`, exposée comme
-	// description), sans `aria-label` : aucun nom accessible (src/app/admin/workspaces/workspaces.component.html, l. 48 et 51).
-	test.fixme('les actions d’une ligne ont un nom accessible', async () => {
+	test('les actions d’une ligne ont un nom accessible', async () => {
 		const row = admin.row(table, 'Cotisations');
-		await expect(admin.rowAction(row, 'pencil')).toHaveAccessibleName(/Modifier/);
-		await expect(admin.rowAction(row, 'delete')).toHaveAccessibleName(/Supprimer/);
+		await expect(admin.rowAction(row, 'Modifier')).toHaveAccessibleName('Modifier Cotisations');
+		await expect(admin.rowAction(row, 'Supprimer')).toHaveAccessibleName('Supprimer Cotisations');
 	});
 });
 

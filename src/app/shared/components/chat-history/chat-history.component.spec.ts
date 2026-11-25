@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {ApplicationRef, Component, input} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatIcon} from '@angular/material/icon';
 import {provideTranslateService} from '@ngx-translate/core';
@@ -139,6 +139,14 @@ describe('ChatHistoryComponent', () => {
 
 			expect(input_().value).toBe('Rentes');
 			expect(items()[0].querySelector('.history-item-body')).toBeNull();
+		});
+
+		it('donne au champ un nom accessible et le focus', async () => {
+			await Promise.resolve();
+			TestBed.inject(ApplicationRef).tick();
+
+			expect(input_().getAttribute('aria-label')).toBe('chat.history.rename.label');
+			expect(document.activeElement).toBe(input_());
 		});
 
 		it('enregistre le nouveau titre avec Entrée', async () => {
