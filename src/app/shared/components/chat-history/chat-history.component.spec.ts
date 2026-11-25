@@ -149,10 +149,18 @@ describe('ChatHistoryComponent', () => {
 			expect(document.activeElement).toBe(input_());
 		});
 
+		it('reste ouvert au relâchement de la touche Entrée qui l’a ouvert', () => {
+			input_().dispatchEvent(new KeyboardEvent('keyup', {key: 'Enter'}));
+			fixture.detectChanges();
+
+			expect(conversations.renameConversation).not.toHaveBeenCalled();
+			expect(input_()).not.toBeNull();
+		});
+
 		it('enregistre le nouveau titre avec Entrée', async () => {
 			await type('Rentes AVS');
 
-			input_().dispatchEvent(new KeyboardEvent('keyup', {key: 'Enter'}));
+			input_().dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
 			fixture.detectChanges();
 
 			expect(conversations.renameConversation).toHaveBeenCalledWith('c1', 'Rentes AVS');
@@ -162,7 +170,7 @@ describe('ChatHistoryComponent', () => {
 
 		it('ignore un titre vide ou inchangé', async () => {
 			await type('   ');
-			input_().dispatchEvent(new KeyboardEvent('keyup', {key: 'Enter'}));
+			input_().dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
 			fixture.detectChanges();
 
 			expect(conversations.renameConversation).not.toHaveBeenCalled();
