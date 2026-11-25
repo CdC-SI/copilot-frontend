@@ -107,6 +107,26 @@ describe('pollUntil', () => {
 		expect(errors).toHaveLength(1);
 	});
 
+	it('accepte un intervalle variable, calculé à partir de la tentative et du temps écoulé', () => {
+		const intervalMs = jest.fn((attempt: number, elapsedMs: number) => (elapsedMs < 3000 ? 1000 : 2000));
+		observe(pollUntil(counter, {intervalMs, isDone: () => false}));
+
+		jest.advanceTimersByTime(0);
+		expect(values).toEqual([1]);
+		jest.advanceTimersByTime(1000);
+		expect(values).toEqual([1, 2]); // elapsedMs=0 -> 1000ms
+		jest.advanceTimersByTime(1000);
+		expect(values).toEqual([1, 2, 3]); // elapsedMs=1000 -> 1000ms
+		jest.advanceTimersByTime(1000);
+		expect(values).toEqual([1, 2, 3, 4]); // elapsedMs=2000 -> 1000ms (total 3000)
+		jest.advanceTimersByTime(1999);
+		expect(values).toEqual([1, 2, 3, 4]); // elapsedMs=3000 -> 2000ms, pas encore écoulé
+		jest.advanceTimersByTime(1);
+		expect(values).toEqual([1, 2, 3, 4, 5]);
+		expect(intervalMs).toHaveBeenCalledWith(2, 0);
+		expect(intervalMs).toHaveBeenCalledWith(5, 3000);
+	});
+
 	it("le désabonnement arrête l'interrogation et annule la requête en cours", () => {
 		const response = new Subject<number>();
 		const subscription = observe(

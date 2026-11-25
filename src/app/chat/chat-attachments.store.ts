@@ -7,8 +7,17 @@ import {ConversationService} from '../shared/services/conversation.service';
 import {extractUploadErrorCode, uploadErrorNotification} from '../shared/utils/upload-error.utils';
 import {PollTimeoutError, pollUntil} from '../shared/utils/poll-until';
 
-const ATTACHMENT_POLL_INTERVAL_MS = 15_000;
-const ATTACHMENT_POLL_MAX_ATTEMPTS = 240;
+/** Petits documents (1-3 pages, ~5s de traitement) : vérification rapprochée pour un retour quasi immédiat. */
+const ATTACHMENT_POLL_FAST_INTERVAL_MS = 2_000;
+/** Durée de la phase rapide avant ralentissement (ms, depuis le premier essai). */
+const ATTACHMENT_POLL_FAST_PHASE_MS = 10_000;
+/** Documents plus longs à traiter (ex. 24 pages) : intervalle plus espacé au-delà de la phase rapide. */
+const ATTACHMENT_POLL_SLOW_INTERVAL_MS = 5_000;
+/** ~1h au total (phase rapide puis intervalle lent). */
+const ATTACHMENT_POLL_MAX_ATTEMPTS = 725;
+
+const attachmentPollIntervalMs = (_attempt: number, elapsedMs: number): number =>
+	elapsedMs < ATTACHMENT_POLL_FAST_PHASE_MS ? ATTACHMENT_POLL_FAST_INTERVAL_MS : ATTACHMENT_POLL_SLOW_INTERVAL_MS;
 
 /**
  * Pièces jointes de la conversation courante : envoi, nouvel essai, suppression, téléchargement et suivi du
@@ -156,7 +165,7 @@ export class ChatAttachmentsStore implements OnDestroy {
 		this.stopPolling();
 		this.timedOut.set(false);
 		this.polling = pollUntil(() => this.conversationService.getConversationAttachmentsStatus(conversationId), {
-			intervalMs: ATTACHMENT_POLL_INTERVAL_MS,
+			intervalMs: attachmentPollIntervalMs,
 			maxAttempts: ATTACHMENT_POLL_MAX_ATTEMPTS,
 			continueWhile: () => this.hasPending(),
 			isDone: () => !this.hasPending()
