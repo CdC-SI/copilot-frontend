@@ -35,10 +35,8 @@ export class ChatPage {
 		this.timeline = page.locator('zco-chat-timeline');
 		this.questions = this.timeline.locator('.message.user');
 		this.answers = this.timeline.locator('.message.assistant');
-		// Bouton de la réponse en erreur ou interrompue sans enregistrement, sinon icône de la barre d'actions. Celle-ci
-		// est masquée aux technologies d'assistance (`mat-icon` ajoute `aria-hidden="true"`) : les éléments masqués
-		// sont inclus puis filtrés sur la visibilité (cf. test.fixme « barre d'actions accessible »).
-		this.regenerateButton = this.timeline.getByRole('button', {name: 'Régénérer la réponse', includeHidden: true}).filter({visible: true});
+		// Bouton de la réponse en erreur ou interrompue sans enregistrement, ou de la barre d'actions de la réponse.
+		this.regenerateButton = this.timeline.getByRole('button', {name: 'Régénérer la réponse'});
 		this.attachments = page.locator('zco-chat-composer zco-chat-attachments mat-chip');
 		this.notifications = page.locator('ob-notification');
 	}

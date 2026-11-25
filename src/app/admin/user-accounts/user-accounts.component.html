@@ -31,10 +31,23 @@
 						}
 					</div>
 					<div class="roles-edit-actions">
-						<button mat-icon-button color="primary" [matTooltip]="'admin.actions.save' | translate" (click)="saveRoles(user.username)">
+						<button
+							mat-icon-button
+							type="button"
+							color="primary"
+							[attr.aria-label]="'admin.actions.save' | translate"
+							[matTooltip]="'admin.actions.save' | translate"
+							(click)="saveRoles(user.username)"
+						>
 							<mat-icon svgIcon="checkmark"></mat-icon>
 						</button>
-						<button mat-icon-button [matTooltip]="'admin.actions.cancel' | translate" (click)="cancelEditingRoles()">
+						<button
+							mat-icon-button
+							type="button"
+							[attr.aria-label]="'admin.actions.cancel' | translate"
+							[matTooltip]="'admin.actions.cancel' | translate"
+							(click)="cancelEditingRoles()"
+						>
 							<mat-icon svgIcon="xmark"></mat-icon>
 						</button>
 					</div>
@@ -50,7 +63,13 @@
 		<th mat-header-cell *matHeaderCellDef scope="col">{{ "user.actions" | translate }}</th>
 		<td mat-cell *matCellDef="let user">
 			@for (action of user.actions; track action) {
-				<button mat-icon-button [matTooltip]="action.tooltip | translate" (click)="onAction(action.id, user)">
+				<button
+					mat-icon-button
+					type="button"
+					[attr.aria-label]="action.tooltip | translate"
+					[matTooltip]="action.tooltip | translate"
+					(click)="onAction(action.id, user)"
+				>
 					<mat-icon [svgIcon]="action.icon"></mat-icon>
 				</button>
 			}

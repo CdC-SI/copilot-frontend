@@ -35,7 +35,7 @@ export class ChatConversationManagerService {
 		inError = false,
 		isCompleted = true,
 		lang?: Language,
-		faqItemId?: number,
+		faqItemId?: string,
 		url?: string,
 		sources?: MessageSource[]
 	): ChatMessage {

@@ -1,6 +1,6 @@
-@use '@oblique/oblique/styles/scss/core/variables';
-@use '@oblique/oblique/styles/scss/core/palette';
-@use '@oblique/oblique/styles/scss/core/mixins/layout';
+@use "@oblique/oblique/styles/scss/core/variables";
+@use "@oblique/oblique/styles/scss/core/palette";
+@use "@oblique/oblique/styles/scss/core/mixins/layout";
 
 :host {
 	display: flex;
@@ -8,14 +8,29 @@
 	width: 100%;
 	flex-direction: row;
 
-	mat-icon {
+	.message-action {
+		// Même rendu que les anciennes icônes cliquables : carré de 32px (icône de 24px + 4px de marge), fond sombre au survol.
+		--mat-icon-button-state-layer-size: 32px;
+		--mat-icon-button-icon-size: 24px;
+		--mat-icon-button-state-layer-shape: 0;
+		width: 32px;
+		height: 32px;
 		padding: 4px;
-		font-size: 24px;
+		border-radius: 0;
+
+		::ng-deep .mat-mdc-button-touch-target {
+			width: 100%;
+			height: 100%;
+		}
 
 		&:hover {
-			cursor: pointer;
 			background: variables.$ob-gray-dark;
 			color: white;
+		}
+
+		&:focus-visible {
+			outline: 2px solid variables.$ob-gray-dark;
+			outline-offset: 1px;
 		}
 	}
 

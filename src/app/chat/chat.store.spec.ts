@@ -317,7 +317,7 @@ describe('ChatStore', () => {
 	});
 
 	describe('question de la FAQ', () => {
-		const faq = {id: 9, text: 'Âge de la retraite ?', answer: {text: '65 ans'}, language: Language.FR, url: 'https://ahv.ch/retraite'} as IQuestion;
+		const faq = {id: 'faq-9', text: 'Âge de la retraite ?', answer: {text: '65 ans'}, language: Language.FR, url: 'https://ahv.ch/retraite'} as IQuestion;
 
 		it('affiche la question et la réponse de la FAQ, puis enregistre une nouvelle conversation', () => {
 			conversationService.getConversationTitles.mockReturnValue(of([{conversationId: 'srv', title: 'Retraite', timestamp: new Date()}]));
@@ -326,7 +326,7 @@ describe('ChatStore', () => {
 
 			expect(ragService.process).not.toHaveBeenCalled();
 			expect(conversationService.init).toHaveBeenCalledWith([
-				expect.objectContaining({source: ChatMessageSource.USER, message: 'Âge de la retraite ?', faqItemId: 9}),
+				expect.objectContaining({source: ChatMessageSource.USER, message: 'Âge de la retraite ?', faqItemId: 'faq-9'}),
 				expect.objectContaining({source: ChatMessageSource.FAQ, message: '65 ans', sources: [{type: 'URL', link: 'https://ahv.ch/retraite'}]})
 			]);
 			expect(store.currentConversation().conversationId).toBe('srv');

@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {ApplicationRef, Component, input} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatIcon} from '@angular/material/icon';
 import {provideTranslateService} from '@ngx-translate/core';
@@ -141,10 +141,26 @@ describe('ChatHistoryComponent', () => {
 			expect(items()[0].querySelector('.history-item-body')).toBeNull();
 		});
 
+		it('donne au champ un nom accessible et le focus', async () => {
+			await Promise.resolve();
+			TestBed.inject(ApplicationRef).tick();
+
+			expect(input_().getAttribute('aria-label')).toBe('chat.history.rename.label');
+			expect(document.activeElement).toBe(input_());
+		});
+
+		it('reste ouvert au relâchement de la touche Entrée qui l’a ouvert', () => {
+			input_().dispatchEvent(new KeyboardEvent('keyup', {key: 'Enter'}));
+			fixture.detectChanges();
+
+			expect(conversations.renameConversation).not.toHaveBeenCalled();
+			expect(input_()).not.toBeNull();
+		});
+
 		it('enregistre le nouveau titre avec Entrée', async () => {
 			await type('Rentes AVS');
 
-			input_().dispatchEvent(new KeyboardEvent('keyup', {key: 'Enter'}));
+			input_().dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
 			fixture.detectChanges();
 
 			expect(conversations.renameConversation).toHaveBeenCalledWith('c1', 'Rentes AVS');
@@ -154,7 +170,7 @@ describe('ChatHistoryComponent', () => {
 
 		it('ignore un titre vide ou inchangé', async () => {
 			await type('   ');
-			input_().dispatchEvent(new KeyboardEvent('keyup', {key: 'Enter'}));
+			input_().dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
 			fixture.detectChanges();
 
 			expect(conversations.renameConversation).not.toHaveBeenCalled();

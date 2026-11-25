@@ -69,19 +69,20 @@ test.describe('Rejouer le dernier échange', () => {
 		expect(second).toEqual({query: 'Délai de recours AI ?', conversationId: first.conversationId, replaceMessageId: 'a1'});
 	});
 
-	// Bug (accessibilité) : shared/components/message-action/message-action.component.html, actions d'une réponse
-	// enregistrée rendues par des <mat-icon> ; MatIcon pose aria-hidden="true" sur son hôte, si bien que « Régénérer
-	// la réponse » (role="button", aria-label) est masqué aux technologies d'assistance, et que Copier, J'aime, Je n'aime
-	// pas et Lire à voix haute n'ont ni rôle, ni nom accessible, ni focus clavier.
-	test.fixme('les actions d’une réponse enregistrée sont des boutons accessibles', async ({page, backend}) => {
-		backend.reply(...answerTurn('Réponse.'));
+	test('les actions d’une réponse enregistrée sont des boutons accessibles au clavier', async ({page, backend}) => {
+		backend.reply(...answerTurn('Réponse.', {messageId: 'a1'}));
+		backend.reply(...answerTurn('Réponse régénérée.', {generationId: 'g2', messageId: 'a2'}));
 		const chat = new ChatPage(page);
 		await chat.open();
 		await chat.ask('Quel est le délai ?');
 
 		const answer = chat.answers.last();
-		await expect(answer.getByRole('button', {name: 'Régénérer la réponse'})).toBeVisible();
-		await expect(answer.getByRole('button', {name: 'Copier la réponse'})).toBeVisible();
+		for (const name of ['Bonne réponse', 'Mauvaise réponse', 'Lire à haute voix', 'Copier la réponse', 'Régénérer la réponse']) {
+			await expect(answer.getByRole('button', {name})).toBeVisible();
+		}
+		await answer.getByRole('button', {name: 'Régénérer la réponse'}).focus();
+		await page.keyboard.press('Enter');
+		await expect.poll(() => backend.chatRequests.length).toBe(2);
 	});
 
 	test('un refus du backend (409) rétablit l’échange précédent et prévient l’utilisateur', async ({page, backend}) => {

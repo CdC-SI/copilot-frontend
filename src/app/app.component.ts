@@ -141,6 +141,11 @@ export class AppComponent implements OnInit, DoCheck {
 		}
 	}
 
+	/** Statuts dont l'icône ouvre une boîte de dialogue (inscription, information) : elle est alors un bouton. */
+	hasStatusDialog(status: string): boolean {
+		return status === 'guest' || status === 'john-doe';
+	}
+
 	openDialog(status: string) {
 		if (status === 'guest') {
 			this.openRegisterDialog();

@@ -18,7 +18,14 @@
 											<mat-icon svgIcon="file"></mat-icon>
 											{{ doc.fileName }} ({{ getFileSizeInKB(doc.fileSize) }} KB)
 										</span>
-										<button mat-icon-button type="button" [obButton]="'secondary'" (click)="removeDocument(doc)" [attr.aria-label]="'Remove ' + doc.fileName">
+										<button
+											mat-icon-button
+											type="button"
+											[obButton]="'secondary'"
+											(click)="removeDocument(doc)"
+											[attr.aria-label]="'upload.remove' | translate: { name: doc.fileName }"
+											[matTooltip]="'upload.remove' | translate: { name: doc.fileName }"
+										>
 											<mat-icon svgIcon="delete"></mat-icon>
 										</button>
 									</div>
@@ -33,7 +40,7 @@
 							[obButton]="'primary'"
 							(click)="uploadDocuments()"
 							[disabled]="!documentsToUpload.length || isUploading"
-							[attr.aria-label]="'Upload ' + documentsToUpload.length + ' document(s)'"
+							[attr.aria-label]="'personal.documents.upload.ariaLabel' | translate: { count: documentsToUpload.length }"
 						>
 							<mat-icon svgIcon="upload"></mat-icon>
 							{{ "upload" | translate }}
@@ -51,7 +58,15 @@
 				<div class="user-documents-section">
 					<div class="section-header">
 						<h3>{{ "personal.documents.my.documents" | translate }}</h3>
-						<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadUserDocuments()" [disabled]="isLoadingDocuments">
+						<button
+							mat-icon-button
+							type="button"
+							[obButton]="'tertiary'"
+							(click)="loadUserDocuments()"
+							[disabled]="isLoadingDocuments"
+							[attr.aria-label]="'personal.documents.refresh' | translate"
+							[matTooltip]="'personal.documents.refresh' | translate"
+						>
 							<mat-icon svgIcon="refresh"></mat-icon>
 						</button>
 					</div>
@@ -126,8 +141,8 @@
 												type="button"
 												[obButton]="'secondary'"
 												(click)="reactivateDocument(doc)"
-												[attr.aria-label]="'Reactivate ' + doc.title"
-												matTooltip="{{ 'personal.documents.reactivate' | translate }}"
+												[attr.aria-label]="'personal.documents.reactivate.named' | translate: { title: doc.title }"
+												[matTooltip]="'personal.documents.reactivate.named' | translate: { title: doc.title }"
 											>
 												<mat-icon svgIcon="refresh"></mat-icon>
 											</button>
@@ -141,7 +156,7 @@
 												(click)="openDocument(doc)"
 												[disabled]="!isDocumentReady(doc)"
 												[attr.aria-label]="'sourceViewer.openDocument' | translate: { title: doc.title }"
-												[matTooltip]="'sourceViewer.open' | translate"
+												[matTooltip]="'sourceViewer.openDocument' | translate: { title: doc.title }"
 											>
 												<mat-icon svgIcon="file_pdf"></mat-icon>
 											</button>
@@ -152,8 +167,8 @@
 											[obButton]="'secondary'"
 											(click)="downloadDocument(doc)"
 											[disabled]="!isDocumentReady(doc)"
-											[attr.aria-label]="'Download ' + doc.title"
-											matTooltip="{{ 'download' | translate }}"
+											[attr.aria-label]="'personal.documents.download.named' | translate: { title: doc.title }"
+											[matTooltip]="'personal.documents.download.named' | translate: { title: doc.title }"
 										>
 											<mat-icon svgIcon="download"></mat-icon>
 										</button>
@@ -162,8 +177,8 @@
 											type="button"
 											[obButton]="'secondary'"
 											(click)="deleteDocument(doc)"
-											[attr.aria-label]="'Delete ' + doc.title"
-											matTooltip="{{ 'personal.documents.delete' | translate }}"
+											[attr.aria-label]="'personal.documents.delete.named' | translate: { title: doc.title }"
+											[matTooltip]="'personal.documents.delete.named' | translate: { title: doc.title }"
 										>
 											<mat-icon svgIcon="delete"></mat-icon>
 										</button>
@@ -239,7 +254,15 @@
 								<mat-icon svgIcon="plus"></mat-icon>
 								{{ "sources.request.new" | translate }}
 							</button>
-							<button mat-icon-button type="button" [obButton]="'tertiary'" (click)="loadMySourceRequests()" [disabled]="isLoadingRequests">
+							<button
+								mat-icon-button
+								type="button"
+								[obButton]="'tertiary'"
+								(click)="loadMySourceRequests()"
+								[disabled]="isLoadingRequests"
+								[attr.aria-label]="'sources.requests.refresh' | translate"
+								[matTooltip]="'sources.requests.refresh' | translate"
+							>
 								<mat-icon svgIcon="refresh"></mat-icon>
 							</button>
 						</div>
@@ -291,8 +314,8 @@
 											type="button"
 											[obButton]="'secondary'"
 											(click)="deleteSourceRequest(request)"
-											[attr.aria-label]="'Delete ' + request.sourceName"
-											matTooltip="{{ 'sources.request.delete' | translate }}"
+											[attr.aria-label]="'sources.request.delete.named' | translate: { name: request.sourceName }"
+											[matTooltip]="'sources.request.delete.named' | translate: { name: request.sourceName }"
 											[disabled]="request.status === SourceRequestStatus.INTEGRATED"
 										>
 											<mat-icon svgIcon="delete"></mat-icon>

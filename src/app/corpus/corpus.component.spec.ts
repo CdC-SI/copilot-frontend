@@ -204,13 +204,13 @@ describe('CorpusComponent', () => {
 			expect(text('.ttl-info', archived)).toEqual(['personal.documents.ttl.deletion']);
 			expect(archived.querySelector('.availability-info mat-chip')?.classList).toContain('availability-archived');
 			expect(archived.querySelector('.archived-warning')).not.toBeNull();
-			expect(button(archived, 'Reactivate')).not.toBeNull();
-			expect(button(active, 'Reactivate')).toBeNull();
+			expect(button(archived, 'personal.documents.reactivate.named')).not.toBeNull();
+			expect(button(active, 'personal.documents.reactivate.named')).toBeNull();
 			// Seuls les PDF s'ouvrent dans la visionneuse ; un document non traité ne s'ouvre ni ne se télécharge.
 			expect(pending.querySelector('button.open-document')).toBeNull();
 			expect(active.querySelector<HTMLButtonElement>('button.open-document')?.disabled).toBe(false);
 			expect(failed.querySelector<HTMLButtonElement>('button.open-document')?.disabled).toBe(true);
-			expect(button(pending, 'Download')?.disabled).toBe(true);
+			expect(button(pending, 'personal.documents.download.named')?.disabled).toBe(true);
 		});
 
 		it.each([
@@ -250,7 +250,7 @@ describe('CorpusComponent', () => {
 			});
 			create();
 
-			button(cards()[0], 'Download')?.click();
+			button(cards()[0], 'personal.documents.download.named')?.click();
 
 			expect(uploadService.downloadSourceDocument).toHaveBeenCalledWith('directive-avs.pdf');
 			expect(click).toHaveBeenCalledTimes(1);
@@ -262,7 +262,7 @@ describe('CorpusComponent', () => {
 			uploadService.downloadSourceDocument.mockReturnValue(throwError(() => new Error('500')));
 			create();
 
-			button(cards()[0], 'Download')?.click();
+			button(cards()[0], 'personal.documents.download.named')?.click();
 
 			expect(notifications.error).toHaveBeenCalledWith('personal.documents.download.error');
 		});
@@ -271,7 +271,7 @@ describe('CorpusComponent', () => {
 			create();
 			component.openDocument(pdf);
 
-			button(cards()[0], 'Delete')?.click();
+			button(cards()[0], 'personal.documents.delete.named')?.click();
 
 			expect(uploadService.deleteUserDocument).toHaveBeenCalledWith('directive-avs.pdf');
 			expect(notifications.success).toHaveBeenCalledWith('personal.documents.delete.success');
@@ -292,7 +292,7 @@ describe('CorpusComponent', () => {
 			uploadService.deleteUserDocument.mockReturnValue(throwError(() => new Error('500')));
 			create();
 
-			button(cards()[0], 'Delete')?.click();
+			button(cards()[0], 'personal.documents.delete.named')?.click();
 
 			expect(notifications.error).toHaveBeenCalledWith('personal.documents.delete.error');
 			expect(uploadService.getUserDocuments).toHaveBeenCalledTimes(1);
@@ -302,7 +302,7 @@ describe('CorpusComponent', () => {
 			uploadService.getUserDocuments.mockReturnValue(of([aPersonalDocument({availabilityStatus: 'ARCHIVED'})]));
 			create();
 
-			button(cards()[0], 'Reactivate')?.click();
+			button(cards()[0], 'personal.documents.reactivate.named')?.click();
 
 			expect(uploadService.reactivateUserDocument).toHaveBeenCalledWith('directive-avs.pdf');
 			expect(notifications.success).toHaveBeenCalledWith('personal.documents.reactivate.success');
@@ -430,15 +430,15 @@ describe('CorpusComponent', () => {
 			expect(text('mat-card-subtitle span', requests[0])).toEqual(['· u12345']);
 			expect(text('.status-badge mat-chip')).toEqual(['sources.status.waiting', 'sources.status.integrated']);
 			// Une demande déjà intégrée ne peut plus être supprimée.
-			expect(button(requests[0], 'Delete')?.disabled).toBe(false);
-			expect(button(requests[1], 'Delete')?.disabled).toBe(true);
+			expect(button(requests[0], 'sources.request.delete.named')?.disabled).toBe(false);
+			expect(button(requests[1], 'sources.request.delete.named')?.disabled).toBe(true);
 		});
 
 		it('supprime une demande et recharge la liste', async () => {
 			create();
 			await openRequestsTab();
 
-			button(element().querySelector<HTMLElement>('mat-card.request-card'), 'Delete')?.click();
+			button(element().querySelector<HTMLElement>('mat-card.request-card'), 'sources.request.delete.named')?.click();
 
 			expect(sourceRequestService.deleteRequest).toHaveBeenCalledWith(3);
 			expect(notifications.success).toHaveBeenCalledWith('sources.request.delete.success');

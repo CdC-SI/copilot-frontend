@@ -26,11 +26,8 @@ export class AdminPage {
 		return this.page.getByRole('dialog', {name: title});
 	}
 
-	/**
-	 * Bouton icône d'une ligne (`pencil`, `delete`…). Ces boutons n'ont qu'une infobulle (description), sans nom
-	 * accessible : ils sont localisés par leur icône (voir `admin-workspaces.spec.ts`).
-	 */
-	rowAction(row: Locator, icon: string): Locator {
-		return row.getByRole('button').filter({has: this.page.locator(`mat-icon[svgicon="${icon}"]`)});
+	/** Bouton d'action d'une ligne, par son nom accessible « <verbe> <nom> » (`Modifier`, `Supprimer`). */
+	rowAction(row: Locator, verb: 'Modifier' | 'Supprimer'): Locator {
+		return row.getByRole('button', {name: new RegExp(`^${verb} `)});
 	}
 }

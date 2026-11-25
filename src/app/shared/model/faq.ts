@@ -8,7 +8,7 @@ export enum FaqItemFields {
 }
 
 export interface IFaqItem {
-	id?: number;
+	id?: string;
 	text: string;
 	answer: string;
 	url: string;

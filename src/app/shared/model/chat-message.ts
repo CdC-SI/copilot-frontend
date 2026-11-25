@@ -5,7 +5,7 @@ export interface ChatMessage {
 	/** Identifiant local et stable du message (suivi du rendu, mises à jour immuables). */
 	clientId: string;
 	id?: string;
-	faqItemId?: number;
+	faqItemId?: string;
 	message?: string;
 	source: ChatMessageSource;
 	timestamp: Date;
