@@ -7,7 +7,16 @@ import {NotificationMock, notificationMock, provideNotificationMock} from '../..
 import {aChatTitle} from '../../testing/fixtures';
 import {ChatAttachmentsStore} from './chat-attachments.store';
 
-const POLL_MS = 15_000;
+// Interrogation du statut des pièces jointes (voir chat-attachments.store.ts) : phase rapide (2s pendant 10s)
+// puis intervalle plus espacé (5s), jusqu'à MAX_ATTEMPTS tentatives.
+const FAST_POLL_MS = 2_000;
+const FAST_PHASE_MS = 10_000;
+const SLOW_POLL_MS = 5_000;
+const MAX_ATTEMPTS = 725;
+const FAST_INTERVALS = FAST_PHASE_MS / FAST_POLL_MS;
+const SLOW_INTERVALS = MAX_ATTEMPTS - 1 - FAST_INTERVALS;
+// Temps total écoulé avant que la dernière tentative (MAX_ATTEMPTS) ne soit lancée.
+const TIMEOUT_MS = FAST_INTERVALS * FAST_POLL_MS + SLOW_INTERVALS * SLOW_POLL_MS;
 
 const dto = (id: number, filename: string, status: AttachmentStatus = 'PENDING', errorCode?: string): AttachmentDTO =>
 	({id, filename, fileSize: 1, status, errorCode}) as AttachmentDTO;
@@ -107,7 +116,7 @@ describe('ChatAttachmentsStore', () => {
 			store.upload([new File(['x'], 'a.pdf'), new File(['y'], 'b.pdf')], aChatTitle({conversationId: 'c1'}), id => id);
 
 			upload.next(uploaded(response('c1', 'PENDING', [dto(1, 'a.pdf'), dto(2, 'b.pdf')])));
-			jest.advanceTimersByTime(POLL_MS);
+			jest.advanceTimersByTime(0); // déclenche la première interrogation (immédiate)
 			status.next(response('c1', 'PENDING', [dto(1, 'a.pdf', 'PROCESSED'), dto(2, 'b.pdf')]));
 
 			expect(conversationService.getConversationAttachmentsStatus).toHaveBeenCalledWith('c1');
@@ -128,7 +137,7 @@ describe('ChatAttachmentsStore', () => {
 
 			store.load('c1', [dto(1, 'a.pdf'), dto(2, 'b.pdf', 'PROCESSED')]);
 			expect(store.isUploading()).toBe(true);
-			jest.advanceTimersByTime(POLL_MS);
+			jest.advanceTimersByTime(0); // déclenche la première interrogation (immédiate)
 
 			expect(states()).toEqual([
 				['a.pdf', 'PROCESSED', false],
@@ -138,7 +147,7 @@ describe('ChatAttachmentsStore', () => {
 
 		it('ne suit pas une conversation sans traitement en cours', () => {
 			store.load('c1', [dto(1, 'a.pdf', 'PROCESSED')]);
-			jest.advanceTimersByTime(POLL_MS * 2);
+			jest.advanceTimersByTime(SLOW_POLL_MS * 2);
 
 			expect(conversationService.getConversationAttachmentsStatus).not.toHaveBeenCalled();
 		});
@@ -147,7 +156,7 @@ describe('ChatAttachmentsStore', () => {
 			conversationService.getConversationAttachmentsStatus.mockImplementation(() => of(response('c1', 'PENDING', [dto(1, 'a.pdf')])));
 			store.load('c1', [dto(1, 'a.pdf')]);
 
-			jest.advanceTimersByTime(POLL_MS * 241);
+			jest.advanceTimersByTime(TIMEOUT_MS);
 
 			expect(store.pollingTimedOut()).toBe(true);
 			expect(notif.warning).toHaveBeenCalledWith('attachment.process.timeout');
@@ -160,7 +169,7 @@ describe('ChatAttachmentsStore', () => {
 			store.load('c1', [dto(1, 'a.pdf')]);
 
 			store.suspend();
-			jest.advanceTimersByTime(POLL_MS * 2);
+			jest.advanceTimersByTime(SLOW_POLL_MS * 2);
 
 			expect(conversationService.getConversationAttachmentsStatus).not.toHaveBeenCalled();
 			expect(store.attachments()).toHaveLength(1);
@@ -168,7 +177,7 @@ describe('ChatAttachmentsStore', () => {
 
 		it('ne relance pas le suivi sans conversation', () => {
 			store.refresh(undefined);
-			jest.advanceTimersByTime(POLL_MS);
+			jest.advanceTimersByTime(FAST_POLL_MS);
 
 			expect(conversationService.getConversationAttachmentsStatus).not.toHaveBeenCalled();
 		});
