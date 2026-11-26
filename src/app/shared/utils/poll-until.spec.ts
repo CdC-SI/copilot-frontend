@@ -1,4 +1,5 @@
 import {Observable, Subject, of, throwError} from 'rxjs';
+import {take} from 'rxjs/operators';
 import {PollTimeoutError, pollUntil} from './poll-until';
 
 describe('pollUntil', () => {
@@ -125,6 +126,97 @@ describe('pollUntil', () => {
 		expect(values).toEqual([1, 2, 3, 4, 5]);
 		expect(intervalMs).toHaveBeenCalledWith(2, 0);
 		expect(intervalMs).toHaveBeenCalledWith(5, 3000);
+	});
+
+	it('calcule elapsedMs sur le temps réel écoulé, y compris la durée des requêtes (pas seulement les délais programmés)', () => {
+		/** Requête renvoyant un résultat après `delayMs` de latence réseau, comme un appel HTTP réel (next + complete). */
+		const slowRequest = (delayMs: number) => () => {
+			const result = new Subject<number>();
+			setTimeout(() => {
+				result.next(++calls);
+				result.complete();
+			}, delayMs);
+			return result;
+		};
+
+		const intervalMs = jest.fn((attempt: number, elapsedMs: number) => (elapsedMs < 10_000 ? 2000 : 5000));
+		observe(pollUntil(slowRequest(4000), {intervalMs, isDone: () => false}));
+
+		jest.advanceTimersByTime(4000); // 1ère réponse reçue à t=4000ms
+		expect(values).toEqual([1]);
+		expect(intervalMs).toHaveBeenLastCalledWith(2, 4000);
+
+		jest.advanceTimersByTime(2000); // délai rapide (4000<10000) -> 2ème requête lancée à t=6000ms
+		jest.advanceTimersByTime(4000); // 2ème réponse reçue à t=10000ms (temps réel, pas seulement les délais)
+		expect(values).toEqual([1, 2]);
+		expect(intervalMs).toHaveBeenLastCalledWith(3, 10_000);
+
+		jest.advanceTimersByTime(4999);
+		expect(values).toEqual([1, 2]); // délai lent (5000ms) pas encore écoulé
+		jest.advanceTimersByTime(1);
+		jest.advanceTimersByTime(4000); // 3ème réponse reçue à t=19000ms
+		expect(values).toEqual([1, 2, 3]);
+	});
+
+	it('arrête de programmer de nouvelles requêtes si le désabonnement survient pendant subscriber.next (ex. take(1))', () => {
+		observe(pollUntil(counter, {intervalMs: 1000, isDone: () => false}).pipe(take(1)));
+
+		jest.advanceTimersByTime(0);
+		expect(values).toEqual([1]);
+		expect(completed).toBe(true);
+
+		jest.advanceTimersByTime(10_000);
+		expect(calls).toBe(1); // aucune requête supplémentaire : le timer programmé après l'émission a été annulé
+	});
+
+	it("ne planifie la tentative suivante qu'à la complétion de la requête en cours, pas à chaque émission intermédiaire", () => {
+		const response = new Subject<number>();
+		const request = () => {
+			calls++;
+			return response;
+		};
+
+		observe(pollUntil(request, {intervalMs: 1000, isDone: () => false}));
+
+		jest.advanceTimersByTime(0);
+		response.next(1); // valeur « pending » : la requête reste ouverte (ni complete, ni erreur)
+		expect(values).toEqual([1]);
+		expect(calls).toBe(1);
+
+		jest.advanceTimersByTime(5000);
+		expect(calls).toBe(1); // aucune nouvelle requête tant que la précédente reste ouverte
+
+		response.next(2); // seconde émission sur la même requête (toujours pas de complete)
+		expect(values).toEqual([1, 2]);
+		expect(calls).toBe(1);
+
+		response.complete(); // la requête se termine enfin
+		jest.advanceTimersByTime(1000);
+		expect(calls).toBe(2); // la tentative suivante n'est désormais planifiée qu'après cette complétion
+	});
+
+	it("le désabonnement arrête l'interrogation après plusieurs tentatives déjà effectuées", () => {
+		const response = new Subject<number>();
+		const request = () => {
+			calls++;
+			return calls <= 2 ? of(calls) : response; // 2 premières tentatives synchrones, 3ème reste ouverte
+		};
+
+		const subscription = observe(pollUntil(request, {intervalMs: 1000, isDone: () => false}));
+
+		jest.advanceTimersByTime(0); // 1ère tentative (synchrone, complete) -> calls=1
+		jest.advanceTimersByTime(1000); // 2ème tentative -> calls=2
+		jest.advanceTimersByTime(1000); // 3ème tentative -> calls=3, reste ouverte (response)
+		expect(calls).toBe(3);
+		response.next(3); // valeur de la 3ème tentative, qui reste ensuite ouverte (pas de complete)
+		expect(values).toEqual([1, 2, 3]);
+
+		subscription.unsubscribe();
+		expect(response.observed).toBe(false);
+
+		jest.advanceTimersByTime(10_000);
+		expect(calls).toBe(3); // aucune tentative supplémentaire après plusieurs cycles de polling
+		expect(completed).toBe(false);
 	});
 
 	it("le désabonnement arrête l'interrogation et annule la requête en cours", () => {
