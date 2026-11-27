@@ -27,12 +27,18 @@ export interface TextLayerTask {
 })
 export class PdfJsService {
 	private module?: Promise<PdfJs>;
+	/**
+	 * Destructions de documents en cours : le worker est partagé (`workerPort`) et pdf.js refuse d'y ouvrir un
+	 * document tant qu'une destruction n'est pas terminée (« the worker is being destroyed »).
+	 */
+	private teardown: Promise<void> = Promise.resolve();
 
 	/** Ouvre un PDF ; `data` est transféré au worker (le tableau est vidé). */
 	open(data: Uint8Array): PdfLoadingTask {
 		let task: PDFDocumentLoadingTask | undefined;
 		let destroyed = false;
-		const promise = this.load().then(pdfjs => {
+		const promise = this.load().then(async pdfjs => {
+			await this.teardown;
 			if (destroyed) throw abortError();
 			task = this.getDocument(pdfjs, data);
 			return task.promise;
@@ -41,7 +47,14 @@ export class PdfJsService {
 			promise,
 			destroy: async () => {
 				destroyed = true;
-				await task?.destroy();
+				const destruction = task?.destroy();
+				if (!destruction) return;
+				const previous = this.teardown;
+				this.teardown = destruction.then(
+					() => previous,
+					() => previous
+				);
+				await destruction;
 			}
 		};
 	}
