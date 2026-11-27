@@ -1,3 +1,5 @@
+@use "@oblique/oblique/styles/scss/core/palette";
+
 @mixin thin-scrollbar {
 	scrollbar-width: thin;
 	scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
@@ -16,6 +18,55 @@
 			min-height: 0;
 			overflow-y: auto;
 			@include thin-scrollbar;
+		}
+	}
+
+	.sidebar-actions {
+		padding: 16px 16px 0;
+	}
+
+	// Bouton libellé en tête de colonne, à la manière des assistants conversationnels courants.
+	.new-conversation {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		width: 100%;
+		padding: 8px 12px;
+		border: 1px solid palette.$ob-secondary-100;
+		border-radius: 12px;
+		background: palette.$ob-white;
+		color: palette.$ob-secondary-800;
+		font: inherit;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		text-align: left;
+		cursor: pointer;
+		transition:
+			background-color 0.15s ease,
+			border-color 0.15s ease,
+			box-shadow 0.15s ease;
+
+		mat-icon {
+			flex-shrink: 0;
+			width: 20px;
+			height: 20px;
+			font-size: 20px;
+		}
+
+		span {
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
+		&:hover {
+			background: palette.$ob-secondary-50;
+			border-color: palette.$ob-secondary-300;
+		}
+
+		&:focus-visible {
+			outline: 2px solid palette.$ob-secondary-500;
+			outline-offset: 2px;
 		}
 	}
 }

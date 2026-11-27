@@ -571,7 +571,7 @@
   "chat.composer.placeholder": "Posez une question ou décrivez votre demande…",
   "chat.composer.send": "Envoyer",
   "chat.scroll-to-last-question": "Aller à la dernière question",
-  "chat.new-conversation.short-tooltip": "Nouvelle conversation",
+  "chat.new-conversation": "Nouvelle conversation",
   "chat.history.rename": "Renommer la conversation",
   "chat.history.rename.label": "Nouveau titre de la conversation",
   "chat.history.delete": "Supprimer la conversation",
