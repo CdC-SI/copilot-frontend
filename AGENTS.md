@@ -84,8 +84,10 @@ administration (workspaces, FAQ, sources, alertes, feedback/KPI, comptes, réten
 - Panneau des sources (F2d) : `shared/components/source-viewer/`. `SourceViewerStore` est fourni par la page hôte
   (chat, corpus) ; sans lui, les sources gardent le téléchargement et les liens directs. Le panneau charge
   `GET /api/source-documents/{id}` (`SourceView` : `display` choisi par le backend) puis `/file` pour un PDF.
-  pdf.js (`pdfjs-dist`) n'est chargé qu'à l'ouverture d'un PDF (chunk à la demande, `PdfJsService`) ; worker,
-  CMaps, polices standard, WASM et profils ICC sont copiés dans `assets/pdfjs` par `angular.json` (aucun CDN).
+  pdf.js (`pdfjs-dist`) n'est chargé qu'à l'ouverture d'un PDF (chunk à la demande, `PdfJsService`) ; le worker est
+  bundlé par le build (`pdf.worker.ts` → `worker-<hash>.js`, créé par `pdf-worker.ts`) : ne jamais servir de `.mjs`,
+  l'image nginx ZAS les envoie en `text/plain` (module refusé). CMaps, polices standard, WASM et profils ICC sont
+  copiés dans `assets/pdfjs` par `angular.json` (aucun CDN).
   Tests : remplacer `PdfJsService` par un faux (jsdom n'a ni canvas ni `Blob.arrayBuffer`) ; le rendu réel
   est couvert par l'e2e `source-viewer.spec.ts` (PDF généré par `e2e/support/pdf.ts`).
 

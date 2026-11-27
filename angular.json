@@ -40,11 +40,6 @@
                 "output": "assets"
               },
               {
-                "glob": "pdf.worker.min.mjs",
-                "input": "node_modules/pdfjs-dist/build",
-                "output": "assets/pdfjs"
-              },
-              {
                 "glob": "**/*",
                 "input": "node_modules/pdfjs-dist/cmaps",
                 "output": "assets/pdfjs/cmaps"

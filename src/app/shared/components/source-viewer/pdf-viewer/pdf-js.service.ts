@@ -19,20 +19,26 @@ export interface TextLayerTask {
 }
 
 /**
- * Accès à pdf.js, chargé à la demande (chunk séparé) : le worker et les ressources (CMaps, polices standard,
- * décodeurs WASM, profils ICC) sont servis par l'application elle-même, sans CDN.
+ * Accès à pdf.js, chargé à la demande (chunk séparé) : le worker est bundlé par le build (`pdf-worker.ts`) et les
+ * ressources (CMaps, polices standard, décodeurs WASM, profils ICC) sont servies par l'application elle-même, sans CDN.
  */
 @Injectable({
 	providedIn: 'root'
 })
 export class PdfJsService {
 	private module?: Promise<PdfJs>;
+	/**
+	 * Destructions de documents en cours : le worker est partagé (`workerPort`) et pdf.js refuse d'y ouvrir un
+	 * document tant qu'une destruction n'est pas terminée (« the worker is being destroyed »).
+	 */
+	private teardown: Promise<void> = Promise.resolve();
 
 	/** Ouvre un PDF ; `data` est transféré au worker (le tableau est vidé). */
 	open(data: Uint8Array): PdfLoadingTask {
 		let task: PDFDocumentLoadingTask | undefined;
 		let destroyed = false;
-		const promise = this.load().then(pdfjs => {
+		const promise = this.load().then(async pdfjs => {
+			await this.teardown;
 			if (destroyed) throw abortError();
 			task = this.getDocument(pdfjs, data);
 			return task.promise;
@@ -41,7 +47,14 @@ export class PdfJsService {
 			promise,
 			destroy: async () => {
 				destroyed = true;
-				await task?.destroy();
+				const destruction = task?.destroy();
+				if (!destruction) return;
+				const previous = this.teardown;
+				this.teardown = destruction.then(
+					() => previous,
+					() => previous
+				);
+				await destruction;
 			}
 		};
 	}
@@ -84,8 +97,8 @@ export class PdfJsService {
 	}
 
 	private load(): Promise<PdfJs> {
-		this.module ??= import('pdfjs-dist').then(pdfjs => {
-			pdfjs.GlobalWorkerOptions.workerSrc = new URL(`${ASSETS}pdf.worker.min.mjs`, document.baseURI).href;
+		this.module ??= Promise.all([import('pdfjs-dist'), import('./pdf-worker')]).then(([pdfjs, {createPdfWorker}]) => {
+			pdfjs.GlobalWorkerOptions.workerPort = createPdfWorker();
 			return pdfjs;
 		});
 		return this.module;

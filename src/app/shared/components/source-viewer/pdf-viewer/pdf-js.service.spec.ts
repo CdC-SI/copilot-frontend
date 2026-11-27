@@ -48,6 +48,39 @@ describe('PdfJsService', () => {
 		expect(service.isCancellation(await task.promise.catch((error: unknown) => error))).toBe(true);
 	});
 
+	it('attend la destruction du document précédent avant d’en ouvrir un autre sur le worker partagé', async () => {
+		let finishDestroy: () => void = () => undefined;
+		taskDestroy.mockImplementationOnce(
+			async () =>
+				new Promise<void>(resolve => {
+					finishDestroy = resolve;
+				})
+		);
+		resolveModule({getDocument});
+		const first = service.open(new Uint8Array([1]));
+		await first.promise;
+
+		const destroying = first.destroy();
+		const second = service.open(new Uint8Array([2]));
+		await new Promise(resolve => setTimeout(resolve));
+		expect(getDocument).toHaveBeenCalledTimes(1);
+
+		finishDestroy();
+		await destroying;
+		await expect(second.promise).resolves.toBe('document');
+		expect(getDocument).toHaveBeenCalledTimes(2);
+	});
+
+	it('une destruction en échec ne bloque pas les documents suivants', async () => {
+		taskDestroy.mockRejectedValueOnce(new Error('worker'));
+		resolveModule({getDocument});
+		const first = service.open(new Uint8Array([1]));
+		await first.promise;
+
+		await expect(first.destroy()).rejects.toThrow('worker');
+		await expect(service.open(new Uint8Array([2])).promise).resolves.toBe('document');
+	});
+
 	it('reconnaît les annulations de rendu de pdf.js', () => {
 		expect(service.isCancellation({name: 'RenderingCancelledException'})).toBe(true);
 		expect(service.isCancellation(new Error('Invalid PDF'))).toBe(false);

@@ -66,8 +66,9 @@ export class AppComponent implements OnInit, DoCheck {
 		{url: '/tips', label: 'tips.component'}
 	];
 	projectVersion: string;
-	@ViewChild('userNotRegisteredDialog') userNotRegisteredDialog: TemplateRef<any>;
-	@ViewChild('johnDoeInfoDialog') johnDoeInfoDialog: TemplateRef<any>;
+	// Statiques : le dialogue peut s'ouvrir dès ngOnInit (utilisateur déjà chargé à l'initialisation de l'application).
+	@ViewChild('userNotRegisteredDialog', {static: true}) userNotRegisteredDialog: TemplateRef<any>;
+	@ViewChild('johnDoeInfoDialog', {static: true}) johnDoeInfoDialog: TemplateRef<any>;
 	@ViewChild(ObMasterLayoutComponent, {read: Injector, static: true}) private readonly masterLayoutInjector?: Injector;
 	private masterLayout?: ChangeDetectorRef;
 	private readonly dialog = inject(MatDialog);
