@@ -5,6 +5,11 @@
 @include markdown.markdown-content;
 @include action-icon.action-icon;
 
+// Élément flex du fil : sans `min-width: 0`, un contenu large (bloc préformaté, tableau) élargit la réponse et la page.
+:host {
+	min-width: 0;
+}
+
 .message {
     width: 100%;
     display: grid;

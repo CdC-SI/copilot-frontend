@@ -34,6 +34,26 @@ test.describe('Chat (smoke)', () => {
 		await expect(chat.stopButton).toBeHidden();
 	});
 
+	for (const [label, answer] of [
+		['une balise <pre>', `<pre>${'Ligne préformatée très longue sans retour à la ligne '.repeat(12)}\nDeuxième ligne</pre>`],
+		['un bloc de code', `\`\`\`\n${'const valeur = "une ligne de code bien trop longue pour la largeur du fil"; '.repeat(6)}\n\`\`\``]
+	] as const) {
+		test(`${label} aux lignes longues revient à la ligne sans élargir la page`, async ({page, backend}) => {
+			backend.reply(...answerTurn(answer));
+			const chat = new ChatPage(page);
+
+			await chat.open();
+			await chat.ask('Montre-moi le texte brut');
+			const pre = chat.answers.last().locator('pre');
+			await expect(pre).toBeVisible();
+
+			const thread = await page.locator('.message-container').evaluate(element => ({scroll: element.scrollWidth, client: element.clientWidth}));
+			expect(thread.scroll).toBeLessThanOrEqual(thread.client);
+			const box = await pre.evaluate(element => ({scroll: element.scrollWidth, client: element.clientWidth}));
+			expect(box.scroll).toBeLessThanOrEqual(box.client);
+		});
+	}
+
 	test('rouvre une conversation de l’historique', async ({page, backend}) => {
 		backend.titles = [aChatTitle({conversationId: 'c1', title: 'Rente de vieillesse'})];
 		backend.conversations.set('c1', aConversation('c1', 'Question enregistrée', 'Réponse enregistrée'));

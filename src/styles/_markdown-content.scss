@@ -5,6 +5,12 @@
 		border-radius: 4px;
 		overflow-x: auto;
 
+		// Texte préformaté (`<pre>`, blocs de code) : retour à la ligne plutôt qu'une ligne plus large que la réponse.
+		::ng-deep pre {
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+		}
+
 		::ng-deep table {
 			width: 100%;
 			border-collapse: collapse;
